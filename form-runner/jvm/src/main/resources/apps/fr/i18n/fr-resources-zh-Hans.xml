@@ -812,12 +812,16 @@
             <summary>汇总</summary>
             <sort-by-title>按标题排序</sort-by-title>
             <sort-by-last-modified>按修改日期排序</sort-by-last-modified>
+            <clear-filter>清除筛选</clear-filter>
         </buttons>
         <messages>
             <no-forms>暂无已发布的表单</no-forms>
             <no-data>暂无表单数据</no-data>
             <sorted-by-ascending>已按 {0} 升序排列</sorted-by-ascending>
             <sorted-by-descending>已按 {0} 降序排列</sorted-by-descending>
+            <filter-placeholder>筛选卡片…</filter-placeholder>
+            <no-matches>未找到匹配项</no-matches>
+            <matching-cards>{0} / {1} 张卡片</matching-cards>
         </messages>
     </landing>
     <home>

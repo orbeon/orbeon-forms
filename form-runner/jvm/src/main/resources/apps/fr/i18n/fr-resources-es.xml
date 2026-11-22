@@ -842,12 +842,16 @@
             <summary>Resumen</summary>
             <sort-by-title>Ordenar por título</sort-by-title>
             <sort-by-last-modified>Ordenar por fecha de modificación</sort-by-last-modified>
+            <clear-filter>Borrar filtro</clear-filter>
         </buttons>
         <messages>
             <no-forms>No hay formularios publicados</no-forms>
             <no-data>No hay datos de formulario</no-data>
             <sorted-by-ascending>Ordenado por {0}, ascendente</sorted-by-ascending>
             <sorted-by-descending>Ordenado por {0}, descendente</sorted-by-descending>
+            <filter-placeholder>Filtrar tarjetas…</filter-placeholder>
+            <no-matches>No se encontraron elementos coincidentes</no-matches>
+            <matching-cards>{0} de {1} tarjetas</matching-cards>
         </messages>
     </landing>
     <home>

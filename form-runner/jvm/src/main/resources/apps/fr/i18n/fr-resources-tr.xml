@@ -815,12 +815,16 @@
             <summary>Özet</summary>
             <sort-by-title>Başlığa göre sırala</sort-by-title>
             <sort-by-last-modified>Değiştirilme tarihine göre sırala</sort-by-last-modified>
+            <clear-filter>Filtreyi temizle</clear-filter>
         </buttons>
         <messages>
             <no-forms>Yayınlanmış form yok</no-forms>
             <no-data>Form verisi yok</no-data>
             <sorted-by-ascending>{0} sütununa göre artan sırada</sorted-by-ascending>
             <sorted-by-descending>{0} sütununa göre azalan sırada</sorted-by-descending>
+            <filter-placeholder>Kartları filtrele…</filter-placeholder>
+            <no-matches>Eşleşen öğe bulunamadı</no-matches>
+            <matching-cards>{0} / {1} kart</matching-cards>
         </messages>
     </landing>
     <home>

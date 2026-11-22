@@ -817,12 +817,16 @@
             <summary>Översikt</summary>
             <sort-by-title>Sortera efter titel</sort-by-title>
             <sort-by-last-modified>Sortera efter ändringsdatum</sort-by-last-modified>
+            <clear-filter>Rensa filter</clear-filter>
         </buttons>
         <messages>
             <no-forms>Inga publicerade formulär</no-forms>
             <no-data>Inga formulärdata</no-data>
             <sorted-by-ascending>Sorterat efter {0}, stigande</sorted-by-ascending>
             <sorted-by-descending>Sorterat efter {0}, fallande</sorted-by-descending>
+            <filter-placeholder>Filtrera kort…</filter-placeholder>
+            <no-matches>Inga matchande objekt hittades</no-matches>
+            <matching-cards>{0} av {1} kort</matching-cards>
         </messages>
     </landing>
     <home>

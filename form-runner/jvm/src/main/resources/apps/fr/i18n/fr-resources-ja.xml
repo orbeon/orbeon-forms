@@ -804,12 +804,16 @@
             <summary>サマリー</summary>
             <sort-by-title>タイトル順に並べ替え</sort-by-title>
             <sort-by-last-modified>更新日時順に並べ替え</sort-by-last-modified>
+            <clear-filter>フィルターをクリア</clear-filter>
         </buttons>
         <messages>
             <no-forms>公開済みのフォームはありません</no-forms>
             <no-data>フォームデータはありません</no-data>
             <sorted-by-ascending>{0} の昇順で並べ替えました</sorted-by-ascending>
             <sorted-by-descending>{0} の降順で並べ替えました</sorted-by-descending>
+            <filter-placeholder>カードを絞り込む…</filter-placeholder>
+            <no-matches>一致する項目が見つかりません</no-matches>
+            <matching-cards>{1} 件中 {0} 件のカード</matching-cards>
         </messages>
     </landing>
     <home>

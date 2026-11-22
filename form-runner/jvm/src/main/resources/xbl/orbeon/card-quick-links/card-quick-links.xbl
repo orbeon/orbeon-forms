@@ -113,7 +113,45 @@
                 name="layout"
                 value="(fr:component-param-value('layout')[. = ('tiles', 'list')], 'tiles')[1]"/>
 
-            <xh:div class="card h-100 fr-landing-quick-links-card fr-quick-links-layout-{$layout} {'xforms-hidden'[empty($visible-links)]}">
+            <xf:var
+                name="filter"
+                value="lower-case(xxf:trim(fr:component-param-value('filter')))"/>
+
+            <xf:var
+                name="is-filtering"
+                value="xxf:non-blank($filter)"/>
+
+            <xf:var
+                name="card-matches"
+                value="
+                    $is-filtering and (
+                        contains(lower-case($card-title), $filter) or
+                        contains(lower-case(string($card-description)), $filter)
+                    )"/>
+
+            <xf:var
+                name="filtered-links"
+                value="
+                    if (not($is-filtering) or $card-matches) then
+                        $visible-links
+                    else
+                        for $link in $visible-links
+                        let $title-key :=
+                                if      ($link = 'form-builder-new')     then 'landing.titles.form-builder-new'
+                                else if ($link = 'form-builder-summary') then 'landing.titles.form-builder-summary'
+                                else if ($link = 'published-forms')      then 'landing.titles.published-forms'
+                                else if ($link = 'forms-admin')          then 'landing.titles.form-runner-admin'
+                                else if ($link = 'configuration')        then 'landing.titles.configuration'
+                                else if ($link = 'admin-console')        then 'landing.titles.admin-console'
+                                else                                          'landing.titles.forms-analytics',
+                            $label := xxf:r($title-key, '|fr-fr-resources|')
+                        return
+                            if (contains(lower-case($label), $filter) or contains($link, $filter)) then
+                                $link
+                            else
+                                ()"/>
+
+            <xh:div class="card h-100 fr-landing-quick-links-card fr-quick-links-layout-{$layout} {'xforms-hidden'[empty($visible-links)]} {'fr-card-filtered-out'[$is-filtering and exists($visible-links) and empty($filtered-links)]}">
                 <xh:div class="card-header fr-card-header">
                     <xh:div class="fr-card-header-main">
                         <xh:h2 class="card-title"><xf:output value="$card-title"/></xh:h2>
@@ -125,7 +163,7 @@
                     </xh:div>
                 </xh:div>
                 <xh:div class="fr-landing-quick-links-list">
-                    <xf:repeat ref="$visible-links">
+                    <xf:repeat ref="$filtered-links">
                         <xf:var name="link-id" value="."/>
                         <xf:var
                             name="href"

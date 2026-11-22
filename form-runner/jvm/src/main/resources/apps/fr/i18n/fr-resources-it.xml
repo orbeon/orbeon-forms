@@ -817,12 +817,16 @@
             <summary>Riepilogo</summary>
             <sort-by-title>Ordina per titolo</sort-by-title>
             <sort-by-last-modified>Ordina per data di modifica</sort-by-last-modified>
+            <clear-filter>Cancella filtro</clear-filter>
         </buttons>
         <messages>
             <no-forms>Nessun modulo pubblicato</no-forms>
             <no-data>Nessun dato disponibile</no-data>
             <sorted-by-ascending>Ordinato per {0}, crescente</sorted-by-ascending>
             <sorted-by-descending>Ordinato per {0}, decrescente</sorted-by-descending>
+            <filter-placeholder>Filtra schede…</filter-placeholder>
+            <no-matches>Nessun elemento corrispondente trovato</no-matches>
+            <matching-cards>{0} di {1} schede</matching-cards>
         </messages>
     </landing>
     <home>

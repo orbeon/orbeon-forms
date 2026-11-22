@@ -811,12 +811,16 @@
             <summary>Oversigt</summary>
             <sort-by-title>Sortér efter titel</sort-by-title>
             <sort-by-last-modified>Sortér efter ændringsdato</sort-by-last-modified>
+            <clear-filter>Ryd filter</clear-filter>
         </buttons>
         <messages>
             <no-forms>Ingen publicerede formularer</no-forms>
             <no-data>Ingen formulardata</no-data>
             <sorted-by-ascending>Sorteret efter {0}, stigende</sorted-by-ascending>
             <sorted-by-descending>Sorteret efter {0}, faldende</sorted-by-descending>
+            <filter-placeholder>Filtrer kort…</filter-placeholder>
+            <no-matches>Ingen matchende elementer fundet</no-matches>
+            <matching-cards>{0} af {1} kort</matching-cards>
         </messages>
     </landing>
     <home>

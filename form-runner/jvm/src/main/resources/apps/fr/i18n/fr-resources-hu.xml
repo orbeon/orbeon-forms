@@ -817,12 +817,16 @@
             <summary>Összegzés</summary>
             <sort-by-title>Rendezés cím szerint</sort-by-title>
             <sort-by-last-modified>Rendezés módosítás dátuma szerint</sort-by-last-modified>
+            <clear-filter>Szűrő törlése</clear-filter>
         </buttons>
         <messages>
             <no-forms>Nincsenek közzétett űrlapok</no-forms>
             <no-data>Nincs űrlapadat</no-data>
             <sorted-by-ascending>Rendezve: {0}, növekvő</sorted-by-ascending>
             <sorted-by-descending>Rendezve: {0}, csökkenő</sorted-by-descending>
+            <filter-placeholder>Kártyák szűrése…</filter-placeholder>
+            <no-matches>Nem található egyező elem</no-matches>
+            <matching-cards>{0} / {1} kártya</matching-cards>
         </messages>
     </landing>
     <home>

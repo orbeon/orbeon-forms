@@ -830,12 +830,16 @@
             <summary>Resum</summary>
             <sort-by-title>Ordenar per títol</sort-by-title>
             <sort-by-last-modified>Ordenar per data de modificació</sort-by-last-modified>
+            <clear-filter>Esborra el filtre</clear-filter>
         </buttons>
         <messages>
             <no-forms>No hi ha formularis publicats</no-forms>
             <no-data>No hi ha dades</no-data>
             <sorted-by-ascending>Ordenat per {0}, ascendent</sorted-by-ascending>
             <sorted-by-descending>Ordenat per {0}, descendent</sorted-by-descending>
+            <filter-placeholder>Filtra les targetes…</filter-placeholder>
+            <no-matches>No s'han trobat elements coincidents</no-matches>
+            <matching-cards>{0} de {1} targetes</matching-cards>
         </messages>
     </landing>
     <home>

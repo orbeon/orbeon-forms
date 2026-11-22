@@ -817,12 +817,16 @@
             <summary>Overzicht</summary>
             <sort-by-title>Sorteren op titel</sort-by-title>
             <sort-by-last-modified>Sorteren op wijzigingsdatum</sort-by-last-modified>
+            <clear-filter>Filter wissen</clear-filter>
         </buttons>
         <messages>
             <no-forms>Geen gepubliceerde formulieren</no-forms>
             <no-data>Geen formuliergegevens</no-data>
             <sorted-by-ascending>Gesorteerd op {0}, oplopend</sorted-by-ascending>
             <sorted-by-descending>Gesorteerd op {0}, aflopend</sorted-by-descending>
+            <filter-placeholder>Kaarten filteren…</filter-placeholder>
+            <no-matches>Geen overeenkomende items gevonden</no-matches>
+            <matching-cards>{0} van {1} kaarten</matching-cards>
         </messages>
     </landing>
     <home>

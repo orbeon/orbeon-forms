@@ -817,12 +817,16 @@
             <summary>摘要</summary>
             <sort-by-title>依標題排序</sort-by-title>
             <sort-by-last-modified>依修改日期排序</sort-by-last-modified>
+            <clear-filter>清除篩選</clear-filter>
         </buttons>
         <messages>
             <no-forms>尚無已發佈的表單</no-forms>
             <no-data>尚無表單資料</no-data>
             <sorted-by-ascending>已依 {0} 升冪排列</sorted-by-ascending>
             <sorted-by-descending>已依 {0} 降冪排列</sorted-by-descending>
+            <filter-placeholder>篩選卡片…</filter-placeholder>
+            <no-matches>找不到相符項目</no-matches>
+            <matching-cards>{0} / {1} 張卡片</matching-cards>
         </messages>
     </landing>
     <home>

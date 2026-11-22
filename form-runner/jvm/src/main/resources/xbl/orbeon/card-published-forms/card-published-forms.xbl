@@ -138,10 +138,43 @@
         </xbl:implementation>
         <xbl:template>
 
-            <xf:var name="app-filter" value="fr:component-param-value('app')[xxf:non-blank()]"/>
-            <xf:var name="forms"      value="instance('fr-forms-instance')/*"/>
-            <xf:var name="form-count" value="count($forms)"/>
-            <xf:var name="show-more"  value="$form-count gt $page-size"/>
+            <xf:var name="app-filter"       value="fr:component-param-value('app')[xxf:non-blank()]"/>
+            <xf:var name="all-forms"        value="instance('fr-forms-instance')/*"/>
+            <xf:var name="total-form-count" value="count($all-forms)"/>
+            <xf:var name="filter"           value="lower-case(xxf:trim(fr:component-param-value('filter')))"/>
+            <xf:var name="is-filtering"     value="xxf:non-blank($filter)"/>
+            <xf:var
+                name="card-title-matches"
+                value="
+                    $is-filtering and (
+                        contains(lower-case(string(xxf:label('fr-card-published-forms'))), $filter) or
+                        (exists($app-filter) and contains(lower-case($app-filter), $filter))
+                    )"/>
+            <xf:var
+                name="forms"
+                value="
+                    if (not($is-filtering) or $card-title-matches) then
+                        $all-forms
+                    else
+                        $all-forms[
+                            let $t := string((title[@xml:lang = xxf:lang()], title, form-name)[normalize-space()][1])
+                            return
+                                contains(lower-case($t), $filter)                       or
+                                contains(lower-case(string(application-name)), $filter) or
+                                contains(lower-case(string(form-name)), $filter)
+                        ]"/>
+            <xf:var name="form-count"       value="count($forms)"/>
+            <xf:var
+                name="count-display"
+                value="
+                    if ($is-filtering and $form-count != $total-form-count) then
+                        concat($form-count, ' / ', $total-form-count)
+                    else
+                        string($form-count)"/>
+            <xf:var
+                name="is-filtered-out"
+                value="$is-filtering and not($card-title-matches) and instance('fr-ui-instance')/@has-loaded = 'true' and $form-count = 0"/>
+            <xf:var name="show-more"        value="$form-count gt $page-size"/>
             <xf:var
                 name="show-more-href"
                 value="
@@ -180,7 +213,9 @@
             <fr:card
                 status="{instance('fr-ui-instance')/@state}"
                 has-loaded="{instance('fr-ui-instance')/@has-loaded}"
-                count="{$form-count}"
+                count="{$count-display}"
+                total-count="{$form-count}"
+                filtered-out="{$is-filtered-out}"
                 is-empty="{empty($forms)}"
                 empty-message="{xxf:r('landing.messages.no-forms', '|fr-fr-resources|')}"
             >

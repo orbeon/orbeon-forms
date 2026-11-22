@@ -810,12 +810,16 @@
             <summary>Сводка</summary>
             <sort-by-title>Сортировать по названию</sort-by-title>
             <sort-by-last-modified>Сортировать по дате изменения</sort-by-last-modified>
+            <clear-filter>Очистить фильтр</clear-filter>
         </buttons>
         <messages>
             <no-forms>Нет опубликованных форм</no-forms>
             <no-data>Нет данных формы</no-data>
             <sorted-by-ascending>Отсортировано по {0}, по возрастанию</sorted-by-ascending>
             <sorted-by-descending>Отсортировано по {0}, по убыванию</sorted-by-descending>
+            <filter-placeholder>Фильтровать карточки…</filter-placeholder>
+            <no-matches>Совпадающих элементов не найдено</no-matches>
+            <matching-cards>{0} из {1} карточек</matching-cards>
         </messages>
     </landing>
     <home>

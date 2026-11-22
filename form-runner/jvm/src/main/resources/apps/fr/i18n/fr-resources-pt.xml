@@ -817,12 +817,16 @@
             <summary>Resumo</summary>
             <sort-by-title>Ordenar por título</sort-by-title>
             <sort-by-last-modified>Ordenar por data de modificação</sort-by-last-modified>
+            <clear-filter>Limpar filtro</clear-filter>
         </buttons>
         <messages>
             <no-forms>Nenhum formulário publicado</no-forms>
             <no-data>Nenhum dado de formulário</no-data>
             <sorted-by-ascending>Ordenado por {0}, crescente</sorted-by-ascending>
             <sorted-by-descending>Ordenado por {0}, decrescente</sorted-by-descending>
+            <filter-placeholder>Filtrar cartões…</filter-placeholder>
+            <no-matches>Nenhum item correspondente encontrado</no-matches>
+            <matching-cards>{0} de {1} cartões</matching-cards>
         </messages>
     </landing>
     <home>

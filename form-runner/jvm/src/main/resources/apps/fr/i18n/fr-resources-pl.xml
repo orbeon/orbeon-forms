@@ -818,12 +818,16 @@
             <summary>Podsumowanie</summary>
             <sort-by-title>Sortuj według tytułu</sort-by-title>
             <sort-by-last-modified>Sortuj według daty modyfikacji</sort-by-last-modified>
+            <clear-filter>Wyczyść filtr</clear-filter>
         </buttons>
         <messages>
             <no-forms>Brak opublikowanych formularzy</no-forms>
             <no-data>Brak danych formularza</no-data>
             <sorted-by-ascending>Posortowano według {0}, rosnąco</sorted-by-ascending>
             <sorted-by-descending>Posortowano według {0}, malejąco</sorted-by-descending>
+            <filter-placeholder>Filtruj karty…</filter-placeholder>
+            <no-matches>Nie znaleziono pasujących elementów</no-matches>
+            <matching-cards>{0} z {1} kart</matching-cards>
         </messages>
     </landing>
     <home>

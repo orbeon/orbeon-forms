@@ -67,7 +67,7 @@
                 <xf:var name="version" value="xs:integer((fr:component-param-value('version')[. castable as xs:integer], 1)[1])"/>
 
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial" has-loaded="false" source-form-loaded="false" operations="" latest-modified="" sort-announcement=""/>
+                    <_ state="initial" has-loaded="false" source-form-loaded="false" operations="" latest-modified="" unfiltered-total="" submitted-query="" sort-announcement=""/>
                 </xf:instance>
 
                 <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
@@ -182,7 +182,7 @@
                     targetref="instance('fr-search-results-instance')"
 
                     mode="asynchronous"
-                    xxf:response-must-await="200ms"
+                    xxf:response-must-await="50ms"
                     xxf:show-progress="false"
                 >
 
@@ -192,7 +192,8 @@
                     </xf:header>
 
                     <xf:action event="xforms-submit">
-                        <xf:setvalue ref="instance('fr-state-instance')/@state" value="'loading'"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@state"           value="'loading'"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@submitted-query" value="string(instance('fr-search-instance')/query[1])"/>
                         <xf:setvalue ref="page-size" value="$max-rows"/>
                         <xf:setvalue ref="lang" value="(xxf:instance('fr-fr-language-instance')[xxf:non-blank()], 'en')[1]"/>
                     </xf:action>
@@ -203,24 +204,35 @@
 
                         <xf:var name="returned-docs" value="instance('fr-search-results-instance')/document"/>
                         <xf:var name="search-total"  value="xs:integer((instance('fr-search-results-instance')/@search-total[. castable as xs:integer], 0)[1])"/>
-                        <xf:setvalue
-                            ref="instance('fr-state-instance')/@latest-modified"
-                            value="
-                                if ($search-total le 0 or empty($returned-docs)) then
-                                    ''
-                                else if (instance('fr-order-by')/column = 'last-modified' and instance('fr-order-by')/direction = 'desc') then
-                                    string($returned-docs[1]/@last-modified)
-                                else
-                                    string(
-                                        max((
-                                            instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.),
-                                            $returned-docs/@last-modified[. castable as xs:dateTime]/xs:dateTime(.)
-                                        ))
-                                    )"/>
+                        <xf:action if="xxf:is-blank(instance('fr-state-instance')/@submitted-query)">
+                            <xf:setvalue
+                                ref="instance('fr-state-instance')/@unfiltered-total"
+                                value="string($search-total)"/>
+                            <xf:setvalue
+                                ref="instance('fr-state-instance')/@latest-modified"
+                                value="
+                                    if ($search-total le 0 or empty($returned-docs)) then
+                                        ''
+                                    else if (instance('fr-order-by')/column = 'last-modified' and instance('fr-order-by')/direction = 'desc') then
+                                        string($returned-docs[1]/@last-modified)
+                                    else
+                                        string(
+                                            max((
+                                                instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.),
+                                                $returned-docs/@last-modified[. castable as xs:dateTime]/xs:dateTime(.)
+                                            ))
+                                        )"/>
+                        </xf:action>
+
+                        <!-- If the filter query changed while this submission was in flight, immediately run the latest query -->
+                        <xf:action if="string(instance('fr-search-instance')/query[1]) != string(instance('fr-state-instance')/@submitted-query)">
+                            <xf:send submission="fr-search-submission"/>
+                        </xf:action>
                     </xf:action>
 
                     <xf:setvalue
                         event="xforms-submit-error"
+                        if="event('error-type') != 'submission-in-progress'"
                         ref="instance('fr-state-instance')/@state"
                         value="'error'"/>
 
@@ -382,8 +394,62 @@
                 value="($param-thumbnail, if (empty($metadata-thumbnail) and $app = 'orbeon' and $form = 'builder') then '/apps/fr/style/images/orbeon/library.svg' else ())[1]"/>
 
             <xf:var
+                name="resolved-card-title"
+                value="(
+                    xxf:label('fr-card-form-data')[xxf:non-blank()],
+                    instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[xxf:non-blank()],
+                    $form
+                )[1]"/>
+
+            <xf:var
+                name="filter"
+                value="lower-case(xxf:trim(fr:component-param-value('filter')))"/>
+
+            <xf:var
+                name="is-filtering"
+                value="xxf:non-blank($filter)"/>
+
+            <xf:var
+                name="card-title-matches"
+                value="
+                    $is-filtering and (
+                        contains(lower-case(string($resolved-card-title)), $filter) or
+                        contains(lower-case($app), $filter)                         or
+                        contains(lower-case($form), $filter)
+                    )"/>
+
+            <xf:var
+                name="effective-data-query"
+                value="if ($is-filtering and not($card-title-matches)) then xxf:trim(fr:component-param-value('filter')) else ''"/>
+
+            <xf:var
                 name="latest-modified-dt"
-                value="instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.)"/>
+                value="
+                    if (xxf:non-blank($effective-data-query)) then
+                        max($documents/@last-modified[. castable as xs:dateTime]/xs:dateTime(.))
+                    else
+                        instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.)"/>
+
+            <xf:var
+                name="unfiltered-total-opt"
+                value="instance('fr-state-instance')/@unfiltered-total[. castable as xs:integer]/xs:integer(.)"/>
+
+            <xf:var
+                name="count-display"
+                value="
+                    if (xxf:non-blank($effective-data-query) and exists($unfiltered-total-opt) and $search-total != $unfiltered-total-opt) then
+                        concat($search-total, ' / ', $unfiltered-total-opt)
+                    else
+                        string($search-total)"/>
+
+            <xf:var
+                name="is-filtered-out"
+                value="
+                    $is-filtering                                       and
+                    not($card-title-matches)                            and
+                    instance('fr-state-instance')/@has-loaded = 'true'  and
+                    instance('fr-state-instance')/@state      = 'done'  and
+                    $search-total                             = 0"/>
 
             <xf:var name="new-label"     value="xxf:r('landing.buttons.new', '|fr-fr-resources|')"/>
             <xf:var name="summary-label" value="xxf:r('landing.buttons.summary', '|fr-fr-resources|')"/>
@@ -391,10 +457,12 @@
 
             <xf:var
                 name="refresh-watch"
-                value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'))">
+                value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'), '|', $effective-data-query)">
                 <xf:action event="xforms-value-changed">
+                    <xf:setvalue ref="instance('fr-search-instance')/query[1]" value="$effective-data-query"/>
+                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
                     <xf:send
-                        if="instance('fr-state-instance')/@has-loaded = 'true' and instance('fr-state-instance')/@source-form-loaded = 'true'"
+                        if="instance('fr-state-instance')/@source-form-loaded = 'true'"
                         submission="fr-search-submission"/>
                     <xf:send
                         if="instance('fr-state-instance')/@state = 'error' and not(instance('fr-state-instance')/@source-form-loaded = 'true')"
@@ -405,17 +473,14 @@
             <fr:card
                 status="{instance('fr-state-instance')/@state}"
                 has-loaded="{instance('fr-state-instance')/@has-loaded}"
-                count="{$search-total}"
+                count="{$count-display}"
+                total-count="{$search-total}"
+                filtered-out="{$is-filtered-out}"
                 columns="{max((count($detail-positions), 1))}"
                 is-empty="{empty($documents)}"
                 empty-message="{xxf:r('landing.messages.no-data', '|fr-fr-resources|')}"
             >
-                <xf:label
-                    value="(
-                        xxf:label('fr-card-form-data')[xxf:non-blank()],
-                        instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[xxf:non-blank()],
-                        $form
-                    )[1]"/>
+                <xf:label value="$resolved-card-title"/>
 
                 <fr:card-status>
                     <xf:output value="instance('fr-state-instance')/@sort-announcement"/>

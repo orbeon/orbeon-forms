@@ -817,12 +817,16 @@
             <summary>ملخص</summary>
             <sort-by-title>ترتيب حسب العنوان</sort-by-title>
             <sort-by-last-modified>ترتيب حسب تاريخ التعديل</sort-by-last-modified>
+            <clear-filter>مسح عامل التصفية</clear-filter>
         </buttons>
         <messages>
             <no-forms>لا توجد نماذج منشورة</no-forms>
             <no-data>لا توجد بيانات</no-data>
             <sorted-by-ascending>مرتب حسب {0}، تصاعديًا</sorted-by-ascending>
             <sorted-by-descending>مرتب حسب {0}، تنازليًا</sorted-by-descending>
+            <filter-placeholder>تصفية البطاقات…</filter-placeholder>
+            <no-matches>لم يتم العثور على عناصر مطابقة</no-matches>
+            <matching-cards>{0} من {1} بطاقات</matching-cards>
         </messages>
     </landing>
     <home>

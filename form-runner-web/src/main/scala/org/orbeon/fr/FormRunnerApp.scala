@@ -106,6 +106,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-toolbar"                         , initLandingQuickFilter)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
     }
   }
@@ -458,6 +459,168 @@ object FormRunnerApp extends App {
       dialogElem.closestOpt(s"form.$InitiallyHiddenClass").foreach(_.classList.remove(InitiallyHiddenClass))
       dialogElem.asInstanceOf[HTMLDialogElement].showModal()
     }
+
+  private def initLandingQuickFilter(toolbarElem: html.Element): Unit = {
+
+    val FilterDebounceMs = 120.0
+    val HiddenClass      = "xforms-hidden"
+    val FilteredOutClass = "fr-card-filtered-out"
+
+    val inputOpt     = toolbarElem.querySelectorOpt(".fr-landing-filter-input").map(_.asInstanceOf[html.Input])
+    val clearBtnOpt  = toolbarElem.querySelectorOpt(".fr-landing-filter-clear")
+    val kbdHintOpt   = toolbarElem.querySelectorOpt(".fr-landing-filter-kbd")
+    val countElemOpt = toolbarElem.querySelectorOpt(".fr-landing-filter-count")
+    val formElemOpt  = toolbarElem.closestOpt("form").map(_.asInstanceOf[html.Form])
+
+    inputOpt.foreach { inputElem =>
+
+      var debounceTimerOpt: Option[timers.SetTimeoutHandle] = None
+      var lastSentQuery   : String                          = ""
+
+      def isComposingEvent(e: dom.Event): Boolean =
+        js.DynamicImplicits.truthValue(e.asInstanceOf[js.Dynamic].isComposing)
+
+      def syncInputChrome(): Unit = {
+        val hasText   = inputElem.value.trimAllToOpt.isDefined
+        val isFocused = document.activeElement == inputElem
+        clearBtnOpt.foreach(_.toggleClass(HiddenClass, !hasText))
+        kbdHintOpt .foreach(_.toggleClass(HiddenClass, hasText || isFocused))
+      }
+
+      def updateMatchSummary(): Unit = {
+        val noResultsOpt = document.querySelectorOpt(".orbeon .fr-landing-no-results")
+        val gridOpt      = document.querySelectorOpt(".orbeon .fr-landing-grid")
+
+        if (lastSentQuery.isEmpty) {
+          countElemOpt.foreach { el =>
+            el.textContent = ""
+            el.classList.add(HiddenClass)
+          }
+          noResultsOpt.foreach(_.classList.add(HiddenClass))
+        } else {
+          gridOpt.foreach { grid =>
+            val availableCards =
+              grid
+                .childrenT
+                .iterator
+                .filterNot(w => w.hasClass("xforms-disabled") || w.hasClass(HiddenClass))
+                .flatMap(_.querySelectorOpt(".card").filterNot(_.hasClass(HiddenClass)))
+                .toList
+
+            val matchingCards = availableCards.filterNot(_.hasClass(FilteredOutClass))
+            val anyLoading    = availableCards.exists(c => c.querySelectorOpt(".fr-card-is-refreshing, .fr-card-skeleton:not(.xforms-disabled)").isDefined)
+
+            countElemOpt.foreach { el =>
+              val template = toolbarElem.attValueOpt("data-matching-template").flatMap(_.trimAllToOpt).getOrElse("{0} / {1}")
+              el.textContent =
+                template
+                  .replace("{0}", matchingCards.size.toString)
+                  .replace("{1}", availableCards.size.toString)
+              el.classList.remove(HiddenClass)
+            }
+
+            noResultsOpt.foreach(_.toggleClass(HiddenClass, matchingCards.nonEmpty || anyLoading))
+          }
+        }
+      }
+
+      def sendFilter(rawValue: String, immediate: Boolean): Unit = {
+        debounceTimerOpt.foreach(timers.clearTimeout)
+        debounceTimerOpt = None
+
+        val trimmed = rawValue.trimAllToOpt.getOrElse("")
+        if (immediate) {
+          if (trimmed != lastSentQuery) {
+            lastSentQuery = trimmed
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName    = "fr-landing-filter",
+                targetId     = "fr-form-model",
+                form         = formElemOpt,
+                properties   = Map("query" -> trimmed),
+                showProgress = false
+              )
+            )
+          }
+          if (trimmed.isEmpty)
+            updateMatchSummary()
+        } else {
+          debounceTimerOpt =
+            Some(
+              timers.setTimeout(FilterDebounceMs) {
+                sendFilter(inputElem.value, immediate = true)
+              }
+            )
+        }
+      }
+
+      def clearFilterAndFocus(): Unit = {
+        inputElem.value = ""
+        syncInputChrome()
+        sendFilter("", immediate = true)
+        inputElem.focus()
+      }
+
+      inputElem.addEventListener("focus", (_: dom.FocusEvent) => syncInputChrome())
+      inputElem.addEventListener("blur",  (_: dom.FocusEvent) => syncInputChrome())
+
+      inputElem.addEventListener("input", (e: dom.Event) => {
+        syncInputChrome()
+        if (!isComposingEvent(e))
+          sendFilter(inputElem.value, immediate = inputElem.value.trimAllToOpt.isEmpty)
+      })
+
+      inputElem.addEventListener("compositionend", (_: dom.Event) => {
+        syncInputChrome()
+        sendFilter(inputElem.value, immediate = false)
+      })
+
+      inputElem.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+        if (e.key == "Enter") {
+          e.preventDefault()
+          if (!isComposingEvent(e) && e.keyCode != 229)
+            sendFilter(inputElem.value, immediate = true)
+        } else if (e.key == "Escape") {
+          if (inputElem.value.nonEmpty) {
+            e.preventDefault()
+            e.stopPropagation()
+            inputElem.value = ""
+            syncInputChrome()
+            sendFilter("", immediate = true)
+          } else {
+            inputElem.blur()
+          }
+        }
+      })
+
+      clearBtnOpt.foreach(_.addEventListener("click", (_: dom.MouseEvent) => clearFilterAndFocus()))
+
+      document
+        .querySelectorOpt(".orbeon .fr-landing-no-results .fr-landing-filter-reset")
+        .foreach(_.addEventListener("click", (_: dom.MouseEvent) => clearFilterAndFocus()))
+
+      document.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+        if (e.key == "/" && !e.ctrlKey && !e.metaKey && !e.altKey && document.querySelectorOpt("dialog[open]").isEmpty) {
+          val inEditable =
+            e.target match {
+              case el: dom.Element =>
+                el.closestOpt("input, textarea, select, [contenteditable='true'], [contenteditable='']").isDefined
+              case _ =>
+                false
+            }
+          if (!inEditable) {
+            e.preventDefault()
+            inputElem.focus()
+            inputElem.select()
+          }
+        }
+      })
+
+      AjaxClient.ajaxResponseProcessed.add(_ => updateMatchSummary())
+
+      syncInputChrome()
+    }
+  }
 
   private def initLandingCardExtraRows(gridElem: html.Element): Unit = {
 

@@ -817,12 +817,16 @@
             <summary>Summary</summary>
             <sort-by-title>Sort by title</sort-by-title>
             <sort-by-last-modified>Sort by modification date</sort-by-last-modified>
+            <clear-filter>Clear filter</clear-filter>
         </buttons>
         <messages>
             <no-forms>No published forms</no-forms>
             <no-data>No form data</no-data>
             <sorted-by-ascending>Sorted by {0}, ascending</sorted-by-ascending>
             <sorted-by-descending>Sorted by {0}, descending</sorted-by-descending>
+            <filter-placeholder>Filter cards…</filter-placeholder>
+            <no-matches>No matching items found</no-matches>
+            <matching-cards>{0} of {1} cards</matching-cards>
         </messages>
     </landing>
     <home>

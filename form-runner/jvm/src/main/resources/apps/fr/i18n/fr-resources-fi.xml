@@ -817,12 +817,16 @@
             <summary>Yhteenveto</summary>
             <sort-by-title>Järjestä otsikon mukaan</sort-by-title>
             <sort-by-last-modified>Järjestä muokkauspäivän mukaan</sort-by-last-modified>
+            <clear-filter>Tyhjennä suodatin</clear-filter>
         </buttons>
         <messages>
             <no-forms>Ei julkaistuja lomakkeita</no-forms>
             <no-data>Ei lomaketietoja</no-data>
             <sorted-by-ascending>Järjestetty sarakkeen {0} mukaan, nouseva</sorted-by-ascending>
             <sorted-by-descending>Järjestetty sarakkeen {0} mukaan, laskeva</sorted-by-descending>
+            <filter-placeholder>Suodata kortteja…</filter-placeholder>
+            <no-matches>Vastaavia kohteita ei löytynyt</no-matches>
+            <matching-cards>{0} / {1} korttia</matching-cards>
         </messages>
     </landing>
     <home>

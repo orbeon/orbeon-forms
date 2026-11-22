@@ -11,7 +11,7 @@
          class="orbeon"
          lang="{xxf:instance('fr-fr-language-instance')}"
          xml:lang="{xxf:instance('fr-fr-language-instance')}"
-         xxf:external-events="fr-landing-refresh">
+         xxf:external-events="fr-landing-refresh fr-landing-filter">
 
     <xh:head>
         <xh:title><xf:output ref="$fr-resources/landing/title"/></xh:title>
@@ -86,7 +86,7 @@
             </xf:instance>
 
             <xf:instance id="fr-landing-ui-instance" xxf:exclude-result-prefixes="#all">
-                <ui refresh-token="0"/>
+                <ui refresh-token="0" filter=""/>
             </xf:instance>
 
             <xf:action event="xforms-model-construct-done">
@@ -139,12 +139,50 @@
                     value="xs:integer(.) + 1"/>
             </xf:action>
 
+            <xf:action event="fr-landing-filter">
+                <xf:setvalue
+                    ref="instance('fr-landing-ui-instance')/@filter"
+                    value="xxf:trim(string(event('query')))"/>
+            </xf:action>
+
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view fluid="true">
             <fr:navbar/>
             <fr:config-check/>
+            <xh:search
+                class="fr-landing-toolbar"
+                data-matching-template="{xxf:r('landing.messages.matching-cards', '|fr-fr-resources|')}"
+            >
+                <xh:div class="fr-landing-filter-box">
+                    <xh:label for="fr-landing-filter-input" class="fr-sr-status">
+                        <xf:output value="xxf:r('landing.messages.filter-placeholder', '|fr-fr-resources|')"/>
+                    </xh:label>
+                    <xh:i class="fa fa-magnifying-glass fr-landing-filter-icon" aria-hidden="true"/>
+                    <xh:input
+                        id="fr-landing-filter-input"
+                        type="search"
+                        name="fr-landing-filter"
+                        class="form-control fr-landing-filter-input"
+                        placeholder="{xxf:r('landing.messages.filter-placeholder', '|fr-fr-resources|')}"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        enterkeyhint="search"
+                    />
+                    <xh:kbd class="fr-landing-filter-kbd" aria-hidden="true">/</xh:kbd>
+                    <xh:button
+                        type="button"
+                        class="fr-landing-filter-clear xforms-hidden"
+                        title="{xxf:r('landing.buttons.clear-filter', '|fr-fr-resources|')}"
+                        aria-label="{xxf:r('landing.buttons.clear-filter', '|fr-fr-resources|')}">
+                        <xh:i class="fa fa-xmark" aria-hidden="true"/>
+                    </xh:button>
+                </xh:div>
+                <xh:span class="fr-landing-filter-count xforms-hidden" role="status"/>
+            </xh:search>
             <xh:div class="fr-landing-grid">
                 <xf:repeat ref="instance('fr-cards-config-xml')/_">
                     <xf:var
@@ -159,6 +197,7 @@
                         ref=".[card-type = 'quick-links']"
                         links="{string-join(if (links/@type = 'array') then links/_ else links, ' ')}"
                         layout="{layout}"
+                        filter="{instance('fr-landing-ui-instance')/@filter}"
                     >
                         <xf:label
                             ref="
@@ -187,6 +226,7 @@
                         sort-by="{sort-by}"
                         sort-direction="{sort-direction}"
                         link-to="{link-to}"
+                        filter="{instance('fr-landing-ui-instance')/@filter}"
                         refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
                     >
                         <xf:label
@@ -215,6 +255,7 @@
                         form="{form}"
                         version="{version}"
                         thumbnail="{thumbnail}"
+                        filter="{instance('fr-landing-ui-instance')/@filter}"
                         refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
                     >
                         <xf:label
@@ -235,6 +276,15 @@
                                     ()"/>
                     </fr:card-form-data>
                 </xf:repeat>
+            </xh:div>
+            <xh:div class="fr-landing-no-results xforms-hidden" role="status">
+                <xh:i class="fa fa-magnifying-glass fr-landing-no-results-icon" aria-hidden="true"/>
+                <xh:p class="fr-landing-no-results-text">
+                    <xf:output value="xxf:r('landing.messages.no-matches', '|fr-fr-resources|')"/>
+                </xh:p>
+                <xh:button type="button" class="btn btn-secondary fr-landing-filter-reset">
+                    <xf:output value="xxf:r('landing.buttons.clear-filter', '|fr-fr-resources|')"/>
+                </xh:button>
             </xh:div>
         </fr:view>
     </xh:body>

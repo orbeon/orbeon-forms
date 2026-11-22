@@ -817,12 +817,16 @@
             <summary>Übersicht</summary>
             <sort-by-title>Nach Titel sortieren</sort-by-title>
             <sort-by-last-modified>Nach Änderungsdatum sortieren</sort-by-last-modified>
+            <clear-filter>Filter löschen</clear-filter>
         </buttons>
         <messages>
             <no-forms>Keine veröffentlichten Formulare</no-forms>
             <no-data>Keine Formulardaten</no-data>
             <sorted-by-ascending>Sortiert nach {0}, aufsteigend</sorted-by-ascending>
             <sorted-by-descending>Sortiert nach {0}, absteigend</sorted-by-descending>
+            <filter-placeholder>Karten filtern…</filter-placeholder>
+            <no-matches>Keine passenden Einträge gefunden</no-matches>
+            <matching-cards>{0} von {1} Karten</matching-cards>
         </messages>
     </landing>
     <home>

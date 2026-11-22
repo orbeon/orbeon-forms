@@ -817,12 +817,16 @@
             <summary>Oversikt</summary>
             <sort-by-title>Sorter etter tittel</sort-by-title>
             <sort-by-last-modified>Sorter etter endringsdato</sort-by-last-modified>
+            <clear-filter>Tøm filter</clear-filter>
         </buttons>
         <messages>
             <no-forms>Ingen publiserte skjemaer</no-forms>
             <no-data>Ingen skjemadata</no-data>
             <sorted-by-ascending>Sortert etter {0}, stigende</sorted-by-ascending>
             <sorted-by-descending>Sortert etter {0}, synkende</sorted-by-descending>
+            <filter-placeholder>Filtrer kort…</filter-placeholder>
+            <no-matches>Ingen samsvarende elementer funnet</no-matches>
+            <matching-cards>{0} av {1} kort</matching-cards>
         </messages>
     </landing>
     <home>

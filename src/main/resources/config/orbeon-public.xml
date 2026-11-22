@@ -1,17 +1,5 @@
-<!--
-  Copyright (C) 2010 Orbeon, Inc.
-
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<public-key>MIIBuDCCASwGByqGSM44BAEwggEfAoGBAP1/U4EddRIpUt9KnC7s5Of2EbdSPO9EAMMeP4C2USZp
+<public-keys>
+    <public-key>MIIBuDCCASwGByqGSM44BAEwggEfAoGBAP1/U4EddRIpUt9KnC7s5Of2EbdSPO9EAMMeP4C2USZp
 RV1AIlH7WT2NWPq/xfW6MPbLm1Vs14E7gB00b/JmYLdrmVClpJ+f6AR7ECLCT7up1/63xhv4O1fn
 xqimFQ8E+4P208UewwI1VBNaFpEy9nXzrith1yrv8iIDGZ3RSAHHAhUAl2BQjxUjC8yykrmCouuE
 C/BYHPUCgYEA9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJ
@@ -19,3 +7,12 @@ FnEj6EwoFhO3zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImo
 g9/hWuWfBpKLZl6Ae1UlZAFMO/7PSSoDgYUAAoGBAPYZzfKpHE/oX8nuflYegHP3WDwzLtppKqNw
 VUE5BelKCp9j/YAtDotkN+cE7eSgi/6qV/lnGkfjkn0pxxLAXr6JhnilFKTZAH0JJPG63CR/FutH
 iZ+A4j72U1JgILcBg0pUjuNCqh+DKNC+hM1sKUetkHqOTW0y8+XWOb9aN8qf</public-key>
+    <public-key algorithm="SHA256withRSA">MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAz0lxKWukw1k+GZcRVieKAB13Wj1RaA6q
+SoTsiA4dQYYJKFyI89OfClr1qtLeDqjLPCntTzTkrayvFl1IMRZN9DZA82Y0q7jak0i0o7ZD7KpX
+uzE8vLB7IQV7Tpe4tXIRZ9NU16ZICs8dLoQB6EmG1xQ9EG2jcSOIKoI2SEK4su10E3Un3/mAOwKw
+2Jl2w1CtaToKYx4Ez1yQczFXtlDs6GfzZ70XukIVe5RJreWcUo83DS5+ZkQwhvsUw4vEuNgVKt5d
+0RidGc/RnmatLc1XR9WF9QIbsJD3wkVWxmlEfhFKtwHPs8L9tdqSq8CloJ8cr7TqCHx6GlZprgVZ
+jkWoSEsp1le5b8ESWbn6TtulvD6VDvgIluZKUlbML7EdGe/zktpk9tHCuLn6uYapsyCQyoiRcDMq
+i7iP0fxvPRDkiSImbn5jD1BWEvk8lGDqC5bLa87IIceroOa/iv037vUwvniJJDVoF5zFwWT24Of3
+kzF77byjpFuBs7gz/MfzReMPAgMBAAE=</public-key>
+</public-keys>

@@ -84,32 +84,32 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
         ),
         PublishedForms(
           title       = ByLanguage(Map("en" -> "My demo forms", "fr" -> "Mes formulaires de démonstration")),
-          description = ByLanguage(Map("en" -> "A collection of forms demonstrating various features of Orbeon Forms.", "fr" -> "Une collection de formulaires démontrant diverses fonctionnalités d'''Orbeon Forms.")),
-          thumbnail   = "my-thumbnail.svg",
+          description = Some(ByLanguage(Map("en" -> "A collection of forms demonstrating various features of Orbeon Forms.", "fr" -> "Une collection de formulaires démontrant diverses fonctionnalités d'''Orbeon Forms."))),
+          thumbnail   = Some("my-thumbnail.svg"),
           app         = Some("acme-demo"),
           linkTo      = Nil,
           sort        = None
         ),
         PublishedForms(
           title       = ByResource("landing.titles.demo-forms"),
-          description = ByResource("landing.descriptions.demo-forms"),
-          thumbnail   = "/apps/fr/style/images/orbeon/sports-car.svg",
+          description = Some(ByResource("landing.descriptions.demo-forms")),
+          thumbnail   = Some("/apps/fr/style/images/orbeon/sports-car.svg"),
           app         = Some("orbeon"),
           linkTo      = List(LinkTo.New),
           sort        = Some((SortBy.Title, None))
         ),
         PublishedForms(
           title       = ByResource("landing.titles.demo-features"),
-          description = ByResource("landing.descriptions.demo-features"),
-          thumbnail   = "/apps/fr/style/images/orbeon/checkboxes.svg",
+          description = Some(ByResource("landing.descriptions.demo-features")),
+          thumbnail   = Some("/apps/fr/style/images/orbeon/checkboxes.svg"),
           app         = Some("orbeon-features"),
           linkTo      = List(LinkTo.Summary),
           sort        = Some((SortBy.LastModified, None))
         ),
         PublishedForms(
           title       = ByResource("landing.titles.published-forms"),
-          description = ByResource("landing.descriptions.published-forms"),
-          thumbnail   = "/apps/fr/style/images/orbeon/book.svg",
+          description = Some(ByResource("landing.descriptions.published-forms")),
+          thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
           app         = None,
           linkTo      = Nil,
           sort        = None
@@ -316,12 +316,29 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
 
       // Test serialization with explicit sort-direction
       val cardWithDirection = PublishedForms(
-        title = ByResource("t"), description = ByResource("d"), thumbnail = "th", app = None, linkTo = Nil,
+        title = ByResource("t"), description = Some(ByResource("d")), thumbnail = Some("th"), app = None, linkTo = Nil,
         sort = Some((SortBy.Title, Some(SortDirection.Descending)))
       )
       val serialized = LandingCardsJSON.serializeToJson(List(cardWithDirection))
       val reparsed = LandingCardsJSON.parseString(serialized.noSpaces).get.get._1
       assert(reparsed == List(cardWithDirection))
+    }
+
+    it("must allow optional description and thumbnail on published-forms") {
+      val minimalJson =
+        """[
+          |  {"card-type": "published-forms", "title": {"_": "HR Forms"}},
+          |  {"card-type": "published-forms", "title": "landing.titles.published-forms", "description": null, "thumbnail": "   "}
+          |]""".stripMargin
+
+      val cards = LandingCardsJSON.parseString(minimalJson).get.get._1.collect { case p: PublishedForms => p }
+      assert(cards == List(
+        PublishedForms(title = ByLanguage(Map("_" -> "HR Forms")), description = None, thumbnail = None),
+        PublishedForms(title = ByResource("landing.titles.published-forms"), description = None, thumbnail = None)
+      ))
+
+      val roundTrip = LandingCardsJSON.parseString(LandingCardsJSON.serializeToJson(cards).noSpaces).get.get._1
+      assert(roundTrip == cards)
     }
   }
 }

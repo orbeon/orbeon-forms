@@ -1,0 +1,65 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    &.fr-dnd-dragging,
+    &.fr-dnd-dragging * {
+        cursor: grabbing !important;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .fr-dnd-drop-indicator-line {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background-color: var(--orbeon-focus-border-color);
+        border-radius: 9999px;
+        pointer-events: none;
+        z-index: 9999;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: -3px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--orbeon-focus-border-color);
+            box-shadow: 0 0 0 2px var(--orbeon-form-background-color);
+        }
+
+        &.fr-dnd-drop-indicator-noop {
+            opacity: 0.35;
+        }
+    }
+
+    .xbl-fr-dnd-repeat {
+        .xforms-dnd-item.xforms-dnd-source {
+            opacity: 0.45;
+            transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+        }
+
+        .xforms-dnd-item.xforms-dnd-mirror {
+            position: fixed;
+            z-index: 9998;
+            margin: 0;
+            pointer-events: none;
+            opacity: 0.85;
+            box-shadow: var(--orbeon-help-box-shadow);
+            cursor: grabbing;
+        }
+    }
+}

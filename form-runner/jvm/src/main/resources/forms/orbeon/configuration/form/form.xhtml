@@ -242,6 +242,9 @@
                 grid-row: auto !important;
                 grid-column: span 6 !important;
             }
+            .orbeon .fr-config-filtering .fr-grid.fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td.fr-config-wide-cell {
+                grid-column: span 12 !important;
+            }
             .orbeon .fr-config-filtering .fr-config-subgroup .fr-grid.fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td {
                 grid-column: span 12 !important;
             }
@@ -358,6 +361,7 @@
                     <xf:bind ref="@value[../@validation = 'byte-size-or-percent']"                                             xxf:whitespace="trim" constraint="frf:isValidCacheMaxSizeBytes(.)"/>
                     <xf:bind ref="@value[../@validation = 'duration']"                                                         xxf:whitespace="trim" constraint="frf:isValidCacheDuration(.)"/>
                     <xf:bind ref="@value[../@validation = 'json']"                                                             xxf:whitespace="trim" constraint="frf:isValidJson(.)"/>
+                    <xf:bind ref="@value[../@validation = 'landing-cards']"                                                    xxf:whitespace="trim" constraint="frf:isValidLandingCards(.)"/>
                 </xf:bind>
 
                 <xf:bind
@@ -459,6 +463,7 @@
                             <port>Enter a valid TCP port (1–65535) or leave blank</port>
                             <percentage>Enter a percentage between 0% and 100%</percentage>
                             <json>Invalid JSON syntax</json>
+                            <landing-cards>Complete all required card fields</landing-cards>
                             <byte-size>Enter a byte size or max-heap percentage (1–100%), e.g. 15%, 256m, 1g, or 0</byte-size>
                             <duration>Enter a duration, e.g. 30m, 2h, 1d, PT30M, or milliseconds</duration>
                         </alerts>
@@ -2642,6 +2647,7 @@
                             <port>Saisissez un port TCP valide (1–65535) ou laissez vide</port>
                             <percentage>Saisissez un pourcentage compris entre 0 % et 100 %</percentage>
                             <json>Syntaxe JSON invalide</json>
+                            <landing-cards>Complétez tous les champs requis des cartes</landing-cards>
                             <byte-size>Saisissez une taille en octets ou un pourcentage du tas max (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
                             <duration>Saisissez une durée, ex. 30m, 2h, 1d, PT30M ou millisecondes</duration>
                         </alerts>
@@ -6291,18 +6297,23 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override fr-config-wide-cell">
                                         <fr:checkbox-input id="landing-cards-override-control" ref="landing-cards/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <fr:code-mirror id="landing-cards-value-control" ref="landing-cards/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
+                                        <fr:landing-cards-editor
+                                            id="landing-cards-value-control"
+                                            ref="landing-cards/@value"
+                                            override-ref="landing-cards/@override"
+                                            default-ref="landing-cards/@default"
+                                            class="fr-config-value-control">
                                             <xf:label ref="$form-resources/landing-cards/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/landing-cards/hint"/>
-                                            <xf:alert ref="$form-resources/alerts/json"/>
-                                        </fr:code-mirror>
+                                            <xf:alert ref="$form-resources/alerts/landing-cards"/>
+                                        </fr:landing-cards-editor>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>

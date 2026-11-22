@@ -67,6 +67,22 @@ trait FormRunnerConfiguration {
       case None           => true
       case Some(nonEmpty) => io.circe.parser.parse(nonEmpty).isRight
     }
+
+  //@XPathFunction
+  def isValidLandingCards(value: String): Boolean =
+    LandingCardsConfigXml.isValidLandingCards(value)
+
+  //@XPathFunction
+  def landingCardsToEditorXml(rawValue: String, fallbackValue: String): DocumentNodeInfoType = {
+    val editorDoc = LandingCardsConfigXml.toEditorDom(rawValue, fallbackValue)
+    new DocumentWrapper(editorDoc, null, StaticXPath.GlobalConfiguration)
+  }
+
+  //@XPathFunction
+  def landingCardsFromEditorXml(editorNode: NodeInfo): String = {
+    val editorDoc = StaticXPath.tinyTreeToOrbeonDom(editorNode)
+    LandingCardsConfigXml.toJsonString(editorDoc)
+  }
 }
 
 object FormRunnerConfiguration extends FormRunnerConfiguration {
@@ -1008,8 +1024,8 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       baseName      = "oxf.fr.landing.cards",
       xsType        = "xs:string",
       hasAppForm    = false,
-      defaultValue  = "",
-      validationOpt = Some("json")
+      defaultValue  = LandingCardsJSON.serializeToJson(LandingCardsJSON.DefaultCards).spaces2,
+      validationOpt = Some("landing-cards")
     ),
 
     // 8. Admin Page

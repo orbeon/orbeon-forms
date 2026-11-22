@@ -558,7 +558,7 @@
             display: none;
         }
 
-        &:not(:has(.card-text:not(:empty))):not(:has(.fr-card-intro-media img)):not(:has(.fr-card-intro-media .xforms-output:not(.xforms-disabled))) {
+        &:not(:has(.card-text:not(:empty):not(.xforms-disabled *))):not(:has(.fr-card-intro-media > .xforms-group:not(.xforms-disabled))):not(:has(.fr-card-intro-media > img)):not(:has(.fr-card-intro-media .xforms-output:not(.xforms-disabled))) {
             display: none;
         }
 

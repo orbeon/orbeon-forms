@@ -277,6 +277,68 @@ class ConfigurationPropertiesTest
       assert(linkToElem.attributeValue("override") == "true")
       assert(linkToElem.attributeValue("selection") == "new summary")
     }
+
+    it("must round-trip LandingCardsConfigXml across all card types, localization modes, and legacy tokens") {
+      val complexCards = List(
+        LandingCard.QuickLinks(),
+        LandingCard.QuickLinks(
+          title       = Some(LocalizedString.ByLanguage(Map("_" -> "Team Links"))),
+          description = Some(LocalizedString.ByLanguage(Map("en" -> "Shortcuts", "fr" -> "Raccourcis"))),
+          links       = List(QuickLinkToken.FormBuilderNew, QuickLinkToken.FormsAdmin),
+          layout      = Some(QuickLinksLayout.List)
+        ),
+        LandingCard.PublishedForms(
+          title       = LocalizedString.ByLanguage(Map("_" -> "HR Forms")),
+          description = None,
+          thumbnail   = None,
+          app         = Some("hr"),
+          linkTo      = List(LinkTo.Summary, LinkTo.New),
+          sort        = Some((SortBy.Title, Some(SortDirection.Ascending)))
+        ),
+        LandingCard.PublishedForms(
+          title       = LocalizedString.ByResource("landing.titles.published-forms"),
+          description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
+          thumbnail   = Some("https://example.org/custom-icon.svg"),
+          app         = None,
+          linkTo      = List(LinkTo.New),
+          sort        = Some((SortBy.LastModified, None))
+        ),
+        LandingCard.FormData(
+          title       = None,
+          description = None,
+          thumbnail   = None,
+          app         = "orbeon",
+          form        = "bookshelf",
+          version     = Some(2)
+        ),
+        LandingCard.FormData(
+          title       = Some(LocalizedString.ByLanguage(Map("en" -> "Orders", "fr" -> "Commandes"))),
+          description = Some(LocalizedString.ByLanguage(Map("_" -> "Recent orders"))),
+          thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
+          app         = "acme",
+          form        = "order",
+          version     = None
+        )
+      )
+
+      val inputJson   = LandingCardsJSON.serializeToJson(complexCards).spaces2
+      val editorDom   = LandingCardsConfigXml.toEditorDom(inputJson, "")
+      val outputCards = LandingCardsConfigXml.fromEditorDom(editorDom)
+      assert(outputCards == complexCards)
+      assert(LandingCardsConfigXml.isValidLandingCards(LandingCardsConfigXml.toJsonString(editorDom)))
+
+      // Legacy tokens must upgrade cleanly into structured editor cards
+      val legacyDom   = LandingCardsConfigXml.toEditorDom("quick-links admin orbeon/bookshelf/1", "")
+      val legacyCards = LandingCardsConfigXml.fromEditorDom(legacyDom)
+      assert(legacyCards.size == 3)
+
+      // Validation checks
+      assert(FormRunnerConfiguration.isValidLandingCards(""))
+      assert(FormRunnerConfiguration.isValidLandingCards("[]"))
+      assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "published-forms", "title": {"_": "   "}}]"""))
+      assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "orbeon", "form": ""}]"""))
+      assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "bad slug!", "form": "bookshelf"}]"""))
+    }
   }
 
   describe("PersistencePropertyProvider and built-in orbeon/configuration form") {
@@ -462,6 +524,67 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(docsSizeValue.effectiveId, numberExternalValue("25"))
             assert(docsSizeValue.isValid)
 
+            // Test <fr:landing-cards-editor> visual configurator: enable override, reorder via DnD, remove card, add custom card
+            val landingCardsOverride       = resolveObject[XFormsSingleNodeControl]("landing-cards-override-control").get
+            val landingCardsOverrideSelect = ControlsIterator(landingCardsOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val landingCardsEditor         = resolveObject[org.orbeon.oxf.xforms.control.XFormsComponentControl]("landing-cards-value-control").get
+
+            assert(landingCardsEditor.isInstanceOf[XFormsValueControl])
+            assert(landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isReadonly)
+
+            setControlValueWithEventSearchNested(landingCardsOverrideSelect.effectiveId, encodedTrue)
+            assert(! landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isReadonly)
+
+            // Reorder card 2 (Admin) to position 1 via XXFormsDndEvent on the inner dnd-repeat
+            val dndRepeatControl =
+              ControlsIterator(landingCardsEditor, includeSelf = false)
+                .collectFirst { case r: org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl if r.effectiveId.contains("cards-dnd-repeat") => r }
+                .get
+            withAction {
+              org.orbeon.oxf.xforms.event.Dispatch.dispatchEvent(
+                new org.orbeon.oxf.xforms.event.events.XXFormsDndEvent(
+                  dndRepeatControl,
+                  Map("dnd-start" -> Some("2"), "dnd-end" -> Some("1"))
+                ),
+                EventCollector.Throw
+              )
+            }
+
+            val reorderedJson  = landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)
+            val reorderedCards = LandingCardsJSON.parseString(reorderedJson).get.get._1
+            assert(reorderedCards.head == LandingCard.QuickLinks(
+              title = Some(LocalizedString.ByResource("landing.titles.admin")),
+              links = List(QuickLinkToken.Admin)
+            ))
+
+            // Also verify Move Down / Move Up buttons and Add / Remove card triggers inside <fr:landing-cards-editor>
+            def findCardTrigger(subId: String, iterationIndex: Int): org.orbeon.oxf.xforms.control.XFormsControl =
+              ControlsIterator(landingCardsEditor, includeSelf = false)
+                .find(c => c.effectiveId.contains(s"$subId⊙$iterationIndex"))
+                .get
+
+            // Move card 1 (Admin) down to position 2 -> Quick Links returns to position 1
+            activateControlWithEvent(findCardTrigger("fr-lce-move-down-btn", 1).effectiveId)(ec)
+            val afterMoveDownCards = LandingCardsJSON.parseString(landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)).get.get._1
+            assert(afterMoveDownCards.head == LandingCard.QuickLinks(links = List(QuickLinkToken.Main)))
+
+            // Move card 2 (Admin) back up to position 1 -> Admin returns to position 1
+            activateControlWithEvent(findCardTrigger("fr-lce-move-up-btn", 2).effectiveId)(ec)
+            val afterMoveUpCards = LandingCardsJSON.parseString(landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)).get.get._1
+            assert(afterMoveUpCards.head == LandingCard.QuickLinks(
+              title = Some(LocalizedString.ByResource("landing.titles.admin")),
+              links = List(QuickLinkToken.Admin)
+            ))
+
+            // Add a new Published Forms card via toolbar button ( requires setting title to be valid ), then remove it
+            val addPfBtn = ControlsIterator(landingCardsEditor, includeSelf = false)
+              .find(_.effectiveId.contains("fr-lce-add-published-forms")).get
+            activateControlWithEvent(addPfBtn.effectiveId)(ec)
+            val countAfterAdd = afterMoveUpCards.size + 1
+            assert(! landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isValid)
+            activateControlWithEvent(findCardTrigger("fr-lce-remove-btn", countAfterAdd).effectiveId)(ec)
+            assert(landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isValid)
+
             val configInstance = instance("fr-configuration-instance").get
             val configRoot     = configInstance.rootElement
 
@@ -510,6 +633,11 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256m"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
             assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.live-documents.size").contains(25))
+            val savedLandingCards = LandingCardsJSON.parseString(store.globalPropertySet.getString("oxf.fr.landing.cards")).get.get._1
+            assert(savedLandingCards.head == LandingCard.QuickLinks(
+              title = Some(LocalizedString.ByResource("landing.titles.admin")),
+              links = List(QuickLinkToken.Admin)
+            ))
 
             // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
             val _ = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)

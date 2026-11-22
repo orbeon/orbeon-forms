@@ -269,11 +269,19 @@
                 </fr:card-actions>
 
                 <fr:card-body>
-                    <xh:p class="card-text"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
+                    <xf:group ref=".[xxf:non-blank(xxf:help('fr-card-published-forms'))]">
+                        <xh:p class="card-text"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
+                    </xf:group>
                 </fr:card-body>
 
                 <fr:card-thumbnail>
-                    <xh:img src="{fr:component-param-value('thumbnail')}" alt="" class="img-thumbnail img-invertible"/>
+                    <xf:var name="param-thumbnail" value="fr:component-param-value('thumbnail')[xxf:non-blank()]"/>
+                    <xf:group ref=".[exists($param-thumbnail)]">
+                        <xh:img
+                            src="{($param-thumbnail, 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')[1]}"
+                            alt=""
+                            class="img-thumbnail img-invertible"/>
+                    </xf:group>
                 </fr:card-thumbnail>
 
                 <fr:rows>

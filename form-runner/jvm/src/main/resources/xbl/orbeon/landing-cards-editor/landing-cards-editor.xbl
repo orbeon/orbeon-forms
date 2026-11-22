@@ -1,0 +1,1354 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-landing-cards-editor"
+        element="fr|landing-cards-editor"
+        xxbl:mode="lhha binding value">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/landing-cards-editor/landing-cards-editor.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="landing-cards-editor-model">
+
+                <xf:instance id="editor" xxf:exclude-result-prefixes="#all">
+                    <editor>
+                        <cards/>
+                        <templates/>
+                    </editor>
+                </xf:instance>
+
+                <xf:instance id="state" xxf:exclude-result-prefixes="#all">
+                    <state
+                        initialized="false"
+                        readonly="true"
+                        syncing="false"
+                        forms-loaded="false"
+                        last-json=""
+                        preset-choice=""
+                        announcement=""/>
+                </xf:instance>
+
+                <xf:instance id="forms-metadata" xxf:exclude-result-prefixes="#all">
+                    <forms/>
+                </xf:instance>
+
+                <xf:instance id="icons" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <icons>
+                        <icon id="book"          path="/apps/fr/style/images/orbeon/book.svg"/>
+                        <icon id="sports-car"    path="/apps/fr/style/images/orbeon/sports-car.svg"/>
+                        <icon id="checkboxes"    path="/apps/fr/style/images/orbeon/checkboxes.svg"/>
+                        <icon id="library"       path="/apps/fr/style/images/orbeon/library.svg"/>
+                        <icon id="cogwheels"     path="/apps/fr/style/images/orbeon/cogwheels.svg"/>
+                        <icon id="configuration" path="/apps/fr/style/images/orbeon/configuration.svg"/>
+                        <icon id="console"       path="/apps/fr/style/images/orbeon/console.svg"/>
+                        <icon id="analytics"     path="/apps/fr/style/images/orbeon/analytics.svg"/>
+                        <icon id="crane"         path="/apps/fr/style/images/orbeon/crane.svg"/>
+                    </icons>
+                </xf:instance>
+
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <readonly-hint>Enable Override to add, remove, reorder, or customize cards.</readonly-hint>
+                            <add-published-forms>Published Forms</add-published-forms>
+                            <add-form-data>Form Data</add-form-data>
+                            <add-quick-links>Quick Links</add-quick-links>
+                            <add-preset>Add preset…</add-preset>
+                            <preset-quick-links>Quick Links (Authoring)</preset-quick-links>
+                            <preset-admin>Admin Links</preset-admin>
+                            <preset-published-forms>Published Forms (All Apps)</preset-published-forms>
+                            <preset-form-builder-forms>Form Builder Forms</preset-form-builder-forms>
+                            <preset-demo-forms>Demo Forms</preset-demo-forms>
+                            <preset-demo-features>Demo Features</preset-demo-features>
+                            <preset-bookshelf>Orbeon Demo: Bookshelf</preset-bookshelf>
+                            <expand-all>Expand all</expand-all>
+                            <collapse-all>Collapse all</collapse-all>
+                            <reset-defaults>Reset to defaults</reset-defaults>
+                            <empty-cards>No cards configured. Add a card or preset above.</empty-cards>
+                            <drag-to-reorder>Drag to reorder</drag-to-reorder>
+                            <move-up>Move card up</move-up>
+                            <move-down>Move card down</move-down>
+                            <remove-card>Remove card</remove-card>
+                            <moved-announcement>Moved {0} to position {1} of {2}</moved-announcement>
+                            <removed-announcement>Removed {0}</removed-announcement>
+                            <type-quick-links>Quick Links</type-quick-links>
+                            <type-published-forms>Published Forms</type-published-forms>
+                            <type-form-data>Form Data</type-form-data>
+                            <untitled-card>Untitled card</untitled-card>
+                            <links-label>Included Links</links-label>
+                            <links-main>Authoring links (New Form, Form Builder Forms, Published Forms)</links-main>
+                            <links-admin>Admin links (Forms Admin, Configuration, Console, Analytics)</links-admin>
+                            <links-all>All built-in links</links-all>
+                            <links-custom>Custom link selection…</links-custom>
+                            <links-custom-label>Selected Links</links-custom-label>
+                            <links-summary-main>Authoring links</links-summary-main>
+                            <links-summary-admin>Admin links</links-summary-admin>
+                            <links-summary-all>All links</links-summary-all>
+                            <links-summary-custom>{0} links</links-summary-custom>
+                            <layout-label>Card Layout</layout-label>
+                            <layout-tiles>2×2 Tiles</layout-tiles>
+                            <layout-list>Compact List</layout-list>
+                            <app-scope-label>Application Scope</app-scope-label>
+                            <app-all>All applications</app-all>
+                            <app-specific>Specific application</app-specific>
+                            <app-label>Application Name</app-label>
+                            <form-label>Form Name</form-label>
+                            <version-mode-label>Form Version</version-mode-label>
+                            <version-specific>Specific version</version-specific>
+                            <version-default>Default (v1)</version-default>
+                            <version-number-label>Version</version-number-label>
+                            <published-versions-hint>Published versions: {0}</published-versions-hint>
+                            <link-to-label>Row Click Target</link-to-label>
+                            <link-to-default>Default</link-to-default>
+                            <link-to-summary>Summary page</link-to-summary>
+                            <link-to-new>New form page</link-to-new>
+                            <link-to-summary-new>Summary page + New quick action</link-to-summary-new>
+                            <link-to-new-summary>New form page + Summary quick action</link-to-new-summary>
+                            <sort-by-label>Initial Sort Field</sort-by-label>
+                            <sort-by-default>Default (Last modified)</sort-by-default>
+                            <sort-by-last-modified>Last modified date</sort-by-last-modified>
+                            <sort-by-title>Form title</sort-by-title>
+                            <sort-by-created>Creation date</sort-by-created>
+                            <sort-by-app-name>Application name</sort-by-app-name>
+                            <sort-by-form-name>Form name</sort-by-form-name>
+                            <sort-by-form-version>Form version</sort-by-form-version>
+                            <sort-by-last-modified-by>Last modified by</sort-by-last-modified-by>
+                            <sort-dir-label>Sort Direction</sort-dir-label>
+                            <sort-dir-default>Default for field</sort-dir-default>
+                            <sort-dir-asc>Ascending</sort-dir-asc>
+                            <sort-dir-desc>Descending</sort-dir-desc>
+                            <title-label>Card Title</title-label>
+                            <description-label>Card Description</description-label>
+                            <text-mode-auto-card>Automatic</text-mode-auto-card>
+                            <text-mode-auto-form>From form metadata</text-mode-auto-form>
+                            <text-mode-none>None</text-mode-none>
+                            <text-mode-resource>Built-in localized label</text-mode-resource>
+                            <text-mode-single>Custom text</text-mode-single>
+                            <text-mode-localized>Translated per language</text-mode-localized>
+                            <custom-text-placeholder>Enter text…</custom-text-placeholder>
+                            <builtin-key-label>Built-in Resource Key</builtin-key-label>
+                            <language-label>Language</language-label>
+                            <translation-label>Text</translation-label>
+                            <add-translation>Add language</add-translation>
+                            <remove-translation>Remove language</remove-translation>
+                            <icon-label>Card Icon</icon-label>
+                            <icon-mode-auto-form>From form metadata</icon-mode-auto-form>
+                            <icon-mode-none>None</icon-mode-none>
+                            <icon-mode-preset>Built-in icon</icon-mode-preset>
+                            <icon-mode-custom>Custom image URL</icon-mode-custom>
+                            <icon-custom-label>Image Path or URL</icon-custom-label>
+                            <icon-book>Checklist</icon-book>
+                            <icon-sports-car>Featured / Star</icon-sports-car>
+                            <icon-checkboxes>Features Grid</icon-checkboxes>
+                            <icon-library>Form Builder</icon-library>
+                            <icon-cogwheels>Admin</icon-cogwheels>
+                            <icon-configuration>Settings</icon-configuration>
+                            <icon-console>Console</icon-console>
+                            <icon-analytics>Analytics</icon-analytics>
+                            <icon-crane>Work in Progress</icon-crane>
+                            <alert-required>Required</alert-required>
+                            <alert-slug>Use letters, digits, hyphens, or underscores</alert-slug>
+                            <alert-version>Enter an integer ≥ 1</alert-version>
+                            <alert-duplicate-lang>Duplicate language</alert-duplicate-lang>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <readonly-hint>Activez Surcharger pour ajouter, supprimer, réordonner ou personnaliser les cartes.</readonly-hint>
+                            <add-published-forms>Formulaires publiés</add-published-forms>
+                            <add-form-data>Données de formulaire</add-form-data>
+                            <add-quick-links>Raccourcis</add-quick-links>
+                            <add-preset>Ajouter un modèle…</add-preset>
+                            <preset-quick-links>Raccourcis (Création)</preset-quick-links>
+                            <preset-admin>Liens d'administration</preset-admin>
+                            <preset-published-forms>Formulaires publiés (Toutes les apps)</preset-published-forms>
+                            <preset-form-builder-forms>Formulaires Form Builder</preset-form-builder-forms>
+                            <preset-demo-forms>Formulaires de démonstration</preset-demo-forms>
+                            <preset-demo-features>Fonctions de démonstration</preset-demo-features>
+                            <preset-bookshelf>Démo Orbeon : Bibliothèque</preset-bookshelf>
+                            <expand-all>Tout déplier</expand-all>
+                            <collapse-all>Tout replier</collapse-all>
+                            <reset-defaults>Rétablir les valeurs par défaut</reset-defaults>
+                            <empty-cards>Aucune carte configurée. Ajoutez une carte ou un modèle ci-dessus.</empty-cards>
+                            <drag-to-reorder>Glisser pour réordonner</drag-to-reorder>
+                            <move-up>Monter la carte</move-up>
+                            <move-down>Descendre la carte</move-down>
+                            <remove-card>Supprimer la carte</remove-card>
+                            <moved-announcement>{0} déplacée à la position {1} sur {2}</moved-announcement>
+                            <removed-announcement>{0} supprimée</removed-announcement>
+                            <type-quick-links>Raccourcis</type-quick-links>
+                            <type-published-forms>Formulaires publiés</type-published-forms>
+                            <type-form-data>Données</type-form-data>
+                            <untitled-card>Carte sans titre</untitled-card>
+                            <links-label>Liens inclus</links-label>
+                            <links-main>Liens principaux (Nouveau, Formulaires Form Builder, Formulaires publiés)</links-main>
+                            <links-admin>Liens d'administration (Admin, Configuration, Console, Analytique)</links-admin>
+                            <links-all>Tous les liens intégrés</links-all>
+                            <links-custom>Sélection personnalisée…</links-custom>
+                            <links-custom-label>Liens sélectionnés</links-custom-label>
+                            <links-summary-main>Liens principaux</links-summary-main>
+                            <links-summary-admin>Liens d'admin</links-summary-admin>
+                            <links-summary-all>Tous les liens</links-summary-all>
+                            <links-summary-custom>{0} liens</links-summary-custom>
+                            <layout-label>Disposition</layout-label>
+                            <layout-tiles>Tuiles 2×2</layout-tiles>
+                            <layout-list>Liste compacte</layout-list>
+                            <app-scope-label>Périmètre applicatif</app-scope-label>
+                            <app-all>Toutes les applications</app-all>
+                            <app-specific>Application spécifique</app-specific>
+                            <app-label>Nom de l'application</app-label>
+                            <form-label>Nom du formulaire</form-label>
+                            <version-mode-label>Version du formulaire</version-mode-label>
+                            <version-specific>Version spécifique</version-specific>
+                            <version-default>Par défaut (v1)</version-default>
+                            <version-number-label>Numéro de version</version-number-label>
+                            <published-versions-hint>Versions publiées : {0}</published-versions-hint>
+                            <link-to-label>Cible au clic</link-to-label>
+                            <link-to-default>Par défaut</link-to-default>
+                            <link-to-summary>Page résumé</link-to-summary>
+                            <link-to-new>Nouveau formulaire</link-to-new>
+                            <link-to-summary-new>Page résumé + bouton Nouveau</link-to-summary-new>
+                            <link-to-new-summary>Nouveau formulaire + bouton Résumé</link-to-new-summary>
+                            <sort-by-label>Tri initial</sort-by-label>
+                            <sort-by-default>Par défaut (Date de modification)</sort-by-default>
+                            <sort-by-last-modified>Date de modification</sort-by-last-modified>
+                            <sort-by-title>Titre du formulaire</sort-by-title>
+                            <sort-by-created>Date de création</sort-by-created>
+                            <sort-by-app-name>Nom de l'application</sort-by-app-name>
+                            <sort-by-form-name>Nom du formulaire</sort-by-form-name>
+                            <sort-by-form-version>Version du formulaire</sort-by-form-version>
+                            <sort-by-last-modified-by>Modifié par</sort-by-last-modified-by>
+                            <sort-dir-label>Ordre de tri</sort-dir-label>
+                            <sort-dir-default>Par défaut</sort-dir-default>
+                            <sort-dir-asc>Croissant</sort-dir-asc>
+                            <sort-dir-desc>Décroissant</sort-dir-desc>
+                            <title-label>Titre de la carte</title-label>
+                            <description-label>Description de la carte</description-label>
+                            <text-mode-auto-card>Automatique</text-mode-auto-card>
+                            <text-mode-auto-form>Métadonnées du formulaire</text-mode-auto-form>
+                            <text-mode-none>Aucune</text-mode-none>
+                            <text-mode-resource>Libellé intégré traduit</text-mode-resource>
+                            <text-mode-single>Texte personnalisé</text-mode-single>
+                            <text-mode-localized>Traduit par langue</text-mode-localized>
+                            <custom-text-placeholder>Saisir le texte…</custom-text-placeholder>
+                            <builtin-key-label>Clé de ressource intégrée</builtin-key-label>
+                            <language-label>Langue</language-label>
+                            <translation-label>Texte</translation-label>
+                            <add-translation>Ajouter une langue</add-translation>
+                            <remove-translation>Supprimer la langue</remove-translation>
+                            <icon-label>Icône de la carte</icon-label>
+                            <icon-mode-auto-form>Métadonnées du formulaire</icon-mode-auto-form>
+                            <icon-mode-none>Aucune</icon-mode-none>
+                            <icon-mode-preset>Icône intégrée</icon-mode-preset>
+                            <icon-mode-custom>URL d'image personnalisée</icon-mode-custom>
+                            <icon-custom-label>Chemin ou URL de l'image</icon-custom-label>
+                            <icon-book>Liste</icon-book>
+                            <icon-sports-car>Sélection / Étoile</icon-sports-car>
+                            <icon-checkboxes>Grille de fonctions</icon-checkboxes>
+                            <icon-library>Form Builder</icon-library>
+                            <icon-cogwheels>Administration</icon-cogwheels>
+                            <icon-configuration>Configuration</icon-configuration>
+                            <icon-console>Console</icon-console>
+                            <icon-analytics>Analytique</icon-analytics>
+                            <icon-crane>En cours</icon-crane>
+                            <alert-required>Requis</alert-required>
+                            <alert-slug>Utilisez lettres, chiffres, tirets ou tirets bas</alert-slug>
+                            <alert-version>Saisissez un entier ≥ 1</alert-version>
+                            <alert-duplicate-lang>Langue en double</alert-duplicate-lang>
+                        </resource>
+                    </_>
+                </xf:instance>
+
+                <xf:submission
+                    id="fr-load-published-forms-submission"
+                    method="get"
+                    serialization="none"
+                    mediatype="application/xml"
+                    resource="/fr/service/persistence/form?all-versions=true"
+                    replace="instance"
+                    targetref="instance('forms-metadata')"
+                    xxf:show-progress="false">
+                    <xf:setvalue event="xforms-submit-done xforms-submit-error" ref="instance('state')/@forms-loaded" value="'true'"/>
+                </xf:submission>
+
+                <xf:bind ref="instance('editor')/cards/card">
+                    <xf:bind
+                        ref="descendant::translation | descendant-or-self::*/@*[local-name() != 'expanded']"
+                        readonly="instance('state')/@readonly = 'true'"/>
+
+                    <xf:bind
+                        ref="@links-custom[../@type = 'quick-links' and ../@links-mode = 'custom']"
+                        required="instance('state')/@readonly != 'true'"/>
+
+                    <xf:bind
+                        ref="@app[../@type = 'published-forms' and ../@app-mode = 'specific']"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"
+                        constraint="instance('state')/@readonly = 'true' or matches(., '^[A-Za-z0-9_\-]+$')"/>
+
+                    <xf:bind
+                        ref="title[../@type = 'published-forms']/@single[../@mode = 'single']"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"/>
+
+                    <xf:bind
+                        ref="(@app | @form)[../@type = 'form-data']"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"
+                        constraint="instance('state')/@readonly = 'true' or matches(., '^[A-Za-z0-9_\-]+$')"/>
+
+                    <xf:bind
+                        ref="@version[../@type = 'form-data' and ../@version-mode = 'specific']"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"
+                        constraint="instance('state')/@readonly = 'true' or (. castable as xs:integer and xs:integer(.) ge 1)"/>
+
+                    <xf:bind
+                        ref="@thumbnail-custom[../@thumbnail-mode = 'custom']"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"/>
+
+                    <xf:bind ref="(title | description)[@mode = 'localized']/translation">
+                        <xf:bind
+                            ref="@lang"
+                            required="instance('state')/@readonly != 'true'"
+                            constraint="instance('state')/@readonly = 'true' or not((../../translation/@lang except .) = .)"/>
+                        <xf:bind
+                            ref="."
+                            required="instance('state')/@readonly != 'true'"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+
+                <xf:bind ref="instance('editor')/templates/(descendant-or-self::* | descendant-or-self::*/@*)" readonly="true()"/>
+
+                <xf:action
+                    observer="editor landing-cards-editor-model"
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed fr-lce-push-json"
+                    if="instance('state')/@initialized = 'true' and instance('state')/@syncing != 'true' and instance('state')/@readonly != 'true'">
+                    <xf:var name="new-json" value="frf:landingCardsFromEditorXml(instance('editor'))"/>
+                    <xf:action if="$new-json != string(instance('state')/@last-json)">
+                        <xf:setvalue ref="instance('state')/@last-json" value="$new-json"/>
+                        <xf:setvalue ref="xxf:binding('fr-landing-cards-editor')" value="$new-json"/>
+                    </xf:action>
+                </xf:action>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+
+                <xf:var name="binding"       value="xxf:binding('fr-landing-cards-editor')"/>
+                <xf:var name="is-overridden" as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=override-ref"/></xf:var>
+                <xf:var name="default-json"  as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=default-ref"/></xf:var>
+
+                <xf:var
+                    name="effective-source-json"
+                    value="
+                        if ($is-overridden = 'true') then
+                            string($binding)
+                        else
+                            (
+                                xxf:property('oxf.fr.landing.cards')[xxf:non-blank()],
+                                string($binding)[xxf:non-blank()],
+                                string($default-json)
+                            )[1]">
+                    <xf:action
+                        event="xforms-enabled xforms-value-changed"
+                        if="instance('state')/@initialized != 'true' or $effective-source-json != string(instance('state')/@last-json)">
+                        <xf:setvalue ref="instance('state')/@syncing" value="'true'"/>
+                        <xf:insert
+                            ref="instance('editor')"
+                            origin="frf:landingCardsToEditorXml($effective-source-json, string($default-json))/*"/>
+                        <xf:setvalue ref="instance('state')/@last-json" value="$effective-source-json"/>
+                        <xf:setvalue ref="instance('state')/@initialized" value="'true'"/>
+                        <xf:setvalue ref="instance('state')/@syncing" value="'false'"/>
+                    </xf:action>
+                </xf:var>
+
+                <xf:var
+                    name="is-readonly"
+                    value="fr:is-readonly-mode() or xxf:readonly($binding)">
+                    <xf:action event="xforms-enabled xforms-value-changed">
+                        <xf:setvalue ref="instance('state')/@readonly" value="string($is-readonly)"/>
+                        <xf:action if="not($is-readonly)">
+                            <xf:dispatch name="fr-lce-push-json" targetid="landing-cards-editor-model"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:var>
+
+                <xf:var name="cards"         value="instance('editor')/cards/card"/>
+                <xf:var name="card-count"    value="count($cards)"/>
+                <xf:var name="all-expanded"  value="$card-count gt 0 and (every $c in $cards satisfies $c/@expanded = 'true')"/>
+                <xf:var
+                    name="needs-forms-metadata"
+                    value="not($is-readonly) and exists($cards[@expanded = 'true' and @type = ('published-forms', 'form-data')])">
+                    <xf:send
+                        event="xforms-enabled xforms-value-changed"
+                        if="$needs-forms-metadata and instance('state')/@forms-loaded != 'true' and xxf:non-blank(xxf:get-request-path())"
+                        submission="fr-load-published-forms-submission"/>
+                </xf:var>
+                <xf:var
+                    name="expanded-signature"
+                    value="concat($all-expanded, '|', string-join(for $c in $cards return string($c/@expanded = 'true'), ','))">
+                    <xf:action event="xforms-enabled xforms-value-changed" type="javascript">
+                        <xf:param name="allExpanded" value="string($all-expanded)"/>
+                        <xf:body>
+                            const root = (this instanceof Element &amp;&amp; this.closest('.xbl-fr-landing-cards-editor')) || document.querySelector('.xbl-fr-landing-cards-editor');
+                            if (root) {
+                                const toggleAllBtn = root.querySelector('[id$="fr-lce-toggle-all-btn"] button');
+                                if (toggleAllBtn) toggleAllBtn.setAttribute('aria-expanded', allExpanded);
+                                root.querySelectorAll('.fr-lce-card').forEach((cardEl) =&gt; {
+                                    const btn = cardEl.querySelector('.fr-lce-card-toggle button');
+                                    if (btn) btn.setAttribute('aria-expanded', String(cardEl.classList.contains('fr-lce-card-expanded')));
+                                });
+                            }
+                        </xf:body>
+                    </xf:action>
+                </xf:var>
+                <xf:var
+                    name="distinct-apps"
+                    value="
+                        xxf:sort(
+                            distinct-values(('orbeon', instance('forms-metadata')/form/application-name/string())[xxf:non-blank()]),
+                            .,
+                            'text',
+                            'ascending'
+                        )"/>
+
+                <xh:div class="fr-landing-cards-editor {'fr-lce-is-readonly'[$is-readonly]}">
+
+                    <!-- Polite screen-reader live region for reorder/remove actions -->
+                    <xh:p class="fr-lce-sr-status" role="status">
+                        <xf:output value="instance('state')/@announcement"/>
+                    </xh:p>
+
+                    <!-- Top Action Bar -->
+                    <xh:div class="fr-lce-toolbar">
+                        <xh:div class="fr-lce-toolbar-start">
+                            <xf:group ref=".[$is-readonly]" class="fr-lce-readonly-note">
+                                <xh:i class="fa fa-fw fa-lock" aria-hidden="true"/>
+                                <xh:span><xf:output value="fr:r('readonly-hint')"/></xh:span>
+                            </xf:group>
+
+                            <xf:group ref=".[not($is-readonly)]" class="fr-lce-add-group">
+                                <xf:trigger id="fr-lce-add-published-forms" class="fr-lce-add-btn">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                        <xh:span><xf:output value="fr:r('add-published-forms')"/></xh:span>
+                                    </xf:label>
+                                    <xf:action event="DOMActivate">
+                                        <xf:insert
+                                            context="instance('editor')/cards"
+                                            ref="card"
+                                            origin="instance('editor')/templates/card[@id = 'new-published-forms']"/>
+                                    </xf:action>
+                                </xf:trigger>
+
+                                <xf:trigger id="fr-lce-add-form-data" class="fr-lce-add-btn">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                        <xh:span><xf:output value="fr:r('add-form-data')"/></xh:span>
+                                    </xf:label>
+                                    <xf:action event="DOMActivate">
+                                        <xf:insert
+                                            context="instance('editor')/cards"
+                                            ref="card"
+                                            origin="instance('editor')/templates/card[@id = 'new-form-data']"/>
+                                    </xf:action>
+                                </xf:trigger>
+
+                                <xf:trigger id="fr-lce-add-quick-links" class="fr-lce-add-btn">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                        <xh:span><xf:output value="fr:r('add-quick-links')"/></xh:span>
+                                    </xf:label>
+                                    <xf:action event="DOMActivate">
+                                        <xf:insert
+                                            context="instance('editor')/cards"
+                                            ref="card"
+                                            origin="instance('editor')/templates/card[@id = 'new-quick-links']"/>
+                                    </xf:action>
+                                </xf:trigger>
+
+                                <xf:select1
+                                    id="fr-lce-add-preset-select"
+                                    ref="instance('state')/@preset-choice"
+                                    appearance="minimal"
+                                    class="fr-lce-preset-select">
+                                    <xf:label class="xforms-hidden" value="fr:r('add-preset')"/>
+                                    <xf:item>
+                                        <xf:label value="fr:r('add-preset')"/>
+                                        <xf:value/>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-quick-links')"/>
+                                        <xf:value>preset-quick-links</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-admin')"/>
+                                        <xf:value>preset-admin</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-published-forms')"/>
+                                        <xf:value>preset-published-forms</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-form-builder-forms')"/>
+                                        <xf:value>preset-form-builder-forms</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-demo-forms')"/>
+                                        <xf:value>preset-demo-forms</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-demo-features')"/>
+                                        <xf:value>preset-demo-features</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label value="fr:r('preset-bookshelf')"/>
+                                        <xf:value>preset-bookshelf</xf:value>
+                                    </xf:item>
+                                    <xf:action event="xforms-value-changed" if="xxf:non-blank(context())">
+                                        <xf:var name="chosen" value="string(context())"/>
+                                        <xf:setvalue ref="instance('state')/@preset-choice" value="''"/>
+                                        <xf:insert
+                                            context="instance('editor')/cards"
+                                            ref="card"
+                                            origin="instance('editor')/templates/card[@id = $chosen]"/>
+                                    </xf:action>
+                                </xf:select1>
+                            </xf:group>
+                        </xh:div>
+
+                        <xh:div class="fr-lce-toolbar-end">
+                            <xf:group ref=".[$card-count gt 0]">
+                                <xf:trigger appearance="minimal" id="fr-lce-toggle-all-btn" class="fr-lce-utility-btn">
+                                    <xf:label value="if ($all-expanded) then fr:r('collapse-all') else fr:r('expand-all')"/>
+                                    <xf:action event="DOMActivate">
+                                        <xf:var name="next" value="if ($all-expanded) then 'false' else 'true'"/>
+                                        <xf:action iterate="instance('editor')/cards/card">
+                                            <xf:setvalue ref="@expanded" value="$next"/>
+                                        </xf:action>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xf:group>
+
+                            <xf:group ref=".[not($is-readonly)]">
+                                <xf:trigger appearance="minimal" id="fr-lce-reset-defaults-btn" class="fr-lce-utility-btn">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-rotate-left" aria-hidden="true"/>
+                                        <xh:span><xf:output value="fr:r('reset-defaults')"/></xh:span>
+                                    </xf:label>
+                                    <xf:action event="DOMActivate">
+                                        <xf:setvalue ref="instance('state')/@syncing" value="'true'"/>
+                                        <xf:insert
+                                            ref="instance('editor')"
+                                            origin="frf:landingCardsToEditorXml(string($default-json), string($default-json))/*"/>
+                                        <xf:setvalue ref="instance('state')/@syncing" value="'false'"/>
+                                        <xf:dispatch name="fr-lce-push-json" targetid="landing-cards-editor-model"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xf:group>
+                        </xh:div>
+                    </xh:div>
+
+                    <!-- Empty state -->
+                    <xh:div class="fr-lce-empty {'xforms-hidden'[$card-count gt 0]}">
+                        <xf:output value="fr:r('empty-cards')"/>
+                    </xh:div>
+
+                    <!-- Reorderable Card Stack (Drag-and-Drop + Keyboard Move Up/Down) -->
+                    <fr:dnd-repeat id="cards-dnd-repeat" ref="instance('editor')/cards/card" class="fr-dnd-drop-indicator">
+                        <xf:var name="card"         value="."/>
+                        <xf:var name="card-pos"     value="position()"/>
+                        <xf:var name="card-type"    value="string(@type)"/>
+                        <xf:var name="is-expanded"  value="@expanded = 'true'"/>
+                        <xf:var name="is-card-valid" value="valid($card)"/>
+
+                        <xf:var
+                            name="discovered-form-title"
+                            value="
+                                if ($card-type = 'form-data' and xxf:non-blank(@app) and xxf:non-blank(@form)) then
+                                    (
+                                        instance('forms-metadata')/form[application-name = $card/@app and form-name = $card/@form]/
+                                            (title[@xml:lang = xxf:lang()], title)[xxf:non-blank()]
+                                    )[1]
+                                else
+                                    ()"/>
+
+                        <xf:var
+                            name="resolved-title"
+                            value="
+                                if (title/@mode = 'resource' and xxf:non-blank(title/@resource-key)) then
+                                    (xxf:r(string(title/@resource-key), '|fr-fr-resources|')[xxf:non-blank()], string(title/@resource-key))[1]
+                                else if (title/@mode = 'single' and xxf:non-blank(title/@single)) then
+                                    string(title/@single)
+                                else if (title/@mode = 'localized' and exists(title/translation[xxf:non-blank()])) then
+                                    string((title/translation[@lang = xxf:lang()][xxf:non-blank()], title/translation[xxf:non-blank()])[1])
+                                else if ($card-type = 'quick-links') then
+                                    if (@links-mode = 'admin') then
+                                        xxf:r('landing.titles.admin', '|fr-fr-resources|')
+                                    else
+                                        xxf:r('landing.titles.quick-links', '|fr-fr-resources|')
+                                else if ($card-type = 'form-data') then
+                                    if (exists($discovered-form-title)) then
+                                        string($discovered-form-title)
+                                    else if (xxf:non-blank(@app) and xxf:non-blank(@form)) then
+                                        concat(@app, ' / ', @form)
+                                    else
+                                        fr:r('untitled-card')
+                                else
+                                    fr:r('untitled-card')"/>
+
+                        <xf:var
+                            name="type-badge-label"
+                            value="
+                                if ($card-type = 'quick-links') then
+                                    fr:r('type-quick-links')
+                                else if ($card-type = 'published-forms') then
+                                    fr:r('type-published-forms')
+                                else
+                                    fr:r('type-form-data')"/>
+
+                        <xf:var
+                            name="detail-summary"
+                            value="
+                                if ($card-type = 'quick-links') then
+                                    concat(
+                                        if      (@links-mode = 'main')   then fr:r('links-summary-main')
+                                        else if (@links-mode = 'admin')  then fr:r('links-summary-admin')
+                                        else if (@links-mode = 'custom') then xxf:format-message(fr:r('links-summary-custom'), count(xxf:split(@links-custom)))
+                                        else                                  fr:r('links-summary-all'),
+                                        ' · ',
+                                        if (@layout = 'list') then fr:r('layout-list') else fr:r('layout-tiles')
+                                    )
+                                else if ($card-type = 'published-forms') then
+                                    if (@app-mode = 'specific' and xxf:non-blank(@app)) then
+                                        concat(fr:r('app-label'), ': ', @app)
+                                    else
+                                        fr:r('app-all')
+                                else
+                                    if (xxf:non-blank(@app) or xxf:non-blank(@form)) then
+                                        concat(
+                                            (@app[xxf:non-blank()], '?')[1],
+                                            ' / ',
+                                            (@form[xxf:non-blank()], '?')[1],
+                                            if (@version-mode = 'specific' and xxf:non-blank(@version)) then concat(' (v', @version, ')') else ''
+                                        )
+                                    else
+                                        ''"/>
+
+                        <xf:var
+                            name="preview-icon-src"
+                            value="
+                                if (@thumbnail-mode = 'preset' and xxf:non-blank(@thumbnail-preset)) then
+                                    string(@thumbnail-preset)
+                                else if (@thumbnail-mode = 'custom' and xxf:non-blank(@thumbnail-custom)) then
+                                    string(@thumbnail-custom)
+                                else if ($card-type = 'form-data' and @app = 'orbeon' and @form = 'builder') then
+                                    '/apps/fr/style/images/orbeon/library.svg'
+                                else
+                                    ''"/>
+
+                        <xh:div class="xforms-dnd-item {'xforms-dnd-moves'[not($is-readonly) and $card-count gt 1]} fr-lce-card {'fr-lce-card-expanded'[$is-expanded]} {'fr-lce-card-invalid'[not($is-readonly) and not($is-card-valid)]}">
+
+                            <!-- Card Header Row -->
+                            <xh:div class="fr-lce-card-header">
+                                <xh:span
+                                    class="fr-lce-drag-handle xforms-dnd-handle {'xforms-hidden'[$is-readonly or $card-count le 1]}"
+                                    title="{fr:r('drag-to-reorder')}"
+                                    aria-hidden="true">
+                                    <xh:i class="fa fa-grip-vertical"/>
+                                </xh:span>
+
+                                <xh:span class="fr-lce-card-index">
+                                    <xf:output value="$card-pos"/>
+                                </xh:span>
+
+                                <xf:trigger appearance="minimal" id="fr-lce-card-toggle" class="fr-lce-card-toggle">
+                                    <xf:label>
+                                        <xh:i class="fa fa-chevron-down fr-lce-chevron" aria-hidden="true"/>
+                                        <xh:span class="fr-lce-card-icon-wrap {'xforms-hidden'[xxf:is-blank($preview-icon-src)]}">
+                                            <xh:img
+                                                src="{($preview-icon-src[xxf:non-blank()], 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')[1]}"
+                                                alt=""
+                                                class="fr-lce-card-icon img-invertible"/>
+                                        </xh:span>
+                                        <xh:span class="fr-lce-card-icon-wrap fr-lce-card-icon-fallback {'xforms-hidden'[xxf:non-blank($preview-icon-src)]}">
+                                            <xh:i
+                                                class="fa fa-fw {if ($card-type = 'quick-links') then 'fa-grip' else if ($card-type = 'published-forms') then 'fa-rectangle-list' else 'fa-table'}"
+                                                aria-hidden="true"/>
+                                        </xh:span>
+                                        <xh:span class="fr-lce-card-title"><xf:output value="$resolved-title"/></xh:span>
+                                        <xh:span class="fr-lce-badge fr-lce-type-badge"><xf:output value="$type-badge-label"/></xh:span>
+                                        <xh:span class="fr-lce-card-summary {'xforms-hidden'[xxf:is-blank($detail-summary)]}">
+                                            <xf:output value="$detail-summary"/>
+                                        </xh:span>
+                                    </xf:label>
+                                    <xf:setvalue event="DOMActivate" ref="$card/@expanded" value="if (. = 'true') then 'false' else 'true'"/>
+                                </xf:trigger>
+
+                                <xf:group ref=".[not($is-readonly)]" class="fr-lce-card-actions">
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        id="fr-lce-move-up-btn"
+                                        class="fr-lce-icon-btn {'fr-lce-icon-btn-disabled'[$card-pos le 1]}">
+                                        <xf:label>
+                                            <xh:i class="fa fa-arrow-up" aria-hidden="true"/>
+                                            <xh:span class="xforms-hidden"><xf:output value="concat(fr:r('move-up'), ': ', $resolved-title)"/></xh:span>
+                                        </xf:label>
+                                        <xf:hint value="fr:r('move-up')"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:var name="prev-card" value="$card/preceding-sibling::card[1]"/>
+                                            <xf:action if="exists($prev-card)">
+                                                <xf:var name="new-pos" value="count($prev-card/preceding-sibling::card) + 1"/>
+                                                <xf:setvalue
+                                                    ref="instance('state')/@announcement"
+                                                    value="xxf:format-message(fr:r('moved-announcement'), ($resolved-title, $new-pos, $card-count))"/>
+                                                <xf:insert
+                                                    context="instance('editor')/cards"
+                                                    ref="$prev-card"
+                                                    position="before"
+                                                    origin="$card"/>
+                                                <xf:delete ref="$card"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        id="fr-lce-move-down-btn"
+                                        class="fr-lce-icon-btn {'fr-lce-icon-btn-disabled'[$card-pos ge $card-count]}">
+                                        <xf:label>
+                                            <xh:i class="fa fa-arrow-down" aria-hidden="true"/>
+                                            <xh:span class="xforms-hidden"><xf:output value="concat(fr:r('move-down'), ': ', $resolved-title)"/></xh:span>
+                                        </xf:label>
+                                        <xf:hint value="fr:r('move-down')"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:var name="next-card" value="$card/following-sibling::card[1]"/>
+                                            <xf:action if="exists($next-card)">
+                                                <xf:var name="new-pos" value="count($next-card/preceding-sibling::card) + 1"/>
+                                                <xf:setvalue
+                                                    ref="instance('state')/@announcement"
+                                                    value="xxf:format-message(fr:r('moved-announcement'), ($resolved-title, $new-pos, $card-count))"/>
+                                                <xf:insert
+                                                    context="instance('editor')/cards"
+                                                    ref="$next-card"
+                                                    position="after"
+                                                    origin="$card"/>
+                                                <xf:delete ref="$card"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        id="fr-lce-remove-btn"
+                                        class="fr-lce-icon-btn fr-lce-remove-btn">
+                                        <xf:label>
+                                            <xh:i class="fa fa-trash-can" aria-hidden="true"/>
+                                            <xh:span class="xforms-hidden"><xf:output value="concat(fr:r('remove-card'), ': ', $resolved-title)"/></xh:span>
+                                        </xf:label>
+                                        <xf:hint value="fr:r('remove-card')"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:setvalue
+                                                ref="instance('state')/@announcement"
+                                                value="xxf:format-message(fr:r('removed-announcement'), $resolved-title)"/>
+                                            <xf:delete ref="$card"/>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </xf:group>
+                            </xh:div>
+
+                            <!-- Expandable Card Settings Body (stays XForms-relevant when collapsed so validation always runs) -->
+                            <xh:div class="fr-lce-card-body {'xforms-hidden'[not($is-expanded)]}">
+
+                                <!-- 1. QUICK LINKS SETTINGS -->
+                                <xf:group ref=".[$card-type = 'quick-links']" class="fr-lce-section">
+                                    <xh:div class="fr-lce-fields-grid fr-lce-cols-2">
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-ql-links-mode" ref="@links-mode" appearance="minimal">
+                                                <xf:label value="fr:r('links-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('links-main')"/>
+                                                    <xf:value>main</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('links-admin')"/>
+                                                    <xf:value>admin</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('links-all')"/>
+                                                    <xf:value>all</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('links-custom')"/>
+                                                    <xf:value>custom</xf:value>
+                                                </xf:item>
+                                                <xf:setvalue event="xforms-value-changed" ref="../@links-explicit-all" value="'false'"/>
+                                            </xf:select1>
+                                        </xh:div>
+
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-ql-layout" ref="@layout" appearance="full xxf:horizontal">
+                                                <xf:label value="fr:r('layout-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('layout-tiles')"/>
+                                                    <xf:value>tiles</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('layout-list')"/>
+                                                    <xf:value>list</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                        </xh:div>
+                                    </xh:div>
+
+                                    <xf:group ref=".[@links-mode = 'custom']" class="fr-lce-field">
+                                        <xf:select id="fr-lce-ql-links-custom" ref="@links-custom" appearance="full" class="fr-lce-checkbox-grid">
+                                            <xf:label value="fr:r('links-custom-label')"/>
+                                            <xf:alert value="fr:r('alert-required')"/>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/>
+                                                <xf:value>form-builder-new</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.form-builder-summary', '|fr-fr-resources|')"/>
+                                                <xf:value>form-builder-summary</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>
+                                                <xf:value>published-forms</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/>
+                                                <xf:value>forms-admin</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/>
+                                                <xf:value>configuration</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/>
+                                                <xf:value>admin-console</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/>
+                                                <xf:value>forms-analytics</xf:value>
+                                            </xf:item>
+                                        </xf:select>
+                                    </xf:group>
+                                </xf:group>
+
+                                <!-- 2. PUBLISHED FORMS SETTINGS -->
+                                <xf:group ref=".[$card-type = 'published-forms']" class="fr-lce-section">
+                                    <xh:div class="fr-lce-fields-grid fr-lce-cols-2">
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-pf-app-mode" ref="@app-mode" appearance="full xxf:horizontal">
+                                                <xf:label value="fr:r('app-scope-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('app-all')"/>
+                                                    <xf:value>all</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('app-specific')"/>
+                                                    <xf:value>specific</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+
+                                            <xf:group ref=".[@app-mode = 'specific']" class="fr-lce-subfield">
+                                                <xf:group ref=".[exists($distinct-apps)]">
+                                                    <fr:open-select1 id="fr-lce-pf-app-select" ref="@app" appearance="minimal">
+                                                        <xf:label value="fr:r('app-label')"/>
+                                                        <xf:alert value="fr:r('alert-slug')"/>
+                                                        <xf:itemset ref="$distinct-apps">
+                                                            <xf:label ref="context()"/>
+                                                            <xf:value ref="context()"/>
+                                                        </xf:itemset>
+                                                    </fr:open-select1>
+                                                </xf:group>
+                                                <xf:group ref=".[empty($distinct-apps)]">
+                                                    <xf:input id="fr-lce-pf-app-input" ref="@app">
+                                                        <xf:label value="fr:r('app-label')"/>
+                                                        <xf:alert value="fr:r('alert-slug')"/>
+                                                    </xf:input>
+                                                </xf:group>
+                                            </xf:group>
+                                        </xh:div>
+
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-pf-link-to" ref="@link-to" appearance="minimal">
+                                                <xf:label value="fr:r('link-to-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('link-to-default')"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('link-to-summary')"/>
+                                                    <xf:value>summary</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('link-to-new')"/>
+                                                    <xf:value>new</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('link-to-summary-new')"/>
+                                                    <xf:value>summary new</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('link-to-new-summary')"/>
+                                                    <xf:value>new summary</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                        </xh:div>
+                                    </xh:div>
+
+                                    <xh:div class="fr-lce-fields-grid fr-lce-cols-2">
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-pf-sort-by" ref="@sort-by" appearance="minimal">
+                                                <xf:label value="fr:r('sort-by-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-default')"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-last-modified')"/>
+                                                    <xf:value>last-modified</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-title')"/>
+                                                    <xf:value>title</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-created')"/>
+                                                    <xf:value>created</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-app-name')"/>
+                                                    <xf:value>application-name</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-form-name')"/>
+                                                    <xf:value>form-name</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-form-version')"/>
+                                                    <xf:value>form-version</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-by-last-modified-by')"/>
+                                                    <xf:value>last-modified-by</xf:value>
+                                                </xf:item>
+                                                <xf:setvalue event="xforms-value-changed" if="xxf:is-blank(context())" ref="../@sort-direction" value="''"/>
+                                            </xf:select1>
+                                        </xh:div>
+
+                                        <xh:div class="fr-lce-field">
+                                            <xf:select1 id="fr-lce-pf-sort-dir" ref="@sort-direction[xxf:non-blank(../@sort-by)]" appearance="minimal">
+                                                <xf:label value="fr:r('sort-dir-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-dir-default')"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-dir-asc')"/>
+                                                    <xf:value>ascending</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="fr:r('sort-dir-desc')"/>
+                                                    <xf:value>descending</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+
+                                <!-- 3. FORM DATA SETTINGS -->
+                                <xf:group ref=".[$card-type = 'form-data']" class="fr-lce-section">
+                                    <xf:var
+                                        name="forms-for-app"
+                                        value="
+                                            let $matching := instance('forms-metadata')/form[application-name = $card/@app]
+                                            return
+                                                xxf:sort(
+                                                    distinct-values((
+                                                        if ($card/@app = 'orbeon') then 'builder' else (),
+                                                        $matching/form-name/string()
+                                                    )[xxf:non-blank()]),
+                                                    .,
+                                                    'text',
+                                                    'ascending'
+                                                )"/>
+                                    <xf:var
+                                        name="versions-for-form"
+                                        value="
+                                            xxf:sort(
+                                                distinct-values(
+                                                    instance('forms-metadata')/form[application-name = $card/@app and form-name = $card/@form]/
+                                                        form-version[. castable as xs:integer]/xs:integer(.)
+                                                ),
+                                                .,
+                                                'number',
+                                                'descending'
+                                            )"/>
+
+                                    <xh:div class="fr-lce-fields-grid fr-lce-cols-3">
+                                        <xh:div class="fr-lce-field">
+                                            <xf:group ref=".[exists($distinct-apps)]">
+                                                <fr:open-select1 id="fr-lce-fd-app-select" ref="@app" appearance="minimal">
+                                                    <xf:label value="fr:r('app-label')"/>
+                                                    <xf:alert value="fr:r('alert-slug')"/>
+                                                    <xf:itemset ref="$distinct-apps">
+                                                        <xf:label ref="context()"/>
+                                                        <xf:value ref="context()"/>
+                                                    </xf:itemset>
+                                                </fr:open-select1>
+                                            </xf:group>
+                                            <xf:group ref=".[empty($distinct-apps)]">
+                                                <xf:input id="fr-lce-fd-app-input" ref="@app">
+                                                    <xf:label value="fr:r('app-label')"/>
+                                                    <xf:alert value="fr:r('alert-slug')"/>
+                                                </xf:input>
+                                            </xf:group>
+                                        </xh:div>
+
+                                        <xh:div class="fr-lce-field">
+                                            <xf:group ref=".[exists($forms-for-app)]">
+                                                <fr:open-select1 id="fr-lce-fd-form-select" ref="@form" appearance="minimal">
+                                                    <xf:label value="fr:r('form-label')"/>
+                                                    <xf:alert value="fr:r('alert-slug')"/>
+                                                    <xf:itemset ref="$forms-for-app">
+                                                        <xf:label
+                                                            value="
+                                                                let $fname := context(),
+                                                                    $ftitle := (
+                                                                        if ($card/@app = 'orbeon' and $fname = 'builder') then
+                                                                            xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|')
+                                                                        else
+                                                                            instance('forms-metadata')/form[application-name = $card/@app and form-name = $fname]/
+                                                                                (title[@xml:lang = xxf:lang()], title)[xxf:non-blank()]
+                                                                    )[1]
+                                                                return
+                                                                    if (exists($ftitle)) then concat($ftitle, ' (', $fname, ')') else $fname"/>
+                                                        <xf:value ref="context()"/>
+                                                    </xf:itemset>
+                                                </fr:open-select1>
+                                            </xf:group>
+                                            <xf:group ref=".[empty($forms-for-app)]">
+                                                <xf:input id="fr-lce-fd-form-input" ref="@form">
+                                                    <xf:label value="fr:r('form-label')"/>
+                                                    <xf:alert value="fr:r('alert-slug')"/>
+                                                </xf:input>
+                                            </xf:group>
+                                        </xh:div>
+
+                                        <xh:div class="fr-lce-field">
+                                            <xh:div class="fr-lce-version-row">
+                                                <xf:select1 id="fr-lce-fd-version-mode" ref="@version-mode" appearance="minimal">
+                                                    <xf:label value="fr:r('version-mode-label')"/>
+                                                    <xf:hint value="if (../@version-mode = 'specific' and exists($versions-for-form)) then xxf:format-message(fr:r('published-versions-hint'), string-join(for $v in $versions-for-form return string($v), ', ')) else ''"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('version-specific')"/>
+                                                        <xf:value>specific</xf:value>
+                                                    </xf:item>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('version-default')"/>
+                                                        <xf:value>default</xf:value>
+                                                    </xf:item>
+                                                </xf:select1>
+                                                <xf:input id="fr-lce-fd-version-input" ref="@version[../@version-mode = 'specific']" class="fr-lce-version-input">
+                                                    <xf:label value="fr:r('version-number-label')"/>
+                                                    <xf:alert value="fr:r('alert-version')"/>
+                                                </xf:input>
+                                            </xh:div>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+
+                                <!-- SHARED TITLE & DESCRIPTION CONTROLS -->
+                                <xh:div class="fr-lce-fields-grid fr-lce-cols-2">
+                                    <!-- Title -->
+                                    <xh:div class="fr-lce-field">
+                                        <xf:select1 id="fr-lce-title-mode" ref="title/@mode" appearance="minimal">
+                                            <xf:label value="fr:r('title-label')"/>
+                                            <xf:itemset ref=".[$card-type != 'published-forms']">
+                                                <xf:label value="if ($card-type = 'form-data') then fr:r('text-mode-auto-form') else fr:r('text-mode-auto-card')"/>
+                                                <xf:value>auto</xf:value>
+                                            </xf:itemset>
+                                            <xf:itemset ref=".[title/@mode = 'resource' or $card-type = 'published-forms']">
+                                                <xf:label value="fr:r('text-mode-resource')"/>
+                                                <xf:value>resource</xf:value>
+                                            </xf:itemset>
+                                            <xf:item>
+                                                <xf:label value="fr:r('text-mode-single')"/>
+                                                <xf:value>single</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="fr:r('text-mode-localized')"/>
+                                                <xf:value>localized</xf:value>
+                                            </xf:item>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action if="context() = 'resource' and xxf:is-blank(../@resource-key)">
+                                                    <xf:setvalue ref="../@resource-key" value="'landing.titles.published-forms'"/>
+                                                </xf:action>
+                                                <xf:action if="context() = 'localized' and empty(../translation)">
+                                                    <xf:insert context=".." origin="instance('editor')/templates/translation"/>
+                                                    <xf:setvalue ref="../translation[1]/@lang" value="(xxf:lang()[xxf:non-blank()], 'en')[1]"/>
+                                                    <xf:setvalue ref="../translation[1]" value="string(../@single)"/>
+                                                </xf:action>
+                                                <xf:action if="context() = 'single' and xxf:is-blank(../@single) and exists(../translation[xxf:non-blank()])">
+                                                    <xf:setvalue ref="../@single" value="string((../translation[@lang = xxf:lang()][xxf:non-blank()], ../translation[xxf:non-blank()])[1])"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </xf:select1>
+
+                                        <xf:group ref="title[@mode = 'single']" class="fr-lce-subfield">
+                                            <xf:input id="fr-lce-title-single" ref="@single">
+                                                <xf:label class="xforms-hidden" value="fr:r('title-label')"/>
+                                                <xf:alert value="fr:r('alert-required')"/>
+                                            </xf:input>
+                                        </xf:group>
+
+                                        <xf:group ref="title[@mode = 'resource']" class="fr-lce-subfield">
+                                            <fr:open-select1 id="fr-lce-title-resource" ref="@resource-key" appearance="minimal">
+                                                <xf:label class="xforms-hidden" value="fr:r('builtin-key-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.published-forms', '|fr-fr-resources|'), ' (landing.titles.published-forms)')"/>
+                                                    <xf:value>landing.titles.published-forms</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.demo-forms', '|fr-fr-resources|'), ' (landing.titles.demo-forms)')"/>
+                                                    <xf:value>landing.titles.demo-forms</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.demo-features', '|fr-fr-resources|'), ' (landing.titles.demo-features)')"/>
+                                                    <xf:value>landing.titles.demo-features</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.form-builder-forms', '|fr-fr-resources|'), ' (landing.titles.form-builder-forms)')"/>
+                                                    <xf:value>landing.titles.form-builder-forms</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.quick-links', '|fr-fr-resources|'), ' (landing.titles.quick-links)')"/>
+                                                    <xf:value>landing.titles.quick-links</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.titles.admin', '|fr-fr-resources|'), ' (landing.titles.admin)')"/>
+                                                    <xf:value>landing.titles.admin</xf:value>
+                                                </xf:item>
+                                            </fr:open-select1>
+                                        </xf:group>
+
+                                        <xf:group ref="title[@mode = 'localized']" class="fr-lce-subfield fr-lce-translations">
+                                            <xf:repeat ref="translation">
+                                                <xf:var name="tr-count" value="count(../translation)"/>
+                                                <xh:div class="fr-lce-translation-row">
+                                                    <xh:div class="fr-lce-translation-lang">
+                                                        <fr:language-choice id="fr-lce-title-tr-lang" ref="@lang">
+                                                            <xf:label class="xforms-hidden" value="fr:r('language-label')"/>
+                                                            <xf:alert value="fr:r('alert-duplicate-lang')"/>
+                                                        </fr:language-choice>
+                                                    </xh:div>
+                                                    <xh:div class="fr-lce-translation-text">
+                                                        <xf:input id="fr-lce-title-tr-text" ref=".">
+                                                            <xf:label class="xforms-hidden" value="fr:r('translation-label')"/>
+                                                            <xf:alert value="fr:r('alert-required')"/>
+                                                        </xf:input>
+                                                    </xh:div>
+                                                    <xf:trigger
+                                                        appearance="minimal"
+                                                        ref=".[not($is-readonly) and ($tr-count gt 1 or $card-type != 'published-forms')]"
+                                                        class="fr-lce-icon-btn fr-lce-remove-btn">
+                                                        <xf:label>
+                                                            <xh:i class="fa fa-xmark" aria-hidden="true"/>
+                                                            <xh:span class="xforms-hidden"><xf:output value="fr:r('remove-translation')"/></xh:span>
+                                                        </xf:label>
+                                                        <xf:delete event="DOMActivate" ref="."/>
+                                                    </xf:trigger>
+                                                </xh:div>
+                                            </xf:repeat>
+                                            <xf:trigger appearance="minimal" ref=".[not($is-readonly)]" class="fr-lce-add-subrow-btn">
+                                                <xf:label>
+                                                    <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                                    <xh:span><xf:output value="fr:r('add-translation')"/></xh:span>
+                                                </xf:label>
+                                                <xf:insert event="DOMActivate" context="." ref="translation" origin="instance('editor')/templates/translation"/>
+                                            </xf:trigger>
+                                        </xf:group>
+                                    </xh:div>
+
+                                    <!-- Description -->
+                                    <xh:div class="fr-lce-field">
+                                        <xf:select1 id="fr-lce-desc-mode" ref="description/@mode" appearance="minimal">
+                                            <xf:label value="fr:r('description-label')"/>
+                                            <xf:item>
+                                                <xf:label value="if ($card-type = 'form-data') then fr:r('text-mode-auto-form') else fr:r('text-mode-none')"/>
+                                                <xf:value>auto</xf:value>
+                                            </xf:item>
+                                            <xf:itemset ref=".[description/@mode = 'resource' or $card-type = 'published-forms']">
+                                                <xf:label value="fr:r('text-mode-resource')"/>
+                                                <xf:value>resource</xf:value>
+                                            </xf:itemset>
+                                            <xf:item>
+                                                <xf:label value="fr:r('text-mode-single')"/>
+                                                <xf:value>single</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="fr:r('text-mode-localized')"/>
+                                                <xf:value>localized</xf:value>
+                                            </xf:item>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action if="context() = 'resource' and xxf:is-blank(../@resource-key)">
+                                                    <xf:setvalue ref="../@resource-key" value="'landing.descriptions.published-forms'"/>
+                                                </xf:action>
+                                                <xf:action if="context() = 'localized' and empty(../translation)">
+                                                    <xf:insert context=".." origin="instance('editor')/templates/translation"/>
+                                                    <xf:setvalue ref="../translation[1]/@lang" value="(xxf:lang()[xxf:non-blank()], 'en')[1]"/>
+                                                    <xf:setvalue ref="../translation[1]" value="string(../@single)"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </xf:select1>
+
+                                        <xf:group ref="description[@mode = 'single']" class="fr-lce-subfield">
+                                            <xf:input id="fr-lce-desc-single" ref="@single">
+                                                <xf:label class="xforms-hidden" value="fr:r('description-label')"/>
+                                            </xf:input>
+                                        </xf:group>
+
+                                        <xf:group ref="description[@mode = 'resource']" class="fr-lce-subfield">
+                                            <fr:open-select1 id="fr-lce-desc-resource" ref="@resource-key" appearance="minimal">
+                                                <xf:label class="xforms-hidden" value="fr:r('builtin-key-label')"/>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.descriptions.published-forms', '|fr-fr-resources|'), ' (landing.descriptions.published-forms)')"/>
+                                                    <xf:value>landing.descriptions.published-forms</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.descriptions.demo-forms', '|fr-fr-resources|'), ' (landing.descriptions.demo-forms)')"/>
+                                                    <xf:value>landing.descriptions.demo-forms</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.descriptions.demo-features', '|fr-fr-resources|'), ' (landing.descriptions.demo-features)')"/>
+                                                    <xf:value>landing.descriptions.demo-features</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label value="concat(xxf:r('landing.descriptions.form-builder-forms', '|fr-fr-resources|'), ' (landing.descriptions.form-builder-forms)')"/>
+                                                    <xf:value>landing.descriptions.form-builder-forms</xf:value>
+                                                </xf:item>
+                                            </fr:open-select1>
+                                        </xf:group>
+
+                                        <xf:group ref="description[@mode = 'localized']" class="fr-lce-subfield fr-lce-translations">
+                                            <xf:repeat ref="translation">
+                                                <xh:div class="fr-lce-translation-row">
+                                                    <xh:div class="fr-lce-translation-lang">
+                                                        <fr:language-choice id="fr-lce-desc-tr-lang" ref="@lang">
+                                                            <xf:label class="xforms-hidden" value="fr:r('language-label')"/>
+                                                            <xf:alert value="fr:r('alert-duplicate-lang')"/>
+                                                        </fr:language-choice>
+                                                    </xh:div>
+                                                    <xh:div class="fr-lce-translation-text">
+                                                        <xf:input id="fr-lce-desc-tr-text" ref=".">
+                                                            <xf:label class="xforms-hidden" value="fr:r('translation-label')"/>
+                                                            <xf:alert value="fr:r('alert-required')"/>
+                                                        </xf:input>
+                                                    </xh:div>
+                                                    <xf:trigger appearance="minimal" ref=".[not($is-readonly)]" class="fr-lce-icon-btn fr-lce-remove-btn">
+                                                        <xf:label>
+                                                            <xh:i class="fa fa-xmark" aria-hidden="true"/>
+                                                            <xh:span class="xforms-hidden"><xf:output value="fr:r('remove-translation')"/></xh:span>
+                                                        </xf:label>
+                                                        <xf:delete event="DOMActivate" ref="."/>
+                                                    </xf:trigger>
+                                                </xh:div>
+                                            </xf:repeat>
+                                            <xf:trigger appearance="minimal" ref=".[not($is-readonly)]" class="fr-lce-add-subrow-btn">
+                                                <xf:label>
+                                                    <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                                    <xh:span><xf:output value="fr:r('add-translation')"/></xh:span>
+                                                </xf:label>
+                                                <xf:insert event="DOMActivate" context="." ref="translation" origin="instance('editor')/templates/translation"/>
+                                            </xf:trigger>
+                                        </xf:group>
+                                    </xh:div>
+                                </xh:div>
+
+                                <!-- ICON PICKER (Published Forms & Form Data) -->
+                                <xf:group ref=".[$card-type = ('published-forms', 'form-data')]" class="fr-lce-field fr-lce-icon-section">
+                                    <xf:select1 id="fr-lce-thumbnail-mode" ref="@thumbnail-mode" appearance="full xxf:horizontal">
+                                        <xf:label value="fr:r('icon-label')"/>
+                                        <xf:item>
+                                            <xf:label value="if ($card-type = 'form-data') then fr:r('icon-mode-auto-form') else fr:r('icon-mode-none')"/>
+                                            <xf:value>none</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label value="fr:r('icon-mode-preset')"/>
+                                            <xf:value>preset</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label value="fr:r('icon-mode-custom')"/>
+                                            <xf:value>custom</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+
+                                    <xf:group ref=".[@thumbnail-mode = 'preset']" class="fr-lce-icon-picker">
+                                        <xf:repeat ref="instance('icons')/icon">
+                                            <xf:var name="icon-id"   value="string(@id)"/>
+                                            <xf:var name="icon-path" value="string(@path)"/>
+                                            <xf:var name="icon-name" value="fr:r(concat('icon-', $icon-id))"/>
+                                            <xf:var name="selected"  value="$card/@thumbnail-preset = $icon-path"/>
+                                            <xf:trigger
+                                                appearance="minimal"
+                                                class="fr-lce-icon-tile {'fr-lce-icon-tile-selected'[$selected]}">
+                                                <xf:label>
+                                                    <xh:img src="{$icon-path}" alt="" class="img-invertible"/>
+                                                    <xh:span class="fr-lce-icon-tile-label"><xf:output value="$icon-name"/></xh:span>
+                                                </xf:label>
+                                                <xf:setvalue
+                                                    event="DOMActivate"
+                                                    if="not($is-readonly)"
+                                                    ref="$card/@thumbnail-preset"
+                                                    value="$icon-path"/>
+                                            </xf:trigger>
+                                        </xf:repeat>
+                                    </xf:group>
+
+                                    <xf:group ref=".[@thumbnail-mode = 'custom']" class="fr-lce-subfield">
+                                        <xf:input id="fr-lce-thumbnail-custom" ref="@thumbnail-custom">
+                                            <xf:label value="fr:r('icon-custom-label')"/>
+                                            <xf:alert value="fr:r('alert-required')"/>
+                                        </xf:input>
+                                    </xf:group>
+                                </xf:group>
+
+                            </xh:div>
+                        </xh:div>
+                    </fr:dnd-repeat>
+
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

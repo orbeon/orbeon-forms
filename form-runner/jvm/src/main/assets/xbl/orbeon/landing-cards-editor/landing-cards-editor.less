@@ -1,0 +1,566 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    .xbl-fr-landing-cards-editor {
+        display: block;
+
+        .fr-lce-sr-status {
+            position: absolute;
+            clip-path: inset(50%);
+            overflow: hidden;
+            inline-size: 1px;
+            block-size: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            white-space: nowrap;
+        }
+    }
+
+    .fr-landing-cards-editor {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65em;
+        margin-block-start: 0.35em;
+
+        // Top toolbar
+        .fr-lce-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: safe center;
+            justify-content: space-between;
+            gap: 0.65em;
+            padding: 0.55em 0.75em;
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            .fr-lce-toolbar-start,
+            .fr-lce-toolbar-end {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: safe center;
+                gap: 0.5em;
+            }
+
+            .fr-lce-readonly-note:not(.xforms-disabled) {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4em;
+                color: var(--orbeon-hint-color);
+                font-size: 0.92em;
+            }
+
+            .fr-lce-add-group:not(.xforms-disabled) {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: safe center;
+                gap: 0.45em;
+            }
+
+            .fr-lce-add-btn {
+                margin: 0;
+
+                button.btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35em;
+                    min-inline-size: 24px;
+                    min-block-size: var(--orbeon-control-height);
+                    padding: 0 0.7em;
+                    margin: 0;
+                    font-weight: 500;
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-control-background-color);
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-landing-tile-border-radius);
+                    box-shadow: none;
+
+                    @media (hover: hover) {
+                        &:hover {
+                            background-color: var(--orbeon-pill-muted-background-color);
+                            border-color: var(--orbeon-base-border-color);
+                        }
+                    }
+                }
+            }
+
+            .fr-lce-preset-select:not(.xforms-disabled) {
+                display: inline-flex;
+                align-items: center;
+                margin: 0;
+
+                select {
+                    inline-size: auto;
+                    min-block-size: var(--orbeon-control-height);
+                    margin: 0;
+                }
+            }
+
+            .fr-lce-utility-btn {
+                display: inline-flex;
+                align-items: center;
+                min-inline-size: 24px;
+                min-block-size: 26px;
+                padding: 0 0.45em;
+                margin: 0;
+                text-decoration: none;
+
+                button.btn-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.3em;
+                    padding: 0;
+                    margin: 0;
+                    color: var(--orbeon-link-color);
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .fr-lce-empty {
+            padding: 1.5em 1em;
+            text-align: center;
+            color: var(--orbeon-hint-color);
+            border: 1px dashed var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        // Card stack inside fr:dnd-repeat
+        .xbl-fr-dnd-repeat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > .xforms-repeat-template {
+                display: none !important;
+            }
+        }
+
+        .fr-lce-card {
+            background-color: var(--orbeon-form-background-color);
+            border: 1px solid var(--orbeon-landing-card-border-color);
+            border-radius: var(--orbeon-landing-card-border-radius);
+            overflow: visible;
+
+            &.fr-lce-card-invalid {
+                border-color: var(--orbeon-error-color);
+            }
+
+            &.fr-lce-card-expanded .fr-lce-card-toggle .fr-lce-chevron {
+                transform: rotate(0deg);
+            }
+        }
+
+        .fr-lce-card-header {
+            display: grid;
+            grid-template-columns: auto auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.45em 0.65em;
+            background-color: var(--orbeon-landing-card-header-background-color);
+            border-radius: var(--orbeon-landing-card-border-radius);
+
+            .fr-lce-card-expanded > & {
+                border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+
+        .fr-lce-drag-handle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-inline-size: 24px;
+            min-block-size: 28px;
+            color: var(--orbeon-hint-color);
+            cursor: grab;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+
+            &.xforms-hidden {
+                display: none;
+            }
+
+            &:active {
+                cursor: grabbing;
+            }
+
+            @media (hover: hover) {
+                &:hover {
+                    color: var(--orbeon-base-color);
+                }
+            }
+        }
+
+        .fr-lce-card-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-inline-size: 1.55em;
+            block-size: 1.55em;
+            padding: 0 0.35em;
+            border-radius: 9999px;
+            background-color: var(--orbeon-pill-muted-background-color);
+            border: 1px solid var(--orbeon-pill-muted-border-color);
+            color: var(--orbeon-pill-muted-color);
+            font-size: 0.8em;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fr-lce-card-toggle {
+            min-inline-size: 0;
+            margin: 0;
+
+            button.btn-link {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.55em;
+                inline-size: 100%;
+                min-inline-size: 0;
+                min-block-size: 28px;
+                padding: 0.15em 0.25em;
+                margin: 0;
+                text-align: start;
+                text-decoration: none;
+                color: var(--orbeon-base-color);
+                box-shadow: none;
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    border-radius: 4px;
+                }
+            }
+
+            .fr-lce-chevron {
+                flex: 0 0 auto;
+                font-size: 0.8em;
+                color: var(--orbeon-hint-color);
+                transform: rotate(-90deg);
+
+                &:dir(rtl) {
+                    transform: rotate(90deg);
+                }
+
+                @media (prefers-reduced-motion: no-preference) {
+                    transition: transform 0.18s ease;
+                }
+            }
+
+            .fr-lce-card-icon-wrap {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 auto;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-lce-card-icon {
+                display: block;
+                inline-size: 1.65em;
+                block-size: 1.65em;
+                object-fit: contain;
+            }
+
+            .fr-lce-card-icon-fallback {
+                inline-size: 1.65em;
+                block-size: 1.65em;
+                border-radius: 4px;
+                background-color: var(--orbeon-pill-muted-background-color);
+                color: var(--orbeon-pill-muted-color);
+                font-size: 0.9em;
+            }
+
+            .fr-lce-card-title {
+                font-weight: 600;
+                color: var(--orbeon-base-color);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-inline-size: 24em;
+            }
+
+            .fr-lce-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.12em 0.55em;
+                border-radius: 9999px;
+                border: 1px solid var(--orbeon-pill-muted-border-color);
+                background-color: var(--orbeon-pill-muted-background-color);
+                color: var(--orbeon-pill-muted-color);
+                font-size: 0.78em;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            .fr-lce-card-summary {
+                color: var(--orbeon-hint-color);
+                font-size: 0.88em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        .fr-lce-card-actions:not(.xforms-disabled) {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15em;
+        }
+
+        .fr-lce-icon-btn {
+            margin: 0;
+
+            button.btn-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 26px;
+                min-block-size: 26px;
+                padding: 0;
+                margin: 0;
+                border: 1px solid transparent;
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                color: var(--orbeon-hint-color);
+                text-decoration: none;
+                box-shadow: none;
+
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-base-color);
+                        background-color: var(--orbeon-pill-muted-background-color);
+                        border-color: var(--orbeon-pill-muted-border-color);
+                    }
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -2px;
+                }
+            }
+
+            &.fr-lce-icon-btn-disabled button.btn-link {
+                opacity: 0.32;
+                cursor: default;
+            }
+
+            &.fr-lce-remove-btn button.btn-link {
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-error-color);
+                    }
+                }
+            }
+        }
+
+        // Expanded body
+        .fr-lce-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9em;
+            padding: 0.95em 1.05em;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-lce-section:not(.xforms-disabled) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9em;
+        }
+
+        .fr-lce-fields-grid {
+            display: grid;
+            gap: 0.9em;
+
+            &.fr-lce-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            &.fr-lce-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            @media (max-width: 820px) {
+                &.fr-lce-cols-2,
+                &.fr-lce-cols-3 {
+                    grid-template-columns: minmax(0, 1fr);
+                }
+            }
+        }
+
+        .fr-lce-field {
+            min-inline-size: 0;
+
+            select,
+            input[type="text"],
+            input[type="number"] {
+                inline-size: 100%;
+            }
+
+            .xbl-fr-open-select1:not(.xforms-readonly) .fr-component-group {
+                .xforms-input.xforms-readonly {
+                    display: none;
+                }
+
+                .xforms-select1 {
+                    flex: 1 1 auto;
+                }
+            }
+        }
+
+        .fr-lce-subfield:not(.xforms-disabled) {
+            display: block;
+            margin-block-start: 0.45em;
+        }
+
+        .fr-lce-version-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 5.5em;
+            align-items: start;
+            gap: 0.45em;
+
+            &:has(> .fr-lce-version-input.xforms-disabled) {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .fr-lce-checkbox-grid .xforms-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(14em, 1fr));
+            gap: 0.35em 0.85em;
+            margin-block-start: 0.25em;
+        }
+
+        .fr-lce-translations:not(.xforms-disabled) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4em;
+
+            & > :not(.fr-lce-translation-row):not(.fr-lce-add-subrow-btn) {
+                display: none !important;
+            }
+        }
+
+        .fr-lce-translation-row {
+            display: grid;
+            grid-template-columns: 11em minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 0.45em;
+        }
+
+        .fr-lce-add-subrow-btn {
+            align-self: flex-start;
+
+            button.btn-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25em;
+                padding: 0.15em 0;
+                font-size: 0.9em;
+                text-decoration: none;
+            }
+        }
+
+        // Visual SVG icon tile grid
+        .fr-lce-icon-picker:not(.xforms-disabled) {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(6.5em, 1fr));
+            gap: 0.5em;
+            margin-block-start: 0.45em;
+
+            & > :not(.fr-lce-icon-tile) {
+                display: none !important;
+            }
+        }
+
+        .fr-lce-icon-tile {
+            margin: 0;
+
+            button.btn-link {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.35em;
+                inline-size: 100%;
+                min-block-size: 4.8em;
+                padding: 0.5em 0.35em;
+                margin: 0;
+                background-color: var(--orbeon-control-background-color);
+                border: 1px solid var(--orbeon-landing-card-border-color);
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                color: var(--orbeon-base-color);
+                text-decoration: none;
+                box-shadow: none;
+
+                @media (hover: hover) {
+                    &:hover {
+                        background-color: var(--orbeon-pill-muted-background-color);
+                        border-color: var(--orbeon-base-border-color);
+                    }
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 1px;
+                }
+
+                img {
+                    display: block;
+                    inline-size: 2.2em;
+                    block-size: 2.2em;
+                }
+
+                .fr-lce-icon-tile-label {
+                    font-size: 0.78em;
+                    line-height: 1.2;
+                    text-align: center;
+                    color: var(--orbeon-hint-color);
+                }
+            }
+
+            &.fr-lce-icon-tile-selected button.btn-link {
+                border-color: var(--orbeon-focus-border-color);
+                box-shadow: var(--orbeon-control-focus-ring);
+                background-color: var(--orbeon-pill-muted-background-color);
+
+                .fr-lce-icon-tile-label {
+                    color: var(--orbeon-base-color);
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+}

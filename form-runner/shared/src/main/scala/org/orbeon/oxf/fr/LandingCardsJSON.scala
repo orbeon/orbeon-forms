@@ -19,11 +19,11 @@ object LandingCard {
 
   case class PublishedForms(
     title      : LocalizedString,
-    description: LocalizedString,
-    thumbnail  : String,
-    app        : Option[String],
-    linkTo     : List[LinkTo],
-    sort       : Option[(SortBy, Option[SortDirection])],
+    description: Option[LocalizedString]               = None,
+    thumbnail  : Option[String]                        = None,
+    app        : Option[String]                        = None,
+    linkTo     : List[LinkTo]                          = Nil,
+    sort       : Option[(SortBy, Option[SortDirection])] = None
   ) extends LandingCard
 
   case class FormData(
@@ -90,6 +90,76 @@ object LandingCardsJSON {
   import LandingCard.*
   import Private.*
 
+  val BuiltInThumbnails: List[String] = List(
+    "/apps/fr/style/images/orbeon/book.svg",
+    "/apps/fr/style/images/orbeon/sports-car.svg",
+    "/apps/fr/style/images/orbeon/checkboxes.svg",
+    "/apps/fr/style/images/orbeon/library.svg",
+    "/apps/fr/style/images/orbeon/cogwheels.svg",
+    "/apps/fr/style/images/orbeon/configuration.svg",
+    "/apps/fr/style/images/orbeon/console.svg",
+    "/apps/fr/style/images/orbeon/analytics.svg",
+    "/apps/fr/style/images/orbeon/crane.svg"
+  )
+
+  val DefaultCards: List[LandingCard] = List(
+    QuickLinks(
+      links = List(QuickLinkToken.Main)
+    ),
+    QuickLinks(
+      title = Some(LocalizedString.ByResource("landing.titles.admin")),
+      links = List(QuickLinkToken.Admin)
+    ),
+    PublishedForms(
+      title       = LocalizedString.ByResource("landing.titles.demo-forms"),
+      description = Some(LocalizedString.ByResource("landing.descriptions.demo-forms")),
+      thumbnail   = Some("/apps/fr/style/images/orbeon/sports-car.svg"),
+      app         = Some("orbeon"),
+      sort        = Some((SortBy.Title, None))
+    ),
+    PublishedForms(
+      title       = LocalizedString.ByResource("landing.titles.demo-features"),
+      description = Some(LocalizedString.ByResource("landing.descriptions.demo-features")),
+      thumbnail   = Some("/apps/fr/style/images/orbeon/checkboxes.svg"),
+      app         = Some("orbeon-features"),
+      linkTo      = List(LinkTo.New),
+      sort        = Some((SortBy.Title, None))
+    ),
+    PublishedForms(
+      title       = LocalizedString.ByResource("landing.titles.published-forms"),
+      description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
+      thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
+      linkTo      = List(LinkTo.Summary, LinkTo.New),
+      sort        = Some((SortBy.LastModified, None))
+    ),
+    FormData(
+      title       = Some(LocalizedString.ByResource("landing.titles.form-builder-forms")),
+      description = Some(LocalizedString.ByResource("landing.descriptions.form-builder-forms")),
+      thumbnail   = Some("/apps/fr/style/images/orbeon/library.svg"),
+      app         = "orbeon",
+      form        = "builder",
+      version     = Some(1)
+    ),
+    FormData(
+      title       = None,
+      description = None,
+      thumbnail   = None,
+      app         = "orbeon",
+      form        = "bookshelf",
+      version     = Some(1)
+    )
+  )
+
+  def parseValue(rawValue: String): Try[Option[Seq[LandingCard]]] =
+    rawValue.trimAllToOpt match {
+      case None =>
+        Success(None)
+      case Some(v) if v.startsWith("[") =>
+        parseString(v).map(_.map(_._1))
+      case Some(v) =>
+        Try(Some(legacyTokensToCaseClasses(v)))
+    }
+
   def parseString(jsonString: String): Try[Option[(Seq[LandingCard], Json)]] =
     jsonString.trimAllToOpt match {
       case Some(trimmedJsonString) =>
@@ -115,12 +185,12 @@ object LandingCardsJSON {
             .deepMerge(layout     .map(l => Json.obj("layout"      -> serializeQuickLinksLayout(l))).getOrElse(Json.obj()))
         case PublishedForms(title, description, thumbnail, app, linkTo, sort) =>
           Json.obj(
-            "card-type"   -> Json.fromString("published-forms"),
-            "title"       -> serializeLocalizedString(title),
-            "description" -> serializeLocalizedString(description),
-            "thumbnail"   -> Json.fromString(thumbnail)
+            "card-type" -> Json.fromString("published-forms"),
+            "title"     -> serializeLocalizedString(title)
           )
-            .deepMerge(app.map(a => Json.obj("app" -> Json.fromString(a))).getOrElse(Json.obj()))
+            .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
+            .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
+            .deepMerge(app        .map(a => Json.obj("app"         -> Json.fromString(a)))         .getOrElse(Json.obj()))
             .deepMerge(if (linkTo.nonEmpty) Json.obj("link-to" -> serializeLinkTo(linkTo)) else Json.obj())
             .deepMerge(
               sort.map { case (sortBy, sortDirection) =>
@@ -157,16 +227,16 @@ object LandingCardsJSON {
         List(
           LandingCard.PublishedForms(
             title       = LocalizedString.ByResource("landing.titles.demo-forms"),
-            description = LocalizedString.ByResource("landing.descriptions.demo-forms"),
-            thumbnail   = "/apps/fr/style/images/orbeon/sports-car.svg",
+            description = Some(LocalizedString.ByResource("landing.descriptions.demo-forms")),
+            thumbnail   = Some("/apps/fr/style/images/orbeon/sports-car.svg"),
             app         = Some("orbeon"),
             linkTo      = List(LinkTo.Summary),
             sort        = Some((SortBy.Title, Some(SortDirection.Ascending)))
           ),
           LandingCard.PublishedForms(
             title       = LocalizedString.ByResource("landing.titles.demo-features"),
-            description = LocalizedString.ByResource("landing.descriptions.demo-features"),
-            thumbnail   = "/apps/fr/style/images/orbeon/checkboxes.svg",
+            description = Some(LocalizedString.ByResource("landing.descriptions.demo-features")),
+            thumbnail   = Some("/apps/fr/style/images/orbeon/checkboxes.svg"),
             app         = Some("orbeon-features"),
             linkTo      = List(LinkTo.New),
             sort        = Some((SortBy.Title, Some(SortDirection.Ascending)))
@@ -176,8 +246,8 @@ object LandingCardsJSON {
         List(
           LandingCard.PublishedForms(
             title       = LocalizedString.ByResource("landing.titles.published-forms"),
-            description = LocalizedString.ByResource("landing.descriptions.published-forms"),
-            thumbnail   = "/apps/fr/style/images/orbeon/book.svg",
+            description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
+            thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
             app         = None,
             linkTo      = List(LinkTo.Summary),
             sort        = Some((SortBy.LastModified, Some(SortDirection.Descending)))
@@ -348,11 +418,11 @@ object LandingCardsJSON {
         error("Missing `sort-by` when `sort-direction` is present")
 
       PublishedForms(
-        title       = o("title").map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
-        description = o("description").map(parseLocalizedString).getOrElse(error("Missing `description` for `published-forms`")),
-        thumbnail   = o("thumbnail").flatMap(_.asString).getOrElse(error("Missing `thumbnail` for `published-forms`")),
-        app         = o("app").flatMap(_.asString),
-        linkTo      = o("link-to").filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
+        title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
+        description = o("description").filterNot(_.isNull).map(parseLocalizedString),
+        thumbnail   = o("thumbnail")  .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `thumbnail`")).trimAllToOpt),
+        app         = o("app")        .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `app`")).trimAllToOpt),
+        linkTo      = o("link-to")    .filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
         sort        = sortByOpt.map(sortBy => (sortBy, sortDirectionOpt))
       )
     }
@@ -392,12 +462,12 @@ object LandingCardsJSON {
 
     def parseFormData(o: JsonObject): FormData =
       FormData(
-        title       = o("title").map(parseLocalizedString),
-        description = o("description").map(parseLocalizedString),
-        thumbnail   = o("thumbnail").flatMap(_.asString),
-        app         = o("app").flatMap(_.asString).getOrElse(error("Missing `app` for `form-data`")),
-        form        = o("form").flatMap(_.asString).getOrElse(error("Missing `form` for `form-data`")),
-        version     = o("version").flatMap(_.asNumber).flatMap(_.toInt)
+        title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString),
+        description = o("description").filterNot(_.isNull).map(parseLocalizedString),
+        thumbnail   = o("thumbnail")  .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `thumbnail`")).trimAllToOpt),
+        app         = o("app")        .flatMap(_.asString).getOrElse(error("Missing `app` for `form-data`")),
+        form        = o("form")       .flatMap(_.asString).getOrElse(error("Missing `form` for `form-data`")),
+        version     = o("version")    .filterNot(_.isNull).flatMap(_.asNumber).flatMap(_.toInt)
       )
 
     def parseLocalizedString(json: Json): LocalizedString = {

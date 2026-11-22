@@ -110,7 +110,8 @@ trait FormBuilderSchemaDialogTests {
 
         // 2. Insert a Text Field control (control-1) and bind it to bk:publication-year in Control Settings
         switchToolboxTab(page, ajaxServer, "Controls")
-        page.locator(".fr-grid-td").first().click()
+        // Click away from center to avoid the centered empty-cell quick-insert '+' button
+        page.locator(".fr-grid-td").first().click(new Locator.ClickOptions().setPosition(5, 5))
         ajaxServer.waitForAllEventsProcessed()
 
         val textFieldBtn = page.locator("#fb-toolbox-tabs button[title='Text Field']")

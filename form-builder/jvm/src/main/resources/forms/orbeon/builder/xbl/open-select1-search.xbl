@@ -22,6 +22,8 @@
     <xbl:binding
         id="fr-open-select1-search"
         element="
+            fr|open-select1-search,
+            fr|dropdown-select1-search[selection = open],
             fr|open-select1[appearance ~= search],
             xf|select1[selection = open][appearance ~= search]"
         xxbl:container="span"

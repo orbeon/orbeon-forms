@@ -79,7 +79,7 @@ object Transform {
     if (isXSLT) {
       // Consider the document to be an XSLT transformation and run it
       // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
-      transformDocument(doc, None, XPLConstants.UNSAFE_XSLT_PROCESSOR_QNAME)
+      transformDocument(doc, List("data" -> None), XPLConstants.UNSAFE_XSLT_PROCESSOR_QNAME)
     } else {
       // Return unmodified XBL document
       doc.doc
@@ -187,7 +187,7 @@ object Transform {
 
       // Create pipeline config
       val pipeline =
-        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified, List("data")))
+        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified, inputs.map(_._1)))
 
       val nullDoc =
         NodeConversions.elemToOrbeonDom(

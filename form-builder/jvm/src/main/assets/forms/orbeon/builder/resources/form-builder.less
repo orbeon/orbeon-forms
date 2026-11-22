@@ -2452,6 +2452,29 @@ body.orbeon {
         width: 1130px;
         max-width: calc(100vw - 20px);
 
+        .xbl-fr-tabbable {
+            min-height: 0;
+            display: flex;
+
+            & > .tabs-left {
+                min-height: 0;
+                min-width: 0;
+                flex-grow: 1;
+                grid-template-rows: minmax(0, 1fr);
+
+                > .nav-tabs {
+                    max-height: 100%;
+                    box-sizing: border-box;
+                    .dialog-scrollable();
+                }
+
+                > .tab-content {
+                    min-height: 0;
+                    .dialog-scrollable();
+                }
+            }
+        }
+
         .fb-process-tab-content {
             padding-top: 5px;
         }

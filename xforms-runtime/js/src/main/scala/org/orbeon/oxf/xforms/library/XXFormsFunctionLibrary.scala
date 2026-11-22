@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.function.CoreSupport
@@ -24,9 +25,11 @@ object XXFormsFunctionLibrary
   def property(propertyName: String)(implicit xfc: XFormsFunction.Context): Option[AtomicValue] = {
 
     def fromContainingDocumentProperties =
-      propertyName.startsWith(XFormsPropertyPrefix).option {
+      propertyName.startsWith(XFormsPropertyPrefix).flatOption {
         val shortName = propertyName.substringAfter(XFormsPropertyPrefix)
-        SaxonUtils.convertJavaObjectToSaxonObject(xfc.containingDocument.getProperty(shortName)).asInstanceOf[AtomicValue]
+        XFormsProperties.SupportedDocumentProperties.contains(shortName).option {
+          SaxonUtils.convertJavaObjectToSaxonObject(xfc.containingDocument.getProperty(shortName)).asInstanceOf[AtomicValue]
+        }
       }
 
     def fromOtherProperties =

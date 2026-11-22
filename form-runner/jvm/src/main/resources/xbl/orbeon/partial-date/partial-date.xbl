@@ -366,11 +366,11 @@
                                     <xf:value/>
                                 </xf:item>
                                 <xf:item>
-                                    <xf:label ref="xxf:r('yes', '|fr-form-resources|')"/>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
                                     <xf:value>true</xf:value>
                                 </xf:item>
                                 <xf:item>
-                                    <xf:label ref="xxf:r('no', '|fr-form-resources|')"/>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
                                     <xf:value>false</xf:value>
                                 </xf:item>
                             </xf:select1>
@@ -383,11 +383,11 @@
                                     <xf:value/>
                                 </xf:item>
                                 <xf:item>
-                                    <xf:label ref="xxf:r('yes', '|fr-form-resources|')"/>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
                                     <xf:value>true</xf:value>
                                 </xf:item>
                                 <xf:item>
-                                    <xf:label ref="xxf:r('no', '|fr-form-resources|')"/>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
                                     <xf:value>false</xf:value>
                                 </xf:item>
                             </xf:select1>

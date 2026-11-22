@@ -806,6 +806,11 @@
             <demo-features>试用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>显示更多…</show-more>
+        <labels>
+            <updated>已更新</updated>
+            <auto-refresh>自动刷新</auto-refresh>
+            <auto-off>关闭</auto-off>
+        </labels>
         <buttons>
             <refresh>刷新</refresh>
             <new>新建</new>

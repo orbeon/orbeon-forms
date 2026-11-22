@@ -811,6 +811,11 @@
             <demo-features>Próbálja ki az Orbeon Forms egyes funkcióit bemutató demókat</demo-features>
         </descriptions>
         <show-more>Több megjelenítése…</show-more>
+        <labels>
+            <updated>Frissítve</updated>
+            <auto-refresh>Automatikus frissítés</auto-refresh>
+            <auto-off>Ki</auto-off>
+        </labels>
         <buttons>
             <refresh>Frissítés</refresh>
             <new>Új</new>

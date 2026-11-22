@@ -811,6 +811,11 @@
             <demo-features>試用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>顯示更多…</show-more>
+        <labels>
+            <updated>已更新</updated>
+            <auto-refresh>自動重新整理</auto-refresh>
+            <auto-off>關閉</auto-off>
+        </labels>
         <buttons>
             <refresh>重新整理</refresh>
             <new>新增</new>

@@ -811,6 +811,11 @@
             <demo-features>جرب العروض التوضيحية لميزات محددة من Orbeon Forms</demo-features>
         </descriptions>
         <show-more>إظهار المزيد…</show-more>
+        <labels>
+            <updated>آخر تحديث</updated>
+            <auto-refresh>تحديث تلقائي</auto-refresh>
+            <auto-off>إيقاف</auto-off>
+        </labels>
         <buttons>
             <refresh>تحديث</refresh>
             <new>جديد</new>

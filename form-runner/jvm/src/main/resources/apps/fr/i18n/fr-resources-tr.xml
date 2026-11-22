@@ -809,6 +809,11 @@
             <demo-features>Belirli Orbeon Forms özelliklerinin demolarını deneyin</demo-features>
         </descriptions>
         <show-more>Daha fazla göster…</show-more>
+        <labels>
+            <updated>Güncellendi</updated>
+            <auto-refresh>Otomatik yenileme</auto-refresh>
+            <auto-off>Kapalı</auto-off>
+        </labels>
         <buttons>
             <refresh>Yenile</refresh>
             <new>Yeni</new>

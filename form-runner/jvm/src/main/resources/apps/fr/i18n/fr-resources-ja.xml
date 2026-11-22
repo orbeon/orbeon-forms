@@ -798,6 +798,11 @@
             <demo-features>Orbeon Formsの特定機能のデモを試す</demo-features>
         </descriptions>
         <show-more>もっと見る…</show-more>
+        <labels>
+            <updated>更新</updated>
+            <auto-refresh>自動更新</auto-refresh>
+            <auto-off>オフ</auto-off>
+        </labels>
         <buttons>
             <refresh>更新</refresh>
             <new>新規</new>

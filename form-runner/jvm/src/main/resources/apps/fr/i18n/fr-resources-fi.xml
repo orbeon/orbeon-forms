@@ -811,6 +811,11 @@
             <demo-features>Tutustu yksittäisten Orbeon Forms -ominaisuuksien esimerkkeihin</demo-features>
         </descriptions>
         <show-more>Näytä lisää…</show-more>
+        <labels>
+            <updated>Päivitetty</updated>
+            <auto-refresh>Automaattinen päivitys</auto-refresh>
+            <auto-off>Pois</auto-off>
+        </labels>
         <buttons>
             <refresh>Päivitä</refresh>
             <new>Uusi</new>

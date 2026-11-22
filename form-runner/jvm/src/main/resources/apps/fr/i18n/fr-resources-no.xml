@@ -811,6 +811,11 @@
             <demo-features>Prøv demonstrasjoner av enkelte Orbeon Forms-funksjoner</demo-features>
         </descriptions>
         <show-more>Vis mer…</show-more>
+        <labels>
+            <updated>Oppdatert</updated>
+            <auto-refresh>Automatisk oppdatering</auto-refresh>
+            <auto-off>Av</auto-off>
+        </labels>
         <buttons>
             <refresh>Oppdater</refresh>
             <new>Ny</new>

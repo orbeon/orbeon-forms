@@ -812,6 +812,11 @@
             <demo-features>Wypróbuj demonstracje wybranych funkcji Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Pokaż więcej…</show-more>
+        <labels>
+            <updated>Zaktualizowano</updated>
+            <auto-refresh>Automatyczne odświeżanie</auto-refresh>
+            <auto-off>Wył.</auto-off>
+        </labels>
         <buttons>
             <refresh>Odśwież</refresh>
             <new>Nowy</new>

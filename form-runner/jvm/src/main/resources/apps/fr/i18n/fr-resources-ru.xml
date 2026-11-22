@@ -804,6 +804,11 @@
             <demo-features>Попробуйте демонстрации отдельных возможностей Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Показать больше…</show-more>
+        <labels>
+            <updated>Обновлено</updated>
+            <auto-refresh>Автообновление</auto-refresh>
+            <auto-off>Выкл.</auto-off>
+        </labels>
         <buttons>
             <refresh>Обновить</refresh>
             <new>Создать</new>

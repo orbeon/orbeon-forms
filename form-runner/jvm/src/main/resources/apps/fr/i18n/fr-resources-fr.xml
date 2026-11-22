@@ -814,6 +814,11 @@
             <demo-features>Essayez les exemples de fonctions spécifiques d'Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Voir plus…</show-more>
+        <labels>
+            <updated>Mis à jour</updated>
+            <auto-refresh>Actualisation auto</auto-refresh>
+            <auto-off>Désactivée</auto-off>
+        </labels>
         <buttons>
             <refresh>Actualiser</refresh>
             <new>Nouveau</new>

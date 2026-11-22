@@ -42,8 +42,18 @@
         display: flex;
         flex-wrap: wrap;
         align-items: safe center;
+        justify-content: space-between;
         gap: 0.75em;
         padding: 0.75em 0.25em 0;
+
+        .fr-landing-toolbar-search {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: safe center;
+            gap: 0.75em;
+            flex: 1 1 18em;
+            min-inline-size: 0;
+        }
 
         .fr-landing-filter-box {
             position: relative;
@@ -62,6 +72,7 @@
 
             .fr-landing-filter-input {
                 inline-size: 100%;
+                min-block-size: var(--orbeon-control-height);
                 block-size: var(--orbeon-control-height);
                 padding-inline: 2.35em 2.35em;
                 padding-block: 0;
@@ -71,6 +82,10 @@
                 border: 1px solid var(--orbeon-control-border-color);
                 border-radius: var(--orbeon-landing-tile-border-radius);
                 box-shadow: none;
+
+                @media (pointer: coarse) {
+                    min-block-size: 40px;
+                }
 
                 &::placeholder {
                     color: var(--orbeon-control-placeholder-color);
@@ -167,6 +182,138 @@
 
             &.xforms-hidden {
                 display: none;
+            }
+        }
+
+        .fr-landing-toolbar-actions {
+            &.xforms-disabled {
+                display: none !important;
+            }
+
+            &:not(.xforms-disabled) {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: safe center;
+                gap: 0.65em;
+                margin-inline-start: auto;
+            }
+
+            .fr-landing-updated {
+                display: inline-flex;
+                align-items: baseline;
+                gap: 0.25em;
+                color: var(--orbeon-hint-color);
+                font-size: 0.9em;
+                font-variant-numeric: tabular-nums;
+                white-space: nowrap;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+
+                .fr-landing-updated-label {
+                    font-weight: 500;
+                }
+            }
+
+            .fr-landing-toolbar-select {
+                &:not(.xforms-disabled) {
+                    display: inline-flex;
+                    align-items: center;
+                    margin: 0;
+                }
+
+                select {
+                    inline-size: auto;
+                    min-block-size: var(--orbeon-control-height);
+                    margin: 0;
+                    padding-block: 0;
+                    padding-inline-start: 0.65em;
+                    padding-right: 24px;
+                    font: inherit;
+                    font-variant-numeric: tabular-nums;
+                    color: var(--orbeon-control-color);
+                    background-color: var(--orbeon-control-background-color);
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-landing-tile-border-radius);
+                    cursor: pointer;
+
+                    @media (pointer: coarse) {
+                        min-block-size: 40px;
+                    }
+
+                    &:focus,
+                    &:focus-visible {
+                        border-color: var(--orbeon-focus-border-color);
+                        box-shadow: var(--orbeon-control-focus-ring);
+                        outline: none;
+                    }
+                }
+            }
+
+            .fr-landing-refresh-trigger {
+                &:not(.xforms-disabled) {
+                    display: inline-flex;
+                    align-items: center;
+                    margin: 0;
+                }
+
+                button.btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.4em;
+                    min-inline-size: 24px;
+                    min-block-size: var(--orbeon-control-height);
+                    padding: 0 0.75em;
+                    margin: 0;
+                    font: inherit;
+                    font-weight: 500;
+                    line-height: 1;
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-control-background-color);
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-landing-tile-border-radius);
+                    box-shadow: none;
+                    transition: color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                    @media (prefers-reduced-motion: reduce) {
+                        transition: none;
+                    }
+
+                    @media (pointer: coarse) {
+                        min-block-size: 40px;
+                    }
+
+                    @media (hover: hover) {
+                        &:hover {
+                            color: var(--orbeon-base-color);
+                            background-color: var(--orbeon-pill-muted-background-color);
+                            border-color: var(--orbeon-base-border-color);
+                        }
+                    }
+
+                    &:focus-visible {
+                        border-color: var(--orbeon-focus-border-color);
+                        box-shadow: var(--orbeon-control-focus-ring);
+                        outline: none;
+                    }
+
+                    @media (forced-colors: active) {
+                        border-color: ButtonText;
+                        color: ButtonText;
+                    }
+                }
+            }
+        }
+
+        &:has(~ .fr-landing-grid .fr-card-refresh-btn.is-spinning) .fr-landing-refresh-trigger button.btn i.fa {
+            animation: fr-landing-spin 0.8s linear infinite;
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
             }
         }
     }

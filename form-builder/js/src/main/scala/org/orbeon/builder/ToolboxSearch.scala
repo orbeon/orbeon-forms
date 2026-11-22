@@ -398,7 +398,7 @@ object ToolboxSearch {
     )
 
     // Re-apply active filter after Ajax updates (e.g. reloading toolbox or switching library versions)
-    AjaxClient.ajaxResponseReceived.add { _ =>
+    AjaxClient.ajaxResponseProcessed.add { _ =>
       findSearchInput().foreach { input =>
         if (input.value.trimAllToEmpty.nonEmpty)
           applyFilter(input.value)

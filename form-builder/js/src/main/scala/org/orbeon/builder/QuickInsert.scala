@@ -304,7 +304,7 @@ object QuickInsert {
     inputElOpt.foreach(_.focus())
   }
 
-  def close(): Unit = {
+  def close(refreshCellButton: Boolean = true): Unit = {
     overlayElOpt.foreach(_.remove())
     overlayElOpt  = None
     panelElOpt    = None
@@ -316,7 +316,10 @@ object QuickInsert {
     formControls  = Nil
     renderedRows  = Nil
     selectedIndex = -1
-    updateCellButton()
+    if (refreshCellButton)
+      updateCellButton()
+    else
+      hideCellButton()
   }
 
   def init(): Unit = {
@@ -403,7 +406,7 @@ object QuickInsert {
       }
     )
 
-    AjaxClient.ajaxResponseReceived.add { _ =>
+    AjaxClient.ajaxResponseProcessed.add { _ =>
       if (! isOpen)
         updateCellButton()
     }
@@ -1041,7 +1044,7 @@ object QuickInsert {
     def activateInsertItem(item: ToolboxItem): Unit = {
       val modeOpt = activeModeOpt
       ToolboxSearch.recordRecentItem(item.id)
-      close()
+      close(refreshCellButton = false)
 
       modeOpt match {
         case Some(CellPopover(_, needsSelect)) if needsSelect =>

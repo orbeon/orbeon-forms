@@ -159,9 +159,9 @@ class ConfigurationPropertiesTest
       val configDoc     = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputPropsDoc)
       val configRoot    = configDoc.getRootElement
 
-      // 1. Check <app-form-overrides> contains the 2 profile-capable overrides
+      // 1. Check <app-form-overrides> contains the 2 profile-capable overrides plus the auto-materialized 0-override parent App row (hr / *)
       val overrides = configRoot.element("app-form-overrides").elements("override")
-      assert(overrides.size == 2)
+      assert(overrides.size == 3)
 
       val firstOverride = overrides.head
       assert(firstOverride.attributeValue("app") == "*")
@@ -172,7 +172,12 @@ class ConfigurationPropertiesTest
       assert(buttonsElem.attributeValue("value") == "save-final pdf")
       assert(buttonsElem.attributeValue("has-profiles") == "true")
 
-      val secondOverride = overrides(1)
+      val parentHrOverride = overrides(1)
+      assert(parentHrOverride.attributeValue("app") == "hr")
+      assert(parentHrOverride.attributeValue("form") == "*")
+      assert(parentHrOverride.attributeValue("profiles") == "")
+
+      val secondOverride = overrides(2)
       assert(secondOverride.attributeValue("app") == "hr")
       assert(secondOverride.attributeValue("form") == "onboarding")
       assert(secondOverride.attributeValue("profiles") == "internal admin")
@@ -230,10 +235,13 @@ class ConfigurationPropertiesTest
       assert(msg2.attributeValue("html") == "false")
       assert(msg2.getText == "Inappropriate content.")
 
-      // 2. Check app/form <override><resources>
+      // 2. Check app/form <override><resources> (with auto-materialized acme / * parent row before acme / order)
       val overrides = configRoot.element("app-form-overrides").elements("override")
-      assert(overrides.size == 1)
-      val acmeOrder = overrides.head
+      assert(overrides.size == 2)
+      val acmeApp = overrides.head
+      assert(acmeApp.attributeValue("app") == "acme")
+      assert(acmeApp.attributeValue("form") == "*")
+      val acmeOrder = overrides(1)
       assert(acmeOrder.attributeValue("app") == "acme")
       assert(acmeOrder.attributeValue("form") == "order")
       val acmeMessages = acmeOrder.element("resources").elements("message")
@@ -338,6 +346,61 @@ class ConfigurationPropertiesTest
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "published-forms", "title": {"_": "   "}}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "orbeon", "form": ""}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "bad slug!", "form": "bookshelf"}]"""))
+    }
+
+    it("must auto-create 0-override parent Application rows, sort scopes in canonical tree order, preserve unique @id attributes, and omit empty parent rows on save") {
+      val inputPropsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:string" name="oxf.fr.default-language.zeta.claim"   value="es"/>
+          |    <property as="xs:string" name="oxf.fr.default-language.acme.order"   value="fr"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.acme.*"         profiles="admin"    value="save-final"/>
+          |    <property as="xs:string" name="oxf.fr.default-language.acme.invoice" value="de"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"            profiles="internal" value="pdf"/>
+          |</properties>""".stripMargin
+
+      val configDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(IOSupport.readOrbeonDom(inputPropsXml))
+      val overridesElem = configDoc.getRootElement.element("app-form-overrides")
+      val initialScopes =
+        overridesElem.elements("override").map { el =>
+          (el.attributeValue("app"), el.attributeValue("form"), el.attributeValue("profiles"))
+        }.toList
+
+      assert(initialScopes == List(
+        ("*",    "*",       "internal"),
+        ("acme", "*",       ""),
+        ("acme", "*",       "admin"),
+        ("acme", "invoice", ""),
+        ("acme", "order",   ""),
+        ("zeta", "*",       ""),
+        ("zeta", "claim",   "")
+      ))
+
+      val initialIds = overridesElem.elements("override").map(_.attributeValue("id")).toList
+      assert(initialIds.forall(_.nonEmpty))
+      assert(initialIds.distinct.size == initialIds.size)
+
+      // Inserting a new form override with an explicit @id must preserve that @id even when a parent app row is synthesized before it
+      val templateOverride = configDoc.getRootElement.element("templates").element("override").createCopy
+      templateOverride.addAttribute("id", "scope-99")
+      templateOverride.addAttribute("app", "beta")
+      templateOverride.addAttribute("form", "survey")
+      templateOverride.addAttribute("profiles", "")
+      overridesElem.add(templateOverride)
+
+      FormRunnerConfiguration.normalizeOverridesDom(configDoc)
+
+      val afterInsert = overridesElem.elements("override").toList
+      val betaApp     = afterInsert.find(el => el.attributeValue("app") == "beta" && el.attributeValue("form") == "*").get
+      val betaSurvey  = afterInsert.find(el => el.attributeValue("app") == "beta" && el.attributeValue("form") == "survey").get
+      assert(afterInsert.indexOf(betaApp) < afterInsert.indexOf(betaSurvey))
+      assert(betaSurvey.attributeValue("id") == "scope-99")
+      assert(betaApp.attributeValue("id") != "scope-99")
+      assert(afterInsert.map(_.attributeValue("id")).distinct.size == afterInsert.size)
+
+      // Round-tripping back to <properties> must emit only the 5 overridden properties (zero noise from 0-override rows)
+      val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val defs              = PropertyStore.parseToPropertyDefinitions(roundTripPropsDoc).asScala
+      assert(defs.size == 5)
     }
   }
 
@@ -585,8 +648,83 @@ class ConfigurationPropertiesTest
             activateControlWithEvent(findCardTrigger("fr-lce-remove-btn", countAfterAdd).effectiveId)(ec)
             assert(landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isValid)
 
+            // Add a new Application / Form override (acme / order) via the Add Override modal dialog
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("add-override-button").get.effectiveId)(ec)
+            val levelSelect  = resolveObject[XFormsSelect1Control]("scope-dialog-level-control").get
+            val appFormItem  = levelSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("app-form")).get._1
+            setControlValueWithEventSearchNested(levelSelect.effectiveId, appFormItem.externalValue(levelSelect.mustEncodeValues))
+
+            val dlgAppControl =
+              resolveObject[XFormsValueControl]("scope-dialog-app-select").filter(_.isRelevant)
+                .orElse(resolveObject[XFormsValueControl]("scope-dialog-app-input").filter(_.isRelevant))
+                .get
+            setControlValueWithEventSearchNested(dlgAppControl.effectiveId, "acme")
+
+            val dlgFormControl =
+              resolveObject[XFormsValueControl]("scope-dialog-form-select").filter(_.isRelevant)
+                .orElse(resolveObject[XFormsValueControl]("scope-dialog-form-input").filter(_.isRelevant))
+                .get
+            setControlValueWithEventSearchNested(dlgFormControl.effectiveId, "order")
+
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-scope-dialog-button").get.effectiveId)(ec)
+
             val configInstance = instance("fr-configuration-instance").get
             val configRoot     = configInstance.rootElement
+            val uiInstance     = instance("fr-configuration-ui-instance").get
+
+            // Parent App row (acme / *) must be auto-created before (acme / order), and (acme / order) must be selected
+            val overrideNodes = (configRoot / "app-form-overrides" / "override").toList
+            assert(overrideNodes.size == 2)
+            assert((overrideNodes.head /@ "app").stringValue == "acme" && (overrideNodes.head /@ "form").stringValue == "*")
+            assert((overrideNodes(1) /@ "app").stringValue == "acme" && (overrideNodes(1) /@ "form").stringValue == "order")
+            assert((uiInstance.rootElement / "selected-scope").stringValue == (overrideNodes(1) /@ "id").stringValue)
+
+            // Global-only controls must be non-relevant while an override scope is selected
+            assert(! resolveObject[XFormsSingleNodeControl]("global-available-languages-value-control").get.isRelevant)
+            assert(! resolveObject[XFormsSingleNodeControl]("cache-documents-size-value-control").get.isRelevant)
+
+            // Override default-language to "de" on acme / order using the shared controls
+            assert(valueControl.isReadonly)
+            setControlValueWithEventSearchNested(overrideSelectControl.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(valueControl.effectiveId, "de")
+
+            // Set an invalid XPath on pdf-filename on acme / order, then switch back to Global Settings:
+            // unselected-scopes-validation-repeat must surface the error and prevent save-final from persisting invalid data
+            setControlValueWithEventSearchNested(pdfOverrideSelectControl.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(pdfValueControl.effectiveId, "concat('unclosed")
+            assert(! pdfValueControl.isValid)
+
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("select-global-scope-button").get.effectiveId)(ec)
+            assert((uiInstance.rootElement / "selected-scope").stringValue == "__global__")
+            assert(resolveObject[XFormsSingleNodeControl]("global-available-languages-value-control").get.isRelevant)
+            assert(pdfValueControl.isValid) // Global's own pdf-filename is valid
+
+            SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
+            useAndClose(connection.prepareStatement("SELECT count(*) FROM orbeon_form_data WHERE app = 'orbeon' AND form = 'configuration' AND draft = 'N'")) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                assert(rs.next() && rs.getInt(1) == 0)
+              }
+            }
+
+            // Select acme / order (iteration 2 of scope-tree-repeat) to fix the invalid XPath, and set smtp port on acme / * (iteration 1)
+            val selectScopeTriggers =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "select-override-scope-button" && c.isRelevant)
+                .toList
+            assert(selectScopeTriggers.size == 2)
+
+            activateControlWithEvent(selectScopeTriggers(1).effectiveId)(ec)
+            assert(! pdfValueControl.isValid)
+            setControlValueWithEventSearchNested(pdfValueControl.effectiveId, "concat('order-', fr:document-id())")
+            assert(pdfValueControl.isValid)
+
+            activateControlWithEvent(selectScopeTriggers.head.effectiveId)(ec)
+            setControlValueWithEventSearchNested(smtpPortOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(smtpPortValue.effectiveId, numberExternalValue("2525"))
+            assert(smtpPortValue.isValid)
+
+            // Switch back to Global Settings
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("select-global-scope-button").get.effectiveId)(ec)
 
             // Add a custom property
             val customPropsNodes  = configRoot / "custom-properties"
@@ -610,6 +748,8 @@ class ConfigurationPropertiesTest
               assert(rs.next())
               val savedXml = rs.getString(1)
               assert(savedXml.contains("oxf.fr.default-language.*.*"))
+              assert(savedXml.contains("oxf.fr.default-language.acme.order"))
+              assert(savedXml.contains("oxf.fr.email.smtp.port.acme.*"))
               assert(savedXml.contains("oxf.test.custom.persistence.prop"))
               assert(! savedXml.contains("data-format-version"))
             }
@@ -622,6 +762,8 @@ class ConfigurationPropertiesTest
 
             val store = PropertyLoader.getPropertyStore(Option(ec.getRequest))
             assert(store.globalPropertySet.getString("oxf.fr.default-language.my-app.my-form").contains("fr"))
+            assert(store.globalPropertySet.getString("oxf.fr.default-language.acme.order").contains("de"))
+            assert(store.globalPropertySet.getString("oxf.fr.detail.pdf.filename.acme.order").contains("concat('order-', fr:document-id())"))
             assert(store.globalPropertySet.getString("oxf.fr.available-languages.my-app.my-form").contains("en fr es"))
             assert(store.globalPropertySet.getString("oxf.fr.available-languages").contains("en fr de"))
             assert(store.globalPropertySet.getString("oxf.fr.pdf.jpeg.compression").contains("0.85"))
@@ -629,6 +771,7 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.fr.home.remote-servers").contains("staging.example.org"))
             assert(store.globalPropertySet.getString("oxf.fr.detail.warn-when-data-unsafe.my-app.my-form").contains("count(//*[xxf:non-blank()]) gt 0"))
             assert(store.globalPropertySet.getString("oxf.fr.email.smtp.port.my-app.my-form").contains("587"))
+            assert(store.globalPropertySet.getString("oxf.fr.email.smtp.port.acme.order").contains("2525"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256m"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
@@ -668,6 +811,18 @@ class ConfigurationPropertiesTest
 
             assert((defaultLangNode /@ "override").stringValue == "true")
             assert((defaultLangNode /@ "value").stringValue == "fr")
+
+            val reloadedLandingCardsJson = resolveObject[XFormsValueControl]("landing-cards-value-control").get.getValue(EventCollector.Throw)
+            assert(LandingCardsJSON.parseString(reloadedLandingCardsJson).get.get._1.head == LandingCard.QuickLinks(
+              title = Some(LocalizedString.ByResource("landing.titles.admin")),
+              links = List(QuickLinkToken.Admin)
+            ))
+
+            val reloadedOverrides = (configRoot / "app-form-overrides" / "override").toList
+            assert(reloadedOverrides.size == 2)
+            assert((reloadedOverrides.head /@ "app").stringValue == "acme" && (reloadedOverrides.head /@ "form").stringValue == "*")
+            assert((reloadedOverrides(1) /@ "app").stringValue == "acme" && (reloadedOverrides(1) /@ "form").stringValue == "order")
+            assert(((reloadedOverrides(1) / "curated" / "system" / "default-language").head /@ "value").stringValue == "de")
 
             val customPropNode = (configRoot / "custom-properties" / "property").head
             assert((customPropNode /@ "name").stringValue == "oxf.test.custom.persistence.prop")

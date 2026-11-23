@@ -50,6 +50,11 @@
                     </xf:body>
                 </xf:action>
             </xbl:handler>
+            <xbl:handler event="fr-ensure-visible-tab" phase="target">
+                <xf:action type="javascript">
+                    ORBEON.xforms.XBL.instanceForControl(this).maybeAdjustCurrentTab();
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:implementation>

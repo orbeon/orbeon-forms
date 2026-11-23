@@ -770,6 +770,7 @@
     <!-- ==== Internal Configuration form properties ============================================================== -->
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.configuration"          value="full"/>
+    <property as="xs:string"  name="oxf.fr.detail.html-page-layout.orbeon.configuration"         value="fluid"/>
     <property as="xs:string"  name="oxf.fr.detail.label.appearance.orbeon.configuration"        value="full"/>
     <property as="xs:string"  name="oxf.fr.detail.hint.appearance.orbeon.configuration"         value="full"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.orbeon.configuration"               value="false"/>

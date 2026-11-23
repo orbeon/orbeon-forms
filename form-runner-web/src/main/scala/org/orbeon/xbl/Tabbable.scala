@@ -241,8 +241,9 @@ object Tabbable {
         .filter(_.matches(ExcludeNotVisible))
         .toList
       val newTabPane = allTabPanes(tabPosition)
-      allLis.foreach(_.classList.remove(ActiveClass))
-      allTabPanes.foreach(_.classList.remove(ActiveClass))
+      containerElem
+        .querySelectorAllT(s":scope > div > .nav-tabs > li.$ActiveClass, :scope > div > .tab-content > .tab-pane.$ActiveClass")
+        .foreach(_.classList.remove(ActiveClass))
       newLi.classList.add(ActiveClass)
       newTabPane.classList.add(ActiveClass)
 

@@ -361,8 +361,10 @@
             <xf:group appearance="xxf:internal">
 
                 <xf:var name="binding"       value="xxf:binding('fr-landing-cards-editor')"/>
-                <xf:var name="is-overridden" as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=override-ref"/></xf:var>
-                <xf:var name="default-json"  as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=default-ref"/></xf:var>
+                <xf:var name="override-attr" as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=override-ref"/></xf:var>
+                <xf:var name="default-attr"  as="xs:string?"><xxf:value xxbl:scope="outer" xbl:attr="model context value=default-ref"/></xf:var>
+                <xf:var name="is-overridden" value="($override-attr[xxf:non-blank()], string($binding/../@override))[1]"/>
+                <xf:var name="default-json"  value="($default-attr[xxf:non-blank()],  string($binding/../@default))[1]"/>
 
                 <xf:var
                     name="effective-source-json"
@@ -391,7 +393,10 @@
                 <xf:var
                     name="is-readonly"
                     value="fr:is-readonly-mode() or xxf:readonly($binding)">
-                    <xf:action event="xforms-enabled xforms-value-changed">
+                    <xf:action event="xforms-enabled">
+                        <xf:setvalue ref="instance('state')/@readonly" value="string($is-readonly)"/>
+                    </xf:action>
+                    <xf:action event="xforms-value-changed">
                         <xf:setvalue ref="instance('state')/@readonly" value="string($is-readonly)"/>
                         <xf:action if="not($is-readonly)">
                             <xf:dispatch name="fr-lce-push-json" targetid="landing-cards-editor-model"/>

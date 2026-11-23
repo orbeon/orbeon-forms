@@ -47,6 +47,13 @@ trait FormRunnerConfiguration {
     val propertiesDoc = configurationDomToPropertiesDom(configDoc)
     new DocumentWrapper(propertiesDoc, null, StaticXPath.GlobalConfiguration)
   }
+
+  //@XPathFunction
+  def normalizeConfigurationOverridesXml(configNode: NodeInfo): DocumentNodeInfoType = {
+    val configDoc = StaticXPath.tinyTreeToOrbeonDom(configNode)
+    normalizeOverridesDom(configDoc)
+    new DocumentWrapper(configDoc, null, StaticXPath.GlobalConfiguration)
+  }
   //@XPathFunction
   def isValidCacheMaxSizeBytes(value: String): Boolean =
     value.trimAllToOpt match {
@@ -1851,49 +1858,6 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     for ((prefix, uri) <- allConfigNamespaces)
       configRoot.add(Namespace(prefix, uri))
 
-    def appendCuratedBlock(parent: Element, values: scala.collection.Map[String, String], appFormOnly: Boolean): Unit = {
-      val curatedElem = parent.addElement("curated")
-      for (category <- Categories) {
-        val propsInCategory = CuratedProperties.filter(c => c.category == category && (! appFormOnly || c.hasAppForm))
-        if (propsInCategory.nonEmpty) {
-          val catElem = curatedElem.addElement(category)
-          for (c <- propsInCategory) {
-            val elem = catElem.addElement(c.key)
-            elem.addAttribute("type", c.xsType)
-            elem.addAttribute("default", c.defaultValue)
-            elem.addAttribute("name", if (appFormOnly) c.baseName else c.globalPropertyName)
-            elem.addAttribute("has-profiles", c.hasProfiles.toString)
-            c.validationOpt.foreach(elem.addAttribute("validation", _))
-            values.get(c.key) match {
-              case Some(v) =>
-                elem.addAttribute("override", "true")
-                elem.addAttribute("value", v)
-                elem.addAttribute("selection", if (c.key == "home-table-link-to") v.splitTo[List]().mkString(" ") else v)
-              case None =>
-                elem.addAttribute("override", "false")
-                elem.addAttribute("value", c.defaultValue)
-                elem.addAttribute("selection", "__default__")
-            }
-          }
-        }
-      }
-    }
-
-    def appendResourcesBlock(
-      parent   : Element,
-      resources: scala.collection.Map[ResourceOverrideKey, String],
-      htmlMap  : scala.collection.Map[ResourceOverrideKey, Boolean]
-    ): Unit = {
-      val resourcesElem = parent.addElement("resources")
-      for ((key, v) <- resources) {
-        val msgElem = resourcesElem.addElement("message")
-        msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, key.lang)
-        msgElem.addAttribute("name", key.name)
-        msgElem.addAttribute("html", htmlMap.getOrElse(key, false).toString)
-        msgElem.setText(v)
-      }
-    }
-
     // 1. Global curated properties & global resource overrides
     appendCuratedBlock(configRoot, globalCuratedValues, appFormOnly = false)
     appendResourcesBlock(configRoot, globalResourceValues, globalResourceHtml)
@@ -1902,6 +1866,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     val overridesElem = configRoot.addElement("app-form-overrides")
     for ((scope, values) <- appFormOverrides) {
       val overrideElem = overridesElem.addElement("override")
+      overrideElem.addAttribute("id", "")
       overrideElem.addAttribute("app", scope.app)
       overrideElem.addAttribute("form", scope.form)
       overrideElem.addAttribute("profiles", scope.profiles)
@@ -1935,6 +1900,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     // 5. Templates for XForms repeat insertions
     val templatesElem = configRoot.addElement("templates")
     val templateOverride = templatesElem.addElement("override")
+    templateOverride.addAttribute("id", "")
     templateOverride.addAttribute("app", "*")
     templateOverride.addAttribute("form", "*")
     templateOverride.addAttribute("profiles", "")
@@ -1947,8 +1913,149 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     templateProp.addAttribute("profiles", "")
     templateProp.addAttribute("processor-name", "")
 
+    normalizeOverridesDom(configDoc)
     configDoc
   }
+
+  private def appendCuratedBlock(parent: Element, values: scala.collection.Map[String, String], appFormOnly: Boolean): Unit = {
+    val curatedElem = parent.addElement("curated")
+    for (category <- Categories) {
+      val propsInCategory = CuratedProperties.filter(c => c.category == category && (! appFormOnly || c.hasAppForm))
+      if (propsInCategory.nonEmpty) {
+        val catElem = curatedElem.addElement(category)
+        for (c <- propsInCategory) {
+          val elem = catElem.addElement(c.key)
+          elem.addAttribute("type", c.xsType)
+          elem.addAttribute("default", c.defaultValue)
+          elem.addAttribute("name", if (appFormOnly) c.baseName else c.globalPropertyName)
+          elem.addAttribute("has-profiles", c.hasProfiles.toString)
+          c.validationOpt.foreach(elem.addAttribute("validation", _))
+          values.get(c.key) match {
+            case Some(v) =>
+              elem.addAttribute("override", "true")
+              elem.addAttribute("value", v)
+              elem.addAttribute("selection", if (c.key == "home-table-link-to") v.splitTo[List]().mkString(" ") else v)
+            case None =>
+              elem.addAttribute("override", "false")
+              elem.addAttribute("value", c.defaultValue)
+              elem.addAttribute("selection", "__default__")
+          }
+        }
+      }
+    }
+  }
+
+  private def appendResourcesBlock(
+    parent   : Element,
+    resources: scala.collection.Map[ResourceOverrideKey, String],
+    htmlMap  : scala.collection.Map[ResourceOverrideKey, Boolean]
+  ): Unit = {
+    val resourcesElem = parent.addElement("resources")
+    for ((key, v) <- resources) {
+      val msgElem = resourcesElem.addElement("message")
+      msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, key.lang)
+      msgElem.addAttribute("name", key.name)
+      msgElem.addAttribute("html", htmlMap.getOrElse(key, false).toString)
+      msgElem.setText(v)
+    }
+  }
+
+  def normalizeOverridesDom(configDoc: Document): Unit =
+    for {
+      configRoot    <- Option(configDoc.getRootElement)
+      overridesElem <- Option(configRoot.element("app-form-overrides"))
+    } {
+      val initialElems = overridesElem.elements("override").toList
+      val seenScopes   = mutable.LinkedHashSet.empty[OverrideScope]
+      val keptElems    = mutable.ListBuffer.empty[Element]
+
+      for (elem <- initialElems) {
+        val app      = elem.attributeValueOpt("app").flatMap(_.trimAllToOpt).getOrElse("*")
+        val form     = elem.attributeValueOpt("form").flatMap(_.trimAllToOpt).getOrElse("*")
+        val profiles = elem.attributeValueOpt("profiles").map(_.splitTo[List]().mkString(" ")).getOrElse("")
+        val scope    = OverrideScope(app, form, profiles)
+
+        elem.addAttribute("app", app)
+        elem.addAttribute("form", form)
+        elem.addAttribute("profiles", profiles)
+
+        if ((app != "*" || form != "*" || profiles.nonEmpty) && ! seenScopes.contains(scope)) {
+          seenScopes += scope
+          keptElems  += elem
+        }
+      }
+
+      // Ensure every non-wildcard application has an unprofiled parent Application row (app / *)
+      val distinctApps = seenScopes.iterator.map(_.app).filter(a => a.nonEmpty && a != "*").toList.distinct
+      for (app <- distinctApps) {
+        val parentScope = OverrideScope(app, "*", "")
+        if (! seenScopes.contains(parentScope)) {
+          val parentElem = Element("override")
+          parentElem.addAttribute("id", "")
+          parentElem.addAttribute("app", app)
+          parentElem.addAttribute("form", "*")
+          parentElem.addAttribute("profiles", "")
+          appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
+          appendResourcesBlock(parentElem, Map.empty, Map.empty)
+          seenScopes += parentScope
+          keptElems  += parentElem
+        }
+      }
+
+      // Sort in canonical tree order: Global-profile -> App -> App-profile -> Form
+      def treeSortKey(elem: Element): (Int, String, String, Int, String, String, Int, String) = {
+        val app      = elem.attributeValueOpt("app").flatMap(_.trimAllToOpt).getOrElse("*")
+        val form     = elem.attributeValueOpt("form").flatMap(_.trimAllToOpt).getOrElse("*")
+        val profiles = elem.attributeValueOpt("profiles").getOrElse("")
+        (
+          if (app == "*") 0 else 1,
+          app.toLowerCase,
+          app,
+          if (form == "*") 0 else 1,
+          form.toLowerCase,
+          form,
+          if (profiles.isEmpty) 0 else 1,
+          profiles
+        )
+      }
+
+      val sortedElems = keptElems.toList.sortBy(treeSortKey)
+
+      // Assign unique non-empty @id values while preserving any existing unique @id
+      val usedIds = mutable.Set.empty[String]
+      var nextSeq = 1
+      def freshId(): String = {
+        var candidate = s"scope-$nextSeq"
+        nextSeq += 1
+        while (usedIds.contains(candidate)) {
+          candidate = s"scope-$nextSeq"
+          nextSeq += 1
+        }
+        usedIds += candidate
+        candidate
+      }
+
+      // First pass: reserve the first occurrence of every non-empty @id so synthesized parent rows never steal an existing @id
+      val preservedElems = mutable.Set.empty[Element]
+      for (elem <- sortedElems) {
+        elem.attributeValueOpt("id").flatMap(_.trimAllToOpt) match {
+          case Some(existingId) if ! usedIds.contains(existingId) =>
+            usedIds        += existingId
+            preservedElems += elem
+            elem.addAttribute("id", existingId)
+          case _ =>
+        }
+      }
+
+      // Second pass: assign fresh unique @id values to any element without a preserved @id
+      for (elem <- sortedElems if ! preservedElems.contains(elem))
+        elem.addAttribute("id", freshId())
+
+      for (elem <- initialElems)
+        elem.detach()
+      for (elem <- sortedElems)
+        overridesElem.add(elem)
+    }
 
   def configurationDomToPropertiesDom(configDoc: Document): Document = {
     val propertiesDoc  = Document("properties")

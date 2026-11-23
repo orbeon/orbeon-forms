@@ -108,7 +108,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-toolbar"                         , initLandingQuickFilter)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
-      SummaryTableSupport.init()
+      SearchResultsTableSupport.init()
       initSummaryCellTooltipClickForwarding()
     }
   }

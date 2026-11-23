@@ -1383,7 +1383,12 @@
 
                                 <xf:trigger class="btn-group" xxf:modal="true">
                                     <xf:label mediatype="text/html" ref="$fr-resources/buttons/refresh"/>
-                                    <xf:dispatch event="DOMActivate" name="fr-initialize" targetid="fr-form-model"/>
+                                    <xf:action event="DOMActivate">
+                                        <xf:action type="javascript">
+                                            <xf:body>ORBEON.fr.private.API.resetSearchResultsColumnWidths();</xf:body>
+                                        </xf:action>
+                                        <xf:dispatch name="fr-initialize" targetid="fr-form-model"/>
+                                    </xf:action>
                                 </xf:trigger>
 
                                 <xh:div class="{'btn-group', 'btn-group-empty'[count(instance()/remote-servers/remote-server) = 0]}">
@@ -1960,6 +1965,9 @@
                                 <xf:trigger ref=".[$has-active-filter]" class="fr-home-clear-filters">
                                     <xf:label mediatype="text/html" ref="$fr-resources/buttons/clear"/>
                                     <xf:action event="DOMActivate" propagate="stop">
+                                        <xf:action type="javascript">
+                                            <xf:body>ORBEON.fr.private.API.resetSearchResultsColumnWidths();</xf:body>
+                                        </xf:action>
                                         <xf:var
                                             name="had-backend-filter"
                                             value="
@@ -2002,7 +2010,12 @@
                         </xh:div>
                     </xf:group>
 
-                    <xf:group xxf:update="full" xxf:element="div" class="fr-search-results fr-table-frame">
+                    <xf:group
+                        xxf:update="full"
+                        xxf:element="div"
+                        class="fr-search-results fr-table-frame"
+                        role="region"
+                        aria-label="{if ($is-admin) then $fr-resources/admin/title else $fr-resources/home/title}">
                         <xh:table class="fr-forms-table table table-condensed {'fr-table-no-form-data'[empty($forms)]}">
                             <xh:thead>
                                 <xf:group ref=".[$is-admin and $show-remote]">

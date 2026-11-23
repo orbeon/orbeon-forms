@@ -145,8 +145,8 @@ object FormRunnerPrivateAPI extends js.Object {
   def updateLocationFormVersion(version: Int): Unit =
     removeReplaceOrAddUrlParameter("form-version", Some(version.toString))
 
-  def resetSummaryColumnWidths(): Unit =
-    SummaryTableSupport.markUnlockForNextSync()
+  def resetSearchResultsColumnWidths(): Unit =
+    SearchResultsTableSupport.markUnlockForNextSync()
 
   def replaceOrAddUrlParameter(name: String, value: String): Unit =
     removeReplaceOrAddUrlParameter(name, Some(value))

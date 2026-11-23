@@ -602,7 +602,58 @@
 
     .fr-search-results .fr-forms-table {
         width: 100%;
-        min-width: 860px;
+
+        &:not(.fr-table-fixed):not(.fr-table-measuring) {
+            min-width: 860px;
+
+            thead tr:not(.header-groups) th.fr-form-actions {
+                width: 1%;
+            }
+
+            th.fr-status,
+            td.fr-status,
+            th.fr-application-name,
+            td.fr-application-name,
+            th.fr-version,
+            td.fr-version,
+            th.fr-last-modified,
+            td.fr-modified,
+            td.fr-form-actions {
+                width: 1%;
+            }
+
+            th.fr-title {
+                min-width: 220px;
+            }
+
+            td.fr-title {
+                width: 100%;
+                max-width: 0;
+                min-width: 220px;
+            }
+
+            th.fr-form-name,
+            td.fr-form-name {
+                width: 200px;
+                max-width: 200px;
+            }
+        }
+
+        &.fr-table-fixed td.fr-application-name .fr-table-pill.xforms-trigger:not(.xforms-disabled) {
+            max-inline-size: 100%;
+
+            > button.btn-link {
+                max-inline-size: 100%;
+                overflow: hidden;
+
+                > .xforms-output {
+                    display: block;
+                    min-inline-size: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
 
         thead tr:not(.header-groups) th {
             button.btn-link {
@@ -611,7 +662,6 @@
 
             &.fr-form-actions {
                 padding: 10px 16px;
-                width: 1%;
             }
         }
 
@@ -635,18 +685,10 @@
 
         th.fr-status,
         td.fr-status {
-            width: 1%;
             white-space: nowrap;
         }
 
-        th.fr-title {
-            min-width: 220px;
-        }
-
         td.fr-title {
-            width: 100%;
-            max-width: 0;
-            min-width: 220px;
             font-weight: var(--orbeon-label-font-weight);
             overflow: hidden;
             text-overflow: ellipsis;
@@ -661,14 +703,7 @@
 
         th.fr-application-name,
         td.fr-application-name {
-            width: 1%;
             white-space: nowrap;
-        }
-
-        th.fr-form-name,
-        td.fr-form-name {
-            width: 200px;
-            max-width: 200px;
         }
 
         .fr-form-slug {
@@ -683,14 +718,12 @@
 
         th.fr-version,
         td.fr-version {
-            width: 1%;
             white-space: nowrap;
             text-align: right;
         }
 
         th.fr-last-modified,
         td.fr-modified {
-            width: 1%;
             white-space: nowrap;
         }
 
@@ -702,7 +735,6 @@
 
         td.fr-form-actions {
             padding: 6px 16px;
-            width: 1%;
             white-space: nowrap;
             text-align: right;
 
@@ -769,7 +801,9 @@
     }
 
     .fr-forms-admin .fr-search-results .fr-forms-table {
-        min-width: 960px;
+        &:not(.fr-table-fixed):not(.fr-table-measuring) {
+            min-width: 960px;
+        }
 
         thead tr:not(.header-groups) th {
             button.btn-link {

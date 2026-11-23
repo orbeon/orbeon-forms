@@ -468,7 +468,9 @@
     <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.show-thumbnail.*.*"                              value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.show-thumbnail.orbeon.*"                         value="true"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-thumbnail.*.*"                             value="false"/>
+    <property as="xs:boolean" name="oxf.fr.summary.show-thumbnail.orbeon.*"                        value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                            value="false"/>

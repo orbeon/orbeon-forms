@@ -35,7 +35,7 @@
 
                     <library-versions><_>1</_></library-versions>
 
-                <thumbnail filename="screenshot.webp" mediatype="image/webp" size="78406">/fr/service/persistence/crud/orbeon/builder/data/8fcdfe4ff49218923b6599ec9c7bb91488fcdf1a/9337d06aa456ea8ffa32b35544e56a084eab0f94.bin</thumbnail><data-migration>enabled</data-migration><email><templates><template name="default" xml:lang="en"><headers><header name="to" type="control-value">treasurer-email-address</header><header name="cc" type="control-value">payee-email</header></headers><subject>Payment authorization/request for reimbursement</subject><body mediatype="text/html">&lt;div&gt;Please find attached the PDF of the
+                <thumbnail filename="pta-payment-authorization.webp" mediatype="image/webp" size="28890">/fr/service/persistence/crud/orbeon/builder/data/8fcdfe4ff49218923b6599ec9c7bb91488fcdf1a/7c589be18c4560cb1dd8316d7670fb8617e79c1d.bin</thumbnail><data-migration>enabled</data-migration><email><templates><template name="default" xml:lang="en"><headers><header name="to" type="control-value">treasurer-email-address</header><header name="cc" type="control-value">payee-email</header></headers><subject>Payment authorization/request for reimbursement</subject><body mediatype="text/html">&lt;div&gt;Please find attached the PDF of the
                                 request. Make sure to check with the requester that the request is legitimate, and to
                                 obtain the documentation such as invoices and receipts. You can &lt;a href="{$link}"&gt;view
                                 the request online&lt;/a&gt;.&lt;/div&gt;

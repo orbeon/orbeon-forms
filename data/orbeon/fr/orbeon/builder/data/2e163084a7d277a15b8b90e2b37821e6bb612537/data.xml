@@ -29,14 +29,14 @@
                     <description xml:lang="en">Use this form to tell your employer how much federal income tax to withhold from your pay.</description>
                     
                     <library-versions>
-                        <_>1</_>
+                        <_>1</_><orbeon>2</orbeon>
                     </library-versions>
                     <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
                     <wizard>true</wizard>
                     <wizard-subsections-nav>false</wizard-subsections-nav>
                     <wizard-mode>lax</wizard-mode>
                     <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
-                <email><templates><template name="default"><headers></headers><exclude-from-all-control-values></exclude-from-all-control-values></template></templates><parameters></parameters></email></metadata>
+                <email><templates><template name="default"><headers></headers><exclude-from-all-control-values></exclude-from-all-control-values></template></templates><parameters></parameters></email><thumbnail filename="w4.webp" mediatype="image/webp" size="51732">/fr/service/persistence/crud/orbeon/builder/data/2e163084a7d277a15b8b90e2b37821e6bb612537/03e3be6b65a395d60f8e310f09049185f61b2a48.bin</thumbnail></metadata>
             </xf:instance>
 
             
@@ -74,7 +74,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="section-step1-section" bind="section-step1-bind"><xf:label ref="$form-resources/section-step1/label"></xf:label>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c x="1" y="1" w="4"><xf:input id="step1a_first_name_mi-control" bind="step1a_first_name_mi-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_first_name_mi">
                         <xf:label ref="$form-resources/step1a_first_name_mi/label"></xf:label>
@@ -82,7 +82,7 @@
                         
                         <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                         <fr:index>
-                            <fr:summary-show/>
+                            <fr:summary-show></fr:summary-show>
                         </fr:index>
                     </xf:input>
 
@@ -92,14 +92,14 @@
                         
                         <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                         <fr:index>
-                            <fr:summary-show/>
+                            <fr:summary-show></fr:summary-show>
                         </fr:index>
                     </xf:input></fr:c><fr:c x="9" y="1" w="4"><fr:us-ssn id="step1b_ssn-control" bind="step1b_ssn-bind" class="" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1b_ssn">
                         <xf:label ref="$form-resources/step1b_ssn/label"></xf:label>
                         <xf:hint ref="$form-resources/step1b_ssn/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                         
                         
-                    </fr:us-ssn></fr:c><fr:c x="1" y="2" w="12"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="step1b_ssn_explanation-control" bind="step1b_ssn_explanation-bind">
+                    </fr:us-ssn></fr:c><fr:c x="1" y="2" w="12"><fr:explanation id="step1b_ssn_explanation-control" bind="step1b_ssn_explanation-bind">
                         <fr:text ref="$form-resources/step1b_ssn_explanation/text" mediatype="text/html"></fr:text>
                     </fr:explanation></fr:c><fr:c x="1" y="3" w="12"><xf:input id="step1a_street_address-control" bind="step1a_street_address-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_street_address">
                         <xf:label ref="$form-resources/step1a_street_address/label"></xf:label>

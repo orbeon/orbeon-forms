@@ -290,7 +290,7 @@
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
 
-                <thumbnail filename="screenshot.webp" mediatype="image/webp" size="82154">/fr/service/persistence/crud/orbeon/builder/data/12553579e52f1008617b8d7a000e659db2b15133/ac0b81abeb051a3e01bbdf99b516cdf72250e114.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
+                <thumbnail filename="health-history.webp" mediatype="image/webp" size="25808">/fr/service/persistence/crud/orbeon/builder/data/12553579e52f1008617b8d7a000e659db2b15133/a6b39152828aec5ac5f14adc38564736cec60669.bin</thumbnail><allow-template-use>true</allow-template-use><email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email></metadata>
             </xf:instance>
 
             <!-- Attachments -->

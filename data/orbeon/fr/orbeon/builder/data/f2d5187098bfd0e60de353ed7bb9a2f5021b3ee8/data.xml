@@ -124,7 +124,7 @@
 
 
 
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><thumbnail filename="screenshot.webp" mediatype="image/webp" size="38472">/fr/service/persistence/crud/orbeon/builder/data/f2d5187098bfd0e60de353ed7bb9a2f5021b3ee8/497a7a7b97fcf8c58377b1d922b7bbb2d95c49c2.bin</thumbnail><allow-template-use>true</allow-template-use></metadata>
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><thumbnail filename="public-records.webp" mediatype="image/webp" size="42558">/fr/service/persistence/crud/orbeon/builder/data/f2d5187098bfd0e60de353ed7bb9a2f5021b3ee8/12c2f9955aa9b65959405901088d5594b8622f6f.bin</thumbnail><allow-template-use>true</allow-template-use></metadata>
             </xf:instance>
 
             <!-- Attachments -->

@@ -905,7 +905,10 @@
       inset: auto;
       margin: 0;
       padding: 8px 10px;
-      max-width: 280px;
+      max-inline-size: ~"min(360px, calc(100dvw - 16px))";
+      max-block-size: ~"min(420px, calc(100dvh - 24px))";
+      overflow-y: auto;
+      overscroll-behavior: contain;
       box-sizing: border-box;
       background-color: var(--orbeon-help-background-color);
       border: 1px solid var(--orbeon-help-border-color);
@@ -932,6 +935,16 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 5px;
+
+        &.fr-pills-grid {
+          --fr-pills-grid-cols: 5;
+          display: grid;
+          grid-template-columns: repeat(var(--fr-pills-grid-cols), 1fr);
+
+          > .fr-table-pill {
+            width: 100%;
+          }
+        }
       }
     }
 

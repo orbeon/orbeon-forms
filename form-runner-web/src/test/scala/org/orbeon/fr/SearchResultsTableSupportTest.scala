@@ -788,6 +788,10 @@ class SearchResultsTableSupportTest extends AnyFunSpecLike {
       assert(popover.hasClass(SearchResultsTableSupport.PopoverOpenClass))
       assert(triggerBtn.getAttribute("aria-controls") == popover.id)
 
+      val popBody = popover.querySelectorT(s".${SearchResultsTableSupport.PillsPopoverBodyClass}")
+      assert(popBody.hasClass(SearchResultsTableSupport.PillsGridClass))
+      assert(popBody.style.getPropertyValue(SearchResultsTableSupport.PillsGridColsCssVar) == "5")
+
       val popBadges = popover.querySelectorAllT(".fr-table-pill")
       assert(popBadges.length == 5)
       assert(popBadges.head.hasClass("fr-pill-unavailable"))

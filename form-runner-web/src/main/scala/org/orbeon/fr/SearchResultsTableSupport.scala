@@ -45,6 +45,8 @@ object SearchResultsTableSupport {
   val PillsOverflowTriggerClass = "fr-pills-overflow-trigger"
   val PillsOverflowPopoverClass = "fr-pills-overflow-popover"
   val PillsPopoverBodyClass     = "fr-pills-overflow-popover-body"
+  val PillsGridClass            = "fr-pills-grid"
+  val PillsGridColsCssVar       = "--fr-pills-grid-cols"
   val PopoverOpenClass          = "fr-popover-open"
 
   def init(): Unit =
@@ -182,6 +184,7 @@ object SearchResultsTableSupport {
     val PillsMinCh               = 15.0
     val PillsMaxCh               = 19.0
     val DefaultPillsGapPx        = 5.0
+    val MaxVersionGridCols       = 5
     val PopoverHoverOpenDelayMs  = 120
     val PopoverHoverCloseDelayMs = 150
     val PopoverViewportMarginPx  = 8.0
@@ -1431,10 +1434,16 @@ object SearchResultsTableSupport {
 
     def renderPopoverPills(popoverElem: html.Element, pillsElem: html.Element): Unit = {
       popoverElem.innerHTML = ""
-      val body = dom.document.createElement("div").asInstanceOf[html.Element]
-      body.className = PillsPopoverBodyClass
+      val pills = originalPillsOf(pillsElem)
+      val body  = dom.document.createElement("div").asInstanceOf[html.Element]
+      val useUniformGrid = pills.nonEmpty && pills.forall(_.hasClass("fr-version-badge"))
+      body.className =
+        if (useUniformGrid) s"$PillsPopoverBodyClass $PillsGridClass"
+        else PillsPopoverBodyClass
+      if (useUniformGrid)
+        body.style.setProperty(PillsGridColsCssVar, math.max(1, math.min(MaxVersionGridCols, pills.length)).toString)
 
-      originalPillsOf(pillsElem).foreach { pill =>
+      pills.foreach { pill =>
         val origBtnOpt =
           if (pill.localName == "button") Some(pill)
           else pill.querySelectorOpt("button")

@@ -67,3 +67,35 @@ body {
         padding-top: 0;
     }
 }
+
+.orbeon .tox:is(.tox-hugerte, .tox-hugerte-aux) {
+    .tox-editor-header,
+    .tox-toolbar-overlord,
+    .tox-toolbar__primary,
+    .tox-toolbar__overflow {
+        background-color: var(--orbeon-dropdown-menu-background-color);
+    }
+    .tox-editor-header {
+        border-color: var(--orbeon-dropdown-menu-border-color);
+    }
+    .tox-tbtn {
+        background: transparent;
+        &:not(.tox-tbtn--disabled) {
+            color: var(--orbeon-dropdown-menu-color);
+        }
+        &:hover {
+            background: var(--orbeon-button-background-color);
+        }
+        &:active, &.tox-tbtn--active, &.tox-tbtn--enabled {
+            background: var(--orbeon-button-primary-background-color);
+            color: var(--orbeon-button-primary-color);
+        }
+        &.tox-tbtn--disabled, &:disabled {
+            background: transparent;
+            color: var(--orbeon-dropdown-menu-disabled-color);
+        }
+        .tox-icon svg {
+            fill: currentColor;
+        }
+    }
+}

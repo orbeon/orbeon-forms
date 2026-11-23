@@ -41,7 +41,6 @@
 
 @toolbar-button-height: 25px;           // Make icons smaller
 @toolbar-button-margin: 3px;            // Default margin isn't the same on top and bottom
-@toolbar-height       : (@toolbar-button-height + 2 * @toolbar-button-margin);
 
 body {
     .tox .tox-tbtn {
@@ -105,13 +104,8 @@ body {
 }
 
 // HugeRTE shows the tooltip of a toolbar button below the button, so over the text being edited: show it above the
-// toolbar instead, with its arrow at the bottom
+// toolbar instead
 .orbeon .tox .tox-tooltip--up {
-    transform: translateY(calc(-100% - @toolbar-height));
-    .tox-tooltip__arrow {
-        top: auto;
-        bottom: 0;
-        border-top: 8px solid #222f3e;
-        border-bottom: 0;
-    }
+    transform: translateY(calc(-100% - @toolbar-button-height));
+    padding-bottom: @toolbar-button-margin;
 }

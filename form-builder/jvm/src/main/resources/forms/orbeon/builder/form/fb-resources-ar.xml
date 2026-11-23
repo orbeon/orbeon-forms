@@ -45,6 +45,9 @@
             &lt;a href="{1}" target="_blank"&gt;عرض في صفحة ملخص منشئ النماذج.&lt;/a&gt;
         </form-in-progress-alert>
     </form-name>
+    <published-version>
+        <label>الإصدار</label>
+    </published-version>
     <title>
         <label>عنوان النموذج</label>
         <hint>عنوان النموذج باللغة الحالية</hint>

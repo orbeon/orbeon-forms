@@ -27,6 +27,9 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import scala.collection.immutable.ListMap
 
 object FormLogic {
+
+  private val MaxAppFormsPerQuery = 400
+
   def forms(
     provider       : Provider,
     formRequest    : FormRequest
@@ -35,58 +38,71 @@ object FormLogic {
     indentedLogger : IndentedLogger
   ): FormResponse = {
 
-    // At the moment, the only thing we filter at the SQL level are the app and form names
-    val innerWhereClauses = List(
-      formRequest.exactAppOpt .map(app  => (s"app =  ?", (_.setString(_, app )): Setter)),
-      formRequest.exactFormOpt.map(form => (s"form = ?", (_.setString(_, form)): Setter))
-    ).flatten
-
-    val setters = innerWhereClauses.map(_._2)
-
-    val innerWhere = Some(innerWhereClauses).filter(_.nonEmpty).map(_.map(_._1).mkString(" AND ")).map { innerWhere =>
-      s"""
-         |WHERE
-         |    $innerWhere
-         |""".stripMargin
-    }.mkString
-
-    val query =
-      s"""SELECT
-         |    d.app                application_name,
-         |    d.form               form_name,
-         |    d.form_version       form_version,
-         |    d.form_metadata      form_metadata,
-         |    d.last_modified_time last_modified_time,
-         |    d.last_modified_by   last_modified_by,
-         |    d.created            created
-         |FROM
-         |    orbeon_form_definition d,
-         |    (
-         |        SELECT
-         |            app,
-         |            form,
-         |            form_version,
-         |            MAX(last_modified_time) last_modified_time
-         |        FROM
-         |            orbeon_form_definition
-         |        $innerWhere
-         |        GROUP BY
-         |            app, form, form_version
-         |    ) app_form_version_last_time
-         |WHERE
-         |    d.app                = app_form_version_last_time.app                AND
-         |    d.form               = app_form_version_last_time.form               AND
-         |    d.form_version       = app_form_version_last_time.form_version       AND
-         |    d.last_modified_time = app_form_version_last_time.last_modified_time AND
-         |    d.deleted = 'N'
-         |""".stripMargin
-
-    val statementPart = StatementPart(query, setters)
+    val appFormChunks: List[Option[Seq[AppForm]]] =
+      formRequest.appForms.distinct match {
+        case Seq()    => List(None)
+        case nonEmpty => nonEmpty.grouped(MaxAppFormsPerQuery).map(Some.apply).toList
+      }
 
     RelationalUtils.withConnection(provider) { connection =>
-      executeQuery(connection, statementPart.sql, List(statementPart)) { resultSet =>
+      val allForms = appFormChunks.flatMap { appFormsChunkOpt =>
 
-        val forms =
+        // At the moment, the only things we filter at the SQL level are exact app/form names and batched (app, form) pairs
+        val innerWhereClauses: List[(String, List[Setter])] = List(
+          formRequest.exactAppOpt .map(app  => (s"app =  ?", List[Setter](_.setString(_, app )))),
+          formRequest.exactFormOpt.map(form => (s"form = ?", List[Setter](_.setString(_, form)))),
+          appFormsChunkOpt.map { chunk =>
+            val sql     = chunk.map(_ => "(app = ? AND form = ?)").mkString("(", " OR ", ")")
+            val setters = chunk.toList.flatMap { af =>
+              List[Setter]((_.setString(_, af.app)), (_.setString(_, af.form)))
+            }
+            (sql, setters)
+          }
+        ).flatten
+
+        val setters = innerWhereClauses.flatMap(_._2)
+
+        val innerWhere = Some(innerWhereClauses).filter(_.nonEmpty).map(_.map(_._1).mkString(" AND ")).map { innerWhere =>
+          s"""
+             |WHERE
+             |    $innerWhere
+             |""".stripMargin
+        }.mkString
+
+        val query =
+          s"""SELECT
+             |    d.app                application_name,
+             |    d.form               form_name,
+             |    d.form_version       form_version,
+             |    d.form_metadata      form_metadata,
+             |    d.last_modified_time last_modified_time,
+             |    d.last_modified_by   last_modified_by,
+             |    d.created            created
+             |FROM
+             |    orbeon_form_definition d,
+             |    (
+             |        SELECT
+             |            app,
+             |            form,
+             |            form_version,
+             |            MAX(last_modified_time) last_modified_time
+             |        FROM
+             |            orbeon_form_definition
+             |        $innerWhere
+             |        GROUP BY
+             |            app, form, form_version
+             |    ) app_form_version_last_time
+             |WHERE
+             |    d.app                = app_form_version_last_time.app                AND
+             |    d.form               = app_form_version_last_time.form               AND
+             |    d.form_version       = app_form_version_last_time.form_version       AND
+             |    d.last_modified_time = app_form_version_last_time.last_modified_time AND
+             |    d.deleted = 'N'
+             |""".stripMargin
+
+        val statementPart = StatementPart(query, setters)
+
+        executeQuery(connection, statementPart.sql, List(statementPart)) { resultSet =>
           Iterator.iterateWhile(
             cond = resultSet.next(),
             elem = {
@@ -134,10 +150,11 @@ object FormLogic {
               )
             }
           ).toList
-
-        // No paging for now, return all results
-        FormResponse(forms, searchTotal = forms.size)
+        }
       }
+
+      // No paging for now, return all results
+      FormResponse(allForms, searchTotal = allForms.size)
     }
   }
 }

@@ -651,6 +651,53 @@ trait PersistenceApiTrait {
     }
   } .get
 
+  def readFormsMetadataForAppForms(
+    appForms                : collection.Seq[AppForm],
+    allForms                : Boolean = true
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Try[DocumentNodeInfoType] = {
+
+    val distinctAppForms = appForms.distinct
+    if (distinctAppForms.isEmpty) {
+      Try(
+        XFormsCrossPlatformSupport.stringToTinyTree(
+          XPath.GlobalConfiguration,
+          """<forms search-total="0"/>""",
+          handleXInclude = false,
+          handleLexical  = false
+        )
+      )
+    } else {
+      val searchElem =
+        <search all-forms={allForms.toString}>{
+          distinctAppForms.map(af => <app-form app={af.app} form={af.form}/>)
+        }</search>
+
+      val queryBytes  = searchElem.toString.getBytes(CharsetNames.Utf8)
+      val servicePath = "/fr/service/persistence/form"
+
+      ConnectionResult.tryWithSuccessConnection(
+        connectPersistence(
+          method             = HttpMethod.POST,
+          pathQuery          = servicePath,
+          requestBodyContent = StreamedContent.fromBytes(queryBytes, ContentTypes.XmlContentType.some).some,
+          formVersionOpt     = None
+        ),
+        closeOnSuccess = true
+      ) { is =>
+        XFormsCrossPlatformSupport.readTinyTree(
+          XPath.GlobalConfiguration,
+          is,
+          servicePath,
+          handleXInclude = false,
+          handleLexical  = false
+        )
+      }
+    }
+  }
+
   def doDelete(
     path                       : String,
     modifiedTimeOpt            : Option[Instant],

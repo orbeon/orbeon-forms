@@ -78,6 +78,13 @@
                 }
             }
 
+            // Expose native `title` tooltips on non-link elements (such as status/version pills) above `.fr-summary-cell-link::after`
+            [title]:not(a) {
+                position: relative;
+                z-index: 2;
+                cursor: pointer;
+            }
+
             // Neutralize boxed `.xforms-field` and static output chrome inside compact Summary table cells
             .xforms-field,
             .xforms-output.xforms-output-appearance-minimal output[role = "textbox"],
@@ -120,6 +127,13 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+
+                &:has(> .fr-status-pills) {
+                    max-width: none;
+                    white-space: nowrap;
+                    overflow: visible;
+                    text-overflow: clip;
+                }
 
                 p, h1, h2, h3, h4, h5, h6, blockquote, pre {
                     display: inline;

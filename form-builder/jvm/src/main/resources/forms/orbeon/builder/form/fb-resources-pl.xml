@@ -45,6 +45,9 @@
             &lt;a href="{1}" target="_blank"&gt;Zobacz na stronie podsumowania Form Buildera.&lt;/a&gt;
         </form-in-progress-alert>
     </form-name>
+    <published-version>
+        <label>Wersja</label>
+    </published-version>
     <title>
         <label>Tytuł formularza</label>
         <hint>Tytuł formularza w bieżącym języku</hint>

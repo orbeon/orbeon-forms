@@ -151,6 +151,24 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def publishedVersionsSummaryHtml(
+    documents       : Array[NodeInfo],
+    app             : String,
+    form            : String,
+    versionLabel    : String,
+    availableLabel  : String,
+    unavailableLabel: String
+  ): String =
+    FormBuilderSummarySupport.publishedVersionsSummaryHtml(
+      documents        = documents,
+      app              = app,
+      form             = form,
+      versionLabel     = versionLabel,
+      availableLabel   = availableLabel,
+      unavailableLabel = unavailableLabel
+    )
+
+  //@XPathFunction
   def publishForm(
     doc                  : NodeInfo,
     documentId           : String,

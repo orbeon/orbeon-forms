@@ -77,7 +77,11 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
       )
     )
 
-    val providers     = getProviders(formRequest.exactAppOpt, formRequest.exactFormOpt, FormOrData.Form)
+    val providers =
+      if (formRequest.appForms.nonEmpty && formRequest.exactAppOpt.isEmpty && formRequest.exactFormOpt.isEmpty)
+        formRequest.appForms.distinct.flatMap(af => getProviders(Some(af.app), Some(af.form), FormOrData.Form)).distinct.toList
+      else
+        getProviders(formRequest.exactAppOpt, formRequest.exactFormOpt, FormOrData.Form)
     val remoteServers = FormRunnerHome.remoteServers
 
     // As of 2024, the resource provider does not return any form metadata. Processing it first if present allows us
@@ -162,8 +166,12 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
     }
 
     // 1) Filter forms
+    val appFormsSet    = formRequest.appForms.toSet
     val queriesToCheck = formRequest.filterQueries.diff(latestFormVersionQueryOpt.toSeq)
-    val filteredForms  = formsWithLocalOperations.filter(form => queriesToCheck.forall(_.satisfies(form, formRequest)))
+    val filteredForms  = formsWithLocalOperations.filter { form =>
+      (appFormsSet.isEmpty || appFormsSet.contains(form.appForm)) &&
+        queriesToCheck.forall(_.satisfies(form, formRequest))
+    }
 
     // 2) Sort forms
     val formOrdering = Order.formOrdering(formRequest.sortQuery, formRequest)

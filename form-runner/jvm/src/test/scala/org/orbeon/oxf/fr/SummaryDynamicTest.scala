@@ -351,6 +351,132 @@ class SummaryDynamicTest
       assert(cellGroups.nonEmpty)
       assert(cellGroups.forall(_.attributeValueOpt("functions").isEmpty))
     }
+
+    it("must place non-indexed computed `<fr:summary-show/>` columns in source document order without shifting indexed detail positions") {
+      val formWithComputedCol =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <main>
+                    <first-col/>
+                    <third-col/>
+                  </main>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-bind" name="main" ref="main">
+                  <xf:bind id="first-col-bind" name="first-col" ref="first-col"/>
+                  <xf:bind id="third-col-bind" name="third-col" ref="third-col"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>acme</application-name>
+                  <form-name>computed</form-name>
+                </metadata>
+              </xf:instance>
+              <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                  <resource xml:lang="en">
+                    <main><label>Main</label></main>
+                    <first-col><label>First</label></first-col>
+                    <computed-middle><label>Computed Middle</label></computed-middle>
+                    <third-col><label>Third</label></third-col>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="main-section" bind="main-bind">
+                  <fr:grid id="main-grid">
+                    <fr:c x="1" y="1" w="4">
+                      <xf:input id="first-col-control" bind="first-col-bind">
+                        <xf:label ref="$form-resources/first-col/label"/>
+                        <fr:index><fr:summary-show/></fr:index>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="5" y="1" w="4">
+                      <xf:output id="computed-middle-control" value="concat($first-col, '-', $third-col)">
+                        <xf:label ref="$form-resources/computed-middle/label"/>
+                        <fr:summary-show/>
+                      </xf:output>
+                    </fr:c>
+                    <fr:c x="9" y="1" w="4">
+                      <xf:input id="third-col-control" bind="third-col-bind">
+                        <xf:label ref="$form-resources/third-col/label"/>
+                        <fr:index><fr:summary-show/></fr:index>
+                      </xf:input>
+                    </fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+
+      val docInfo = elemToDocumentInfo(formWithComputedCol)
+      val appForm = AppForm("acme", "computed")
+
+      // Non-indexed `<fr:summary-show/>` control must not appear in `Index.searchableValues`
+      val indexed =
+        org.orbeon.oxf.fr.persistence.relational.index.Index.searchableValues(
+          formDoc                   = docInfo,
+          appForm                   = appForm,
+          searchVersionOpt          = None,
+          databaseDataFormatVersion = DataFormatVersion.V20191
+        )
+      assert(indexed.controls.map(_.name) == List("first-col", "third-col"))
+
+      val builtNode =
+        FormRunnerSummary.buildSummaryDynamicFormImpl(
+          formDoc                   = docInfo,
+          templateNode              = summaryTemplateNode,
+          appForm                   = appForm,
+          databaseDataFormatVersion = DataFormatVersion.V20191,
+          resourcesRootElemOpt      = None,
+          functionLibrary           = FormRunnerFunctionLibrary
+        )
+
+      val domRoot = StaticXPath.tinyTreeToOrbeonDom(builtNode).getRootElement
+
+      // Header order: `main/first-col` (sortable), `computed-middle` (non-sortable), `main/third-col` (sortable)
+      val sortableThs =
+        domRoot.descendantElementIterator(includeSelf = true)
+          .filter(_.getName == "sortable-th")
+          .filter(_.attributeValue("column") != "{$column}")
+          .toList
+
+      assert(sortableThs.map(th => th.attributeValue("column") -> th.attributeValue("sort-supported")) == List(
+        "main/first-col"  -> "{$sort-supported}",
+        "computed-middle" -> "false",
+        "main/third-col"  -> "{$sort-supported}"
+      ))
+
+      // `fr-col-2-bind` still points to `detail[2]` (`main/third-col`), unaffected by the computed middle column
+      val col2Bind = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "fr-col-2-bind").get
+      assert(col2Bind.attributeValue("ref") == "(detail[@path = 'main/third-col'], detail[2])[1]")
+
+      // Computed column keeps its `value` attribute, has no `bind`, and strips `<fr:summary-show/>`
+      val computedCtrl = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "fr-summary-computed-col-1-control").get
+      assert(computedCtrl.attributeValueOpt("bind").isEmpty)
+      assert(computedCtrl.attributeValue("value") == "concat($first-col, '-', $third-col)")
+      assert(! computedCtrl.elements.exists(_.getName == "summary-show"))
+
+      // Referenced variables `$first-col` and `$third-col` are injected into `documents-repeat`
+      val repeatElem = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "documents-repeat").get
+      val injectedVarNames = repeatElem.elements.filter(_.getName == "var").map(_.attributeValue("name")).toSet
+      assert(injectedVarNames.contains("first-col"))
+      assert(injectedVarNames.contains("third-col"))
+    }
   }
 
   describe("Live `<xxf:dynamic>` Summary table rendering and interaction") {

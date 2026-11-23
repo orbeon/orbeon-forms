@@ -507,91 +507,7 @@
             .fr-plain-checkbox-container();
         }
 
-        .fr-status-pills {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            vertical-align: middle;
-        }
-
-        .fr-pill-visual() {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-            min-height: 24px;
-            min-width: 24px;
-            padding: 2px 9px;
-            margin: 0;
-            border-radius: 9999px;
-            border: 1px solid var(--fr-pill-border);
-            background-color: var(--fr-pill-bg);
-            color: var(--fr-pill-color);
-            font-family: var(--orbeon-base-font-family);
-            font-size: var(--orbeon-code-font-size);
-            font-weight: var(--orbeon-label-font-weight);
-            line-height: 1.35;
-            text-decoration: none;
-            text-shadow: none;
-            white-space: nowrap;
-        }
-
         .fr-table-pill {
-            --fr-pill-bg           : var(--orbeon-pill-background-color);
-            --fr-pill-border       : var(--orbeon-pill-border-color);
-            --fr-pill-color        : var(--orbeon-pill-color);
-            --fr-pill-active-bg    : var(--orbeon-pill-active-background-color);
-            --fr-pill-active-border: var(--orbeon-pill-active-color);
-            --fr-pill-active-color : var(--orbeon-pill-active-color);
-
-            &.fr-pill-muted {
-                --fr-pill-bg    : var(--orbeon-pill-muted-background-color);
-                --fr-pill-border: var(--orbeon-pill-muted-border-color);
-                --fr-pill-color : var(--orbeon-pill-muted-color);
-            }
-
-            &.fr-pill-success {
-                --fr-pill-bg    : var(--orbeon-pill-success-background-color);
-                --fr-pill-border: var(--orbeon-pill-success-border-color);
-                --fr-pill-color : var(--orbeon-pill-success-color);
-            }
-
-            &.fr-pill-info {
-                --fr-pill-bg    : var(--orbeon-pill-info-background-color);
-                --fr-pill-border: var(--orbeon-pill-info-border-color);
-                --fr-pill-color : var(--orbeon-pill-info-color);
-            }
-
-            &.fr-pill-warning {
-                --fr-pill-bg    : var(--orbeon-pill-warning-background-color);
-                --fr-pill-border: var(--orbeon-pill-warning-border-color);
-                --fr-pill-color : var(--orbeon-pill-warning-color);
-            }
-
-            &.fr-pill-muted,
-            &.fr-pill-success,
-            &.fr-pill-info,
-            &.fr-pill-warning {
-                --fr-pill-active-bg    : var(--fr-pill-bg);
-                --fr-pill-active-border: var(--fr-pill-color);
-                --fr-pill-active-color : var(--fr-pill-color);
-            }
-
-            @media (prefers-contrast: more) {
-                --fr-pill-border      : currentColor;
-            }
-
-            &.xforms-output:not(.xforms-disabled) {
-                .fr-pill-visual();
-                vertical-align: middle;
-
-                @media (forced-colors: active) {
-                    background-color: Canvas;
-                    border-color: CanvasText;
-                    color: CanvasText;
-                }
-            }
-
             &.xforms-trigger:not(.xforms-disabled) {
                 display: inline-flex;
                 vertical-align: middle;
@@ -673,11 +589,6 @@
                     }
                 }
             }
-        }
-
-        &.fr-forms-table .fr-version-badge,
-        .fr-version-badge {
-            font-variant-numeric: tabular-nums;
         }
 
         #fr-no-form-data {

@@ -971,6 +971,84 @@ class FormMetadataApiTest
       }
     }
 
+    it("filters forms by batched (app, form) pairs including unavailable and library forms (#1795)") {
+      withProvider(applicationCounts) { provider => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
+
+        val app1 = s"${provider.entryName}-1"
+        val app2 = s"${provider.entryName}-2"
+        val app3 = s"${provider.entryName}-3"
+
+        val formA      = TestForm(appForm = AppForm(app1, "order"),       titlesByLanguage = Map("en" -> "Order"),       controls = Seq.empty, operations = None)
+        val formALib   = TestForm(appForm = AppForm(app1, "library"),     titlesByLanguage = Map("en" -> "Library"),     controls = Seq.empty, operations = None)
+        val formBOther = TestForm(appForm = AppForm(app2, "unrequested"), titlesByLanguage = Map("en" -> "Unrequested"), controls = Seq.empty, operations = None)
+
+        formA.putFormDefinition(version = Version.Specific(1))
+        // Publish v2 of `order` marked `<available>false</available>`
+        val unavailableXml = {
+          val doc = formA.formDefinition
+          val metadataElem = doc.getRootElement.element("head").element("model").elements("instance").find(_.attributeValue("id") == "fr-form-metadata").get.element("metadata")
+          metadataElem.addElement("available").setText("false")
+          doc
+        }
+        HttpCall.put(
+          url     = s"crud/$app1/order/form/form.xhtml",
+          version = Version.Specific(2),
+          stage   = None,
+          body    = HttpCall.XML(unavailableXml)
+        )
+
+        formALib.putFormDefinition(version = Version.Specific(1))
+        formBOther.putFormDefinition(version = Version.Specific(1))
+
+        val batchRequest =
+          <search all-forms="true">
+            <app-form app={app1} form="order"/>
+            <app-form app={app1} form="library"/>
+            <app-form app={app3} form="non-existent"/>
+          </search>.toDocument
+
+        HttpCall.assertCall(
+          actualRequest  = solicitedRequest(batchRequest),
+          assertResponse = response => {
+            assert(response.code == StatusCode.Ok)
+            val root  = orbeonDomToTinyTree(IOSupport.readOrbeonDom(new ByteArrayInputStream(response.body))).rootElement
+            val forms = (root / "form").map { f =>
+              (
+                f.elemValue("application-name"),
+                f.elemValue("form-name"),
+                f.elemValue("form-version").toInt,
+                f.elemValue("available").toBoolean
+              )
+            }.toSet
+
+            assert(forms == Set(
+              (app1, "order",   1, true),
+              (app1, "order",   2, false),
+              (app1, "library", 1, true)
+            ))
+          }
+        )
+
+        // Unknown pair alone returns empty `<forms search-total="0"/>`
+        assertCall(
+          searchRequest =
+            <search all-forms="true">
+              <app-form app={app3} form="missing"/>
+            </search>.toDocument,
+          searchResult  = <forms search-total="0"/>.toDocument,
+          contentType   = Check.Some(ContentTypes.XmlContentType)
+        )
+
+        // Blank `app` or `form` attribute returns 400 Bad Request
+        HttpCall.assertCall(
+          actualRequest  = solicitedRequest(<search all-forms="true"><app-form app="" form="order"/></search>.toDocument),
+          assertResponse = response => assert(response.code == StatusCode.BadRequest)
+        )
+      }
+    }
+
     it("serializes and deserializes requests and responses") {
       withProvider(applicationCounts) { provider => implicit externalContext =>
 
@@ -987,7 +1065,8 @@ class FormMetadataApiTest
           ),
           filterQueries           = Seq(FilterQuery.latestVersionsQuery),
           sortQuery               = SortQuery.defaultSortQuery,
-          paginationOpt           = Pagination(pageNumber = 1, pageSize = 10).some
+          paginationOpt           = Pagination(pageNumber = 1, pageSize = 10).some,
+          appForms                = Seq(AppForm("acme", "order"), AppForm("hr", "onboarding"))
         )
 
         val deserializedFormRequest = FormRequest(formRequest.toXML)

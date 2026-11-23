@@ -500,6 +500,83 @@
       .fr-plain-checkbox-container();
       padding: 4px 5px;
     }
+
+    .fr-status-pills {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      vertical-align: middle;
+    }
+
+    .fr-table-pill {
+      --fr-pill-bg           : var(--orbeon-pill-background-color);
+      --fr-pill-border       : var(--orbeon-pill-border-color);
+      --fr-pill-color        : var(--orbeon-pill-color);
+      --fr-pill-active-bg    : var(--orbeon-pill-active-background-color);
+      --fr-pill-active-border: var(--orbeon-pill-active-color);
+      --fr-pill-active-color : var(--orbeon-pill-active-color);
+
+      &.fr-pill-muted {
+        --fr-pill-bg    : var(--orbeon-pill-muted-background-color);
+        --fr-pill-border: var(--orbeon-pill-muted-border-color);
+        --fr-pill-color : var(--orbeon-pill-muted-color);
+      }
+
+      &.fr-pill-success {
+        --fr-pill-bg    : var(--orbeon-pill-success-background-color);
+        --fr-pill-border: var(--orbeon-pill-success-border-color);
+        --fr-pill-color : var(--orbeon-pill-success-color);
+      }
+
+      &.fr-pill-info {
+        --fr-pill-bg    : var(--orbeon-pill-info-background-color);
+        --fr-pill-border: var(--orbeon-pill-info-border-color);
+        --fr-pill-color : var(--orbeon-pill-info-color);
+      }
+
+      &.fr-pill-warning {
+        --fr-pill-bg    : var(--orbeon-pill-warning-background-color);
+        --fr-pill-border: var(--orbeon-pill-warning-border-color);
+        --fr-pill-color : var(--orbeon-pill-warning-color);
+      }
+
+      &.fr-pill-muted,
+      &.fr-pill-success,
+      &.fr-pill-info,
+      &.fr-pill-warning {
+        --fr-pill-active-bg    : var(--fr-pill-bg);
+        --fr-pill-active-border: var(--fr-pill-color);
+        --fr-pill-active-color : var(--fr-pill-color);
+      }
+
+      @media (prefers-contrast: more) {
+        --fr-pill-border: currentColor;
+      }
+
+      &.xforms-output:not(.xforms-disabled),
+      &:not(.xforms-output):not(.xforms-trigger):not(.xforms-disabled) {
+        .fr-pill-visual();
+        vertical-align: middle;
+
+        &.fr-pill-unavailable {
+          border-style: dashed;
+        }
+
+        @media (forced-colors: active) {
+          background-color: Canvas;
+          border-color: CanvasText;
+          color: CanvasText;
+        }
+      }
+    }
+
+    .fr-version-badge {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fr-version-empty {
+      color: var(--orbeon-hint-color);
+    }
   }
 
   // TODO: use same styling as in form-runner-home?

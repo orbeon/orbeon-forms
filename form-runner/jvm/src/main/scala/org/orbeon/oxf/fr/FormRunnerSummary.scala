@@ -273,51 +273,154 @@ trait FormRunnerSummary {
     val referencedVars = mutable.LinkedHashSet.empty[String]
     val isRestricted   = appForm != AppForm.FormBuilder
 
-    // 2. Prepare visible summary controls (`@summary-show = 'true'`)
-    val preparedColumns =
-      for {
+    val indexedVisibleByNode: Map[NodeInfo, (org.orbeon.oxf.fr.persistence.relational.IndexedControl, Int)] =
+      (for {
         (ic, idx0)  <- allControls.zipWithIndex
         if ic.summarySettings.show
         controlNode <- ic.controlElem
-      } yield {
-        val detailPos = idx0 + 1
-        val rawElem   = StaticXPath.tinyTreeToOrbeonDom(controlNode).getRootElement.createCopy
+      } yield controlNode -> (ic, idx0)).toMap
 
-        // Convert legacy `xf:input` bound to `date` or `time` to `fr:date` or `fr:time`
-        val elem = maybeConvertLegacyDateTimeInput(rawElem, ic.xsType)
+    val indexedAllControlNodes: Set[NodeInfo] =
+      allControls.flatMap(_.controlElem).toSet
 
-        // Check whether this control's resources are missing from top-level `fr-form-resources` (section template)
-        // or collide with another indexed control sharing the same control name
-        val needsDisambiguatedResources =
-          controlNameCounts.getOrElse(ic.name, 0) > 1 ||
-            ! hasResourceHolderInAllLangs(dynamicResourcesRoot, ic.name)
+    def prepareIndexedColumn(ic: org.orbeon.oxf.fr.persistence.relational.IndexedControl, idx0: Int, controlNode: NodeInfo): PreparedSummaryColumn = {
+      val detailPos = idx0 + 1
+      val rawElem   = StaticXPath.tinyTreeToOrbeonDom(controlNode).getRootElement.createCopy
 
-        if (needsDisambiguatedResources && ic.resources.nonEmpty) {
-          val syntheticName = s"fr-summary-col-$detailPos"
-          injectControlResources(dynamicResourcesRoot, syntheticName, ic.resources)
-          rewriteFormResourceReferences(elem, ic.name, syntheticName)
-        }
+      // Convert legacy `xf:input` bound to `date` or `time` to `fr:date` or `fr:time`
+      val elem = maybeConvertLegacyDateTimeInput(rawElem, ic.xsType)
 
-        sanitizeSummaryControlElement(elem, detailPos, isRestricted)
+      // Check whether this control's resources are missing from top-level `fr-form-resources` (section template)
+      // or collide with another indexed control sharing the same control name
+      val needsDisambiguatedResources =
+        controlNameCounts.getOrElse(ic.name, 0) > 1 ||
+          ! hasResourceHolderInAllLangs(dynamicResourcesRoot, ic.name)
 
-        collectReferencedVariables(elem, functionLibrary).foreach { varName =>
-          if (! TemplateScopedVars(varName))
-            referencedVars += varName
-        }
-
-        val fieldAlignOpt = elem.attributeValueOpt("field-align")
-        val alignRight    =
-          fieldAlignOpt.contains("right") ||
-            (fieldAlignOpt.isEmpty && RightAlignedControlLocalNames(elem.getName))
-
-        PreparedSummaryColumn(
-          xpath            = ic.xpath,
-          detailPos        = detailPos,
-          controlElem      = elem,
-          controlLocalName = ic.control,
-          alignRight       = alignRight
-        )
+      if (needsDisambiguatedResources && ic.resources.nonEmpty) {
+        val syntheticName = s"fr-summary-col-$detailPos"
+        injectControlResources(dynamicResourcesRoot, syntheticName, ic.resources)
+        rewriteFormResourceReferences(elem, ic.name, syntheticName)
       }
+
+      sanitizeSummaryControlElement(
+        elem         = elem,
+        controlId    = s"fr-summary-col-$detailPos-control",
+        bindIdOpt    = Some(s"fr-col-$detailPos-bind"),
+        isRestricted = isRestricted
+      )
+
+      collectReferencedVariables(elem, functionLibrary).foreach { varName =>
+        if (! TemplateScopedVars(varName))
+          referencedVars += varName
+      }
+
+      val fieldAlignOpt = elem.attributeValueOpt("field-align")
+      val alignRight    =
+        fieldAlignOpt.contains("right") ||
+          (fieldAlignOpt.isEmpty && RightAlignedControlLocalNames(elem.getName))
+
+      val escapedPath = escapeXPathSingleQuotes(ic.xpath)
+      val labelExpr =
+        s"(xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[@lang = xxf:instance('fr-language-instance')]/label, " +
+        s"xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[1]/label, " +
+        s"xf:element('label'))[1]"
+
+      PreparedSummaryColumn(
+        columnKey   = ic.xpath,
+        labelExpr   = labelExpr,
+        isSortable  = ! NonSortableControlLocalNames(ic.control),
+        controlElem = elem,
+        alignRight  = alignRight
+      )
+    }
+
+    var computedColCounter = 0
+
+    def prepareComputedColumn(controlNode: NodeInfo): PreparedSummaryColumn = {
+      computedColCounter += 1
+      val computedPos = computedColCounter
+      val elem        = StaticXPath.tinyTreeToOrbeonDom(controlNode).getRootElement.createCopy
+      val controlName = FormRunner.getControlNameOpt(controlNode).getOrElse(s"computed-col-$computedPos")
+
+      val effectiveResourceName =
+        if (hasResourceHolderInAllLangs(dynamicResourcesRoot, controlName) && ! controlNameCounts.contains(controlName)) {
+          controlName
+        } else {
+          val inlineLabelOpt =
+            (controlNode / (XF -> "label"))
+              .headOption
+              .filter(l => l.attValueOpt("ref").isEmpty && l.attValueOpt("value").isEmpty)
+              .flatMap(_.stringValue.trimAllToOpt)
+
+          inlineLabelOpt match {
+            case Some(inlineLabel) =>
+              val syntheticName = s"fr-summary-computed-col-$computedPos"
+              injectLiteralLabelResource(dynamicResourcesRoot, syntheticName, inlineLabel)
+              syntheticName
+            case None =>
+              controlName
+          }
+        }
+
+      sanitizeSummaryControlElement(
+        elem         = elem,
+        controlId    = s"fr-summary-computed-col-$computedPos-control",
+        bindIdOpt    = None,
+        isRestricted = isRestricted
+      )
+
+      collectReferencedVariables(elem, functionLibrary).foreach { varName =>
+        if (! TemplateScopedVars(varName))
+          referencedVars += varName
+      }
+
+      val fieldAlignOpt = elem.attributeValueOpt("field-align")
+      val alignRight    =
+        fieldAlignOpt.contains("right") ||
+          (fieldAlignOpt.isEmpty && RightAlignedControlLocalNames(elem.getName))
+
+      val escapedResourceName = escapeXPathSingleQuotes(effectiveResourceName)
+      val labelExpr =
+        s"($$form-resources/*[local-name() = '$escapedResourceName']/label, xf:element('label'))[1]"
+
+      PreparedSummaryColumn(
+        columnKey   = controlName,
+        labelExpr   = labelExpr,
+        isSortable  = false,
+        controlElem = elem,
+        alignRight  = alignRight
+      )
+    }
+
+    // 2. Prepare visible summary controls in source document order (including non-indexed `<fr:summary-show/>` computed controls)
+    val bodyElemOpt =
+      frc.findFormRunnerBodyElem(formDoc) orElse
+        (formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body"))
+
+    val matchedIndexedIndices = mutable.Set.empty[Int]
+
+    val bodyPreparedColumns: List[PreparedSummaryColumn] =
+      bodyElemOpt.toList.flatMap(b => (b descendant *).toList).flatMap { elem =>
+        indexedVisibleByNode.get(elem) match {
+          case Some((ic, idx0)) =>
+            matchedIndexedIndices += idx0
+            Some(prepareIndexedColumn(ic, idx0, elem))
+          case None if ! indexedAllControlNodes.contains(elem) && isComputedSummaryShowControl(elem) =>
+            Some(prepareComputedColumn(elem))
+          case _ =>
+            None
+        }
+      }
+
+    // Append any visible indexed controls outside the top-level body (e.g. inside section templates in `<xbl:xbl>`)
+    val remainingIndexedColumns: List[PreparedSummaryColumn] =
+      for {
+        (ic, idx0)  <- allControls.zipWithIndex
+        if ic.summarySettings.show && ! matchedIndexedIndices.contains(idx0)
+        controlNode <- ic.controlElem
+      } yield prepareIndexedColumn(ic, idx0, controlNode)
+
+    val preparedColumns = bodyPreparedColumns ::: remainingIndexedColumns
 
     // 3. Populate `<xh:tr id="fr-summary-header-row">`
     val headerRowElem =
@@ -333,17 +436,10 @@ trait FormRunnerSummary {
         val sortableTh = headerRowElem.addElement(FrSortableThQName)
         if (col.alignRight)
           sortableTh.addAttribute("class", "fr-align-right")
-        val escapedPath = escapeXPathSingleQuotes(col.xpath)
-        sortableTh.addAttribute(
-          "label",
-          s"(xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[@lang = xxf:instance('fr-language-instance')]/label, " +
-          s"xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[1]/label, " +
-          s"xf:element('label'))[1]"
-        )
-        val isSortable = ! NonSortableControlLocalNames(col.controlLocalName)
-        sortableTh.addAttribute("sort-supported", if (isSortable) "{$sort-supported}" else "false")
+        sortableTh.addAttribute("label",          col.labelExpr)
+        sortableTh.addAttribute("sort-supported", if (col.isSortable) "{$sort-supported}" else "false")
         sortableTh.addAttribute("instance",       "xxf:instance('fr-order-by')")
-        sortableTh.addAttribute("column",         col.xpath)
+        sortableTh.addAttribute("column",         col.columnKey)
       }
     }
 
@@ -509,6 +605,7 @@ object FormRunnerSummary extends FormRunnerSummary {
 
   private val SummaryStripChildQNames: Set[QName] = Set(
     QName("index",               FRNamespace),
+    QName("summary-show",        FRNamespace),
     QName("short-label",         FRNamespace),
     QName("iteration-label",     FRNamespace),
     QName("add-iteration-label", FRNamespace),
@@ -558,12 +655,23 @@ object FormRunnerSummary extends FormRunnerSummary {
   private val VarRefFallbackRegex = """\$([A-Za-z_][\w.\-]*)""".r
 
   private case class PreparedSummaryColumn(
-    xpath           : String,
-    detailPos       : Int,
-    controlElem     : dom.Element,
-    controlLocalName: String,
-    alignRight      : Boolean
+    columnKey  : String,
+    labelExpr  : String,
+    isSortable : Boolean,
+    controlElem: dom.Element,
+    alignRight : Boolean
   )
+
+  private def isComputedSummaryShowControl(control: NodeInfo): Boolean =
+    (control / "*:index").isEmpty &&
+      control.attValueNonBlankOpt("value").isDefined &&
+      (control / (FR -> "summary-show")).headOption.exists { element =>
+        element.attValueNonBlankOpt("column").forall(_ == "true") &&
+          SimpleConstraint.satisfiedForUserRolesFromCurrentSession(
+            rolesOpt      = element.attValueNonBlankOpt("require-role"),
+            constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
+          )
+      }
 
   private def escapeXPathSingleQuotes(s: String): String =
     s.replace("'", "''")
@@ -626,6 +734,28 @@ object FormRunnerSummary extends FormRunnerSummary {
       srcHolderElem.nodeIterator.foreach(n => holderElem.add(n.createCopy))
     }
 
+  private def injectLiteralLabelResource(
+    resourcesRoot: dom.Element,
+    syntheticName: String,
+    labelText    : String
+  ): Unit = {
+    val existingResources = childElements(resourcesRoot).filter(_.getName == "resource").toList
+    val targetResources =
+      if (existingResources.nonEmpty)
+        existingResources
+      else {
+        val created = resourcesRoot.addElement("resource")
+        created.addAttribute(XmlLangQName, "en")
+        List(created)
+      }
+
+    targetResources.foreach { resourceElem =>
+      childElements(resourceElem).filter(_.getName == syntheticName).toList.foreach(resourceElem.remove)
+      val holderElem = resourceElem.addElement(syntheticName)
+      holderElem.addElement("label").setText(labelText)
+    }
+  }
+
   private def rewriteFormResourceReferences(root: dom.Element, oldName: String, newName: String): Unit = {
     val target      = s"$$form-resources/$oldName"
     val pattern     = java.util.regex.Pattern.quote(target) + """(?![\p{IsLetter}\p{IsDigit}.·\-_])"""
@@ -639,7 +769,12 @@ object FormRunnerSummary extends FormRunnerSummary {
     }
   }
 
-  private def sanitizeSummaryControlElement(elem: dom.Element, detailPos: Int, isRestricted: Boolean): Unit = {
+  private def sanitizeSummaryControlElement(
+    elem        : dom.Element,
+    controlId   : String,
+    bindIdOpt   : Option[String],
+    isRestricted: Boolean
+  ): Unit = {
     List("ref", "nodeset", "bind", "model").foreach { attName =>
       elem.attributeOpt(attName).foreach(elem.remove)
     }
@@ -652,8 +787,8 @@ object FormRunnerSummary extends FormRunnerSummary {
         appearanceAtt.setValue(remaining.mkString(" "))
     }
 
-    elem.addAttribute("id",                      s"fr-summary-col-$detailPos-control")
-    elem.addAttribute("bind",                    s"fr-col-$detailPos-bind")
+    elem.addAttribute("id", controlId)
+    bindIdOpt.foreach(elem.addAttribute("bind", _))
     elem.addAttribute(FrStaticReadonlyQName,      "true")
     elem.addAttribute(FrSummaryQName,             "true")
     elem.addAttribute(XxfReadonlyAppearanceQName, "static")

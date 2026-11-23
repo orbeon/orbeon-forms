@@ -45,6 +45,21 @@
                     <fr:summary-show/>
                 </fr:index>
             </xf:output>
+            <xf:output
+                id="published-version-control"
+                mediatype="text/html"
+                value="
+                    fbf:publishedVersionsSummaryHtml(
+                        $documents,
+                        $application-name,
+                        $form-name,
+                        $form-resources/published-version/label,
+                        $fr-resources/home/labels/available,
+                        $fr-resources/home/labels/unavailable
+                    )">
+                <xf:label ref="$form-resources/published-version/label"/>
+                <fr:summary-show/>
+            </xf:output>
             <xf:output id="title-control" bind="title-bind">
                 <xf:label ref="$form-resources/title/label"/>
                 <fr:index>

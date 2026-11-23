@@ -108,8 +108,36 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-toolbar"                         , initLandingQuickFilter)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
+      initSummaryCellTooltipClickForwarding()
     }
   }
+
+  private def initSummaryCellTooltipClickForwarding(): Unit =
+    document.body.addEventListener(
+      DomEventNames.Click,
+      (event: dom.Event) =>
+        event match {
+          case mouseEvent: dom.MouseEvent if ! mouseEvent.defaultPrevented && mouseEvent.button == 0 =>
+            mouseEvent.target match {
+              case targetElem: html.Element
+                if targetElem.closestOpt("a, button, input, select, textarea, label").isEmpty &&
+                   Option(dom.window.getSelection()).forall(_.isCollapsed) =>
+                for {
+                  cellValue  <- targetElem.closestOpt(".fr-summary-cell-value")
+                  tdElem     <- cellValue.closestOpt("td")
+                  cellAnchor <- tdElem.querySelectorOpt("a.fr-summary-cell-link:not(.xforms-hidden)")
+                  href       <- cellAnchor.attValueOpt("href").flatMap(_.trimAllToOpt)
+                } locally {
+                  if (mouseEvent.metaKey || mouseEvent.ctrlKey)
+                    dom.window.open(href, "_blank", "noopener")
+                  else
+                    cellAnchor.click()
+                }
+              case _ =>
+            }
+          case _ =>
+        }
+    )
 
   private def initStatusIconPopover(statusIconElem: html.Element): Unit = {
 

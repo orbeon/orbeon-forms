@@ -33,6 +33,9 @@
             &lt;a href="{1}" target="_blank"&gt;Visualizza nella pagina Sommario di Form Builder.&lt;/a&gt;
         </form-in-progress-alert>
     </form-name>
+    <published-version>
+        <label>Versione</label>
+    </published-version>
     <title>
         <label>Titolo del modulo</label>
         <hint>Titolo del modulo nella lingua attualmente usata</hint>

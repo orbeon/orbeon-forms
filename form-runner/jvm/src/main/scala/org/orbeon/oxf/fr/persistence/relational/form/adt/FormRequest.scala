@@ -20,11 +20,12 @@ import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxy
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.instantFromString
 import org.orbeon.oxf.fr.persistence.relational.form.PublishedFormMetadataRoute
 import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator.Remote
-import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
+import org.orbeon.oxf.fr.{AppForm, AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.dom.IOSupport.readOrbeonDom
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
@@ -43,7 +44,8 @@ case class FormRequest(
   // Support only one sort query for now
   sortQuery              : SortQuery[?],
   // Support no-pagination mode for compatibility reasons (i.e. old API returns all results)
-  paginationOpt          : Option[Pagination]
+  paginationOpt          : Option[Pagination],
+  appForms               : Seq[AppForm]
 ) {
 
   def toXML: NodeInfo = {
@@ -55,11 +57,12 @@ case class FormRequest(
           }
         }
 
+        val appFormsXml      = appForms.map(af => <app-form app={af.app} form={af.form}/>)
         val filterQueriesXml = filterQueries.map(_.toXML).map(nodeInfoToElem)
         val sortQueryXml     = sortQuery.toXML
         val paginationXml    = paginationOpt.map(_.toXML).map(nodeInfoToElem)
 
-        (remoteServersXml ++ filterQueriesXml :+ sortQueryXml) ++ paginationXml.toSeq
+        (remoteServersXml ++ appFormsXml ++ filterQueriesXml :+ sortQueryXml) ++ paginationXml.toSeq
        }</search>
 
     // toString method on Boolean returns "false"/"true"
@@ -176,7 +179,8 @@ object FormRequest {
       remoteServerCredentials = Map.empty,
       filterQueries           = appQuery ++ formQuery ++ allVersionsQuery ++ modifiedSinceQuery,
       sortQuery               = SortQuery.defaultSortQuery,
-      paginationOpt           = None
+      paginationOpt           = None,
+      appForms                = Nil
     )
   }
 
@@ -204,6 +208,12 @@ object FormRequest {
       url -> credentials
     }.toMap
 
+    val appForms = (searchElement / "app-form").map { appFormElem =>
+      val app  = appFormElem.attValue("app") .trimAllToOpt.getOrElse(throw new IllegalArgumentException("Missing `app` attribute on `app-form`"))
+      val form = appFormElem.attValue("form").trimAllToOpt.getOrElse(throw new IllegalArgumentException("Missing `form` attribute on `app-form`"))
+      AppForm(app, form)
+    }
+
     val filterQueries = searchElement.child("filter").map(FilterQuery.apply)
 
     // Check that query URLs match credentials URLs
@@ -222,7 +232,8 @@ object FormRequest {
       remoteServerCredentials = remoteServerCredentials,
       filterQueries           = filterQueries,
       sortQuery               = searchElement.child("sort")      .headOption.map(SortQuery .apply).getOrElse(SortQuery.defaultSortQuery),
-      paginationOpt           = searchElement.child("pagination").headOption.map(Pagination.apply)
+      paginationOpt           = searchElement.child("pagination").headOption.map(Pagination.apply),
+      appForms                = appForms
     )
   }
 }

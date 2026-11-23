@@ -727,7 +727,14 @@ body.orbeon {
         box-sizing: border-box; // Makes relative sizing easier
         font-size: var(--orbeon-section-title-font-size);
         line-height: 20px;      // Bootstrap 2's body line height (the inherited 1.5 would make the input ~7px taller)
+        // The input has no type attribute, so it doesn't get the colors of the input[type="text"] fields
+        color: var(--orbeon-control-color);
+        background-color: var(--orbeon-control-background-color);
         .focusHighlight();
+
+        &::placeholder {
+            color: var(--orbeon-control-placeholder-color);
+        }
     }
 
     .xbl-fr-section .fr-section-title {

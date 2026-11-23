@@ -998,6 +998,7 @@
                 color: var(--orbeon-landing-card-footer-color);
                 font-size: 0.85em;
                 transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
                             color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
                             background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
                             border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
@@ -1011,7 +1012,17 @@
                 }
 
                 @media (hover: hover) {
-                    opacity: 0;
+                    opacity: 0.4;
+                }
+
+                @media (forced-colors: active) {
+                    opacity: 1 !important;
+                }
+            }
+
+            @media (hover: hover) {
+                &:hover .fr-card-row-secondary {
+                    opacity: 0.9;
 
                     &:hover {
                         opacity: 1;
@@ -1020,23 +1031,29 @@
                         border-color: var(--orbeon-pill-border-color);
                     }
                 }
-
-                &:focus-visible {
-                    opacity: 1;
-                    color: var(--orbeon-landing-card-link-color);
-                    outline: 2px solid var(--orbeon-focus-border-color);
-                    outline-offset: -2px;
-                }
-            }
-
-            @media (hover: hover) {
-                &:hover .fr-card-row-secondary {
-                    opacity: 1;
-                }
             }
 
             &:focus-within .fr-card-row-secondary {
+                opacity: 0.9;
+            }
+
+            .fr-card-row-secondary:focus-visible {
                 opacity: 1;
+                color: var(--orbeon-landing-card-link-color);
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: -2px;
+            }
+
+            .fr-card-row-secondary:active {
+                opacity: 1;
+                color: var(--orbeon-landing-card-link-hover-color);
+                background-color: var(--orbeon-pill-background-color);
+                border-color: var(--orbeon-pill-border-color);
+                transform: scale(0.94);
+
+                @media (prefers-reduced-motion: reduce) {
+                    transform: none;
+                }
             }
 
             &:has(.fr-card-row-primary:focus-visible) {

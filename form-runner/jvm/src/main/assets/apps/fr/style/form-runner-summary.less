@@ -59,6 +59,144 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .fr-search-results table.fr-summary-table-fixed {
+            table-layout: fixed;
+
+            thead th {
+                overflow: visible;
+
+                button.btn-link {
+                    overflow: hidden;
+
+                    > .xforms-output {
+                        min-inline-size: 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .fr-col-resizer {
+                    position: absolute;
+                    inset-block: 0;
+                    inset-inline-end: -3px;
+                    inline-size: 7px;
+                    cursor: col-resize;
+                    z-index: 3;
+                    touch-action: none;
+
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        inset-block: 18%;
+                        inset-inline-start: 3px;
+                        inline-size: 2px;
+                        border-radius: 1px;
+                        background-color: transparent;
+                        transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                        @media (prefers-reduced-motion: reduce) {
+                            transition: none;
+                        }
+                    }
+
+                    &:hover::after,
+                    &:focus-visible::after,
+                    &.fr-dragging::after {
+                        inset-block: 0;
+                        background-color: var(--orbeon-accent-color);
+
+                        @media (forced-colors: active) {
+                            background-color: Highlight;
+                        }
+                    }
+
+                    &:focus-visible {
+                        outline: 2px solid var(--orbeon-focus-border-color);
+                        outline-offset: -1px;
+                    }
+                }
+            }
+
+            tbody td {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            tbody td.fr-cell-truncated {
+                --fr-cell-scroll-width: 160;
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -2px;
+                }
+
+                @media (prefers-reduced-motion: no-preference) {
+                    &:hover,
+                    &:focus-visible,
+                    &:has(> a.fr-summary-cell-link:focus-visible) {
+                        text-overflow: clip;
+
+                        .xforms-output:not(.xforms-disabled) {
+                            display: inline-block;
+                            margin-inline-start: 100%;
+                            translate: ~"calc(1px - 100%)";
+                            transition:
+                                margin-inline-start ~"calc(var(--fr-cell-scroll-width) * 12ms)" ease-in,
+                                translate ~"calc(var(--fr-cell-scroll-width) * 12ms)" ease-in;
+                        }
+
+                        &:dir(rtl) .xforms-output:not(.xforms-disabled) {
+                            translate: ~"calc(100% - 1px)";
+                        }
+                    }
+                }
+            }
+
+            .fr-summary-cell-value {
+                --fr-cell-scroll-width: 160;
+                display: block;
+                max-inline-size: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                .xforms-textarea.xforms-static > pre,
+                .xforms-output.xforms-mediatype-text-html .xforms-output-output:not(:has(> .fr-status-pills)) {
+                    display: inline;
+                    max-width: none;
+                    overflow: visible;
+                    text-overflow: clip;
+                }
+
+                &.fr-cell-truncated:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -2px;
+                }
+            }
+
+            @media (prefers-reduced-motion: no-preference) {
+                tbody td:hover .fr-summary-cell-value.fr-cell-truncated,
+                tbody td:has(> a.fr-summary-cell-link:focus-visible) .fr-summary-cell-value.fr-cell-truncated,
+                tbody td .fr-summary-cell-value.fr-cell-truncated:focus-visible {
+                    text-overflow: clip;
+
+                    > * {
+                        display: inline-block;
+                        margin-inline-start: 100%;
+                        translate: ~"calc(1px - 100%)";
+                        transition:
+                            margin-inline-start ~"calc(var(--fr-cell-scroll-width) * 12ms)" ease-in,
+                            translate ~"calc(var(--fr-cell-scroll-width) * 12ms)" ease-in;
+                    }
+
+                    &:dir(rtl) > * {
+                        translate: ~"calc(100% - 1px)";
+                    }
+                }
+            }
+        }
+
         .fr-summary-cell-value {
             // Keep inner control links (`fr:url`, `fr:hyperlink`, rich-text `<a>`) interactive above `.fr-summary-cell-link::after`
             a[href] {

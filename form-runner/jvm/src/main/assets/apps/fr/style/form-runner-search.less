@@ -225,6 +225,13 @@
   .fr-search-results {
 
     overflow: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+
+    &:focus-visible {
+      outline: 2px solid var(--orbeon-focus-border-color);
+      outline-offset: 2px;
+    }
 
     .alert  {
       display: block;
@@ -427,6 +434,12 @@
 
       &.fr-status {
         width: 120px;
+      }
+
+      &.fr-created,
+      &.fr-modified,
+      &.fr-last-modified {
+        font-variant-numeric: tabular-nums;
       }
 
       &.fr-created,

@@ -508,7 +508,11 @@
                             <xf:var name="encoded-search-context" value="xxf:instance('fr-last-search-context-instance')/encoded/string()"/>
                             <xf:var name="search-page-offset"     value="xs:integer(xxf:instance('fr-last-search-context-instance')/page-offset)"/>
 
-                            <xh:div class="fr-search-results fr-table-frame">
+                            <xh:div
+                                class="fr-search-results fr-table-frame"
+                                tabindex="0"
+                                role="region"
+                                aria-label="{$fr-resources/summary/titles/summary-title}">
                                 <xh:table class="table table-condensed">
                                     <xh:thead>
                                         <xh:tr id="fr-summary-header-row">
@@ -1055,6 +1059,10 @@
 
             <!-- Reset search selection and navigation -->
             <xf:action event="fr-reset-search">
+
+                <xf:action type="javascript">
+                    <xf:body>ORBEON.fr.private.API.resetSummaryColumnWidths();</xf:body>
+                </xf:action>
 
                 <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
 

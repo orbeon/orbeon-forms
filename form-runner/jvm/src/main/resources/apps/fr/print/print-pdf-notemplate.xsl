@@ -511,6 +511,8 @@
     <xsl:template match="*:body">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*"/>
+            <!-- Color mode class on the body, so the CSS also covers the header and the footer, outside of #fr-view -->
+            <xsl:attribute name="class" select="string-join((@class, concat('fr-pdf-color-mode-', $color-mode)), ' ')"/>
             <div class="fr-header-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
             <div class="fr-footer-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
             <xsl:apply-templates select="node()"/>

@@ -867,9 +867,24 @@
         list-style-type: decimal;
     }
 
+    // https://github.com/orbeon/orbeon-forms/issues/4158
+    // The color mode class is on the body of PDF files, so this also covers the header and the footer, which are
+    // outside of #fr-view
     .fr-pdf-color-mode-black-and-white * {
-        // https://github.com/orbeon/orbeon-forms/issues/4158
         color: black !important;
         background: transparent !important;
+    }
+
+    // The body itself, so the page stays white
+    body.fr-pdf-color-mode-black-and-white {
+        color: black !important;
+        background: white !important;
+    }
+
+    // Pseudo-elements, such as the required star, can have colors of their own
+    .fr-pdf-color-mode-black-and-white *::before,
+    .fr-pdf-color-mode-black-and-white *::after {
+        color: black !important;
+        background-color: transparent !important;
     }
 }

@@ -634,5 +634,188 @@ class SearchResultsTableSupportTest extends AnyFunSpecLike {
       assert(unlinkedSlug.hasClass(SearchResultsTableSupport.CellTruncatedClass))
       assert(unlinkedSlug.getAttribute("tabindex") == "0")
     }
+
+    it("must collapse overflowing `.fr-status-pills` using span/latest-preserving `+N` pill without `.fr-cell-truncated` and auto-fit on resizer dblclick") {
+      SearchResultsTableSupport.resetAllStates()
+      dom.window.sessionStorage.clear()
+      dom.document.body.innerHTML =
+        """<form class="xforms-form">
+          |  <div class="fr-dynamic">
+          |    <div class="fr-search-results fr-table-frame" role="region" aria-label="Form Builder Summary">
+          |      <table class="table table-condensed">
+          |        <thead>
+          |          <tr>
+          |            <th id="th-app" scope="col">
+          |              <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Application Name</span></button></span>
+          |            </th>
+          |            <th id="th-form" scope="col">
+          |              <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Form Name</span></button></span>
+          |            </th>
+          |            <th id="th-version" scope="col">
+          |              <span><button class="btn-link" type="button"><span class="xforms-output">Version</span></button></span>
+          |            </th>
+          |            <th id="th-title" scope="col">
+          |              <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Form Title</span></button></span>
+          |            </th>
+          |          </tr>
+          |        </thead>
+          |        <tbody>
+          |          <tr id="row-unpub">
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-1" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>hr</span></div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-1" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>onboarding</span></div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-1" class="fr-summary-cell-link"></a>
+          |              <div id="ver-cell-unpub" class="fr-summary-cell-value"><span class="fr-version-empty" aria-hidden="true">—</span></div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-1" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>Onboarding</span></div>
+          |            </td>
+          |          </tr>
+          |          <tr id="row-multi">
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-2" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>acme</span></div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-2" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>sales-order</span></div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a id="row-2-ver-link" href="#edit-2" class="fr-summary-cell-link"></a>
+          |              <div id="ver-cell-multi" class="fr-summary-cell-value">
+          |                <span class="xforms-output xforms-mediatype-text-html xforms-static">
+          |                  <span class="xforms-output-output">
+          |                    <span class="fr-status-pills">
+          |                      <span id="p-v1" class="fr-table-pill fr-version-badge fr-pill-muted fr-pill-unavailable" title="Version: v1 — Unavailable">v1<span class="visually-hidden"> (Unavailable)</span></span>
+          |                      <span id="p-v2" class="fr-table-pill fr-version-badge fr-pill-success" title="Version: v2 — Available">v2<span class="visually-hidden"> (Available)</span></span>
+          |                      <span id="p-v3" class="fr-table-pill fr-version-badge fr-pill-success" title="Version: v3 — Available">v3<span class="visually-hidden"> (Available)</span></span>
+          |                      <span id="p-v4" class="fr-table-pill fr-version-badge fr-pill-success" title="Version: v4 — Available">v4<span class="visually-hidden"> (Available)</span></span>
+          |                      <span id="p-v5" class="fr-table-pill fr-version-badge fr-pill-success" title="Version: v5 — Available">v5<span class="visually-hidden"> (Available)</span></span>
+          |                    </span>
+          |                  </span>
+          |                </span>
+          |              </div>
+          |            </td>
+          |            <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |              <a href="#edit-2" class="fr-summary-cell-link"></a>
+          |              <div class="fr-summary-cell-value"><span>Customer Sales Order</span></div>
+          |            </td>
+          |          </tr>
+          |        </tbody>
+          |      </table>
+          |    </div>
+          |  </div>
+          |</form>""".stripMargin
+      dom.document.body.className = "orbeon"
+
+      val wrapper   = dom.document.querySelectorT(".fr-search-results")
+      val table     = dom.document.querySelectorT(".fr-search-results table")
+      val verCell   = dom.document.getElementById("ver-cell-multi").asInstanceOf[html.Element]
+      val pillsElem = verCell.querySelectorT(".fr-status-pills")
+
+      defineNumericProp(wrapper, "clientWidth", 1200)
+      mockRect(table.querySelectorT("#th-app"),     130.0)
+      mockRect(table.querySelectorT("#th-form"),    150.0)
+      mockRect(table.querySelectorT("#th-version"), 76.0)
+      mockRect(table.querySelectorT("#th-title"),   300.0)
+
+      pillsElem.querySelectorAllT(".fr-table-pill").foreach(p => mockRect(p, 34.0))
+
+      def visiblePillLabelsInVisualOrder(): List[String] =
+        pillsElem
+          .childrenT
+          .zipWithIndex
+          .filter { case (el, _) =>
+            ! el.hasAttribute("hidden") && ! el.hasClass(SearchResultsTableSupport.PillCollapsedClass)
+          }
+          .sortBy { case (el, domIdx) =>
+            val orderNum = Option(el.style.getPropertyValue("order")).flatMap(_.toIntOption).getOrElse(0)
+            (orderNum, domIdx)
+          }
+          .map { case (el, _) =>
+            val clone = el.cloneNodeT(deep = true)
+            clone.querySelectorAllT(".visually-hidden").foreach(_.remove())
+            clone.textContent.trim
+          }
+          .toList
+
+      // 1. Even though `#th-version` measured `76px`, status-pills column applies `PillsMinCh` (`15 * 8 + 20 = 140px`) floor
+      defineNumericProp(verCell, "clientWidth", 120)
+      defineNumericProp(verCell, "scrollWidth", 190)
+      SearchResultsTableSupport.syncTable(table)
+
+      assert(colWidthsByKey(table)("dyn:2") == "140px")
+      assert(! verCell.hasClass(SearchResultsTableSupport.CellTruncatedClass))
+      assert(verCell.style.getPropertyValue(SearchResultsTableSupport.ScrollWidthCssVar).isEmpty)
+
+      // At `120px` content width (`34*2 + 34 + 2*5 = 112 <= 120`), 3 badges fit: `[v1] [+3] [v5]`
+      assert(visiblePillLabelsInVisualOrder() == List("v1", "+3", "v5"))
+
+      // 2. At `160px` content width (`34*3 + 34 + 3*5 = 151 <= 160`), 4 badges fit: `[v1] [+2] [v4] [v5]`
+      defineNumericProp(verCell, "clientWidth", 160)
+      SearchResultsTableSupport.syncTable(table)
+      assert(visiblePillLabelsInVisualOrder() == List("v1", "+2", "v4", "v5"))
+
+      // 3. At `80px` content width (`34 + 34 + 5 = 73 <= 80`), 2 badges fit: `[+4] [v5]`
+      defineNumericProp(verCell, "clientWidth", 80)
+      SearchResultsTableSupport.syncTable(table)
+      assert(visiblePillLabelsInVisualOrder() == List("+4", "v5"))
+
+      // 4. At `44px` content width (`< 73`), falls back to `[+5]`
+      defineNumericProp(verCell, "clientWidth", 44)
+      SearchResultsTableSupport.syncTable(table)
+      assert(visiblePillLabelsInVisualOrder() == List("+5"))
+
+      // 5. Popover interactions: click `+5` pins popover open with all 5 badges, without firing row link or duplicating IDs
+      val triggerBtn = pillsElem.querySelectorT(s".${SearchResultsTableSupport.PillsOverflowTriggerClass}")
+      var rowLinkClicked = false
+      dom.document.getElementById("row-2-ver-link").addEventListener("click", (_: dom.Event) => rowLinkClicked = true)
+
+      assert(triggerBtn.getAttribute("aria-expanded") == "false")
+      triggerBtn.click()
+
+      assert(! rowLinkClicked)
+      assert(triggerBtn.getAttribute("aria-expanded") == "true")
+
+      val popover = wrapper.querySelectorT(s".${SearchResultsTableSupport.PillsOverflowPopoverClass}")
+      assert(popover.hasClass(SearchResultsTableSupport.PopoverOpenClass))
+      assert(triggerBtn.getAttribute("aria-controls") == popover.id)
+
+      val popBadges = popover.querySelectorAllT(".fr-table-pill")
+      assert(popBadges.length == 5)
+      assert(popBadges.head.hasClass("fr-pill-unavailable"))
+      assert(popBadges.head.getAttribute("title") == "Version: v1 — Unavailable")
+      assert(popBadges.head.querySelectorOpt(".visually-hidden").map(_.textContent).contains(" (Unavailable)"))
+      assert(popover.querySelectorAllT("[id]").isEmpty)
+
+      // Pressing Escape dismisses the popover and resets `aria-expanded`
+      dom.document.dispatchEvent(
+        new dom.KeyboardEvent(
+          "keydown",
+          new dom.KeyboardEventInit {
+            key     = "Escape"
+            bubbles = true
+          }
+        )
+      )
+      assert(! popover.hasClass(SearchResultsTableSupport.PopoverOpenClass))
+      assert(triggerBtn.getAttribute("aria-expanded") == "false")
+
+      // 6. Double-clicking `.fr-col-resizer` on `#th-version` measures uncollapsed `190px + 20px + 4px = 214px` and restores all 5 inline pills
+      val verResizer = table.querySelectorT(s"#th-version .${SearchResultsTableSupport.ColResizerClass}")
+      defineNumericProp(verCell, "clientWidth", 194)
+      verResizer.dispatchEvent(new dom.MouseEvent("dblclick", new dom.MouseEventInit { bubbles = true }))
+
+      assert(colWidthsByKey(table)("dyn:2") == "214px")
+      assert(visiblePillLabelsInVisualOrder() == List("v1", "v2", "v3", "v4", "v5"))
+      assert(triggerBtn.hasAttribute("hidden"))
+    }
   }
 }

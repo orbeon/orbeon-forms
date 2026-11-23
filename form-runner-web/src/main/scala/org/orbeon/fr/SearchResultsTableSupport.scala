@@ -33,14 +33,19 @@ object SearchResultsTableSupport {
 
   import Private.*
 
-  val TableSelector        = ".orbeon .fr-search-results table:not(.fr-table-no-form-data)"
-  val EmptyTableSelector   = ".orbeon .fr-search-results table.fr-table-no-form-data"
-  val FixedTableClass      = "fr-table-fixed"
-  val MeasuringTableClass  = "fr-table-measuring"
-  val ColgroupClass        = "fr-table-colgroup"
-  val ColResizerClass      = "fr-col-resizer"
-  val CellTruncatedClass   = "fr-cell-truncated"
-  val ScrollWidthCssVar    = "--fr-cell-scroll-width"
+  val TableSelector             = ".orbeon .fr-search-results table:not(.fr-table-no-form-data)"
+  val EmptyTableSelector        = ".orbeon .fr-search-results table.fr-table-no-form-data"
+  val FixedTableClass           = "fr-table-fixed"
+  val MeasuringTableClass       = "fr-table-measuring"
+  val ColgroupClass             = "fr-table-colgroup"
+  val ColResizerClass           = "fr-col-resizer"
+  val CellTruncatedClass        = "fr-cell-truncated"
+  val ScrollWidthCssVar         = "--fr-cell-scroll-width"
+  val PillCollapsedClass        = "fr-pill-collapsed"
+  val PillsOverflowTriggerClass = "fr-pills-overflow-trigger"
+  val PillsOverflowPopoverClass = "fr-pills-overflow-popover"
+  val PillsPopoverBodyClass     = "fr-pills-overflow-popover-body"
+  val PopoverOpenClass          = "fr-popover-open"
 
   def init(): Unit =
     if (! initialized) {
@@ -62,6 +67,7 @@ object SearchResultsTableSupport {
 
   def resetAllStates(clearManual: Boolean = true): Unit = {
     unlockPending = false
+    closeActivePillsPopover()
     statesByScope.values.foreach { state =>
       state.wrapperObserver.foreach(_.disconnect())
       state.cellObserver.foreach(_.disconnect())
@@ -173,6 +179,13 @@ object SearchResultsTableSupport {
     val DynamicTextHeadroomCh    = 2.5
     val DynamicNumHeadroomCh     = 1.5
     val DynamicCompactHeadroomCh = 1.0
+    val PillsMinCh               = 15.0
+    val PillsMaxCh               = 19.0
+    val DefaultPillsGapPx        = 5.0
+    val PopoverHoverOpenDelayMs  = 120
+    val PopoverHoverCloseDelayMs = 150
+    val PopoverViewportMarginPx  = 8.0
+    val PopoverVerticalOffsetPx  = 6.0
     val KeyboardStepPx           = 8.0
     val KeyboardShiftStepPx      = 24.0
 
@@ -184,8 +197,20 @@ object SearchResultsTableSupport {
       "xforms-hidden"
     )
 
+    val PreservedPillClasses = List(
+      "fr-table-pill",
+      "fr-version-badge",
+      "fr-pill-neutral",
+      "fr-pill-muted",
+      "fr-pill-success",
+      "fr-pill-info",
+      "fr-pill-warning",
+      "fr-pill-unavailable",
+      "fr-pill-active"
+    )
+
     val TruncationCandidateSelector =
-      "tbody .fr-summary-cell-value, tbody .fr-form-slug:not(.xforms-hidden), tbody td > a:not(.fr-summary-cell-link):not(.xforms-hidden), tbody td.fr-title, tbody td.fr-created, tbody td.fr-modified, tbody td.fr-created-by, tbody td.fr-last-modified-by, tbody td.fr-workflow-stage"
+      "tbody .fr-summary-cell-value, tbody .fr-form-slug:not(.xforms-hidden), tbody td > a:not(.fr-summary-cell-link):not(.xforms-hidden), tbody td.fr-status, tbody td.fr-title, tbody td.fr-created, tbody td.fr-modified, tbody td.fr-created-by, tbody td.fr-last-modified-by, tbody td.fr-workflow-stage"
 
     sealed trait ColumnKind
     object ColumnKind {
@@ -671,22 +696,41 @@ object SearchResultsTableSupport {
                   if (allBlank) {
                     math.max(headerMin, math.ceil(DynamicEmptyFloorCh * ch + padPx))
                   } else {
-                    val isCompactWidgetCol =
-                      bodyRows.nonEmpty && bodyRows.forall { r =>
-                        findVisibleRowCells(r).lift(col.index).forall { td =>
-                          td.textContent.trimAllToEmpty.isEmpty ||
-                            td.querySelectorOpt(".fr-status-pills, [role='checkbox']").isDefined
+                    val hasAnyStatusPillsOrEmpty =
+                      bodyRows.exists { r =>
+                        findVisibleRowCells(r).lift(col.index).exists { td =>
+                          td.querySelectorOpt(".fr-status-pills, .fr-version-empty").isDefined
                         }
                       }
-                    val headroomCh =
-                      if (isCompactWidgetCol) DynamicCompactHeadroomCh
-                      else if (col.alignRight) DynamicNumHeadroomCh
-                      else DynamicTextHeadroomCh
-                    val capCh =
-                      if (pageW > DynamicWideThresholdCh * ch + padPx) DynamicWideMaxCh
-                      else DynamicMaxCh
-                    val maxPx = math.max(headerMin, math.ceil(capCh * ch + padPx))
-                    clamp(headerMin, pageW + math.ceil(headroomCh * ch), maxPx)
+                    val isStatusPillsCol =
+                      hasAnyStatusPillsOrEmpty && bodyRows.forall { r =>
+                        findVisibleRowCells(r).lift(col.index).forall { td =>
+                          td.textContent.trimAllToEmpty.isEmpty ||
+                            td.querySelectorOpt(".fr-status-pills, .fr-version-empty").isDefined
+                        }
+                      }
+                    if (isStatusPillsCol) {
+                      val minPx = math.max(headerMin, math.ceil(PillsMinCh * ch + padPx))
+                      val maxPx = math.max(minPx, math.ceil(PillsMaxCh * ch + padPx))
+                      clamp(minPx, pageW + math.ceil(DynamicCompactHeadroomCh * ch), maxPx)
+                    } else {
+                      val isCompactWidgetCol =
+                        bodyRows.nonEmpty && bodyRows.forall { r =>
+                          findVisibleRowCells(r).lift(col.index).forall { td =>
+                            td.textContent.trimAllToEmpty.isEmpty ||
+                              td.querySelectorOpt("[role='checkbox']").isDefined
+                          }
+                        }
+                      val headroomCh =
+                        if (isCompactWidgetCol) DynamicCompactHeadroomCh
+                        else if (col.alignRight) DynamicNumHeadroomCh
+                        else DynamicTextHeadroomCh
+                      val capCh =
+                        if (pageW > DynamicWideThresholdCh * ch + padPx) DynamicWideMaxCh
+                        else DynamicMaxCh
+                      val maxPx = math.max(headerMin, math.ceil(capCh * ch + padPx))
+                      clamp(headerMin, pageW + math.ceil(headroomCh * ch), maxPx)
+                    }
                   }
               }
 
@@ -721,16 +765,20 @@ object SearchResultsTableSupport {
     def measureCellIntrinsicWidth(tdElem: html.Element, fallbackPadPx: Double): Double = {
       val padPx = effectiveCellHorizontalPadding(tdElem, fallbackPadPx)
       val innerW =
-        tdElem
-          .querySelectorOpt(".fr-summary-cell-value > *")
-          .orElse(tdElem.querySelectorOpt(".fr-form-slug:not(.xforms-hidden) > .xforms-output:not(.xforms-disabled)"))
-          .orElse(tdElem.querySelectorOpt(":scope > a:not(.fr-summary-cell-link):not(.xforms-hidden) > .xforms-output:not(.xforms-disabled)"))
-          .orElse(tdElem.querySelectorOpt(".fr-status-pills"))
-          .orElse(tdElem.querySelectorOpt(".fr-table-pill:not(.xforms-disabled)"))
-          .orElse(tdElem.querySelectorOpt(".xforms-output:not(.xforms-disabled)"))
-          .orElse(tdElem.childrenT.find(isRenderedElement))
-          .map(el => math.max(el.scrollWidth.toDouble, el.getBoundingClientRect().width))
-          .getOrElse(tdElem.scrollWidth.toDouble)
+        tdElem.querySelectorOpt(".fr-status-pills") match {
+          case Some(pillsElem) =>
+            measureUncollapsedStatusPillsWidth(pillsElem)
+          case None =>
+            tdElem
+              .querySelectorOpt(".fr-summary-cell-value > *")
+              .orElse(tdElem.querySelectorOpt(".fr-form-slug:not(.xforms-hidden) > .xforms-output:not(.xforms-disabled)"))
+              .orElse(tdElem.querySelectorOpt(":scope > a:not(.fr-summary-cell-link):not(.xforms-hidden) > .xforms-output:not(.xforms-disabled)"))
+              .orElse(tdElem.querySelectorOpt(".fr-table-pill:not(.xforms-disabled)"))
+              .orElse(tdElem.querySelectorOpt(".xforms-output:not(.xforms-disabled)"))
+              .orElse(tdElem.childrenT.find(isRenderedElement))
+              .map(el => math.max(el.scrollWidth.toDouble, el.getBoundingClientRect().width))
+              .getOrElse(tdElem.scrollWidth.toDouble)
+        }
       innerW + padPx
     }
 
@@ -942,6 +990,11 @@ object SearchResultsTableSupport {
     }
 
     def observeAndRefreshTruncations(tableElem: html.Element, state: TableState): Unit = {
+      activePopoverTriggerOpt.foreach { trigger =>
+        if (! dom.document.body.contains(trigger) || isElemHidden(trigger))
+          closeActivePillsPopover()
+      }
+
       val candidates =
         tableElem
           .querySelectorAllT(TruncationCandidateSelector)
@@ -963,23 +1016,523 @@ object SearchResultsTableSupport {
       }
     }
 
-    def refreshSingleCellTruncation(elem: html.Element): Unit = {
-      val hiddenPx    = math.ceil((elem.scrollWidth - elem.clientWidth).toDouble).toInt
-      val isTruncated = elem.clientWidth > 0 && hiddenPx > 1
-      elem.toggleClass(CellTruncatedClass, isTruncated)
-      if (isTruncated) {
-        elem.style.setProperty(ScrollWidthCssVar, hiddenPx.toString)
-        val alreadyFocusableOrLinked =
-          elem.localName == "a" ||
-            elem.closestOpt("a:not(.xforms-hidden)").isDefined ||
-            elem.closestOpt("td").flatMap(_.querySelectorOpt("a.fr-summary-cell-link:not(.xforms-hidden)")).isDefined
-        if (! alreadyFocusableOrLinked && ! elem.hasAttribute("tabindex"))
-          elem.tabIndex = 0
-      } else {
-        elem.style.removeProperty(ScrollWidthCssVar)
-        if (elem.attValueOpt("tabindex").contains("0"))
-          elem.removeAttribute("tabindex")
+    def refreshSingleCellTruncation(elem: html.Element): Unit =
+      elem.querySelectorOpt(".fr-status-pills") match {
+        case Some(pillsElem) =>
+          elem.classList.remove(CellTruncatedClass)
+          elem.style.removeProperty(ScrollWidthCssVar)
+          if (elem.attValueOpt("tabindex").contains("0"))
+            elem.removeAttribute("tabindex")
+          refreshStatusPillsOverflow(pillsElem)
+
+        case None =>
+          val hiddenPx    = math.ceil((elem.scrollWidth - elem.clientWidth).toDouble).toInt
+          val isTruncated = elem.clientWidth > 0 && hiddenPx > 1
+          elem.toggleClass(CellTruncatedClass, isTruncated)
+          if (isTruncated) {
+            elem.style.setProperty(ScrollWidthCssVar, hiddenPx.toString)
+            val alreadyFocusableOrLinked =
+              elem.localName == "a" ||
+                elem.closestOpt("a:not(.xforms-hidden)").isDefined ||
+                elem.closestOpt("td").flatMap(_.querySelectorOpt("a.fr-summary-cell-link:not(.xforms-hidden)")).isDefined
+            if (! alreadyFocusableOrLinked && ! elem.hasAttribute("tabindex"))
+              elem.tabIndex = 0
+          } else {
+            elem.style.removeProperty(ScrollWidthCssVar)
+            if (elem.attValueOpt("tabindex").contains("0"))
+              elem.removeAttribute("tabindex")
+          }
       }
+
+    // ***** Status / version pills `+N` overflow & anchored popover ***************************************************
+
+    val pillWidthsCache                        = new WeakMap[html.Element, Double]()
+    var popoverListenersInstalled : Boolean    = false
+    var activePopoverTriggerOpt   : Option[html.Element] = None
+    var activePopoverElemOpt      : Option[html.Element] = None
+    var activePopoverPinned       : Boolean    = false
+    var hoverOpenTimerOpt         : Option[Int] = None
+    var hoverCloseTimerOpt        : Option[Int] = None
+
+    def originalPillsOf(pillsElem: html.Element): Vector[html.Element] =
+      pillsElem
+        .childrenT
+        .iterator
+        .filter { el =>
+          ! el.hasClass(PillsOverflowTriggerClass) &&
+            ! el.hasClass("visually-hidden") &&
+            ! el.hasAnyClass(HiddenOrDelimiterClasses*)
+        }
+        .toVector
+
+    def isElemHidden(elem: html.Element): Boolean =
+      elem.hasAttribute("hidden")
+
+    def setElemHidden(elem: html.Element, hide: Boolean): Unit =
+      if (hide) elem.setAttribute("hidden", "")
+      else elem.removeAttribute("hidden")
+
+    def readFlexGapPx(pillsElem: html.Element): Double = {
+      val st = dom.window.getComputedStyle(pillsElem)
+      Option(st.getPropertyValue("column-gap")).flatMap(DomSupport.parseDoubleIgnoreTail)
+        .orElse(Option(st.getPropertyValue("gap")).flatMap(DomSupport.parseDoubleIgnoreTail))
+        .filter(_ > 0.0)
+        .getOrElse(DefaultPillsGapPx)
+    }
+
+    def visibleLabelLengthOfPill(pillElem: html.Element): Int = {
+      val clone = pillElem.cloneNodeT(deep = true)
+      clone.querySelectorAllT(".visually-hidden, .xforms-hidden").foreach(_.remove())
+      clone.textContent.trimAllToEmpty.length
+    }
+
+    def measurePillNaturalWidth(pillElem: html.Element): Double =
+      if (! pillElem.hasClass(PillCollapsedClass)) {
+        val measured = math.max(pillElem.getBoundingClientRect().width, pillElem.offsetWidth.toDouble)
+        if (measured > 0.0) {
+          pillWidthsCache.set(pillElem, measured)
+          measured
+        } else {
+          pillWidthsCache
+            .get(pillElem)
+            .toOption
+            .getOrElse(math.max(28.0, visibleLabelLengthOfPill(pillElem) * 7.5 + 18.0))
+        }
+      } else {
+        pillWidthsCache.get(pillElem).toOption.getOrElse {
+          pillElem.classList.remove(PillCollapsedClass)
+          val measured = math.max(pillElem.getBoundingClientRect().width, pillElem.offsetWidth.toDouble)
+          pillElem.classList.add(PillCollapsedClass)
+          if (measured > 0.0) {
+            pillWidthsCache.set(pillElem, measured)
+            measured
+          } else {
+            math.max(28.0, visibleLabelLengthOfPill(pillElem) * 7.5 + 18.0)
+          }
+        }
+      }
+
+    def measureUncollapsedStatusPillsWidth(pillsElem: html.Element): Double = {
+      val pills = originalPillsOf(pillsElem)
+      if (pills.isEmpty) {
+        0.0
+      } else {
+        val gap = readFlexGapPx(pillsElem)
+        pills.map(measurePillNaturalWidth).sum + math.max(0, pills.length - 1) * gap
+      }
+    }
+
+    def availableStatusPillsWidth(pillsElem: html.Element): Double =
+      pillsElem.closestOpt(".fr-summary-cell-value") match {
+        case Some(cellVal) =>
+          if (cellVal.clientWidth > 0) cellVal.clientWidth.toDouble
+          else cellVal.getBoundingClientRect().width
+        case None =>
+          pillsElem.closestOpt("td") match {
+            case Some(td) =>
+              val cw = if (td.clientWidth > 0) td.clientWidth.toDouble else td.getBoundingClientRect().width
+              if (cw > 0.0) math.max(0.0, cw - horizontalPaddingOf(td)) else 0.0
+            case None =>
+              0.0
+          }
+      }
+
+    def measureOverflowTriggerWidth(triggerBtn: html.Element, hiddenCount: Int): Double = {
+      val wasHidden          = isElemHidden(triggerBtn)
+      val prevText           = triggerBtn.textContent
+      setElemHidden(triggerBtn, hide = false)
+      triggerBtn.textContent = s"+$hiddenCount"
+      val measured = math.max(triggerBtn.getBoundingClientRect().width, triggerBtn.offsetWidth.toDouble)
+      triggerBtn.textContent = prevText
+      setElemHidden(triggerBtn, hide = wasHidden)
+      if (measured > 0.0) measured
+      else if (hiddenCount >= 10) 42.0
+      else 34.0
+    }
+
+    def refreshStatusPillsOverflow(pillsElem: html.Element): Unit = {
+      val pills      = originalPillsOf(pillsElem)
+      val n          = pills.length
+      val availWidth = availableStatusPillsWidth(pillsElem)
+
+      if (n <= 1 || availWidth <= 0.0) {
+        restoreAllStatusPills(pillsElem, pills)
+      } else {
+        val widths       = pills.map(measurePillNaturalWidth)
+        val gap          = readFlexGapPx(pillsElem)
+        val naturalTotal = widths.sum + (n - 1) * gap
+
+        if (naturalTotal <= availWidth + 0.5) {
+          restoreAllStatusPills(pillsElem, pills)
+        } else {
+          val triggerBtn = getOrCreateOverflowTrigger(pillsElem)
+
+          // Span / latest-preserving selection:
+          // 1. Try keeping first pill `P_0` + latest `m - 1` pills (`[v1] [+k] ... [v_n]`) for largest `m` in `(n - 1) .. 2`
+          // 2. Else try keeping latest pill `P_{n-1}` (`[+(n-1)] [v_n]`)
+          // 3. Else collapse all into `[+n]`
+          val spanVisibleOpt: Option[Vector[Int]] =
+            ((n - 1) to 2 by -1).iterator.map { m =>
+              val indices     = 0 +: ((n - (m - 1)) until n).toVector
+              val hiddenCount = n - m
+              val triggerW    = measureOverflowTriggerWidth(triggerBtn, hiddenCount)
+              val neededW     = indices.map(widths).sum + triggerW + m * gap
+              indices -> neededW
+            }.collectFirst {
+              case (indices, neededW) if neededW <= availWidth + 0.5 => indices
+            }
+
+          val chosenIndices: Vector[Int] =
+            spanVisibleOpt.getOrElse {
+              val latestOnlyHidden = n - 1
+              val latestTriggerW   = measureOverflowTriggerWidth(triggerBtn, latestOnlyHidden)
+              val latestNeededW    = widths(n - 1) + latestTriggerW + gap
+              if (latestNeededW <= availWidth + 0.5) Vector(n - 1)
+              else Vector.empty
+            }
+
+          val visibleSet  = chosenIndices.toSet
+          val hiddenCount = n - visibleSet.size
+
+          pills.zipWithIndex.foreach { case (pill, idx) =>
+            pill.toggleClass(PillCollapsedClass, ! visibleSet.contains(idx))
+            pill.style.setProperty("order", if (idx == 0) "0" else "2")
+          }
+
+          setElemHidden(triggerBtn, hide = false)
+          triggerBtn.textContent = s"+$hiddenCount"
+          triggerBtn.style.setProperty("order", "1")
+
+          if (activePopoverTriggerOpt.contains(triggerBtn)) {
+            activePopoverElemOpt.foreach { pop =>
+              renderPopoverPills(pop, pillsElem)
+              positionPopover(triggerBtn, pop)
+            }
+          }
+        }
+      }
+    }
+
+    def restoreAllStatusPills(pillsElem: html.Element, pills: Vector[html.Element]): Unit = {
+      pills.foreach { pill =>
+        pill.classList.remove(PillCollapsedClass)
+        pill.style.removeProperty("order")
+      }
+      pillsElem.querySelectorOpt(s":scope > .$PillsOverflowTriggerClass").foreach { btn =>
+        if (activePopoverTriggerOpt.contains(btn))
+          closeActivePillsPopover()
+        setElemHidden(btn, hide = true)
+      }
+    }
+
+    def getOrCreateOverflowTrigger(pillsElem: html.Element): html.Element =
+      pillsElem.querySelectorOpt(s":scope > .$PillsOverflowTriggerClass").getOrElse {
+        ensurePopoverGlobalListeners()
+        val btn = dom.document.createElement("button").asInstanceOf[html.Element]
+        btn.setAttribute("type",          "button")
+        btn.setAttribute("aria-expanded", "false")
+        btn.className = s"fr-table-pill fr-version-badge fr-pill-neutral $PillsOverflowTriggerClass"
+        setElemHidden(btn, hide = true)
+        wireOverflowTriggerEvents(btn, pillsElem)
+        pillsElem.appendChild(btn)
+        btn
+      }
+
+    def wireOverflowTriggerEvents(triggerBtn: html.Element, pillsElem: html.Element): Unit = {
+      triggerBtn.addEventListener("pointerenter", (e: dom.PointerEvent) =>
+        if (e.pointerType != "touch") {
+          cancelPopoverCloseTimer()
+          if (! activePopoverTriggerOpt.contains(triggerBtn)) {
+            cancelPopoverOpenTimer()
+            // Switch immediately if moving directly from another open `+N` trigger; otherwise delay briefly
+            if (activePopoverTriggerOpt.isDefined && ! activePopoverPinned) {
+              openPillsPopover(triggerBtn, pillsElem, pinned = false)
+            } else if (activePopoverTriggerOpt.isEmpty) {
+              hoverOpenTimerOpt = Some(
+                dom.window.setTimeout(
+                  () => {
+                    hoverOpenTimerOpt = None
+                    if (dom.document.body.contains(triggerBtn) && ! isElemHidden(triggerBtn))
+                      openPillsPopover(triggerBtn, pillsElem, pinned = false)
+                  },
+                  PopoverHoverOpenDelayMs
+                )
+              )
+            }
+          }
+        }
+      )
+
+      triggerBtn.addEventListener("pointerleave", (e: dom.PointerEvent) =>
+        if (e.pointerType != "touch") {
+          cancelPopoverOpenTimer()
+          if (activePopoverTriggerOpt.contains(triggerBtn) && ! activePopoverPinned && ! isFocusVisible(triggerBtn))
+            schedulePopoverClose()
+        }
+      )
+
+      triggerBtn.addEventListener("focusin", (_: dom.FocusEvent) =>
+        if (isFocusVisible(triggerBtn) && ! activePopoverTriggerOpt.contains(triggerBtn)) {
+          cancelPopoverCloseTimer()
+          openPillsPopover(triggerBtn, pillsElem, pinned = false)
+        }
+      )
+
+      triggerBtn.addEventListener("focusout", (e: dom.FocusEvent) =>
+        if (activePopoverTriggerOpt.contains(triggerBtn) && ! activePopoverPinned) {
+          val nextTargetOpt = Option(e.relatedTarget).collect { case n: dom.Node => n }
+          val staysInside   =
+            nextTargetOpt.exists(n => triggerBtn.contains(n) || activePopoverElemOpt.exists(_.contains(n)))
+          if (! staysInside)
+            closeActivePillsPopover()
+        }
+      )
+
+      triggerBtn.addEventListener("click", (e: dom.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        cancelPopoverOpenTimer()
+        cancelPopoverCloseTimer()
+        if (activePopoverTriggerOpt.contains(triggerBtn)) {
+          if (activePopoverPinned) {
+            closeActivePillsPopover()
+          } else {
+            // Opened on hover/focus right before click: pin it open rather than immediately closing it
+            activePopoverPinned = true
+          }
+        } else {
+          openPillsPopover(triggerBtn, pillsElem, pinned = true)
+        }
+      })
+    }
+
+    def isFocusVisible(elem: html.Element): Boolean =
+      Try(elem.matches(":focus-visible")).getOrElse(dom.document.activeElement eq elem)
+
+    def cancelPopoverOpenTimer(): Unit = {
+      hoverOpenTimerOpt.foreach(dom.window.clearTimeout)
+      hoverOpenTimerOpt = None
+    }
+
+    def cancelPopoverCloseTimer(): Unit = {
+      hoverCloseTimerOpt.foreach(dom.window.clearTimeout)
+      hoverCloseTimerOpt = None
+    }
+
+    def schedulePopoverClose(): Unit = {
+      cancelPopoverCloseTimer()
+      hoverCloseTimerOpt = Some(
+        dom.window.setTimeout(
+          () => {
+            hoverCloseTimerOpt = None
+            if (! activePopoverPinned)
+              closeActivePillsPopover()
+          },
+          PopoverHoverCloseDelayMs
+        )
+      )
+    }
+
+    def ensurePopoverGlobalListeners(): Unit =
+      if (! popoverListenersInstalled) {
+        popoverListenersInstalled = true
+
+        dom.document.addEventListener(
+          "keydown",
+          (e: dom.KeyboardEvent) =>
+            if (e.key == "Escape" && activePopoverTriggerOpt.isDefined) {
+              e.stopPropagation()
+              closeActivePillsPopover()
+            },
+          useCapture = true
+        )
+
+        dom.document.addEventListener(
+          "pointerdown",
+          (e: dom.PointerEvent) =>
+            if (activePopoverTriggerOpt.isDefined) {
+              val targetOpt = Option(e.target).collect { case n: dom.Node => n }
+              val insideTrigger = targetOpt.exists(n => activePopoverTriggerOpt.exists(_.contains(n)))
+              val insidePopover = targetOpt.exists(n => activePopoverElemOpt.exists(_.contains(n)))
+              if (! insideTrigger && ! insidePopover)
+                closeActivePillsPopover()
+            },
+          useCapture = true
+        )
+
+        dom.window.addEventListener(
+          "scroll",
+          (_: dom.Event) =>
+            for {
+              trigger <- activePopoverTriggerOpt
+              popover <- activePopoverElemOpt
+            } locally {
+              if (! dom.document.body.contains(trigger) || isElemHidden(trigger))
+                closeActivePillsPopover()
+              else
+                positionPopover(trigger, popover)
+            },
+          useCapture = true
+        )
+
+        dom.window.addEventListener(
+          "resize",
+          (_: dom.Event) =>
+            for {
+              trigger <- activePopoverTriggerOpt
+              popover <- activePopoverElemOpt
+            } locally {
+              if (! dom.document.body.contains(trigger) || isElemHidden(trigger))
+                closeActivePillsPopover()
+              else
+                positionPopover(trigger, popover)
+            }
+        )
+      }
+
+    def getOrCreateWrapperPopover(wrapperElem: html.Element): html.Element =
+      wrapperElem.querySelectorOpt(s":scope > .$PillsOverflowPopoverClass").getOrElse {
+        val pop = dom.document.createElement("div").asInstanceOf[html.Element]
+        pop.className = PillsOverflowPopoverClass
+        val popId     = DomSupport.generateIdIfNeeded(pop)
+        pop.id        = popId
+        pop.setAttribute("popover", "manual")
+        pop.setAttribute("role",    "tooltip")
+
+        pop.addEventListener("pointerenter", (_: dom.PointerEvent) => cancelPopoverCloseTimer())
+        pop.addEventListener("pointerleave", (e: dom.PointerEvent) =>
+          if (e.pointerType != "touch" && ! activePopoverPinned)
+            schedulePopoverClose()
+        )
+        pop.addEventListener("toggle", (e: dom.Event) =>
+          if (Option(e.asInstanceOf[js.Dynamic].newState).contains("closed") && activePopoverElemOpt.contains(pop))
+            closeActivePillsPopover()
+        )
+
+        wrapperElem.appendChild(pop)
+        pop
+      }
+
+    def cloneCleanPillNodes(source: dom.Node, destParent: dom.Element): Unit =
+      source.childNodes.foreach {
+        case childElem: html.Element =>
+          if (! childElem.hasAnyClass(HiddenOrDelimiterClasses*)) {
+            val tagName = if (childElem.localName == "button") "span" else childElem.localName
+            val copy    = dom.document.createElement(tagName).asInstanceOf[html.Element]
+            if (childElem.hasClass("visually-hidden"))
+              copy.className = "visually-hidden"
+            cloneCleanPillNodes(childElem, copy)
+            destParent.appendChild(copy)
+          }
+        case textNode if textNode.nodeType == dom.Node.TEXT_NODE =>
+          destParent.appendChild(dom.document.createTextNode(textNode.textContent))
+        case _ =>
+      }
+
+    def renderPopoverPills(popoverElem: html.Element, pillsElem: html.Element): Unit = {
+      popoverElem.innerHTML = ""
+      val body = dom.document.createElement("div").asInstanceOf[html.Element]
+      body.className = PillsPopoverBodyClass
+
+      originalPillsOf(pillsElem).foreach { pill =>
+        val origBtnOpt =
+          if (pill.localName == "button") Some(pill)
+          else pill.querySelectorOpt("button")
+
+        val matchedClasses = PreservedPillClasses.filter(pill.hasClass)
+        val badgeClasses   =
+          if (matchedClasses.contains("fr-table-pill")) matchedClasses
+          else "fr-table-pill" :: matchedClasses
+
+        val badgeTag = if (origBtnOpt.isDefined) "button" else "span"
+        val badge    = dom.document.createElement(badgeTag).asInstanceOf[html.Element]
+        if (origBtnOpt.isDefined) {
+          badge.setAttribute("type", "button")
+          origBtnOpt.flatMap(_.attValueOpt("aria-pressed")).foreach(badge.setAttribute("aria-pressed", _))
+        }
+        badge.className = badgeClasses.mkString(" ")
+
+        pill.attValueOpt("title")
+          .orElse(origBtnOpt.flatMap(_.attValueOpt("title")))
+          .foreach(badge.setAttribute("title", _))
+
+        val contentRoot = origBtnOpt.getOrElse(pill)
+        cloneCleanPillNodes(contentRoot, badge)
+
+        origBtnOpt.foreach { origBtn =>
+          badge.addEventListener("click", (e: dom.MouseEvent) => {
+            e.preventDefault()
+            e.stopPropagation()
+            closeActivePillsPopover()
+            origBtn.click()
+          })
+        }
+
+        body.appendChild(badge)
+      }
+
+      popoverElem.appendChild(body)
+    }
+
+    def positionPopover(triggerBtn: html.Element, popoverElem: html.Element): Unit = {
+      val trigRect = triggerBtn.getBoundingClientRect()
+      val popRect  = popoverElem.getBoundingClientRect()
+      val vw       = if (dom.window.innerWidth > 0) dom.window.innerWidth.toDouble else 1024.0
+      val vh       = if (dom.window.innerHeight > 0) dom.window.innerHeight.toDouble else 768.0
+      val popW     = if (popRect.width > 0.0) popRect.width else 180.0
+      val popH     = if (popRect.height > 0.0) popRect.height else 44.0
+
+      val maxLeft  = math.max(PopoverViewportMarginPx, vw - popW - PopoverViewportMarginPx)
+      val leftPx   = math.round(clamp(PopoverViewportMarginPx, trigRect.left, maxLeft))
+
+      val belowTop = trigRect.bottom + PopoverVerticalOffsetPx
+      val aboveTop = trigRect.top - popH - PopoverVerticalOffsetPx
+      val topPx    =
+        if (belowTop + popH > vh - PopoverViewportMarginPx && aboveTop >= PopoverViewportMarginPx)
+          math.round(aboveTop)
+        else
+          math.round(math.max(PopoverViewportMarginPx, belowTop))
+
+      popoverElem.style.left = s"${leftPx}px"
+      popoverElem.style.top  = s"${topPx}px"
+    }
+
+    def openPillsPopover(triggerBtn: html.Element, pillsElem: html.Element, pinned: Boolean): Unit =
+      pillsElem.closestOpt(".fr-search-results").foreach { wrapperElem =>
+        if (! activePopoverTriggerOpt.contains(triggerBtn))
+          closeActivePillsPopover()
+
+        val popoverElem = getOrCreateWrapperPopover(wrapperElem)
+        renderPopoverPills(popoverElem, pillsElem)
+
+        activePopoverTriggerOpt = Some(triggerBtn)
+        activePopoverElemOpt    = Some(popoverElem)
+        activePopoverPinned     = pinned
+
+        triggerBtn.setAttribute("aria-controls", popoverElem.id)
+        triggerBtn.setAttribute("aria-expanded", "true")
+
+        popoverElem.classList.add(PopoverOpenClass)
+        val dynPop = popoverElem.asInstanceOf[js.Dynamic]
+        if (! js.isUndefined(dynPop.showPopover))
+          Try(dynPop.showPopover())
+
+        positionPopover(triggerBtn, popoverElem)
+      }
+
+    def closeActivePillsPopover(): Unit = {
+      cancelPopoverOpenTimer()
+      cancelPopoverCloseTimer()
+      activePopoverTriggerOpt.foreach(_.setAttribute("aria-expanded", "false"))
+      activePopoverElemOpt.foreach { pop =>
+        pop.classList.remove(PopoverOpenClass)
+        val dynPop = pop.asInstanceOf[js.Dynamic]
+        if (! js.isUndefined(dynPop.hidePopover))
+          Try(dynPop.hidePopover())
+      }
+      activePopoverTriggerOpt = None
+      activePopoverElemOpt    = None
+      activePopoverPinned     = false
     }
   }
 }

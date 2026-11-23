@@ -78,8 +78,9 @@
                 }
             }
 
-            // Expose native `title` tooltips on non-link elements (such as status/version pills) above `.fr-summary-cell-link::after`
-            [title]:not(a) {
+            // Expose native `title` tooltips and `+N` overflow triggers above `.fr-summary-cell-link::after`
+            [title]:not(a),
+            .fr-pills-overflow-trigger {
                 position: relative;
                 z-index: 2;
                 cursor: pointer;

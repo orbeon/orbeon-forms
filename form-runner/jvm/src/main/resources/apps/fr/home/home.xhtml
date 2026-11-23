@@ -1101,7 +1101,6 @@
                     <xf:var name="home-page-size" value="xs:integer(xxf:property('oxf.fr.home.page-size'))"/>
 
                     <xf:group class="fr-top-fields">
-                        <xf:var name="pager-id" value="if ($is-admin) then 'fr-admin-pager' else 'fr-pager'"/>
 
                         <!-- Search also when user presses "enter" in a field -->
                         <xf:dispatch
@@ -1129,17 +1128,14 @@
                                 fr-forms-remote-last-modified-before
                             "
                             if="instance('fr-form-instance')/request-parameters-loaded = 'true'">
-                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                <xf:property name="page-number" value="1"/>
-                            </xf:dispatch>
+                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                             <xf:dispatch name="fr-initialize" targetid="fr-form-model">
                                 <xf:property name="keep-selection" value="'true'"/>
                             </xf:dispatch>
                         </xf:action>
 
-                        <!-- Row 1 on Forms Admin: Admin operations (left) + Pager (right) -->
+                        <!-- Row 1 on Forms Admin: Admin operations -->
                         <xf:group ref=".[$is-admin]" class="fr-admin-top-row">
-                            <xh:div class="fr-admin-left">
                             <xf:group
                                 class="btn-toolbar fr-admin-actions"
                                 xmlns="http://www.w3.org/1999/xhtml"
@@ -1507,25 +1503,9 @@
                                         value="$fr-resources/home/labels/reindexing-finished"/>
                                 </xf:group>
                             </xf:group>
-                            </xh:div>
-
-                            <fr:pager
-                                id="fr-admin-pager"
-                                page-size="{$home-page-size}"
-                                total-value="count($forms)"
-                                from-ref="instance('fr-paging-instance')/from"
-                                to-ref="instance('fr-paging-instance')/to"
-                                page-number-ref="instance('fr-paging-instance')/page-number">
-
-                                <xf:setindex
-                                    event="fr-pager-changed"
-                                    repeat="forms-repeat"
-                                    index="1"/>
-
-                            </fr:pager>
                         </xf:group>
 
-                        <!-- Always-visible inline filter bar (Row 2 on Forms Admin, Row 1 + Pager on Published Forms) -->
+                        <!-- Always-visible inline filter bar -->
                         <xh:div class="fr-filter-row">
                             <xf:group class="fr-home-filters" role="search">
                                 <xf:var name="local-search"      value="instance()/search-options/local"/>
@@ -1623,9 +1603,7 @@
                                                 value="if ($local-search/free-search/@scope = 'title') then 'all' else 'title'"/>
                                             <xf:setvalue ref="$local-search/free-search/@scope" value="$next-scope"/>
                                             <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                             <xf:action if="xxf:is-blank($local-search/free-search)">
                                                 <xf:setfocus control="fr-forms-search-input"/>
                                             </xf:action>
@@ -1654,34 +1632,34 @@
                                             </xf:body>
                                         </xf:action>
                                         <xf:action event="xforms-value-changed">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                         <xf:action event="DOMActivate" propagate="stop">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                     </xf:input>
-                                    <xf:trigger
-                                        ref=".[xxf:non-blank($local-search/free-search)]"
-                                        appearance="minimal"
-                                        class="fr-home-search-clear">
-                                        <xf:label>
-                                            <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
-                                            <xh:span class="xforms-hidden">
-                                                <xf:output value="frf:removeHtmlTags($fr-resources/buttons/clear)"/>
-                                            </xh:span>
-                                        </xf:label>
-                                        <xf:action event="DOMActivate" propagate="stop">
-                                            <xf:setvalue ref="$local-search/free-search"/>
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
-                                            <xf:setfocus control="fr-forms-search-input"/>
-                                        </xf:action>
-                                    </xf:trigger>
+                                    <xh:span class="fr-search-box-suffix">
+                                        <xf:output
+                                            ref=".[not(instance()/initializing = 'true')]"
+                                            class="fr-search-count"
+                                            value="count($forms)"/>
+                                        <xf:trigger
+                                            ref=".[xxf:non-blank($local-search/free-search)]"
+                                            appearance="minimal"
+                                            class="fr-home-search-clear">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
+                                                <xh:span class="xforms-hidden">
+                                                    <xf:output value="frf:removeHtmlTags($fr-resources/buttons/clear)"/>
+                                                </xh:span>
+                                            </xf:label>
+                                            <xf:action event="DOMActivate" propagate="stop">
+                                                <xf:setvalue ref="$local-search/free-search"/>
+                                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
+                                                <xf:setfocus control="fr-forms-search-input"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </xh:span>
                                 </xh:div>
 
                                 <xh:div
@@ -1711,9 +1689,7 @@
                                             <xf:setvalue ref="$current-app-name/@match" value="$next-match"/>
                                             <xf:setvalue ref="$current-app-name"/>
                                             <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                             <xf:action if="$next-match != 'exact'">
                                                 <xf:setfocus control="fr-forms-application-input"/>
                                             </xf:action>
@@ -1775,14 +1751,10 @@
                                             </xf:body>
                                         </xf:action>
                                         <xf:action event="xforms-value-changed">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                         <xf:action event="DOMActivate" propagate="stop">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                     </xf:input>
                                 </xh:div>
@@ -1814,9 +1786,7 @@
                                             <xf:setvalue ref="$current-form-name/@match" value="$next-match"/>
                                             <xf:setvalue ref="$current-form-name"/>
                                             <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                             <xf:action if="$next-match != 'exact'">
                                                 <xf:setfocus control="fr-forms-form-input"/>
                                             </xf:action>
@@ -1871,14 +1841,10 @@
                                             </xf:body>
                                         </xf:action>
                                         <xf:action event="xforms-value-changed">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                         <xf:action event="DOMActivate" propagate="stop">
-                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                                <xf:property name="page-number" value="1"/>
-                                            </xf:dispatch>
+                                            <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         </xf:action>
                                     </xf:input>
                                 </xh:div>
@@ -2024,9 +1990,7 @@
                                             <xf:setvalue ref="$remote-search/last-modified-before"/>
                                         </xf:action>
                                         <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
-                                        <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
-                                            <xf:property name="page-number" value="1"/>
-                                        </xf:dispatch>
+                                        <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                         <xf:action if="$had-backend-filter">
                                             <xf:dispatch name="fr-initialize" targetid="fr-form-model">
                                                 <xf:property name="keep-selection" value="'true'"/>
@@ -2034,23 +1998,6 @@
                                         </xf:action>
                                     </xf:action>
                                 </xf:trigger>
-                            </xf:group>
-
-                            <xf:group ref=".[not($is-admin)]" class="fr-published-pager">
-                                <fr:pager
-                                    id="fr-pager"
-                                    page-size="{$home-page-size}"
-                                    total-value="count($forms)"
-                                    from-ref="instance('fr-paging-instance')/from"
-                                    to-ref="instance('fr-paging-instance')/to"
-                                    page-number-ref="instance('fr-paging-instance')/page-number">
-
-                                    <xf:setindex
-                                        event="fr-pager-changed"
-                                        repeat="forms-repeat"
-                                        index="1"/>
-
-                                </fr:pager>
                             </xf:group>
                         </xh:div>
                     </xf:group>
@@ -2545,13 +2492,15 @@
                     </xf:group>
 
                     <xf:group
-                        ref=".[count($forms) gt $home-page-size]"
+                        ref=".[count($forms) gt 0]"
                         xxf:element="div"
                         class="fr-table-footer">
                         <fr:pager
-                            id="fr-bottom-pager"
+                            id="fr-pager"
                             page-size="{$home-page-size}"
                             total-value="count($forms)"
+                            from-ref="instance('fr-paging-instance')/from"
+                            to-ref="instance('fr-paging-instance')/to"
                             page-number-ref="instance('fr-paging-instance')/page-number">
 
                             <xf:action event="fr-pager-changed">

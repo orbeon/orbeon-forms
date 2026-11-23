@@ -1629,12 +1629,19 @@
                                 </xf:select1>
                             </xf:group>
 
-                            <xf:input
-                                id="fr-search-free-input"
-                                ref="if (case('fr-search-options-switch') = 'fr-search-free-case') then instance('fr-search-instance')/query else ''"
-                                class="fr-search-free-input">
-                                <xf:label appearance="minimal" ref="$fr-resources/summary/labels/free-search"/>
-                            </xf:input>
+                            <xh:div class="fr-summary-search-box">
+                                <xf:input
+                                    id="fr-search-free-input"
+                                    ref="if (case('fr-search-options-switch') = 'fr-search-free-case') then instance('fr-search-instance')/query else ''"
+                                    class="fr-search-free-input">
+                                    <xf:label appearance="minimal" ref="$fr-resources/summary/labels/free-search"/>
+                                </xf:input>
+                                <xh:span class="fr-search-box-suffix">
+                                    <xf:output
+                                        class="fr-search-count"
+                                        value="$summary-search-total"/>
+                                </xh:span>
+                            </xh:div>
                             <fr:trigger ref="." name="summary.search" class="xforms-disabled">
                                 <xf:setfocus event="DOMActivate" control="fr-search-free-input"/>
                             </fr:trigger>
@@ -1716,19 +1723,6 @@
                                 </xf:case>
                             </xf:switch>
                             </xh:div>
-
-                            <fr:pager
-                                id="fr-pager"
-                                page-size="{$summary-page-size}"
-                                total-value="$summary-search-total"
-                                page-number-ref="instance('fr-search-instance')/page-number">
-
-                                <xf:action event="fr-pager-changed">
-                                    <xf:send
-                                        submission="fr-summary-search-submission"/>
-                                </xf:action>
-
-                            </fr:pager>
 
                         </xh:div>
 
@@ -2207,11 +2201,11 @@
                         <xxf:dynamic id="fr-summary-dynamic" ref="instance('fr-dynamic-instance')"/>
                     </xh:div>
                     <xf:group
-                        ref=".[exists(instance('fr-search-results-instance')/document) and $summary-search-total gt $summary-page-size]"
+                        ref=".[exists(instance('fr-search-results-instance')/document)]"
                         xxf:element="div"
                         class="fr-table-footer">
                         <fr:pager
-                            id="fr-bottom-pager"
+                            id="fr-pager"
                             page-size="{$summary-page-size}"
                             total-value="$summary-search-total"
                             page-number-ref="instance('fr-search-instance')/page-number">

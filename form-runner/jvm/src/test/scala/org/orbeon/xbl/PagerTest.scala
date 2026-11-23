@@ -331,5 +331,148 @@ class PagerTest
         }
       }
     }
+
+    it("must manage from/to/page-number with a single table-footer pager shown when total > 0") {
+      val singleFooterDoc =
+        <xh:html
+          xml:lang="en"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-resources-model">
+              <xf:instance id="fr-fr-resources">
+                <resources>
+                  <resource xml:lang="en">
+                    <summary>
+                      <paging>
+                        <to>to</to>
+                        <of>of</of>
+                        <page>Page</page>
+                      </paging>
+                    </summary>
+                    <buttons>
+                      <previous>Previous</previous>
+                      <next>Next</next>
+                    </buttons>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+            <xf:model
+              id="fr-form-model"
+              xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
+              xxf:xbl-support="org.orbeon.oxf.fr.xbl.FormRunnerXblSupport"
+              xxf:expose-xpath-types="true">
+              <xf:instance id="fr-form-instance">
+                <state>
+                  <total>25</total>
+                  <from>0</from>
+                  <to>0</to>
+                  <page-number>1</page-number>
+                </state>
+              </xf:instance>
+              <xf:bind ref="instance('fr-form-instance')/*" type="xs:integer"/>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xf:group model="fr-form-model" ref=".[instance('fr-form-instance')/total gt 0]">
+              <fr:pager
+                id="fr-pager"
+                page-size="10"
+                total-value="instance('fr-form-instance')/total"
+                from-ref="instance('fr-form-instance')/from"
+                to-ref="instance('fr-form-instance')/to"
+                page-number-ref="instance('fr-form-instance')/page-number"/>
+            </xf:group>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(singleFooterDoc) { doc =>
+          withActionAndDoc(doc) {
+
+            def findTrigger(triggerClass: String): XFormsTriggerControl = {
+              val comp = doc.getControlByEffectiveId("fr-pager").asInstanceOf[XFormsComponentControl]
+              ControlsIterator(comp, includeSelf = false)
+                .collectFirst {
+                  case t: XFormsTriggerControl
+                    if t.staticControl.attributeValueOpt("class").exists(_.splitTo[Set]().contains(triggerClass)) =>
+                    t
+                }
+                .getOrElse(sys.error(s"Missing `$triggerClass` in `fr-pager`"))
+            }
+
+            def rangeText: Option[String] = {
+              val comp = doc.getControlByEffectiveId("fr-pager").asInstanceOf[XFormsComponentControl]
+              ControlsIterator(comp, includeSelf = false)
+                .collect {
+                  case c: XFormsValueControl
+                    if ! c.isInstanceOf[XXFormsAttributeControl] &&
+                       c.isRelevant =>
+                    c.getValue(EventCollector.Throw)
+                }
+                .find(_.contains(" to "))
+            }
+
+            def stateVal(elemName: String): Int =
+              (doc.findInstance("fr-form-instance").get.rootElement / elemName).stringValue.toInt
+
+            assert(doc.getControlByEffectiveId("fr-pager").isRelevant)
+            assert(stateVal("from")        == 1)
+            assert(stateVal("to")          == 10)
+            assert(stateVal("page-number") == 1)
+            assert(rangeText.contains("1 to 10 of 25"))
+
+            // Navigate to page 3 ("21 to 25 of 25")
+            activateControlWithEvent(findTrigger("fr-navigate-last").effectiveId)
+            assert(stateVal("page-number") == 3)
+            assert(stateVal("from")        == 21)
+            assert(stateVal("to")          == 25)
+            assert(rangeText.contains("21 to 25 of 25"))
+
+            // Filter down to single page (8 items) -> footer stays relevant in count-only mode ("1 to 8 of 8")
+            withAction {
+              val root = doc.findInstance("fr-form-instance").get.rootElement
+              XFormsAPI.setvalue(root / "page-number", "1")
+              XFormsAPI.setvalue(root / "total",       "8")
+            }
+            assert(doc.getControlByEffectiveId("fr-pager").isRelevant)
+            assert(stateVal("page-number") == 1)
+            assert(stateVal("from")        == 1)
+            assert(stateVal("to")          == 8)
+            assert(rangeText.contains("1 to 8 of 8"))
+
+            // Navigate to page 3 on 25 items, then filter to 0 items (footer hides) with page-number reset, then restore 25
+            withAction {
+              val root = doc.findInstance("fr-form-instance").get.rootElement
+              XFormsAPI.setvalue(root / "total", "25")
+            }
+            activateControlWithEvent(findTrigger("fr-navigate-last").effectiveId)
+            assert(stateVal("page-number") == 3)
+
+            withAction {
+              val root = doc.findInstance("fr-form-instance").get.rootElement
+              XFormsAPI.setvalue(root / "page-number", "1")
+              XFormsAPI.setvalue(root / "total",       "0")
+            }
+            assert(! doc.getControlByEffectiveId("fr-pager").isRelevant)
+            assert(stateVal("page-number") == 1)
+
+            withAction {
+              val root = doc.findInstance("fr-form-instance").get.rootElement
+              XFormsAPI.setvalue(root / "total", "25")
+            }
+            assert(doc.getControlByEffectiveId("fr-pager").isRelevant)
+            assert(stateVal("page-number") == 1)
+            assert(stateVal("from")        == 1)
+            assert(stateVal("to")          == 10)
+            assert(rangeText.contains("1 to 10 of 25"))
+          }
+        }
+      }
+    }
   }
 }

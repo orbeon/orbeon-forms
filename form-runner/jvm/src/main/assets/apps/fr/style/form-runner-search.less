@@ -25,15 +25,6 @@
     margin-bottom: 16px;
 
     .fr-main-top-fields {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: start;
-      column-gap: @spacing;
-
-      &:has(> .xbl-fr-pager > .pagination[data-search-total="0"]) {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
       .fr-summary-top-controls {
         display: flex;
         flex-wrap: wrap;
@@ -46,34 +37,84 @@
         }
       }
 
-      > .xbl-fr-pager {
-        .pagination {
-          float: none;
-          margin: 0;
-
-          @container fr-list-page (inline-size < 980px) {
-            .fr-pager-compact-arrows();
-          }
-
-          @container fr-list-page (inline-size < 620px) {
-            .fr-pager-count-only();
-          }
-        }
-      }
-
       .btn-toolbar {
         display: flex;
       }
     }
 
-    .fr-search-free-input {
-      flex: 1 1 180px;
-      min-inline-size: 140px;
-      margin: 0;
-      input {
-        width: 100%;
-        &[readonly] {
-          background-color: var(--orbeon-search-free-input-read-only-background-color);
+    .fr-summary-search-box {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex: 1 1 200px;
+      min-inline-size: 150px;
+      max-inline-size: 360px;
+
+      .fr-search-free-input {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        margin: 0;
+
+        &:focus-within {
+          position: relative;
+          z-index: 3;
+        }
+
+        input {
+          width: 100%;
+          padding-inline-end: 3.6em;
+
+          &[readonly] {
+            background-color: var(--orbeon-search-free-input-read-only-background-color);
+          }
+        }
+      }
+    }
+
+    .fr-search-box-suffix {
+      position: absolute;
+      inset-inline-end: 6px;
+      z-index: 4;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      pointer-events: none;
+
+      .fr-search-count:not(.xforms-disabled) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        min-inline-size: 1.7em;
+        padding: 1px 7px;
+        margin: 0;
+        border-radius: 9999px;
+        border: 1px solid var(--orbeon-pill-muted-border-color);
+        background-color: var(--orbeon-pill-muted-background-color);
+        color: var(--orbeon-pill-muted-color);
+        font-size: 0.86em;
+        font-weight: var(--orbeon-label-font-weight);
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+
+        .xforms-output-output {
+          display: inline;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          line-height: inherit;
+          color: inherit;
+        }
+
+        @media (prefers-contrast: more) {
+          border-color: currentColor;
+        }
+
+        @media (forced-colors: active) {
+          background-color: Canvas;
+          border-color: CanvasText;
+          color: CanvasText;
         }
       }
     }

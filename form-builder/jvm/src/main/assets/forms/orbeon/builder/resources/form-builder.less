@@ -1332,20 +1332,6 @@ body.orbeon {
                         }
                     }
 
-                    .fb-toggle-badges-button.active,
-                    .fb-toggle-toolbar-button.active {
-                        button,
-                        .xforms-trigger-appearance-minimal:not(.xforms-readonly):hover button {
-                            color: var(--orbeon-fb-active-color);
-                            background-color: var(--orbeon-form-background-color);
-                            box-shadow: inset 0 0 0 1px var(--orbeon-fb-active-color);
-
-                            i.fa {
-                                color: var(--orbeon-fb-active-color);
-                            }
-                        }
-                    }
-
                     button {
                         display: inline-flex;
                         align-items: center;
@@ -1730,6 +1716,13 @@ body.orbeon {
             right: @fbGutter;
         }
 
+        .fb-tool-window-bar-divider {
+            width: 18px;
+            height: 1px;
+            margin: 2px 0;
+            background-color: var(--orbeon-base-border-color);
+        }
+
         .xforms-trigger-appearance-minimal {
             margin: 0;
             display: flex;
@@ -1759,6 +1752,7 @@ body.orbeon {
             }
 
             &.active button,
+            &.active button:focus,
             &.active:not(.xforms-readonly):hover button {
                 color: var(--orbeon-fb-active-color);
                 background-color: var(--orbeon-form-background-color);

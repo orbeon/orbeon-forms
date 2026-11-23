@@ -46,6 +46,38 @@
                 <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
             </xf:action>
         </xf:trigger>
+
+        <xh:div class="fb-tool-window-bar-divider" aria-hidden="true"/>
+
+        <xf:trigger
+            id="toggle-control-toolbar-trigger"
+            appearance="minimal"
+            ref="$toolbar/@visible"
+            class="fb-toggle-toolbar-button{' active'[$toolbar/@visible = 'true']}">
+            <xf:label><xh:i class="fa fa-sliders fa-fw"/></xf:label>
+            <xf:hint ref="$form-resources/control-settings-toolbar/show-toolbar"/>
+            <xf:action event="DOMActivate">
+                <xf:setvalue
+                    ref="$toolbar/@visible"
+                    value="if (. = 'true') then 'false' else 'true'"/>
+                <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
+            </xf:action>
+        </xf:trigger>
+
+        <xf:trigger
+            id="toggle-cell-badges-trigger"
+            appearance="minimal"
+            ref="$toolbar/@show-cell-badges"
+            class="fb-toggle-badges-button{' active'[$toolbar/@show-cell-badges = 'true']}">
+            <xf:label><xh:i class="fa fa-tags fa-fw"/></xf:label>
+            <xf:hint ref="$form-resources/control-settings-toolbar/show-cell-badges"/>
+            <xf:action event="DOMActivate">
+                <xf:setvalue
+                    ref="$toolbar/@show-cell-badges"
+                    value="if (. = 'true') then 'false' else 'true'"/>
+                <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
+            </xf:action>
+        </xf:trigger>
     </xh:div>
 
     <!-- Outline tool window panel (#7857) -->

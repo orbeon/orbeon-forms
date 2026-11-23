@@ -1640,6 +1640,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Dateiname</filename>
+            <mediatype>Mediatyp</mediatype>
+            <size>Größe</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Formularvorschau</label>

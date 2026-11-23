@@ -1690,6 +1690,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>اسم الملف</filename>
+            <mediatype>نوع الوسائط</mediatype>
+            <size>الحجم</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>معاينة النموذج</label>

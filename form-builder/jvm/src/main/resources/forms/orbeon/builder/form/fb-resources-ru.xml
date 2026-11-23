@@ -1670,6 +1670,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Имя файла</filename>
+            <mediatype>Медиатип</mediatype>
+            <size>Размер</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Предварительный просмотр формы</label>

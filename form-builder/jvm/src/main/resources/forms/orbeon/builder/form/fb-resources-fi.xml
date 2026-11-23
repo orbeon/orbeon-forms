@@ -1684,6 +1684,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Tiedostonimi</filename>
+            <mediatype>Mediatyyppi</mediatype>
+            <size>Koko</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Lomakkeen esikatselu</label>

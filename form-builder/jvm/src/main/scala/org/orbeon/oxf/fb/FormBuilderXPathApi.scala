@@ -1193,10 +1193,15 @@ object FormBuilderXPathApi {
         )
       val ancestorRepeats =
         FormRunner.findAncestorRepeatNames(controlElem, includeSelf = false).reverse.mkString(" ")
+      val isAttachment =
+        (controlElem.attClasses ++ controlElem.attValueOpt(org.orbeon.oxf.fb.XMLNames.FBClass).toList.flatMap(_.splitTo[Set]()))
+          .contains(FormRunner.AttachmentClassName) ||
+          controlElem.resolveQName(controlElem.name) == XFormsNames.XFORMS_UPLOAD_QNAME
       <item
         label={s"$controlLabel ($controlName)"}
         value={controlName}
         local-name={controlElem.localname}
+        is-attachment={isAttachment.toString}
         ancestor-repeats={ancestorRepeats}/>
     }.map(elemToNodeInfo)
   }

@@ -2920,7 +2920,7 @@ body.orbeon {
 
             .fb-service-call-parameter-row {
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 padding-bottom: 5px;
 
                 .fb-service-call-parameter-fields {
@@ -2938,7 +2938,7 @@ body.orbeon {
                             flex: 0 0 140px;
                         }
 
-                        input, select, textarea {
+                        input:not([type="checkbox"]):not([type="radio"]), select, textarea {
                             width: 100%;
                             box-sizing: border-box;
                         }
@@ -2959,6 +2959,7 @@ body.orbeon {
                     flex: 0 0 auto;
                     white-space: nowrap;
                     text-align: right;
+                    padding-top: 3px;
                 }
             }
         }
@@ -3114,6 +3115,26 @@ body.orbeon {
             .xforms-items {
                 display: flex;
                 align-items: center;
+            }
+        }
+
+        .fb-attachment-metadata-checkboxes {
+            margin-top: 4px;
+            font-size: 0.9em;
+
+            .xforms-items {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                column-gap: 12px;
+                row-gap: 2px;
+
+                label.checkbox {
+                    margin: 0;
+                    padding: 0;
+                    display: inline-flex;
+                    align-items: center;
+                }
             }
         }
 

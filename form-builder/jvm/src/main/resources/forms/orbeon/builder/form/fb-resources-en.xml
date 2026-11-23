@@ -1708,6 +1708,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Filename</filename>
+            <mediatype>Mediatype</mediatype>
+            <size>Size</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Form Preview</label>

@@ -1,0 +1,215 @@
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Attachment Service Call Serialization</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <single-file filename="" mediatype="" size=""/>
+                            <multi-files/>
+                            <single-image filename="" mediatype="" size=""/>
+                            <plain-text>abc</plain-text>
+                            <call-services/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="single-file-bind" ref="single-file" name="single-file" type="xf:anyURI"/>
+                        <xf:bind id="multi-files-bind" ref="multi-files" name="multi-files"/>
+                        <xf:bind id="single-image-bind" ref="single-image" name="single-image" type="xf:anyURI"/>
+                        <xf:bind id="plain-text-bind" ref="plain-text" name="plain-text" xxf:whitespace="trim"/>
+                        <xf:bind id="call-services-bind" ref="call-services" name="call-services"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>8105</form-name>
+                    <title xml:lang="en">Attachment Service Call Serialization</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label>Main</label>
+                        </section-1>
+                        <single-file>
+                            <label>Single File</label>
+                            <hint/>
+                        </single-file>
+                        <multi-files>
+                            <label>Multiple Files</label>
+                            <hint/>
+                        </multi-files>
+                        <single-image>
+                            <label>Single Image</label>
+                            <hint/>
+                        </single-image>
+                        <plain-text>
+                            <label>Plain Text</label>
+                            <hint/>
+                        </plain-text>
+                        <call-services>
+                            <label>Call Services</label>
+                            <hint/>
+                        </call-services>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance id="xml-echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body>&lt;request&gt;
+    &lt;file-plain/&gt;
+    &lt;file-all-meta/&gt;
+    &lt;file-subset-meta/&gt;
+    &lt;files-plain/&gt;
+    &lt;files-meta/&gt;
+    &lt;image-meta/&gt;
+    &lt;text-val/&gt;
+    &lt;formula-val/&gt;
+&lt;/request&gt;</body>
+            </xf:instance>
+            <xf:submission
+                id="xml-echo-submission"
+                class="fr-service"
+                resource="echo:"
+                method="post"
+                serialization="application/xml"
+                mediatype="application/xml"/>
+
+            <xf:instance id="json-echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body>&lt;json type="object"&gt;
+    &lt;file-plain type="null"/&gt;
+    &lt;file-all-meta type="null"/&gt;
+    &lt;file-subset-meta type="null"/&gt;
+    &lt;my_file name="my file" type="null"/&gt;
+    &lt;files-plain type="null"/&gt;
+    &lt;files-meta type="array"/&gt;
+    &lt;text-val/&gt;
+    &lt;formula-val/&gt;
+&lt;/json&gt;</body>
+            </xf:instance>
+            <xf:submission
+                id="json-echo-submission"
+                class="fr-service"
+                resource="echo:"
+                method="post"
+                serialization="application/json"
+                mediatype="application/json"/>
+
+            <fr:listener
+                version="2018.2"
+                controls="single-file multi-files single-image"
+                events="value-changed"
+                actions="sync-attachments"/>
+
+            <fr:listener
+                version="2018.2"
+                controls="call-services"
+                events="activated"
+                actions="sync-attachments"/>
+
+            <fr:action name="sync-attachments" version="2018.2" async="false">
+                <fr:service-call service="xml-echo">
+                    <fr:value control="single-file"  ref="/request/file-plain"/>
+                    <fr:value control="single-file"  ref="/request/file-all-meta"    metadata="filename mediatype size"/>
+                    <fr:value control="single-file"  ref="/request/file-subset-meta" metadata="filename"/>
+                    <fr:value control="multi-files"  ref="/request/files-plain"/>
+                    <fr:value control="multi-files"  ref="/request/files-meta"       metadata="filename mediatype size"/>
+                    <fr:value control="single-image" ref="/request/image-meta"       metadata="filename mediatype"/>
+                    <fr:value control="plain-text"   ref="/request/text-val"/>
+                    <fr:value value="concat($plain-text, '!')" ref="/request/formula-val"/>
+                </fr:service-call>
+                <fr:dataset-write name="xml-res"/>
+
+                <fr:service-call service="json-echo">
+                    <fr:value control="single-file" ref="/json/file-plain"/>
+                    <fr:value control="single-file" ref="/json/file-all-meta"    metadata="filename mediatype size"/>
+                    <fr:value control="single-file" ref="/json/file-subset-meta" metadata="filename"/>
+                    <fr:value control="single-file" ref="/json/my_file"          metadata="size"/>
+                    <fr:value control="multi-files" ref="/json/files-plain"/>
+                    <fr:value control="multi-files" ref="/json/files-meta"       metadata="filename mediatype size"/>
+                    <fr:value control="plain-text"  ref="/json/text-val"/>
+                    <fr:value value="concat($plain-text, '!')" ref="/json/formula-val"/>
+                </fr:service-call>
+                <fr:dataset-write name="json-res"/>
+            </fr:action>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:attachment id="single-file-control" bind="single-file-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/single-file/label"/>
+                                <xf:hint ref="$form-resources/single-file/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:attachment id="multi-files-control" bind="multi-files-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/multi-files/label"/>
+                                <xf:hint ref="$form-resources/multi-files/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:image-attachment id="single-image-control" bind="single-image-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/single-image/label"/>
+                                <xf:hint ref="$form-resources/single-image/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="plain-text-control" bind="plain-text-bind">
+                                <xf:label ref="$form-resources/plain-text/label"/>
+                                <xf:hint ref="$form-resources/plain-text/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <xf:trigger id="call-services-control" bind="call-services-bind">
+                                <xf:label ref="$form-resources/call-services/label"/>
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -1096,4 +1096,32 @@ class FormBuilderFunctionsTest
       }
     }
   }
+
+  describe("#8105: `getControlsLabelValueItemset` attachment flag") {
+
+    it("must mark controls with `fr-attachment` class or `xf:upload` QName as `is-attachment='true'`") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+        val gridCell = (ctx.bodyElem descendant "*:c").head
+        insert(
+          into   = List(gridCell),
+          after  = gridCell / *,
+          origin = List(
+            elemToNodeInfo(<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" id="my-file-control" class="fr-attachment"/>),
+            elemToNodeInfo(<fr:custom-upload xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="my-avt-file-control" fb:class="foo fr-attachment"/>),
+            elemToNodeInfo(<xf:upload xmlns:xf="http://www.w3.org/2002/xforms" id="raw-upload-control"/>)
+          )
+        )
+
+        val itemsByValue =
+          FormBuilderXPathApi.getControlsLabelValueItemset()
+            .map(i => i.attValue("value") -> i.attValue("is-attachment"))
+            .toMap
+
+        assert(itemsByValue.get("control-1").contains("false"))
+        assert(itemsByValue.get("my-file").contains("true"))
+        assert(itemsByValue.get("my-avt-file").contains("true"))
+        assert(itemsByValue.get("raw-upload").contains("true"))
+      }
+    }
+  }
 }

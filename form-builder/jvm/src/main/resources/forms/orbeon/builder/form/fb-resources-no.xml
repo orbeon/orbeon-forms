@@ -1671,6 +1671,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Filnavn</filename>
+            <mediatype>Mediatype</mediatype>
+            <size>Størrelse</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Skjemaforhåndsvisning</label>

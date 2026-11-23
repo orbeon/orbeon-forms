@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -58,10 +59,19 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       case _                                    => null
     }
 
+  val AttachmentClassName: String = "fr-attachment"
+
   val StandardCassNames: Set[String] = Set(
-    "fr-attachment",
+    AttachmentClassName,
     "fr-static-attachment"
   )
+
+  def isAttachmentControl(staticControl: ElementAnalysis): Boolean =
+    staticControl.attributeValueOpt("class").exists(_.splitTo[Set]().contains(AttachmentClassName)) ||
+      staticControl.qName == XFormsNames.XFORMS_UPLOAD_QNAME
+
+  def isMultipleAttachmentControl(staticControl: ElementAnalysis): Boolean =
+    isAttachmentControl(staticControl) && staticControl.attributeValueOpt("multiple").contains("true")
 
   def hasAllClassesPredicate(classNamesList: List[String])(control: NodeInfo): Boolean = {
     val controlClasses = control.attClasses

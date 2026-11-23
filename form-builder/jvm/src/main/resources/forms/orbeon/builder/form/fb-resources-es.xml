@@ -1684,6 +1684,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Nombre de archivo</filename>
+            <mediatype>Tipo de medio</mediatype>
+            <size>Tamaño</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Vista Previa del Formulario</label>

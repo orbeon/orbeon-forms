@@ -14,7 +14,9 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option.*
+import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom.QName
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.definitions.ControlValue
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
@@ -25,12 +27,15 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.*
-import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
-import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
+import org.orbeon.oxf.xforms.model.{BindVariableResolver, InstanceData, RuntimeBind, XFormsModel}
+import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
@@ -42,9 +47,12 @@ import org.orbeon.xforms.{XFormsId, XFormsNames}
 import shapeless.syntax.typeable.typeableOps
 
 import scala.collection.mutable
+import scala.util.Try
 
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
+
+  import Private.*
 
   // Resolve target data nodes from an action source and a target control.
   //
@@ -234,8 +242,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
             c.getFormattedValue(collector) orElse Option(c.getValue(collector))
 
         ControlValue.SingleControlValue(c.getValue(collector), formattedValue, isHtml = isHtmlValueControl(c))
-      case c if Set("image-attachment", "attachment")(c.staticControl.localName) =>
-        if (c.staticControl.attributeValueOpt("multiple").contains("true")) {
+      case c if frc.isAttachmentControl(c.staticControl) =>
+        if (frc.isMultipleAttachmentControl(c.staticControl)) {
           val items = c.boundNodeOpt.toList.flatMap(_.child("_")).filter(_.getStringValue.nonAllBlank)
           ControlValue.MultipleControlValue(
             storageValue    = items.map(_.getStringValue).mkString(" "),
@@ -789,4 +797,239 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       modelOpt          = formModelOpt,
       bindNodeOpt       = None
     )
+
+  def setServiceRequestValueFromControl(
+    actionSourceOrActionId: String,
+    targetControlName     : String,
+    libraryName           : String,
+    destinationNodes      : SequenceIterator,
+    metadata              : String,
+    isJson                : Boolean
+  ): Unit = {
+
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+
+    val destElems =
+      Option(destinationNodes)
+        .toList
+        .flatMap(it => asScalaIterator(it).collect { case n: NodeInfo => n })
+
+    destElems.headOption.foreach { targetElem =>
+
+      val effectiveActionSource =
+        Option(actionSourceOrActionId)
+          .flatMap(_.trimAllToOpt)
+          .map(resolveActionSourceAbsoluteId)
+          .getOrElse(XFormsId.effectiveIdToAbsoluteId(xfc.sourceEffectiveId))
+
+      val libraryNameOpt = Option(libraryName).flatMap(_.trimAllToOpt)
+
+      val holders =
+        resolveTargetRelativeToActionSourceOpt(
+          actionSourceAbsoluteId  = effectiveActionSource,
+          targetControlName       = targetControlName,
+          followIndexes           = true,
+          libraryOrSectionNameOpt = libraryNameOpt.map(Left.apply)
+        )
+        .toList
+        .flatMap(_.collect { case n: NodeInfo => n })
+
+      val staticControlOpt =
+        findStaticControlAnalysisOpt(effectiveActionSource, targetControlName, libraryNameOpt)
+
+      staticControlOpt.filter(frc.isAttachmentControl) match {
+        case None =>
+          XFormsAPI.setvalue(List(targetElem), holders.headOption.map(_.getStringValue).getOrElse(""))
+        case Some(staticControl) =>
+          val metadataTokens =
+            Option(metadata)
+              .toList
+              .flatMap(_.splitTo[List]())
+              .filter(FormRunnerPersistence.AttachmentAttributeNames.contains)
+              .distinct
+
+          XFormsAPI.delete(ref = (targetElem / Node).toList)
+          XFormsAPI.delete(ref = (targetElem /@ @*).filterNot(_.localname == "name").toList)
+
+          if (! frc.isMultipleAttachmentControl(staticControl)) {
+            val holderAndBase64Opt =
+              holders.headOption.flatMap(h => holderToBase64Opt(h).map(h -> _))
+
+            holderAndBase64Opt match {
+              case None =>
+                if (isJson)
+                  XFormsAPI.insert(
+                    into   = List(targetElem),
+                    origin = List(NodeInfoFactory.attributeInfo(QName("type"), "null"))
+                  )
+              case Some((holder, b64)) =>
+                if (metadataTokens.isEmpty) {
+                  XFormsAPI.setvalue(List(targetElem), b64)
+                } else if (! isJson) {
+                  XFormsAPI.insert(
+                    into   = List(targetElem),
+                    origin = metadataAttributes(holder, metadataTokens)
+                  )
+                  XFormsAPI.setvalue(List(targetElem), b64)
+                } else {
+                  XFormsAPI.insert(
+                    into   = List(targetElem),
+                    origin = NodeInfoFactory.attributeInfo(QName("type"), "object") +:
+                      jsonContentAndMetadataChildren(holder, b64, metadataTokens)
+                  )
+                }
+            }
+          } else {
+            val itemElems =
+              holders
+                .headOption
+                .toList
+                .flatMap(_ / "_")
+                .filter(_.getStringValue.nonAllBlank)
+                .flatMap(h => holderToBase64Opt(h).map(h -> _))
+                .map { case (itemHolder, b64) =>
+                  if (metadataTokens.isEmpty)
+                    NodeInfoFactory.elementInfo(QName("_"), textContent(b64))
+                  else if (! isJson)
+                    NodeInfoFactory.elementInfo(
+                      QName("_"),
+                      metadataAttributes(itemHolder, metadataTokens) ++ textContent(b64)
+                    )
+                  else
+                    NodeInfoFactory.elementInfo(
+                      QName("_"),
+                      NodeInfoFactory.attributeInfo(QName("type"), "object") +:
+                        jsonContentAndMetadataChildren(itemHolder, b64, metadataTokens)
+                    )
+                }
+
+            val toInsert =
+              (if (isJson) List(NodeInfoFactory.attributeInfo(QName("type"), "array")) else Nil) ++ itemElems
+
+            if (toInsert.nonEmpty)
+              XFormsAPI.insert(
+                into   = List(targetElem),
+                origin = toInsert
+              )
+          }
+      }
+    }
+  }
+
+  private object Private {
+
+    def findStaticControlAnalysisOpt(
+      actionSourceAbsoluteId: String,
+      targetControlName     : String,
+      libraryNameOpt        : Option[String]
+    )(implicit
+      xfc                   : XFormsFunction.Context
+    ): Option[ElementAnalysis] = {
+      val targetStaticId = controlId(targetControlName)
+
+      libraryNameOpt match {
+        case Some(libName) =>
+          val libraryUri = FormRunner.libraryUriFromName(libName)
+
+          val fromControlTreeOpt =
+            xfc.containingDocument.controls.getCurrentControlTree.getSectionTemplateControls
+              .iterator
+              .filter(_.staticControl.namespaceURI == libraryUri)
+              .flatMap(_.innerRootControlOpt)
+              .flatMap { root =>
+                Option(root.container.innerScope.prefixedIdForStaticId(targetStaticId))
+                  .flatMap(root.container.partAnalysis.findControlAnalysis)
+              }
+              .nextOption()
+
+          fromControlTreeOpt.orElse {
+            xfc.container.partAnalysis.controlAnalysisMap.valuesIterator
+              .collect { case c: ComponentControl if c.namespaceURI == libraryUri => c }
+              .flatMap(_.bindingOpt)
+              .flatMap(b => Option(b.innerScope.prefixedIdForStaticId(targetStaticId)))
+              .flatMap(xfc.container.partAnalysis.findControlAnalysis)
+              .nextOption()
+          }
+
+        case None =>
+          Option(xfc.container.innerScope.prefixedIdForStaticId(targetStaticId))
+            .flatMap(xfc.container.partAnalysis.findControlAnalysis)
+            .orElse {
+              val sourcePrefixedId = XFormsId.getPrefixedId(XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId))
+              Try(xfc.containingDocument.staticOps.scopeForPrefixedId(sourcePrefixedId))
+                .toOption
+                .flatMap(s => Option(s.prefixedIdForStaticId(targetStaticId)))
+                .flatMap(xfc.containingDocument.staticOps.findControlAnalysis)
+            }
+            .orElse(xfc.container.partAnalysis.findControlAnalysis(targetStaticId))
+      }
+    }
+
+    def holderToBase64Opt(holder: NodeInfo)(implicit xfc: XFormsFunction.Context): Option[String] = {
+      val tmpFileOpt = (holder /@ "*:tmp-file").headOption.flatMap(_.stringValue.trimAllToOpt)
+      val valueOpt   = tmpFileOpt.orElse(holder.getStringValue.trimAllToOpt)
+
+      valueOpt.map { value =>
+        if (tmpFileOpt.isEmpty && Option(InstanceData.getType(holder)).exists(XFormsUploadControl.Base64BinaryQNames)) {
+          value
+        } else {
+          implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
+          implicit val xfcd           : XFormsContainingDocument = xfc.containingDocument
+          implicit val indentedLogger : IndentedLogger           = xfcd.indentedLogger
+
+          val dataBasePaths =
+            FormRunnerParamsOpt().toList.flatMap { params =>
+              List(
+                frc.createFormDataBasePath(params.app, params.form, params.isDraft.getOrElse(false), params.document.getOrElse("")) -> params.formVersion,
+                frc.createFormDefinitionBasePath(params.app, params.form) -> params.formVersion
+              )
+            }
+
+          val extraHeaders =
+            if ((holder /@ FormRunnerPersistence.AttachmentEncryptedAttributeName).stringValue == "true")
+              Map(FormRunnerPersistence.OrbeonDecryptHeader -> List("true"))
+            else
+              Map.empty[String, List[String]]
+
+          ConnectionResult.withSuccessConnection(
+            frc.readAttachmentSync(dataBasePaths, value, extraHeaders),
+            closeOnSuccess = true
+          ) { is =>
+            Base64.encode(SubmissionUtils.inputStreamToByteArray(is), useLineBreaks = false)
+          }
+        }
+      }
+    }
+
+    def textContent(s: String): List[Item] =
+      if (s.isEmpty) Nil else List(stringToStringValue(s))
+
+    def metadataAttributes(holder: NodeInfo, metadataTokens: List[String]): List[NodeInfo] =
+      metadataTokens.map { token =>
+        NodeInfoFactory.attributeInfo(QName(token), holder.attValueOpt(token).getOrElse(""))
+      }
+
+    def jsonContentAndMetadataChildren(holder: NodeInfo, b64: String, metadataTokens: List[String]): List[NodeInfo] =
+      NodeInfoFactory.elementInfo(QName("content"), textContent(b64)) ::
+        metadataTokens.map {
+          case "size" =>
+            holder.attValueOpt("size").flatMap(_.trimAllToOpt).filter(_.toLongOption.isDefined) match {
+              case Some(numericSize) =>
+                NodeInfoFactory.elementInfo(
+                  QName("size"),
+                  NodeInfoFactory.attributeInfo(QName("type"), "number") +: textContent(numericSize)
+                )
+              case None =>
+                NodeInfoFactory.elementInfo(
+                  QName("size"),
+                  List(NodeInfoFactory.attributeInfo(QName("type"), "null"))
+                )
+            }
+          case token =>
+            NodeInfoFactory.elementInfo(
+              QName(token),
+              textContent(holder.attValueOpt(token).getOrElse(""))
+            )
+        }
+  }
 }

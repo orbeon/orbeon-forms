@@ -1682,6 +1682,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>ファイル名</filename>
+            <mediatype>メディアタイプ</mediatype>
+            <size>サイズ</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>フォームプレビュー</label>

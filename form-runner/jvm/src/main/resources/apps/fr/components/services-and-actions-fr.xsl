@@ -400,6 +400,7 @@
                         select="$current-group except $nested-grouping-elems/fr:*"/>
 
                     <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                        <xsl:with-param tunnel="yes" name="model"                 select="$model"/>
                         <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                         <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                         <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
@@ -457,6 +458,7 @@
                                 value="event('fr-action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                                <xsl:with-param tunnel="yes" name="model"                 select="$model"/>
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                                 <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                                 <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
@@ -499,6 +501,7 @@
                                 value="event('fr-action-id')"/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                                <xsl:with-param tunnel="yes" name="model"                 select="$model"/>
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                                 <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                                 <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
@@ -515,11 +518,13 @@
     </xsl:template>
 
     <xsl:template match="fr:service-call" mode="within-action-2018.2">
+        <xsl:param tunnel="yes" name="model"                 as="element(xf:model)?"/>
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
         <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
 
         <xsl:variable name="service-name" select="@service/string()"/>
+        <xsl:variable name="is-json"      select="$model/xf:submission[@id = concat($service-name, '-submission')]/@serialization = 'application/json'" as="xs:boolean"/>
 
         <xxf:log
             class="fr-action-impl"
@@ -552,71 +557,95 @@
                 <xsl:for-each select="$request-actions">
                     <xf:action>
                         <xsl:choose>
-                            <xsl:when test="exists(@control)">
-                                <xsl:variable name="control" select="@control/string()" as="xs:string"/>
+                            <xsl:when test="./self::fr:value and exists(@control)">
+                                <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
                                 <xf:var
-                                    name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
-                            </xsl:when>
-                            <xsl:when test="exists(@value)">
-                                <xsl:variable name="value" select="@value/string()" as="xs:string"/>
-                                <xsl:variable name="use-iteration-context" select="@expression-context = 'current-iteration'" as="xs:boolean"/>
-                                <xsl:if test="$use-iteration-context">
-                                    <xf:var
-                                        name="iteration-context"
-                                        value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param(..)}')"/>
-                                </xsl:if>
-                                <xf:var
-                                    name="value"
-                                    context="{if ($use-iteration-context) then '$iteration-context' else '$original-context'}"
-                                    value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value, false(), $library-name, $fr-form-model-vars, ())}">
+                                    name="destination-nodes"
+                                    value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $ref, false(), $library-name, $fr-form-model-vars, ())}">
                                     <xsl:if test="$is-restricted-form">
                                         <xsl:attribute name="xxf:functions" select="'restricted'"/>
                                     </xsl:if>
                                 </xf:var>
+                                <xf:action type="xpath">
+                                    frf:setServiceRequestValueFromControl(
+                                        xxf:get-document-attribute($current-action-id, 'action-source'),
+                                        '<xsl:value-of select="@control"/>',
+                                        <xsl:value-of select="if (exists($library-name)) then concat('''', $library-name, '''') else '()'"/>,
+                                        $destination-nodes,
+                                        '<xsl:value-of select="replace(string(@metadata), '''', '''''')"/>',
+                                        <xsl:value-of select="if ($is-json) then 'true()' else 'false()'"/>
+                                    )
+                                </xf:action>
                             </xsl:when>
-                        </xsl:choose>
-                        <xsl:choose>
-                            <xsl:when test="./self::fr:value">
-                                <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
-                                <xf:setvalue
-                                    ref="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $ref, false(), $library-name, $fr-form-model-vars, ())}"
-                                    value="$value">
-                                    <xsl:if test="$is-restricted-form">
-                                        <xsl:attribute name="xxf:functions" select="'restricted'"/>
-                                    </xsl:if>
-                                </xf:setvalue>
-                            </xsl:when>
-                            <xsl:when test="./self::fr:sql-param">
-                                <xsl:variable name="index" select="xs:integer(@index)" as="xs:integer"/>
-                                <xf:setvalue
-                                    xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                                    ref="/sql:config/sql:query/sql:param[{$index}]/(@value | @select)[1]"
-                                    value="
-                                        concat(
-                                            '''',
-                                            replace(
-                                                string(
-                                                    $value
-                                                ),
-                                                '''',
-                                                ''''''
-                                            ),
-                                            ''''
-                                        )"/>
-                            </xsl:when>
-                            <xsl:when test="./self::fr:url-param">
-                                <xf:var name="name"><xsl:value-of select="@name"/></xf:var>
-                                <xf:setvalue
-                                    ref="(//*[@name = $name], //*[local-name() = $name])[1]"
-                                    value="$value"/>
-                            </xsl:when>
-                            <xsl:when test="./self::fr:header">
-                                <xsl:variable name="header-name" select="@name/string()"/>
-                                <xf:insert
-                                    context="xxf:instance('fr-service-headers-instance')"
-                                    origin="xf:element('header', (xf:attribute('name', '{$header-name}'), string($value)))"/>
-                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="exists(@control)">
+                                        <xsl:variable name="control" select="@control/string()" as="xs:string"/>
+                                        <xf:var
+                                            name="value"
+                                            value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
+                                    </xsl:when>
+                                    <xsl:when test="exists(@value)">
+                                        <xsl:variable name="value" select="@value/string()" as="xs:string"/>
+                                        <xsl:variable name="use-iteration-context" select="@expression-context = 'current-iteration'" as="xs:boolean"/>
+                                        <xsl:if test="$use-iteration-context">
+                                            <xf:var
+                                                name="iteration-context"
+                                                value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param(..)}')"/>
+                                        </xsl:if>
+                                        <xf:var
+                                            name="value"
+                                            context="{if ($use-iteration-context) then '$iteration-context' else '$original-context'}"
+                                            value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value, false(), $library-name, $fr-form-model-vars, ())}">
+                                            <xsl:if test="$is-restricted-form">
+                                                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                                            </xsl:if>
+                                        </xf:var>
+                                    </xsl:when>
+                                </xsl:choose>
+                                <xsl:choose>
+                                    <xsl:when test="./self::fr:value">
+                                        <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
+                                        <xf:setvalue
+                                            ref="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $ref, false(), $library-name, $fr-form-model-vars, ())}"
+                                            value="$value">
+                                            <xsl:if test="$is-restricted-form">
+                                                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                                            </xsl:if>
+                                        </xf:setvalue>
+                                    </xsl:when>
+                                    <xsl:when test="./self::fr:sql-param">
+                                        <xsl:variable name="index" select="xs:integer(@index)" as="xs:integer"/>
+                                        <xf:setvalue
+                                            xmlns:sql="http://orbeon.org/oxf/xml/sql"
+                                            ref="/sql:config/sql:query/sql:param[{$index}]/(@value | @select)[1]"
+                                            value="
+                                                concat(
+                                                    '''',
+                                                    replace(
+                                                        string(
+                                                            $value
+                                                        ),
+                                                        '''',
+                                                        ''''''
+                                                    ),
+                                                    ''''
+                                                )"/>
+                                    </xsl:when>
+                                    <xsl:when test="./self::fr:url-param">
+                                        <xf:var name="name"><xsl:value-of select="@name"/></xf:var>
+                                        <xf:setvalue
+                                            ref="(//*[@name = $name], //*[local-name() = $name])[1]"
+                                            value="$value"/>
+                                    </xsl:when>
+                                    <xsl:when test="./self::fr:header">
+                                        <xsl:variable name="header-name" select="@name/string()"/>
+                                        <xf:insert
+                                            context="xxf:instance('fr-service-headers-instance')"
+                                            origin="xf:element('header', (xf:attribute('name', '{$header-name}'), string($value)))"/>
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:otherwise>
                         </xsl:choose>
                     </xf:action>
                 </xsl:for-each>

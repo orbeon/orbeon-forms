@@ -1718,6 +1718,11 @@
             <label>Steps</label>
         </steps>
 
+        <attachment-metadata>
+            <filename>Filnamn</filename>
+            <mediatype>Mediatyp</mediatype>
+            <size>Storlek</size>
+        </attachment-metadata>
     </dialog-actions>
     <dialog-test>
         <label>Förhandsvisa formulär</label>

@@ -867,7 +867,8 @@ trait FormRunnerPersistence {
 
   private def getAttachmentUriAndHeaders(
     fromBasePaths : Iterable[(String, Int)],
-    beforeUrl     : String
+    beforeUrl     : String,
+    extraHeaders  : Map[String, List[String]] = Map.empty
   )(implicit
     safeRequestCtx: SafeRequestContext,
     xfcd          : XFormsContainingDocument,
@@ -890,7 +891,7 @@ trait FormRunnerPersistence {
     // https://github.com/orbeon/orbeon-forms/issues/4919
 
     val customGetHeaders =
-      Map(attachmentVersionOpt.toList.map(v => OrbeonFormDefinitionVersion -> List(v.toString))*)
+      Map(attachmentVersionOpt.toList.map(v => OrbeonFormDefinitionVersion -> List(v.toString))*) ++ extraHeaders
 
     val resolvedGetUri: URI =
       URI.create(rewriteServiceUrl(beforeUrl))
@@ -1036,7 +1037,8 @@ trait FormRunnerPersistence {
   // 1 use: `buildMultipartEntity()`
   def readAttachmentSync(
     fromBasePaths  : Iterable[(String, Int)],
-    beforeUrl      : String
+    beforeUrl      : String,
+    extraHeaders   : Map[String, List[String]] = Map.empty
   )(implicit
     externalContext: ExternalContext,
     xfcd           : XFormsContainingDocument,
@@ -1046,7 +1048,7 @@ trait FormRunnerPersistence {
     implicit val resourceResolver: Option[ResourceResolver] = xfcd.staticState.resourceResolverOpt
     implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
-    val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl)
+    val (resolvedGetUri, allGetHeaders) = getAttachmentUriAndHeaders(fromBasePaths, beforeUrl, extraHeaders)
 
     Connection.connectNow(
       method      = HttpMethod.GET,

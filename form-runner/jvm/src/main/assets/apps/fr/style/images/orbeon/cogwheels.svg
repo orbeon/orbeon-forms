@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <style>
-    .bg { fill: rgba(225, 29, 72, 0.12); stroke: rgba(225, 29, 72, 0.28); stroke-width: 1.5; }
-    .glyph { stroke: #be123c; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .knob { fill: #be123c; stroke: #be123c; stroke-width: 1; }
+    .bg { fill: rgba(16, 67, 168, 0.08); stroke: rgba(16, 67, 168, 0.22); stroke-width: 1.5; }
+    .glyph { stroke: #1043a8; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .knob { fill: #1043a8; stroke: #1043a8; stroke-width: 1; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: rgba(251, 113, 133, 0.18); stroke: rgba(251, 113, 133, 0.35); }
-      .glyph { stroke: #fda4af; }
-      .knob { fill: #fda4af; stroke: #fda4af; }
+      .bg { fill: rgba(96, 152, 248, 0.12); stroke: rgba(96, 152, 248, 0.28); }
+      .glyph { stroke: #8bb2f5; }
+      .knob { fill: #8bb2f5; stroke: #8bb2f5; }
     }
   </style>
   <rect class="bg" x="2" y="2" width="60" height="60" rx="14"/>

@@ -62,7 +62,7 @@ object ControlLabelHintTextEditor {
       val target = event.targetT
       val eventOnEditor        = target.closestOpt(".fb-label-editor").isDefined
       val eventOnMceDialog     = target.closestOpt(".tox-dialog").isDefined
-      val eventOnMceToolbar    = target.closestOpt(".tox-tinymce").isDefined
+      val eventOnMceToolbar    = target.closestOpt(".tox-hugerte").isDefined
       val eventOnMceToolbarOvf = target.closestOpt(".tox-toolbar__overflow").isDefined // https://github.com/orbeon/orbeon-forms/issues/6315
       val eventOnMceMenu       = target.closestOpt(".tox-menu").isDefined
       val eventOnControlLabel  =

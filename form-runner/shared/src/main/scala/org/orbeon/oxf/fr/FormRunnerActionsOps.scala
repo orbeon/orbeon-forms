@@ -52,7 +52,7 @@ import scala.util.Try
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
-  import Private.*
+  import FormRunnerActionsOpsPrivate.*
 
   // Resolve target data nodes from an action source and a target control.
   //
@@ -916,7 +916,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
   }
 
-  private object Private {
+  private object FormRunnerActionsOpsPrivate {
 
     def findStaticControlAnalysisOpt(
       actionSourceAbsoluteId: String,

@@ -1389,6 +1389,47 @@
                     <xf:var name="show-created-by"       value="frf:showSummaryMetadataColumn($source-form-metadata, 'created-by',       $app, $form)"/>
                     <xf:var name="show-last-modified-by" value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified-by', $app, $form)"/>
 
+                    <xf:var
+                        name="summary-thumbnail"
+                        value="$source-form-metadata/thumbnail[xxf:non-blank()]"/>
+                    <xf:var
+                        name="summary-form-title"
+                        value="
+                            (
+                                $source-form-metadata/title[@xml:lang = xxf:instance('fr-language-instance')],
+                                $source-form-metadata/title
+                            )[1]"/>
+                    <xf:var
+                        name="summary-form-description"
+                        value="
+                            (
+                                $source-form-metadata/description[@xml:lang = xxf:instance('fr-language-instance')],
+                                $source-form-metadata/description
+                            )[1]"/>
+
+                    <!-- Option A: Compact Split Header Card when summary thumbnail is enabled -->
+                    <xf:group
+                        xxf:element="div"
+                        ref=".[
+                            xxf:property(string-join(('oxf.fr.summary.show-thumbnail', $app, $form), '.')) = true() and
+                            exists($summary-thumbnail)
+                        ]"
+                        class="fr-form-header-card fr-summary-header-card">
+                        <xh:div class="fr-form-header-thumbnail">
+                            <xf:output mediatype="image/*" ref="$summary-thumbnail"/>
+                        </xh:div>
+                        <xh:div class="fr-form-header-content">
+                            <xf:group xxf:element="h2" ref=".[xxf:non-blank($summary-form-title)]" class="fr-form-header-title">
+                                <xf:output value="$summary-form-title"/>
+                            </xf:group>
+                            <xf:group xxf:element="div" ref=".[xxf:non-blank($summary-form-description)]" class="fr-form-header-description">
+                                <xf:var name="is-html" value="$summary-form-description/@mediatype = 'text/html'"/>
+                                <xf:output ref=".[$is-html]"      value="$summary-form-description" mediatype="text/html"/>
+                                <xf:output ref=".[not($is-html)]" value="$summary-form-description"/>
+                            </xf:group>
+                        </xh:div>
+                    </xf:group>
+
                     <xf:group class="fr-top-fields">
 
                         <!-- Search also when user presses "enter" in a field -->

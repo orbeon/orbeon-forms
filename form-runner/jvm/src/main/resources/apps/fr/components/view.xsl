@@ -747,9 +747,50 @@
                                 xxf:instance('fr-form-metadata')/description
                             )[1]"/>
 
+                    <xf:var
+                        name="form-title"
+                        value="
+                            (
+                                xxf:instance('fr-form-metadata')/title[@xml:lang = xxf:instance('fr-language-instance')],
+                                xxf:instance('fr-form-metadata')/title
+                            )[1]"/>
+
+                    <xf:var
+                        name="thumbnail"
+                        value="xxf:instance('fr-form-metadata')/thumbnail[xxf:non-blank()]"/>
+
+                    <xf:var
+                        name="show-thumbnail-card"
+                        value="
+                            not(fr:mode() = ('pdf', 'tiff', 'test-pdf')) and
+                            xxf:property(string-join(('oxf.fr.detail.show-thumbnail', fr:app-name(), fr:form-name()), '.')) = true() and
+                            exists($thumbnail) and
+                            xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)"/>
+
+                    <!-- Option B: Compact Split Header Card when detail thumbnail is enabled -->
+                    <xf:group
+                        xxf:element="div"
+                        ref=".[$show-thumbnail-card]"
+                        class="fr-form-header-card">
+                        <xh:div class="fr-form-header-thumbnail">
+                            <xf:output mediatype="image/*" ref="$thumbnail"/>
+                        </xh:div>
+                        <xh:div class="fr-form-header-content">
+                            <xf:group xxf:element="h2" ref=".[xxf:non-blank($form-title)]" class="fr-form-header-title">
+                                <xf:output value="$form-title"/>
+                            </xf:group>
+                            <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="fr-form-header-description">
+                                <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
+                                <xf:output ref=".[$is-html]"      value="$description" mediatype="text/html"/>
+                                <xf:output ref=".[not($is-html)]" value="$description"/>
+                            </xf:group>
+                        </xh:div>
+                    </xf:group>
+
                     <xf:group
                         xxf:element="div"
                         ref=".[
+                            not($show-thumbnail-card) and
                             xxf:non-blank($description) and
                             xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)
                         ]"

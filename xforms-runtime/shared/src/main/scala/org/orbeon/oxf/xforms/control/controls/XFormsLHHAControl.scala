@@ -56,13 +56,38 @@ class XFormsLHHAControl(
   // https://github.com/orbeon/orbeon-forms/issues/6645
   private var _parentBindingContext: BindingContext = null
 
-  // Set as a side effect of calling `computeValue()`
+  // Set as a side effect of evaluating bindings/values.
   // This is not great, but we need to store this instead of computing it in `addAjaxAttributes()`, as cannot resolve
   // controls in the copy of the tree.
-  private var _associatedControlsLevel: Option[ValidationLevel] = None
-  private var _associatedControlsVisited: Boolean = false
-  def associatedControlsLevel: Option[ValidationLevel] = _associatedControlsLevel
-  def associatedControlsVisited: Boolean = _associatedControlsVisited
+  private var _associatedControlsLevel   : Option[ValidationLevel] = None
+  private var _associatedControlsVisited : Boolean                 = false
+  private var _associatedControlsReadonly: Boolean                 = false
+  private var _associatedControlsRequired: Boolean                 = false
+  private var _associatedControlsEmpty   : Option[Boolean]         = None
+
+  def associatedControlsLevel   : Option[ValidationLevel] = _associatedControlsLevel
+  def associatedControlsVisited : Boolean                 = _associatedControlsVisited
+  def associatedControlsReadonly: Boolean                 = _associatedControlsReadonly
+  def associatedControlsRequired: Boolean                 = _associatedControlsRequired
+  def associatedControlsEmpty   : Option[Boolean]         = _associatedControlsEmpty
+
+  private def updateAssociatedControlsState(collector: ErrorEventCollector): Unit = {
+    if (staticControl.lhhaType == LHHA.Alert) {
+      val associated = associatedControls
+      _associatedControlsLevel   = associated.flatMap(_.alertLevel).maxOption
+      _associatedControlsVisited = associated.exists(_.visited)
+    } else if (staticControl.lhhaType == LHHA.Label && ! staticControl.isForRepeat) {
+      val associated = associatedControls.filter(_.isRelevant)
+      val required   = associated.exists(_.isRequired)
+      _associatedControlsReadonly = associated.nonEmpty && associated.forall(_.isReadonly)
+      _associatedControlsRequired = required
+      _associatedControlsEmpty    =
+        if (required)
+          associated.collectFirst { case vc: XFormsValueControl => vc.isEmptyValue(collector) }
+        else
+          None
+    }
+  }
 
   final override def evaluateBindingAndValues(
     parentContext : BindingContext,
@@ -75,12 +100,32 @@ class XFormsLHHAControl(
     super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)
   }
 
+  override def onCreate(
+    restoreState: Boolean,
+    state       : Option[ControlState],
+    update      : Boolean,
+    collector   : ErrorEventCollector
+  ): Unit = {
+    super.onCreate(restoreState, state, update, collector)
+    updateAssociatedControlsState(collector)
+  }
+
+  override def onBindingUpdate(
+    oldBinding: BindingContext,
+    newBinding: BindingContext,
+    collector : ErrorEventCollector
+  ): Unit = {
+    super.onBindingUpdate(oldBinding, newBinding, collector)
+    updateAssociatedControlsState(collector)
+  }
+
   override def onDestroy(update: Boolean): Unit = {
     super.onDestroy(update)
-    if (staticControl.lhhaType == LHHA.Alert) {
-      _associatedControlsLevel = None
-      _associatedControlsVisited = false
-    }
+    _associatedControlsLevel    = None
+    _associatedControlsVisited  = false
+    _associatedControlsReadonly = false
+    _associatedControlsRequired = false
+    _associatedControlsEmpty    = None
   }
 
   final override def refreshBindingAndValues(
@@ -141,10 +186,7 @@ class XFormsLHHAControl(
       )
     }
 
-    if (staticControl.lhhaType == LHHA.Alert) {
-      _associatedControlsLevel   =  associatedControls.flatMap(_.alertLevel).maxOption
-      _associatedControlsVisited = associatedControls.exists(_.visited)
-    }
+    updateAssociatedControlsState(collector)
 
     resultOpt getOrElse ""
   }
@@ -189,6 +231,31 @@ class XFormsLHHAControl(
     // Visited
     if (visited1 != visited2) {
       attributesImpl.addOrReplace("visited", visited2.toString)
+      added |= true
+    }
+
+    val readonly1 = control1Opt.exists(_._associatedControlsReadonly)
+    val readonly2 = control2._associatedControlsReadonly
+
+    if (readonly1 != readonly2) {
+      attributesImpl.appendToClassAttribute(if (readonly2) "+xforms-readonly" else "-xforms-readonly")
+      added |= true
+    }
+
+    val required1 = control1Opt.exists(_._associatedControlsRequired)
+    val required2 = control2._associatedControlsRequired
+
+    if (required1 != required2) {
+      attributesImpl.appendToClassAttribute(if (required2) "+xforms-required" else "-xforms-required")
+      added |= true
+    }
+
+    val empty1 = control1Opt.flatMap(_._associatedControlsEmpty)
+    val empty2 = control2._associatedControlsEmpty
+
+    if (empty1 != empty2) {
+      empty1.foreach(e => attributesImpl.appendToClassAttribute(if (e) "-xforms-empty" else "-xforms-filled"))
+      empty2.foreach(e => attributesImpl.appendToClassAttribute(if (e) "+xforms-empty" else "+xforms-filled"))
       added |= true
     }
 

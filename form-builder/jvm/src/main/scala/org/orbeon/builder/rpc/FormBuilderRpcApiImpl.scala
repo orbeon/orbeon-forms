@@ -49,29 +49,31 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
     val staticControlId = XFormsId.getStaticIdFromId(controlId)
 
-    // The target might the control itself, or for grids with LHH in headers, an `xf:output` added to edit the LHH
-    val controlName = FormRunner.controlNameFromId(
+    // The target might be the control itself, a separate `<xf:label>` (`<name>-label`), or for grids with LHH in headers, an `xf:output` added to edit the LHH
+    val strippedId =
       EditorIdPrefixes find staticControlId.startsWith match {
         case Some(prefix) => staticControlId.substring(prefix.size)
         case None         => staticControlId
       }
-    )
 
-    // The client might send this after the control is deleted and we don't want to crash
-    FormRunner.findControlByName(controlName) foreach { controlElem =>
+    org.orbeon.oxf.fr.ControlOps.controlNameFromControlOrLabelIdOpt(strippedId) foreach { controlName =>
 
-      val xcvElemOpt = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+      // The client might send this after the control is deleted and we don't want to crash
+      FormRunner.findControlByName(controlName) foreach { controlElem =>
 
-      if (FormBuilder.setControlLabelHintHelpOrText(controlName, lhha, value, None, isHTML))
-        xcvElemOpt foreach { xcvElem =>
-          Undo.pushUserUndoAction(
-            ControlSettings(
-              controlName,
-              controlName,
-              xcvElem
+        val xcvElemOpt = ToolboxOps.controlOrContainerElemToXcv(controlElem)
+
+        if (FormBuilder.setControlLabelHintHelpOrText(controlName, lhha, value, None, isHTML))
+          xcvElemOpt foreach { xcvElem =>
+            Undo.pushUserUndoAction(
+              ControlSettings(
+                controlName,
+                controlName,
+                xcvElem
+              )
             )
-          )
-        }
+          }
+      }
     }
   }
 
@@ -84,11 +86,43 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def controlEditDetails(controlId: String): Future[Unit] = Future.successful {
+    val staticId = XFormsId.getStaticIdFromId(controlId)
+    val resolvedStaticControlId =
+      org.orbeon.oxf.fr.ControlOps.controlNameFromSeparateLabelIdOpt(staticId)
+        .map(FormRunner.controlId)
+        .getOrElse(staticId)
+
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-control-settings",
-      properties = Map("control-id" -> Some(XFormsId.getStaticIdFromId(controlId)))
+      properties = Map("control-id" -> Some(resolvedStaticControlId))
     )
+  }
+
+  def controlMoveLabelLeft(controlId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    org.orbeon.oxf.fr.ControlOps.controlNameFromControlOrLabelIdOpt(controlId)
+      .flatMap(FormRunner.findControlByName)
+      .flatMap(FormBuilder.moveControlLabelToLeft(_, None))
+      .foreach(Undo.pushUserUndoAction)
+  }
+
+  def controlMoveLabelTop(controlId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    org.orbeon.oxf.fr.ControlOps.controlNameFromControlOrLabelIdOpt(controlId)
+      .flatMap(FormRunner.findControlByName)
+      .flatMap(FormBuilder.moveControlLabelToTop(_))
+      .foreach(Undo.pushUserUndoAction)
+  }
+
+  def gridMoveLabelsLeft(gridId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    resolveId(gridId).flatMap(FormBuilder.moveGridLabelsToLeft).foreach(Undo.pushUserUndoAction)
+  }
+
+  def gridMoveLabelsTop(gridId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    resolveId(gridId).flatMap(FormBuilder.moveGridLabelsToTop).foreach(Undo.pushUserUndoAction)
   }
 
   def controlEditItems(controlId: String): Future[Unit] = Future.successful {

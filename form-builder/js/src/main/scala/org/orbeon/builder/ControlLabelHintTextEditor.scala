@@ -81,7 +81,10 @@ object ControlLabelHintTextEditor {
 
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {
-        event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
+        val inFloatingEditor =
+          event.targetT.closestOpt(".fb-control-editor-right, .fb-control-editor-left, .fb-control-editor-top").isDefined
+        if (! inFloatingEditor)
+          event.targetT.closestOpt(LabelHintSelector).foreach { labelHint =>
           val isViewMode = FormRunnerUtils.isViewMode(labelHint)
           if (! isViewMode) {
             // Close current editor, if there is one open
@@ -94,8 +97,11 @@ object ControlLabelHintTextEditor {
                   // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
                   resourceEditorCurrentLabelHintOpt
                 case None =>
-                  labelHint.closestOpt(OuterComponentSelector)
-                    .orElse(labelHint.closestOpt(ControlSelector))
+                  if (ControlEditor.isSeparateLabelElem(labelHint))
+                    labelHint.some
+                  else
+                    labelHint.closestOpt(OuterComponentSelector)
+                      .orElse(labelHint.closestOpt(ControlSelector))
               }
             resourceEditorCurrentLabelHintOpt
               .foreach(resourceEditorStartEdit)
@@ -126,6 +132,8 @@ object ControlLabelHintTextEditor {
     // Show editor on click on label
     def resourceEditorStartEdit(currentLabelHint: html.Element): Unit =
       AjaxClient.allEventsProcessedF("resourceEditorStartEdit") foreach { _ =>
+        // Ensure `.fb-control-editor-right` is not inside `<label>` when reading `innerHTML`/`innerText`
+        ControlEditor.detachRightEditorIfInside(currentLabelHint)
         // Remove `for` so browser doesn't set the focus to the control on click
         currentLabelHint.removeAttribute("for")
         // Show, position, and populate editor
@@ -180,6 +188,7 @@ object ControlLabelHintTextEditor {
             // Update values in the DOM, without waiting for the server to send us the value
             Private.labelHintValue(labelHint, sanitized)
           }
+          ControlEditor.refreshEditors()
 
           // Clean state
           resourceEditorCurrentControlOpt = None
@@ -265,8 +274,20 @@ object ControlLabelHintTextEditor {
         else                                                                                                                      EditorType.Hint
 
       def htmlClass: String = s"fb-${getEditorType.entryName}-is-html"
-      def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt.exists(_.hasClass(htmlClass))
-      def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
+      def isLabelHintHtml: Boolean =
+        resourceEditorCurrentControlOpt.exists { ctrl =>
+          if (ControlEditor.isSeparateLabelElem(ctrl))
+            ctrl.hasClass("xforms-mediatype-text-html")
+          else
+            ctrl.hasClass(htmlClass)
+        }
+      def setLabelHintHtml(isHtml: Boolean): Unit =
+        resourceEditorCurrentControlOpt.foreach { ctrl =>
+          if (ControlEditor.isSeparateLabelElem(ctrl))
+            ctrl.toggleClass("xforms-mediatype-text-html", isHtml)
+          else
+            ctrl.toggleClass(htmlClass, isHtml)
+        }
       def annotateWithLhhaClass(add: Boolean): Unit = containerDivElem.toggleClass(s"fb-label-editor-for-${getEditorType.entryName}", add)
 
       def labelHintValue(labelHint: html.Element): String =

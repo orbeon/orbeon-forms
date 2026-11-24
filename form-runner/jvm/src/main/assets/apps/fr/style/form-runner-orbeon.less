@@ -677,9 +677,11 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         }
 
         .xforms-required.xforms-empty {
-            .xforms-label:before,
-            .xforms-label:after {
-                color: var(--orbeon-error-color);                      // Error-red when empty
+            &.xforms-label, .xforms-label {
+                &:before,
+                &:after {
+                    color: var(--orbeon-error-color);                      // Error-red when empty
+                }
             }
         }
     });

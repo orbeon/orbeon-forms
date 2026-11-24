@@ -19,6 +19,7 @@ object FormBuilder
     with ControlOps
     with GridOps
     with SectionOps
+    with SeparateLhhaOps
     with AlertsAndConstraintsOps
     with BindingOps
     with ActionsOps

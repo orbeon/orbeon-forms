@@ -20,7 +20,7 @@ import org.orbeon.oxf.fb.XMLNames.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.NodeInfoCell.*
 import org.orbeon.oxf.fr.XMLNames.*
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerRename, FormRunnerTemplatesOps, Names}
+import org.orbeon.oxf.fr.{Cell, FormRunner, FormRunnerRename, FormRunnerTemplatesOps, Names}
 import org.orbeon.oxf.util.ContentTypes.HtmlContentType
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -220,18 +220,57 @@ trait ControlOps extends ResourcesOps {
   )(implicit
     ctx             : FormBuilderDocContext
   ): Option[UndoAction] =
-    cellElem firstChildOpt * flatMap { controlElem =>
+    cellElem firstChildOpt * flatMap { childElem =>
+      if (FormRunner.isSeparateLhhaElem(childElem)) {
+        val targetControlOpt =
+          childElem
+            .attValueOpt("for")
+            .flatMap(forId => findInViewTryIndex(forId).orElse((childElem.rootElement descendant *).find(_.idOpt.contains(forId))))
 
-      val undo =
-        ToolboxOps.controlOrContainerElemToXcv(controlElem) map
-          (DeleteControl(controlPosition(controlElem), _))
+        targetControlOpt match {
+          case Some(targetControl) =>
+            FormBuilder.moveControlLabelToTop(targetControl)
+          case None =>
+            delete(childElem)
+            None
+        }
+      } else {
+        val xcvOpt           = ToolboxOps.controlOrContainerElemToXcv(childElem)
+        val separateLabelOpt = FormRunner.findSeparateLabelForControl(childElem)
 
-      controlElementsToDelete(controlElem) foreach (delete(_))
+        separateLabelOpt.foreach { separateLabelElem =>
+          val labelCellElem = separateLabelElem.parentUnsafe
+          val gridElem      = FormBuilder.getContainingGrid(cellElem)
+          val shouldMerge   =
+            FormBuilder.getContainingGrid(labelCellElem) == gridElem && {
+              val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+              (for {
+                cOrigin <- Cell.findOriginCell(gridModel, cellElem)
+                lOrigin <- Cell.findOriginCell(gridModel, labelCellElem)
+              } yield lOrigin.x + lOrigin.w == cOrigin.x && lOrigin.y == cOrigin.y && lOrigin.h == cOrigin.h).contains(true)
+            }
 
-      if (updateTemplates)
-        self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to(Set))(FormBuilderDocContext())
+          delete(separateLabelElem)
 
-      undo
+          if (shouldMerge) {
+            val lx = NodeInfoCellOps.x(labelCellElem).get
+            val lw = NodeInfoCellOps.w(labelCellElem).getOrElse(1)
+            val cw = NodeInfoCellOps.w(cellElem).getOrElse(1)
+            NodeInfoCellOps.updateX(cellElem, lx)
+            NodeInfoCellOps.updateW(cellElem, lw + cw)
+            delete(labelCellElem)
+          }
+        }
+
+        val pos = controlPosition(childElem)
+
+        controlElementsToDelete(childElem) foreach (delete(_))
+
+        if (updateTemplates)
+          self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to(Set))(FormBuilderDocContext())
+
+        xcvOpt.map(DeleteControl(pos, _))
+      }
     }
 
   // Find all associated elements to delete for a given control element
@@ -322,6 +361,8 @@ trait ControlOps extends ResourcesOps {
     index         : BindingIndex[BindingDescriptor]
   ): Unit = {
 
+    val separateLabelOpt = FormRunner.findSeparateLabelForControl(controlElement)
+
     // Produce `section-` and `grid-` for sections and grids
     val newControlId =
       if (IsSection(controlElement))
@@ -335,6 +376,8 @@ trait ControlOps extends ResourcesOps {
     ensureAttribute(controlElement, "id", newControlId)
     if (! isSectionTemplateContent(controlElement) && (! IsGrid(controlElement) || controlElement.hasAtt(BIND_QNAME)))
       ensureAttribute(controlElement, BIND_QNAME.localName, bindId(newName))
+
+    separateLabelOpt.foreach(FormBuilder.renameSeparateLabelByElement(_, newName))
 
     // Make the control point to its template if @template (or legacy @origin) is present
     for (attName <- List("template", "origin"))
@@ -585,7 +628,10 @@ trait ControlOps extends ResourcesOps {
 
   // Find a control's LHHAT (there can be more than one for alerts)
   def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): NodeColl =
-    findControlByName(controlName).toList child controlLHHATQName(lhhaName)
+    if (lhhaName == "label")
+      findControlByName(controlName).to(LazyList).flatMap(FormRunner.findControlOrSeparateLabelElem)
+    else
+      findControlByName(controlName).toList child controlLHHATQName(lhhaName)
 
   // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =

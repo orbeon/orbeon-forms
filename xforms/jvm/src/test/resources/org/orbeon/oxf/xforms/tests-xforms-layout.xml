@@ -96,7 +96,7 @@
                     <xh:span class="xforms-hint" id="my-new-boolean-input≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-11⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
+                <xh:label class="xforms-required xforms-filled xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-11⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="xf-12⊙1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
@@ -108,7 +108,7 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="xf-14⊙1">My alert</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-15⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
+                <xh:label class="xforms-required xforms-filled xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-15⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="xf-16⊙1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
@@ -3008,7 +3008,7 @@
                     <xh:span class="xforms-hint" id="my-multiple-checkbox≡≡t">My hint</xh:span>
                 </xh:span>
                 <xh:label
-                        class="xforms-label"
+                        class="xforms-required xforms-empty xforms-label"
                         id="my-single-checkbox-external-label"
                         for="my-single-checkbox-with-external-label≡≡e0">My label
                 </xh:label>
@@ -3031,7 +3031,7 @@
                     <xh:span class="xforms-hint" id="my-single-checkbox-with-external-label≡≡t">My hint</xh:span>
                 </xh:span>
                 <xh:label
-                        class="xforms-label"
+                        class="xforms-required xforms-empty xforms-label"
                         id="my-multiple-checkbox-external-label">My label
                 </xh:label>
                 <xh:span
@@ -3224,6 +3224,67 @@
                 <element id="g⊙2-1" aria-labelledby="t⊙2"/>
                 <element id="g⊙2-2" aria-labelledby="t⊙2"/>
             </result>
+        </output>
+    </test>
+
+    <test description="#2865: External `xf:label` with XBL `xxbl:label-for` (`GroupControl` input/div) and `static-readonly`" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="my-outer-model">
+                        <xf:instance id="my-outer-instance">
+                            <_>
+                                <date/>
+                                <att/>
+                                <static>Readonly value</static>
+                            </_>
+                        </xf:instance>
+                        <xf:bind ref="date" required="true()"/>
+                        <xf:bind ref="static" readonly="true()"/>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-mock-date" element="fr|mock-date" xxbl:mode="lhha binding value" xxbl:container="span" xxbl:label-for="input">
+                            <xbl:template>
+                                <xh:input id="input" xxf:control="true"/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding id="fr-mock-att" element="fr|mock-att" xxbl:mode="lhha binding value" xxbl:container="div" xxbl:label-for="box">
+                            <xbl:template>
+                                <xh:div id="box" xxf:control="true"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xf:label id="my-date-label"   for="my-date">Birth Date</xf:label>
+                    <fr:mock-date id="my-date"     ref="date"/>
+                    <xf:label id="my-att-label"    for="my-att">Resume</xf:label>
+                    <fr:mock-att id="my-att"       ref="att"/>
+                    <xf:label id="my-static-label" for="my-static">Static Label</xf:label>
+                    <xf:input id="my-static"       ref="static" xxf:readonly-appearance="static"/>
+                    <xf:output id="date-label-out" value="xxf:label('my-date')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:label id="my-date-label" class="xforms-required xforms-empty xforms-label" for="my-date≡input">Birth Date</xh:label>
+                <xh:span id="my-date" class="xforms-invalid xforms-required xforms-empty xbl-component xbl-fr-mock-date">
+                    <xh:input id="my-date≡input" class="xforms-group" aria-labelledby="my-date-label" aria-required="true"/>
+                </xh:span>
+                <xh:label id="my-att-label" class="xforms-label">Resume</xh:label>
+                <xh:div id="my-att" class="xbl-component xbl-fr-mock-att">
+                    <xh:div id="my-att≡box" class="xforms-group" role="group" tabindex="0" aria-labelledby="my-att-label"/>
+                </xh:div>
+                <xh:span id="my-static-label" class="xforms-readonly xforms-label">Static Label</xh:span>
+                <xh:span id="my-static" class="xforms-control xforms-input xforms-static xforms-readonly">
+                    <xh:span class="xforms-field" tabindex="0" role="textbox" aria-readonly="true" aria-labelledby="my-static-label">Readonly value</xh:span>
+                </xh:span>
+                <xh:span id="date-label-out" class="xforms-control xforms-output">
+                    <xh:span id="date-label-out≡≡c" class="xforms-output-output">Birth Date</xh:span>
+                </xh:span>
+            </controls>
         </output>
     </test>
 </group>

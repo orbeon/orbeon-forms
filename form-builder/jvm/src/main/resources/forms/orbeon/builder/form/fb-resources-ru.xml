@@ -80,6 +80,8 @@
         <merge-cell>объединение ячеек</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>обзор элементов управления</control-settings-batch>
+        <move-control-label>перемещение подписи</move-control-label>
+        <move-separate-lhha>перемещение подписи</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Объединить шаблон раздела</label>
@@ -283,6 +285,21 @@
     <grid-details-icon>
         <label>Настройки сетки</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Переместить подпись в ячейку слева</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Переместить подпись над элементом управления</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Переместить все подписи в ячейки слева</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Переместить все подписи над элементами управления</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>подпись</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Переместить выше</label>
     </move-up-icon>
@@ -974,6 +991,11 @@
             <label>Использовать автоматическую подсказку</label>
             <hint>Добавляет подсказку на основе максимального размера файла и поддерживаемых типов файлов, которые вы могли указать на вкладке валидации и предупреждений</hint>
         </automatic-hint>
+        <label-position>
+            <label>Расположение подписи</label>
+            <top>Над элементом</top>
+            <separate>Отдельная ячейка</separate>
+        </label-position>
         <multiple-selection>
             <label>Множественный выбор</label>
             <hint>Если включено, пользователи могут выбрать несколько значений</hint>
@@ -1012,6 +1034,12 @@
             <item id="1">По строкам</item>
             <item id="2">По столбцам</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Подписи элементов</label>
+            <unchanged>Оставить без изменений</unchanged>
+            <left>Переместить все влево</left>
+            <top>Переместить все наверх</top>
+        </grid-labels-position>
         <options>
             <label>Параметры</label>
             <item>

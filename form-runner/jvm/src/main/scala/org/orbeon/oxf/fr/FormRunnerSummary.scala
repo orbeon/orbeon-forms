@@ -347,7 +347,7 @@ trait FormRunnerSummary {
           controlName
         } else {
           val inlineLabelOpt =
-            (controlNode / (XF -> "label"))
+            FormRunner.findControlOrSeparateLabelElem(controlNode)
               .headOption
               .filter(l => l.attValueOpt("ref").isEmpty && l.attValueOpt("value").isEmpty)
               .flatMap(_.stringValue.trimAllToOpt)

@@ -337,17 +337,45 @@ trait GridOps extends ContainerOps {
         // Find the new cell to select if we are removing the currently selected cell
         val newCellToSelect = findNewCellToSelect(cellsToDelete)
 
+        val cellsToDeleteSet = cellsToDelete.toSet
+
+        // Handle separate labels spanning into or out of the deleted row so no dangling `@for` remains
+        cellsToDelete.foreach { cell =>
+          cell.firstChildOpt(*).foreach { elem =>
+            if (FormRunner.isSeparateLhhaElem(elem)) {
+              val targetOpt =
+                elem.attValueOpt("for").flatMap(forId => findInViewTryIndex(forId))
+              targetOpt.filter(t => ! cellsToDeleteSet(t.parentUnsafe)).foreach { targetControl =>
+                FormBuilder.moveControlLabelToTop(targetControl, mergeAdjacentIfLeft = false)
+              }
+            } else {
+              FormRunner.findSeparateLabelForControl(elem)
+                .filter(l => ! cellsToDeleteSet(l.parentUnsafe))
+                .foreach(delete(_))
+            }
+          }
+        }
+
         // Delete all controls in the row
         cellsToDelete foreach (deleteControlWithinCell(_))
 
         // Delete row and its content
         delete(cellsToDelete)
 
+        // If a repeated grid shrank down to a single row, move any remaining separate labels back to top
+        if (FormRunner.isRepeat(gridElem) && allCells.size - 1 <= 1)
+          FormBuilder.moveGridLabelsToTop(gridElem)
+
         // Update templates
         updateTemplatesCheckContainers(findAncestorRepeatNames(gridElem, includeSelf = true).to(Set))
 
         // Adjust selected cell if needed
-        newCellToSelect foreach selectCell
+        newCellToSelect foreach { cell =>
+          if ((gridElem / CellTest).contains(cell))
+            selectCell(cell)
+          else
+            (gridElem / CellTest).headOption.foreach(selectCell)
+        }
 
         undo
       }

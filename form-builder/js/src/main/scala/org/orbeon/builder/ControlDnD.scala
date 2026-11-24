@@ -51,13 +51,22 @@ private object ControlDnD {
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
           handle.hasClass("fb-control-handle")
 
-        // Can only drop into an empty cell
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
-          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-cell-badges)").isEmpty
+        // Can only drop into an empty cell (and for a separate label, only within the same grid)
+        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] = {
+          val isTargetEmpty =
+            target
+              .querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-editor-right, .fb-control-editor-top, .fb-control-cell-badges)")
+              .isEmpty
+          val isGridAllowed =
+            ! ControlEditor.isSeparateLabelElem(el) ||
+              (target.closestOpt(".fr-grid") == source.closestOpt(".fr-grid"))
+          isTargetEmpty && isGridAllowed
+        }
 
         override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
-          el.classList.add(if (shiftPressed) CopyClass else MoveClass)
-          shiftPressed
+          val doCopy = shiftPressed && ! ControlEditor.isSeparateLabelElem(el)
+          el.classList.add(if (doCopy) CopyClass else MoveClass)
+          doCopy
         }
       }
     )
@@ -86,7 +95,7 @@ private object ControlDnD {
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
-          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-cell-badges)").isEmpty
+          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-editor-right, .fb-control-editor-top, .fb-control-cell-badges)").isEmpty
 
         override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
           el.classList.add(CopyClass)

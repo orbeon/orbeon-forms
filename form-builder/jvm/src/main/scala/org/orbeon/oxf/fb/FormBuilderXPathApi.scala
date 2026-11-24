@@ -2153,14 +2153,17 @@ object FormBuilderXPathApi {
             )
 
           } else {
-            val cellElem = controlElem.parentUnsafe
-            val position = FormBuilder.controlPosition(controlElem)
-
-            FormBuilder.deleteControlWithinCell(cellElem)
+            val cellElem     = controlElem.parentUnsafe
+            val fallbackPos  = FormBuilder.controlPosition(controlElem)
+            val deletedPos   =
+              FormBuilder.deleteControlWithinCell(cellElem) match {
+                case Some(DeleteControl(pos, _)) => pos
+                case _                           => fallbackPos
+              }
 
             ToolboxOps.pasteSingleControlFromXcv(
               TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
-              Some(position),
+              Some(deletedPos),
               copyAttachments = false
             )
           }
@@ -2189,10 +2192,58 @@ object FormBuilderXPathApi {
           )
         }
         Some(ControlLhha(controlName, lhht, currentValues, isOptional))
+      case action: MoveControlLabel =>
+        FormBuilder.applyMoveControlLabelUndo(action)
+      case action: MoveSeparateLhha =>
+        FormBuilder.applyMoveSeparateLhhaUndo(action)
       case ControlSettingsBatch(actions) =>
         val redoActions = actions.reverse.flatMap(processUndoRedoAction)
         if (redoActions.nonEmpty) Some(ControlSettingsBatch(redoActions)) else None
     }
+
+  //@XPathFunction
+  def canHaveSeparateLabel(controlElem: NodeInfo): Boolean =
+    FormBuilder.canHaveSeparateLabel(controlElem)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def hasSeparateLabel(controlElem: NodeInfo): Boolean =
+    (controlElem ne null) && FormBuilder.hasSeparateLabel(controlElem)
+
+  //@XPathFunction
+  def canMoveLabelLeft(controlElem: NodeInfo): Boolean =
+    FormBuilder.canMoveLabelLeft(controlElem)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def moveControlLabelToLeft(controlName: String): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormRunner.findControlByName(controlName).foreach(FormBuilder.moveControlLabelToLeft(_, None))
+  }
+
+  //@XPathFunction
+  def moveControlLabelToTop(controlName: String): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormRunner.findControlByName(controlName).foreach(FormBuilder.moveControlLabelToTop(_))
+  }
+
+  //@XPathFunction
+  def canGridMoveLabelsLeft(gridElem: NodeInfo): Boolean =
+    FormBuilder.canGridMoveLabelsLeft(gridElem)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def canGridMoveLabelsTop(gridElem: NodeInfo): Boolean =
+    FormBuilder.canGridMoveLabelsTop(gridElem)
+
+  //@XPathFunction
+  def moveGridLabelsToLeft(gridElem: NodeInfo): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormBuilder.moveGridLabelsToLeft(gridElem)
+  }
+
+  //@XPathFunction
+  def moveGridLabelsToTop(gridElem: NodeInfo): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormBuilder.moveGridLabelsToTop(gridElem)
+  }
 
   //@XPathFunction
   def buildControlOverviewXml(fbLang: String, isReadonlyMode: Boolean): NodeInfo =

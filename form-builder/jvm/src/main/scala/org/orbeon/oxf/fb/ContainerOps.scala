@@ -326,6 +326,9 @@ trait ContainerOps extends ControlOps {
       toggleAttribute(control, "apply-defaults",    "true",                                          repeat && applyDefaults)
       toggleAttribute(control, FBInitialIterations, initialIterationsOpt.get,                        repeat && initialIterationsOpt.isDefined)
 
+      if (repeat && IsGrid(control) && FormBuilder.isSingleRowRepeatGrid(control))
+        FormBuilder.moveGridLabelsToTop(control)
+
       if (! wasRepeat && repeat) {
         // Insert new bind and template
 

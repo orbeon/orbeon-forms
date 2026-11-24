@@ -191,7 +191,7 @@
                         string-join(
                             (
                                 for $id
-                                    in $root/fr:c/(* except fr:hidden)/@id/string()
+                                    in $root/fr:c/(* except (fr:hidden, xf:label))/@id/string()
                                     return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
                                 'false()'
                             ),

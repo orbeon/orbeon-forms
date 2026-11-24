@@ -100,6 +100,8 @@
         <merge-cell>solun yhdistäminen</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>kontrollien yleiskatsaus</control-settings-batch>
+        <move-control-label>siirrä nimike</move-control-label>
+        <move-separate-lhha>siirrä nimike</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Yhdistä lohkomalli</label>
@@ -304,6 +306,21 @@
     <grid-details-icon>
         <label>Ruudukon yksityiskohdat</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Siirrä nimike vasempaan soluun</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Siirrä nimike kentän yläpuolelle</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Siirrä kaikki nimikkeet vasempiin soluihin</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Siirrä kaikki nimikkeet kenttien yläpuolelle</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>nimike</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Siirry ylös</label>
     </move-up-icon>
@@ -995,6 +1012,11 @@
             <label>Käytä automaattista vihjettä</label>
             <hint>Lisää vihjetekstin, joka perustuu enimmäistiedostokokoon ja tuettuihin tiedostotyyppeihin, jotka olet saattanut määrittää Validoinnit ja hälytykset -välilehdellä</hint>
         </automatic-hint>
+        <label-position>
+            <label>Nimikkeen sijainti</label>
+            <top>Kentän yläpuolella</top>
+            <separate>Erillinen solu</separate>
+        </label-position>
         <multiple-selection>
             <label>Monivalinta</label>
             <hint>Jos käytössä, käyttäjät voivat valita useita arvoja</hint>
@@ -1033,6 +1055,12 @@
             <item id="1">Rivit</item>
             <item id="2">Sarakkeet</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Kenttien nimikkeet</label>
+            <unchanged>Säilytä nykyinen</unchanged>
+            <left>Siirrä kaikki vasemmalle</left>
+            <top>Siirrä kaikki yläpuolelle</top>
+        </grid-labels-position>
         <options>
             <label>Asetukset</label>
             <item>

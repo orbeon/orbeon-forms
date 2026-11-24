@@ -230,7 +230,7 @@
     </xsl:template>
 
     <xsl:template
-        match="xf:output[exists(xf:label) and empty(@appearance)]"
+        match="xf:output[(exists(xf:label) or (exists(@id) and exists(ancestor::fr:grid[1]/fr:c/xf:label[@for = current()/@id]))) and empty(@appearance) and empty(@mediatype)]"
         mode="within-grid">
         <xsl:copy>
             <xsl:choose>
@@ -552,7 +552,7 @@
     <!-- Annotate remaining (most) controls with `fr:static-readonly`/`fr:pdf-template` if needed -->
     <xsl:template
         mode="within-grid"
-        match="*[parent::fr:c or parent::xh:td]"
+        match="*[(parent::fr:c or parent::xh:td) and empty(self::xf:label)]"
         priority="-10">
         <xsl:copy>
             <xsl:choose>

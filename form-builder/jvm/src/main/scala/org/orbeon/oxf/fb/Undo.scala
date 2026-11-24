@@ -32,6 +32,7 @@ sealed trait UndoAction extends Product {
 }
 
 object UndoAction {
+  case class CellRect(x: Int, y: Int, w: Int, h: Int)
   case class Rename                (oldName    : String,            newName : String)     extends UndoAction
   case class DeleteControl         (position   : ControlPosition,   xcv     : NodeInfo)   extends UndoAction
   case class DeleteContainer       (position   : ContainerPosition, xcv     : NodeInfo)   extends UndoAction
@@ -88,7 +89,18 @@ object UndoAction {
                                     values     : List[(String, String)],
                                     isOptional : Boolean)                                 extends UndoAction
 
-  case class ControlSettingsBatch  (actions    : List[UndoAction])                        extends UndoAction
+  case class ControlSettingsBatch  (actions        : List[UndoAction])                  extends UndoAction
+
+  case class MoveControlLabel      (controlName    : String,
+                                    toTop          : Boolean,
+                                    origControlRect: CellRect,
+                                    labelRectOpt   : Option[CellRect],
+                                    splitOccurred  : Boolean)                           extends UndoAction
+
+  case class MoveSeparateLhha      (lhhaId         : String,
+                                    gridName       : String,
+                                    fromCoord      : Coordinate1,
+                                    toCoord        : Coordinate1)                       extends UndoAction
 
   // From https://github.com/lloydmeta/enumeratum/blob/92b28ca1ceb72cebd58c1b3b1b763a6add875be3/enumeratum-core/src/main/scala/enumeratum/EnumEntry.scala#L34
   import java.util.regex.Pattern

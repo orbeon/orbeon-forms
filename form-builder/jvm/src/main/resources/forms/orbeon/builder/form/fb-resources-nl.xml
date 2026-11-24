@@ -81,6 +81,8 @@
         <merge-cell>voeg cellen samen</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>overzicht van controls</control-settings-batch>
+        <move-control-label>label verplaatsen</move-control-label>
+        <move-separate-lhha>label verplaatsen</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Voeg sectietemplate samen</label>
@@ -284,6 +286,21 @@
     <grid-details-icon>
         <label>Grid-instellingen</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Label naar linkercel verplaatsen</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Label boven besturingselement plaatsen</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Alle labels naar linkercellen verplaatsen</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Alle labels boven besturingselementen plaatsen</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>label</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Naar boven</label>
     </move-up-icon>
@@ -975,6 +992,11 @@
             <label>Gebruik automatische hint</label>
             <hint>Voegt een hint toe op basis van de maximale bestandsgrootte en ondersteunde bestandstypen die u mogelijk hebt opgegeven in het tabblad Validaties en waarschuwingen</hint>
         </automatic-hint>
+        <label-position>
+            <label>Positie van label</label>
+            <top>Boven besturingselement</top>
+            <separate>Afzonderlijke cel</separate>
+        </label-position>
         <multiple-selection>
             <label>Meervoudige selectie</label>
             <hint>Indien ingeschakeld, kunnen gebruikers meerdere waarden selecteren</hint>
@@ -1013,6 +1035,12 @@
             <item id="1">Rijen</item>
             <item id="2">Kolommen</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Labels van besturingselementen</label>
+            <unchanged>Huidige behouden</unchanged>
+            <left>Alles naar links verplaatsen</left>
+            <top>Alles erboven plaatsen</top>
+        </grid-labels-position>
         <options>
             <label>Opties</label>
             <item>

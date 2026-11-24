@@ -100,6 +100,8 @@
         <merge-cell>دمج الخلية</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>نظرة عامة على عناصر التحكم</control-settings-batch>
+        <move-control-label>نقل التسمية</move-control-label>
+        <move-separate-lhha>نقل التسمية</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>دمج قالب القسم</label>
@@ -303,6 +305,21 @@
     <grid-details-icon>
         <label>إعدادات الشبكة</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>نقل التسمية إلى الخلية اليسرى</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>نقل التسمية أعلى عنصر التحكم</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>نقل جميع التسميات إلى الخلايا اليسرى</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>نقل جميع التسميات أعلى عناصر التحكم</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>تسمية</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>نقل لأعلى</label>
     </move-up-icon>
@@ -994,6 +1011,11 @@
             <label>استخدام تلميح تلقائي</label>
             <hint>يضيف تلميحاً بناءً على الحد الأقصى لحجم الملف وأنواع الملفات المدعومة التي قد تكون حددتها في علامة التحققات والتنبيهات</hint>
         </automatic-hint>
+        <label-position>
+            <label>موضع التسمية</label>
+            <top>أعلى عنصر التحكم</top>
+            <separate>خلية منفصلة</separate>
+        </label-position>
         <multiple-selection>
             <label>تحديد متعدد</label>
             <hint>إذا تم تمكينه، يمكن للمستخدمين تحديد قيم متعددة</hint>
@@ -1032,6 +1054,12 @@
             <item id="1">صفوف</item>
             <item id="2">أعمدة</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>تسميات عناصر التحكم</label>
+            <unchanged>الإبقاء على الوضع الحالي</unchanged>
+            <left>نقل الكل إلى اليسار</left>
+            <top>نقل الكل إلى الأعلى</top>
+        </grid-labels-position>
         <options>
             <label>الخيارات</label>
             <item>

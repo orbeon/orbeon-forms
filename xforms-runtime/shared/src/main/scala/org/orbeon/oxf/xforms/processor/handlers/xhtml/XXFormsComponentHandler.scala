@@ -129,7 +129,7 @@ class XXFormsComponentHandler(
 object XXFormsComponentHandler {
 
   // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#labelable
-//  val labelableElemName = Set("button", "input", "meter", "output", "progress", "select", "textarea")
+  val LabelableElemNames: Set[String] = Set("button", "input", "meter", "output", "progress", "select", "textarea")
 
   // Below, restrict to `CoreControl`, which is our approximation of our native "labelable" controls.
   // https://github.com/orbeon/orbeon-forms/issues/5367

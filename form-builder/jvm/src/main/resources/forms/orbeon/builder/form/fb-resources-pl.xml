@@ -100,6 +100,8 @@
         <merge-cell>scalenie komórek</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>przegląd kontrolek</control-settings-batch>
+        <move-control-label>przenieś etykietę</move-control-label>
+        <move-separate-lhha>przenieś etykietę</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Scal szablon sekcji</label>
@@ -303,6 +305,21 @@
     <grid-details-icon>
         <label>Ustawienia siatki</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Przenieś etykietę do komórki po lewej</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Przenieś etykietę nad kontrolkę</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Przenieś wszystkie etykiety do komórek po lewej</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Przenieś wszystkie etykiety nad kontrolki</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>etykieta</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Przenieś w górę</label>
     </move-up-icon>
@@ -993,6 +1010,11 @@
             <label>Użyj automatycznej podpowiedzi</label>
             <hint>Dodaje podpowiedź na podstawie Maksymalnego rozmiaru plików i Obsługiwanych typów plików ustawionych w zakładce Walidacje i alerty</hint>
         </automatic-hint>
+        <label-position>
+            <label>Położenie etykiety</label>
+            <top>Nad kontrolką</top>
+            <separate>Osobna komórka</separate>
+        </label-position>
         <multiple-selection>
             <label>Wybór wielokrotny</label>
             <hint>Jeśli włączone, użytkownicy mogą wybrać wiele wartości</hint>
@@ -1031,6 +1053,12 @@
             <item id="1">Wiersze</item>
             <item id="2">Kolumny</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Etykiety kontrolek</label>
+            <unchanged>Bez zmian</unchanged>
+            <left>Przenieś wszystkie w lewo</left>
+            <top>Przenieś wszystkie nad kontrolki</top>
+        </grid-labels-position>
         <options>
             <label>Opcje</label>
             <item>

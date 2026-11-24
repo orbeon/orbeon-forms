@@ -125,11 +125,12 @@ protected def evaluateValue(collector: ErrorEventCollector)(implicit indentedLog
   }
 
 protected def requireUpdate: Boolean =
-  control.containingDocument.xpathDependencies.requireLHHAUpdate(
-    control.staticControl,
-    lhhaAnalysis.lhhaType,
-    XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
-  )
+  ! lhhaAnalysis.isLocal ||
+    control.containingDocument.xpathDependencies.requireLHHAUpdate(
+      control.staticControl,
+      lhhaAnalysis.lhhaType,
+      XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
+    )
 
 protected def notifyCompute(): Unit =
   control.containingDocument.xpathDependencies.notifyComputeLHHA()

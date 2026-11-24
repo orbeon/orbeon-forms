@@ -100,6 +100,8 @@
         <merge-cell>merge cell</merge-cell>
         <control-lhha>label</control-lhha>
         <control-settings-batch>controls overview</control-settings-batch>
+        <move-control-label>move label</move-control-label>
+        <move-separate-lhha>move label</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Merge Section Template</label>
@@ -303,6 +305,21 @@
     <grid-details-icon>
         <label>Grid Settings</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Move label to left cell</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Move label above control</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Move all control labels to left cells</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Move all control labels above controls</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>label</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Move Up</label>
     </move-up-icon>
@@ -1012,6 +1029,11 @@
             <label>Use automatic hint</label>
             <hint>Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab</hint>
         </automatic-hint>
+        <label-position>
+            <label>Label position</label>
+            <top>Above control</top>
+            <separate>Separate cell</separate>
+        </label-position>
         <multiple-selection>
             <label>Multiple selection</label>
             <hint>If enabled, users can select multiple values</hint>
@@ -1050,6 +1072,12 @@
             <item id="1">Rows</item>
             <item id="2">Columns</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Control labels</label>
+            <unchanged>Keep current</unchanged>
+            <left>Move all to left</left>
+            <top>Move all above controls</top>
+        </grid-labels-position>
         <options>
             <label>Options</label>
             <item>

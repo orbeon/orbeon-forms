@@ -100,6 +100,8 @@
         <merge-cell>sammanfoga cell</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>översikt över kontroller</control-settings-batch>
+        <move-control-label>flytta etikett</move-control-label>
+        <move-separate-lhha>flytta etikett</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Sammanfoga sektionsmall</label>
@@ -303,6 +305,21 @@
     <grid-details-icon>
         <label>Inställningar för rutnät</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Flytta etikett till vänster cell</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Flytta etikett ovanför kontrollen</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Flytta alla etiketter till vänstra celler</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Flytta alla etiketter ovanför kontrollerna</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>etikett</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Flytta uppåt</label>
     </move-up-icon>
@@ -994,6 +1011,11 @@
             <label>Använd automatisk anvisning</label>
             <hint>Lägger till en anvisning baserad på maximal filstorlek och filtyper som du angett i fliken Valideringar och aviseringar</hint>
         </automatic-hint>
+        <label-position>
+            <label>Etikettplacering</label>
+            <top>Ovanför kontrollen</top>
+            <separate>Separat cell</separate>
+        </label-position>
         <multiple-selection>
             <label>Flerval</label>
             <hint>Om aktiverat kan användare välja flera värden</hint>
@@ -1032,6 +1054,12 @@
             <item id="1">Rader</item>
             <item id="2">Kolumner</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Kontrolletiketter</label>
+            <unchanged>Behåll nuvarande</unchanged>
+            <left>Flytta alla åt vänster</left>
+            <top>Flytta alla ovanför</top>
+        </grid-labels-position>
         <options>
             <label>Val</label>
             <item>

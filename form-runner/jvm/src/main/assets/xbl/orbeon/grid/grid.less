@@ -89,7 +89,8 @@
 
                 & > .xforms-control,
                 & > .xbl-component,
-                & > .xforms-group {
+                & > .xforms-group,
+                & > .xforms-label {
 
                     margin: @densityMarginTopBottom @densityMarginLeftRight;
                     display: block;
@@ -97,6 +98,14 @@
                     &:has(.fr-fixed-density) {
                         // Reduced margin around +/- buttons
                         margin: @densityMarginTopBottom @frGridDensityMarginCompactLeftRight;
+                    }
+                }
+
+                & > .xforms-label {
+                    padding-top: var(--orbeon-cell-label-padding-top);
+
+                    &.xforms-disabled {
+                        display: none;
                     }
                 }
                 // https://github.com/orbeon/orbeon-forms/issues/4213
@@ -141,6 +150,10 @@
                             & > .fr-grid-body, & > .fr-grid-repeat-iteration > .fr-grid-body {
                                 display: block;
                             }
+                        }
+
+                        .fr-grid-td > .xforms-label {
+                            padding-top: 0;
                         }
                     }
                 }
@@ -1045,6 +1058,10 @@
                     box-sizing: border-box;
                     min-height: @fixedControlMinHeight - 2 * 2px + 2 * @frGridCellPadding + 2px !important; // not sure why it doesn't kick in otherwise
                     line-height: @fixedControlMinHeight - 2 * 2px;
+                }
+
+                .fr-grid-td > .xforms-label {
+                    padding-top: @frGridCellPadding + 1px;
                 }
             }
 

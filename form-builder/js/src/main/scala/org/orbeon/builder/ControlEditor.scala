@@ -21,6 +21,7 @@ import org.scalajs.dom.html
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.XFormsUI
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -36,7 +37,7 @@ object ControlEditor {
     "fb-y-split" -> Direction.Up    -> ((cellId: String) => FormBuilderRpcClient.api.splitY    (cellId))
   )
 
-  private val ControlActionNames             = List("delete", "edit-details", "edit-items")
+  private val ControlActionNames             = List("delete", "edit-details", "edit-items", "label-left", "label-top")
   private var currentCellOpt : Option[Block] = None
 
   private val controlEditorLeft : () => html.Element = memoizeIfFound(".fb-control-editor-left")
@@ -44,6 +45,68 @@ object ControlEditor {
   private val controlEditorTop  : () => html.Element = memoizeIfFound(".fb-control-editor-top")
 
   private def controlEditors: List[html.Element] = controlEditorLeft() :: controlEditorRight() :: controlEditorTop() :: Nil
+
+  def isSeparateLabelElem(elem: html.Element): Boolean =
+    elem.hasClass("xforms-label") &&
+      ! elem.hasClass("xforms-control") &&
+      ! elem.hasClass("xbl-component")  &&
+      elem.hasAttribute("id")           &&
+      ControlOps.controlNameFromSeparateLabelIdOpt(elem.id).isDefined
+
+  def isCellEmptyOfControlOrLabel(cellEl: html.Element): Boolean =
+    cellEl.childrenT.forall(elem =>
+      controlEditors.contains(elem)          ||
+      elem.hasClass("gu-transit")            ||
+      elem.hasClass("gu-mirror")             ||
+      elem.hasClass("fb-control-cell-badges")
+    )
+
+  def gridHasSeparateLabelFor(gridEl: html.Element, controlName: String): Boolean =
+    gridEl
+      .querySelectorAllT(".fr-grid-td > .xforms-label")
+      .exists(el => isSeparateLabelElem(el) && ControlOps.controlNameFromSeparateLabelIdOpt(el.id).contains(controlName))
+
+  def canCellMoveLabelLeft(cellEl: html.Element): Boolean = {
+    val controlElemOpt =
+      cellEl.childrenT.find(elem =>
+        ! controlEditors.contains(elem)          &&
+        ! elem.hasClass("gu-transit")            &&
+        ! elem.hasClass("fb-control-cell-badges") &&
+        elem.hasAttribute("id")                  &&
+        ControlOps.controlNameFromIdOpt(elem.id).isDefined
+      )
+
+    controlElemOpt.exists { controlEl =>
+      val controlName = ControlOps.controlNameFromIdOpt(controlEl.id).get
+      canControlMoveLabelLeft(cellEl, controlEl, controlName)
+    }
+  }
+
+  private def canControlMoveLabelLeft(cellEl: html.Element, controlEl: html.Element, controlName: String): Boolean =
+    cellEl.closestOpt(".fr-grid").exists { gridEl =>
+      ! gridEl.hasClass("fr-repeat-single-row")                         &&
+      ! isSeparateLabelElem(controlEl)                                  &&
+      ! gridHasSeparateLabelFor(gridEl, controlName)                    &&
+      ! controlEl.hasClass("xforms-trigger")                            &&
+      ! controlEl.hasClass("xbl-fr-hyperlink")                          &&
+      controlEl.querySelectorOpt(".xforms-label, label.checkbox").isDefined &&
+      (
+        HtmlElementCellOps.w(cellEl).getOrElse(1) >= 2 || {
+          cellEl.closestOpt(".fr-grid-body").exists { gridBodyEl =>
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridBodyEl, simplify = false, transpose = false)
+            Cell.findOriginCell(gridModel, cellEl).exists { originCell =>
+              val neighbors = Cell.nonOverflowingNeighbors(gridModel, originCell, Direction.Left)
+              neighbors.size == 1 && {
+                val leftCell = neighbors.head
+                leftCell.y == originCell.y &&
+                leftCell.h == originCell.h &&
+                leftCell.u.exists(isCellEmptyOfControlOrLabel)
+              }
+            }
+          }
+        }
+      )
+    }
 
   private var masked: Boolean                = false
 
@@ -71,6 +134,10 @@ object ControlEditor {
     currentCellOpt.foreach(showEditors)
   }
 
+  def refreshEditors(): Unit =
+    if (! masked)
+      currentCellOpt.foreach(showEditors)
+
   private def showEditors(cell: Block): Unit = {
 
     def showAndPositionLeftOrRightEditor(
@@ -95,46 +162,89 @@ object ControlEditor {
       ))
     }
 
-    val controlElemWithNames: collection.Seq[(html.Element, String)] =
+    val controlElemWithNames: collection.Seq[(html.Element, String, Boolean)] =
       for {
         elem <- cell.el.childrenT
         if ! controlEditors.contains(elem)
         if ! elem.hasClass("gu-transit")
+        if ! elem.hasClass("fb-control-cell-badges")
         if elem.hasAttribute("id")
-        name <- ControlOps.controlNameFromIdOpt(elem.id)
+        isSepLabel = isSeparateLabelElem(elem)
+        name <-
+          if (isSepLabel)
+            ControlOps.controlNameFromSeparateLabelIdOpt(elem.id)
+          else
+            ControlOps.controlNameFromIdOpt(elem.id)
       } yield
-        elem -> name
+        (elem, name, isSepLabel)
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
     val isViewMode                  = FormRunnerUtils.isViewMode(cell.el)
 
-    // Control/right editor is only show when the cell isn't empty
-    firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>
+    // Control/right editor is only shown when the cell isn't empty
+    firstControlElemWithNameOpt.foreach { case (controlEl, controlName, isSepLabel) =>
 
-      // Right editor
+      // Right editor: must be appended inside `controlEl` so Dragula sees `.fb-control-handle` as a descendant of `controlEl`
       controlEl.append(controlEditorRight())
-      showAndPositionLeftOrRightEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth)
+
+      val gridElOpt        = cell.el.closestOpt(".fr-grid")
+      val hasSeparateLabel = ! isSepLabel && gridElOpt.exists(gridHasSeparateLabelFor(_, controlName))
+      val canMoveLeft      = ! isSepLabel && ! isViewMode && canControlMoveLabelLeft(cell.el, controlEl, controlName)
+      val canMoveTop       = ! isViewMode && (isSepLabel || hasSeparateLabel)
 
       // Show/hide itemset icon
       controlEditorRight()
         .querySelectorOpt(".fb-control-edit-items")
-        .foreach(_.toggleClass("xforms-disabled", ! controlEl.hasClass("fb-itemset")))
+        .foreach(_.toggleClass("xforms-disabled", isSepLabel || ! controlEl.hasClass("fb-itemset")))
 
-      if (isViewMode)
-        controlEditorRight()
-          .querySelectorOpt(".fb-control-delete, .fb-control-handle")
-          .foreach(_.hide())
+      // Show/hide label placement icons
+      controlEditorRight()
+        .querySelectorOpt(".fb-control-label-left")
+        .foreach(_.toggleClass("xforms-disabled", ! canMoveLeft))
 
-      // Top editor
-      controlEl.append(controlEditorTop())
+      controlEditorRight()
+        .querySelectorOpt(".fb-control-label-top")
+        .foreach(_.toggleClass("xforms-disabled", ! canMoveTop))
+
+      // Hide destructive delete icon on a separate label cell (`.fb-control-label-top` moves it back to top)
+      controlEditorRight()
+        .querySelectorOpt(".fb-control-delete")
+        .foreach(el => if (isViewMode || isSepLabel) el.hide() else el.show())
+
+      controlEditorRight()
+        .querySelectorOpt(".fb-control-handle")
+        .foreach(el => if (isViewMode) el.hide() else el.show())
+
+      showAndPositionLeftOrRightEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth)
+
+      // Top editor: append to `cell.el` when `isSepLabel` so badge text never pollutes `<label>`'s `innerText`/`innerHTML`
+      (if (isSepLabel) cell.el else controlEl).append(controlEditorTop())
+      controlEditorTop().toggleClass("fb-is-separate-label", isSepLabel)
       showAndPositionTopEditor(controlEditorTop(), 0)
 
-      controlEditorTop().childrenT.head.textContent = controlName
+      val badgeText =
+        if (isSepLabel) {
+          val suffix =
+            controlEditorTop()
+              .querySelectorOpt(".fb-separate-label-suffix")
+              .flatMap(XFormsUI.getCurrentValue(_).toOption)
+              .filter(_.nonEmpty)
+              .getOrElse("label")
+          s"$controlName ($suffix)"
+        } else
+          controlName
+
+      controlEditorTop().childrenT.head.textContent = badgeText
     }
 
     // Cell/left editor
     if (! isViewMode) {
-      firstControlElemWithNameOpt.map(e => e._1).getOrElse(cell.el).append(controlEditorLeft())
+      val leftHost =
+        firstControlElemWithNameOpt match {
+          case Some((el, _, false)) => el
+          case _                    => cell.el
+        }
+      leftHost.append(controlEditorLeft())
       showAndPositionLeftOrRightEditor(controlEditorLeft(), 0)
 
       // Enable/disable split/merge icons
@@ -155,18 +265,37 @@ object ControlEditor {
     controlEditorTop().hide()
   }
 
+  def detachRightEditorIfInside(elem: html.Element): Unit =
+    if (elem.contains(controlEditorRight())) {
+      controlEditorRight().hide()
+      elem.parentElementOpt.foreach(_.append(controlEditorRight()))
+    }
+
   // Control actions
   ControlActionNames.foreach { actionName =>
     val actionEl = controlEditorRight().querySelectorOpt(s".fb-control-$actionName")
-    actionEl.foreach(_.addEventListener("click", (_: dom.Event) => {
+    actionEl.foreach(_.addEventListener("click", (event: dom.Event) => {
+      event.preventDefault()
+      event.stopPropagation()
       currentCellOpt.foreach { currentCell =>
+        val targetElemOpt =
+          currentCell.el.childrenT.find(elem =>
+            ! controlEditors.contains(elem)          &&
+            ! elem.hasClass("gu-transit")            &&
+            ! elem.hasClass("fb-control-cell-badges") &&
+            elem.hasAttribute("id")
+          )
 
-        val controlId = currentCell.el.childrenT.head.id
+        targetElemOpt.foreach { targetElem =>
+          val controlId = targetElem.id
 
-        actionName match {
-          case "delete"       => FormBuilderRpcClient.api.controlDelete     (controlId = controlId)
-          case "edit-details" => FormBuilderRpcClient.api.controlEditDetails(controlId = controlId)
-          case "edit-items"   => FormBuilderRpcClient.api.controlEditItems  (controlId = controlId)
+          actionName match {
+            case "delete"       => FormBuilderRpcClient.api.controlDelete       (controlId = controlId)
+            case "edit-details" => FormBuilderRpcClient.api.controlEditDetails  (controlId = controlId)
+            case "edit-items"   => FormBuilderRpcClient.api.controlEditItems    (controlId = controlId)
+            case "label-left"   => FormBuilderRpcClient.api.controlMoveLabelLeft(controlId = controlId)
+            case "label-top"    => FormBuilderRpcClient.api.controlMoveLabelTop (controlId = controlId)
+          }
         }
       }
     }))

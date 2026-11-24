@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import enumeratum.EnumEntry.Lowercase
+import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.datatypes.Coordinate1
@@ -492,13 +492,14 @@ object ToolboxOps {
   </xcv>
   */
 
-  sealed trait XcvEntry extends EnumEntry with Lowercase
+  sealed trait XcvEntry extends EnumEntry with Hyphencase
   object XcvEntry extends Enum[XcvEntry] {
     val values = findValues
-    case object Control   extends XcvEntry
-    case object Holder    extends XcvEntry
-    case object Resources extends XcvEntry
-    case object Bind      extends XcvEntry
+    case object Control       extends XcvEntry
+    case object Holder        extends XcvEntry
+    case object Resources     extends XcvEntry
+    case object Bind          extends XcvEntry
+    case object SeparateLabel extends XcvEntry
   }
 
   def controlOrContainerElemToXcv(
@@ -535,18 +536,43 @@ object ToolboxOps {
                 FormBuilder.iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resourcesRootElem)
             )
 
-        val xcvContent =
-          XcvEntry.values map {
-            case e @ XcvEntry.Control   => e -> List(control)
-            case e @ XcvEntry.Holder    => e -> holders.toList.flatten
-            case e @ XcvEntry.Resources => e -> resourcesWithLang
-            case e @ XcvEntry.Bind      => e -> bindAsList
+        val separateLabelElemOpt =
+          if (! FormRunner.IsContainer(control))
+            FormRunner.findSeparateLabelForControl(control).map { sepLabel =>
+              val labelCell    = sepLabel.parentUnsafe
+              val lx           = NodeInfoCellOps.x(labelCell).getOrElse(1)
+              val ly           = NodeInfoCellOps.y(labelCell).getOrElse(1)
+              val lw           = NodeInfoCellOps.w(labelCell).getOrElse(1)
+              val lh           = NodeInfoCellOps.h(labelCell).getOrElse(1)
+              val adjacentLeft = FormBuilder.isSeparateLabelAdjacentLeft(control)
+              elementInfo(
+                XcvEntry.SeparateLabel.entryName,
+                List(
+                  attributeInfo("x",             lx.toString),
+                  attributeInfo("y",             ly.toString),
+                  attributeInfo("w",             lw.toString),
+                  attributeInfo("h",             lh.toString),
+                  attributeInfo("adjacent-left", adjacentLeft.toString),
+                  sepLabel
+                )
+              )
+            }
+          else
+            None
+
+        val xcvEntries =
+          XcvEntry.values.flatMap {
+            case e @ XcvEntry.Control       => Some(elementInfo(e.entryName, List(control)))
+            case e @ XcvEntry.Holder        => Some(elementInfo(e.entryName, holders.toList.flatten))
+            case e @ XcvEntry.Resources     => Some(elementInfo(e.entryName, resourcesWithLang))
+            case e @ XcvEntry.Bind          => Some(elementInfo(e.entryName, bindAsList))
+            case XcvEntry.SeparateLabel     => separateLabelElemOpt
           }
 
         val result =
           elementInfo(
             "xcv",
-            xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) }
+            xcvEntries
           )
 
         // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
@@ -558,10 +584,15 @@ object ToolboxOps {
     }
   }
 
-  def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
-    val name  = getControlName(cellElem / * head)
-    findControlByName(name) flatMap controlOrContainerElemToXcv
-  }
+  def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    for {
+      child <- (cellElem / *).headOption
+      id    <- child.idOpt
+      name  <- ControlOps.controlNameFromControlOrLabelIdOpt(id)
+      ctrl  <- findControlByName(name)
+      xcv   <- controlOrContainerElemToXcv(ctrl)
+    } yield
+      xcv
 
   // Copy control to the clipboard
   //@XPathFunction
@@ -579,8 +610,19 @@ object ToolboxOps {
 
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
 
-    copyToClipboard(cellElem)
-    deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUserUndoAction
+    val targetControlCellOpt =
+      for {
+        child <- (cellElem / *).headOption
+        id    <- child.idOpt
+        name  <- ControlOps.controlNameFromControlOrLabelIdOpt(id)
+        ctrl  <- findControlByName(name)
+      } yield
+        ctrl.parentUnsafe
+
+    targetControlCellOpt.foreach { targetControlCell =>
+      copyToClipboard(targetControlCell)
+      deleteControlWithinCell(targetControlCell, updateTemplates = true) foreach Undo.pushUserUndoAction
+    }
   }
 
   private val FormBuilderClipboardSessionAttributeName = "orbeon-form-builder-clipboard"
@@ -621,29 +663,90 @@ object ToolboxOps {
   )(implicit
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
-  ): Option[UndoAction] = {
-    val (xcvElemOpt, undoDeleteControlOpt) = ToolboxOps.dndControlBefore(sourceCellElem, copy)
-    dndControlAfter(xcvElemOpt, targetCellElem, undoDeleteControlOpt)
-  }
+  ): Option[UndoAction] =
+    (sourceCellElem / *).headOption match {
+      case Some(separateElem) if FormRunner.isSeparateLhhaElem(separateElem) =>
+        val sourceGrid = FormBuilder.getContainingGrid(sourceCellElem)
+        val targetGrid = FormBuilder.getContainingGrid(targetCellElem)
+        if (! copy && sourceGrid == targetGrid && ! NodeInfoCellOps.hasChildElement(targetCellElem)) {
+          val sx       = NodeInfoCellOps.x(sourceCellElem).get
+          val sy       = NodeInfoCellOps.y(sourceCellElem).get
+          val tx       = NodeInfoCellOps.x(targetCellElem).get
+          val ty       = NodeInfoCellOps.y(targetCellElem).get
+          val inserted = insert(into = targetCellElem, origin = separateElem).head
+          delete(separateElem)
+          selectCell(targetCellElem)
+          Some(MoveSeparateLhha(inserted.id, getControlName(targetGrid), Coordinate1(sx, sy), Coordinate1(tx, ty)))
+        } else
+          None
+
+      case Some(controlElem) if ! copy && FormBuilder.hasSeparateLabel(controlElem) =>
+        val sourceGrid = FormBuilder.getContainingGrid(sourceCellElem)
+        val targetGrid = FormBuilder.getContainingGrid(targetCellElem)
+        val targetIsSingleRowRepeat =
+          FormRunner.isRepeat(targetGrid) &&
+            Cell.analyze12ColumnGridAndFillHoles(targetGrid, simplify = false, transpose = false).height <= 1
+        val sameRepeatScope =
+          findAncestorRepeatNames(sourceCellElem) == findAncestorRepeatNames(targetCellElem)
+
+        if (sourceGrid == targetGrid && ! NodeInfoCellOps.hasChildElement(targetCellElem)) {
+          val sx       = NodeInfoCellOps.x(sourceCellElem).get
+          val sy       = NodeInfoCellOps.y(sourceCellElem).get
+          val tx       = NodeInfoCellOps.x(targetCellElem).get
+          val ty       = NodeInfoCellOps.y(targetCellElem).get
+          val inserted = insert(into = targetCellElem, origin = controlElem).head
+          delete(controlElem)
+          reorderBindsForGrid(targetGrid)
+          selectCell(targetCellElem)
+          Some(MoveSeparateLhha(inserted.id, getControlName(targetGrid), Coordinate1(sx, sy), Coordinate1(tx, ty)))
+        } else if (sameRepeatScope && ! targetIsSingleRowRepeat) {
+          val (xcvElemOpt, undoDeleteControlOpt) = ToolboxOps.dndControlBefore(sourceCellElem, copy = false, keepSeparateLabelInPlace = true)
+          dndControlAfter(xcvElemOpt, targetCellElem, undoDeleteControlOpt)
+        } else {
+          val reattachUndoOpt = FormBuilder.moveControlLabelToTop(controlElem)
+          val (xcvElemOpt, undoDeleteControlOpt) = ToolboxOps.dndControlBefore(sourceCellElem, copy = false)
+          val moveUndoOpt = dndControlAfter(xcvElemOpt, targetCellElem, undoDeleteControlOpt)
+          val actions = reattachUndoOpt.toList ++ moveUndoOpt.toList
+          actions.nonEmpty option ControlSettingsBatch(actions)
+        }
+
+      case _ =>
+        val (xcvElemOpt, undoDeleteControlOpt) = ToolboxOps.dndControlBefore(sourceCellElem, copy)
+        dndControlAfter(xcvElemOpt, targetCellElem, undoDeleteControlOpt)
+    }
 
   def dndControlBefore(
-    sourceCellElem  : NodeInfo,
-    copy            : Boolean
+    sourceCellElem          : NodeInfo,
+    copy                    : Boolean,
+    keepSeparateLabelInPlace: Boolean = false
   )(implicit
-    ctx             : FormBuilderDocContext,
+    ctx                     : FormBuilderDocContext,
   ): (Option[NodeInfo], Option[UndoAction]) = {
 
     val xcvElemOpt = controlElementsInCellToXcv(sourceCellElem)
 
-    val undoDeleteControlOpt =
-      withDebugGridOperation("dnd delete") {
-        if (! copy)
-          deleteControlWithinCell(sourceCellElem, updateTemplates = true)
-        else
-          None
-      }
-
-    (xcvElemOpt, undoDeleteControlOpt)
+    if (! copy && keepSeparateLabelInPlace) {
+      xcvElemOpt.foreach(xcv => delete(xcv / XcvEntry.SeparateLabel.entryName))
+      val undoDeleteControlOpt =
+        withDebugGridOperation("dnd delete keep separate label") {
+          sourceCellElem.firstChildOpt(*).flatMap { controlElem =>
+            val pos = FormBuilder.controlPosition(controlElem)
+            FormBuilder.controlElementsToDelete(controlElem).foreach(delete(_))
+            FormBuilder.updateTemplatesCheckContainers(findAncestorRepeatNames(sourceCellElem).to(Set))(FormBuilderDocContext())
+            xcvElemOpt.map(DeleteControl(pos, _))
+          }
+        }
+      (xcvElemOpt, undoDeleteControlOpt)
+    } else {
+      val undoDeleteControlOpt =
+        withDebugGridOperation("dnd delete") {
+          if (! copy)
+            deleteControlWithinCell(sourceCellElem, updateTemplates = true)
+          else
+            None
+        }
+      (xcvElemOpt, undoDeleteControlOpt)
+    }
   }
 
   def dndControlAfter(
@@ -872,11 +975,12 @@ object ToolboxOps {
         }
 
         val xcvContent =
-          XcvEntry.values map {
-            case e @ XcvEntry.Control   => e -> List(newSectionControlElem)
-            case e @ XcvEntry.Holder    => e -> List(newDataHolderElem)
-            case e @ XcvEntry.Resources => e -> resourcesWithLangElems
-            case e @ XcvEntry.Bind      => e -> List(newBindElem)
+          XcvEntry.values flatMap {
+            case e @ XcvEntry.Control       => Some(e -> List(newSectionControlElem))
+            case e @ XcvEntry.Holder        => Some(e -> List(newDataHolderElem))
+            case e @ XcvEntry.Resources     => Some(e -> resourcesWithLangElems)
+            case e @ XcvEntry.Bind          => Some(e -> List(newBindElem))
+            case XcvEntry.SeparateLabel     => None
           }
 
         new DocumentWrapper(
@@ -1258,7 +1362,9 @@ object ToolboxOps {
 
     insertCellElemOpt map { insertCellElem =>
 
-      val controlElem = xcvElem / XcvEntry.Control.entryName / * head
+      val controlElem          = xcvElem / XcvEntry.Control.entryName / * head
+      val separateLabelWrapOpt = (xcvElem / XcvEntry.SeparateLabel.entryName).headOption
+      val separateLabelElemOpt = separateLabelWrapOpt.flatMap(w => (w / *).headOption)
 
       def dataHolders = xcvElem / XcvEntry.Holder.entryName / *
       def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
@@ -1279,6 +1385,7 @@ object ToolboxOps {
           // Rename everything
           import ctx.bindingIndex
           renameControlByElement(controlElem, newName)
+          separateLabelElemOpt.foreach(FormBuilder.renameSeparateLabelByElement(_, newName))
 
           dataHolders ++ resources foreach
             (rename(_, newName))
@@ -1293,6 +1400,46 @@ object ToolboxOps {
 
       // Insert control and holders
       val newControlElem = insert(into = insertCellElem, origin = controlElem).head
+
+      separateLabelWrapOpt.zip(separateLabelElemOpt).foreach { case (sepWrap, sepLabelElem) =>
+        val localLabel = FormBuilder.buildLocalLabelFromSeparate(sepLabelElem)
+        FormBuilder.insertLocalLabelIntoControl(newControlElem, localLabel)
+
+        insertPosition match {
+          case Some(_) =>
+            // Restoring via Undo / ControlSettings: restore exact separate cell coordinates when possible
+            val lx           = sepWrap.attValueOpt("x").flatMap(_.toIntOption).getOrElse(1)
+            val ly           = sepWrap.attValueOpt("y").flatMap(_.toIntOption).getOrElse(1)
+            val lw           = sepWrap.attValueOpt("w").flatMap(_.toIntOption).getOrElse(1)
+            val adjacentLeft = sepWrap.attValueOpt("adjacent-left").contains("true")
+            val gridElem     = FormBuilder.getContainingGrid(insertCellElem)
+            val cellW        = NodeInfoCellOps.w(insertCellElem).getOrElse(1)
+
+            if (adjacentLeft && cellW > lw) {
+              FormBuilder.moveControlLabelToLeft(newControlElem, Some(lw))
+            } else {
+              val exactEmptyCellOpt =
+                (gridElem / CellTest).find { c =>
+                  NodeInfoCellOps.x(c).contains(lx) &&
+                  NodeInfoCellOps.y(c).contains(ly) &&
+                  ! NodeInfoCellOps.hasChildElement(c)
+                }
+              exactEmptyCellOpt match {
+                case Some(targetLabelCell) if FormBuilder.canHaveSeparateLabel(newControlElem) =>
+                  (newControlElem / (Namespaces.XF -> "label")).headOption.foreach { attachedLocal =>
+                    val detached = FormBuilder.buildDetachedSeparateLabel(name, attachedLocal)
+                    delete(attachedLocal)
+                    insert(into = targetLabelCell, origin = detached)
+                  }
+                case _ =>
+                  FormBuilder.moveControlLabelToLeft(newControlElem, None)
+              }
+            }
+          case None =>
+            // Normal Paste / Copy: place in empty left cell or split proportionally, else keep on top
+            FormBuilder.moveControlLabelToLeft(newControlElem, None)
+        }
+      }
 
       insertHolders(
         controlElement       = newControlElem,

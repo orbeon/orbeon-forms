@@ -166,7 +166,8 @@
 
             <xf:var name="current-cell"      value="fbf:getCurrentlySelectedCell()"/>
             <xf:var name="in-section-tmpl"   value="exists($current-cell/ancestor::xbl:binding)"/>
-            <xf:var name="current-control"   value="if ($in-section-tmpl) then () else $current-cell/*[1]"/>
+            <xf:var name="cell-elem"         value="if ($in-section-tmpl) then () else $current-cell/*[1]"/>
+            <xf:var name="current-control"   value="if (exists($cell-elem/self::xf:label[@for])) then id($cell-elem/@for, $current-cell/root()) else $cell-elem"/>
             <xf:var name="has-control"       value="exists($current-control/@id)"/>
             <xf:var name="control-id"        value="if ($has-control) then $current-control/@id/string() else ''"/>
             <xf:var name="control-name"      value="if ($has-control) then frf:controlNameFromId($control-id) else ''"/>
@@ -720,8 +721,9 @@
                                 xxf:modifiers="shift"
                                 if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell()/*/@id)">
 
+                                <xf:var name="selected-elem" value="fbf:getCurrentlySelectedCell()/*[1]"/>
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-control-settings" >
-                                    <xf:property name="control-id" value="fbf:getCurrentlySelectedCell()/*/@id/string()"/>
+                                    <xf:property name="control-id" value="if (exists($selected-elem/self::xf:label[@for])) then $selected-elem/@for/string() else $selected-elem/@id/string()"/>
                                 </xf:dispatch>
                             </xf:action>
 
@@ -881,6 +883,7 @@
 
                             <xh:div class="fb-control-editor-top">
                                 <xh:div/>
+                                <xf:output class="fb-separate-label-suffix xforms-hidden" ref="$fb-resources/separate-label-suffix/label"/>
                             </xh:div>
 
                             <xh:div class="fb-control-editor-left">
@@ -922,6 +925,14 @@
                                         class="fb-control-edit-items fa fa-th-list fa-fw"
                                         role="button"
                                         title="{$fb-resources/edit-items/label} (⌥↵)"/>
+                                    <xh:i
+                                        class="fb-control-label-left fa fa-outdent fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-label-left-icon/label}"/>
+                                    <xh:i
+                                        class="fb-control-label-top fa fa-level-up fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/move-label-top-icon/label}"/>
 
                                     <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
                                     <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">-->
@@ -980,6 +991,14 @@
                                         class="fb-container-merge fa fa-share-alt fa-fw"
                                         role="button"
                                         title="{$fb-resources/merge-section/label}"/>
+                                    <xh:i
+                                        class="fb-grid-labels-left fa fa-outdent fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/grid-labels-left-icon/label}"/>
+                                    <xh:i
+                                        class="fb-grid-labels-top fa fa-level-up fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/grid-labels-top-icon/label}"/>
                                 </xh:div>
                             </xh:div>
 

@@ -184,7 +184,7 @@ trait FormDefinition {
         control            = control.localname,
         summarySettings    = summarySettings(control),
         staticallyRequired = isBindRequired(bind),
-        htmlLabel          = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
+        htmlLabel          = FormRunner.hasHTMLMediatype(FormRunner.findControlOrSeparateLabelElem(control)),
         resources          = resourcesWithDynamicItems.toList,
         controlElem        = includeControlElem option control
       )

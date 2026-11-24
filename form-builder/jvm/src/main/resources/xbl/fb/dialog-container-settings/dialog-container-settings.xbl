@@ -52,6 +52,9 @@
                     <xf:setvalue ref="$i/grid-height"                value="array:size(cell:analyze12ColumnGridAndFillHoles($control, false(), false()))"/>
                     <xf:setvalue ref="$i/can-migrate-grid-columns"   value="if ($control/@columns = 24) then fbf:canMigrateGridColumns($control, 24, 12) else fbf:canMigrateGridColumns($control, 12, 24)"/>
                     <xf:setvalue ref="$i/grid-tab-order"             value="if ($control/@tab-order = 'columns') then 'columns' else if ($control/@tab-order = 'rows') then 'rows' else 'default'"/>
+                    <xf:setvalue ref="$i/grid-labels-action"         value="''"/>
+                    <xf:setvalue ref="$i/can-grid-labels-left"       value="fbf:canGridMoveLabelsLeft($control)"/>
+                    <xf:setvalue ref="$i/can-grid-labels-top"        value="fbf:canGridMoveLabelsTop($control)"/>
                 </xf:action>
 
                 <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(fbf:findControlByNameOrEmpty($i/control-name))"/>
@@ -253,6 +256,16 @@
                         <xf:var name="grid-tab-order" value="$i/grid-tab-order"/>
                         <xf:delete if="$grid-tab-order  = 'default'"     ref="$control/@tab-order"/>
                         <xf:insert if="not($grid-tab-order = 'default')" context="$control" origin="xf:attribute('tab-order', $i/grid-tab-order)"/>
+
+                        <!-- Batch control label placement (not applicable when converting a 1-row grid to repeated, which moves labels above controls automatically) -->
+                        <xf:action if="not($i/is-repeat = true() and xs:integer(($i/grid-height[. castable as xs:integer], 1)[1]) le 1)">
+                            <xf:action if="$i/grid-labels-action = 'left'" type="xpath">
+                                fbf:moveGridLabelsToLeft($control)
+                            </xf:action>
+                            <xf:action if="$i/grid-labels-action = 'top'" type="xpath">
+                                fbf:moveGridLabelsToTop($control)
+                            </xf:action>
+                        </xf:action>
                     </xf:action>
 
                     <xf:delete if="$i/appearance = 'default'"      ref="$control/@appearance"/>
@@ -420,6 +433,10 @@
 
                         <prev-control-id/>
                         <next-control-id/>
+
+                        <grid-labels-action/>
+                        <can-grid-labels-left/>
+                        <can-grid-labels-top/>
                     </_>
                 </xf:instance>
 
@@ -695,6 +712,28 @@
                                             <xf:itemset ref="$resources/dialog-container-settings/grid-tab-order/item">
                                                 <xf:label ref="."/>
                                                 <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'rows' else 'columns'"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <xf:select1
+                                            appearance="full xxf:horizontal"
+                                            ref="
+                                                grid-labels-action[
+                                                    $i/container-type = 'grid' and
+                                                    not($i/is-repeat = true() and xs:integer(($i/grid-height[. castable as xs:integer], 1)[1]) le 1) and
+                                                    ($i/can-grid-labels-left = 'true' or $i/can-grid-labels-top = 'true')
+                                                ]">
+                                            <xf:label ref="$resources/dialog-container-settings/grid-labels-position/label"/>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-container-settings/grid-labels-position/unchanged"/>
+                                                <xf:value/>
+                                            </xf:item>
+                                            <xf:itemset ref="$resources/dialog-container-settings/grid-labels-position/left[$i/can-grid-labels-left = 'true']">
+                                                <xf:label ref="."/>
+                                                <xf:value>left</xf:value>
+                                            </xf:itemset>
+                                            <xf:itemset ref="$resources/dialog-container-settings/grid-labels-position/top[$i/can-grid-labels-top = 'true']">
+                                                <xf:label ref="."/>
+                                                <xf:value>top</xf:value>
                                             </xf:itemset>
                                         </xf:select1>
                                     </xh:td>

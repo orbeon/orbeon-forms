@@ -146,6 +146,33 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def hasName(control: NodeInfo): Boolean = getControlNameOpt(control).isDefined
 
+  def isSeparateLhhaElem(elem: NodeInfo): Boolean =
+    elem.namespaceURI == XF && elem.localname == "label" && elem.hasAtt("for")
+
+  def findSeparateLabelForControl(control: NodeInfo): Option[NodeInfo] =
+    for {
+      controlId     <- control.idOpt
+      controlName   = ControlOps.controlNameFromIdOpt(controlId)
+      enclosingGrid <-
+        (control ancestor FRGridTest).headOption
+          .orElse(Option(control.root).flatMap(r => (r / *).headOption))
+          .orElse((control ancestor *).lastOption)
+      labelElem     <-
+        controlName
+          .flatMap(name => findTryIndex(ControlOps.labelId(name), enclosingGrid, includeSelf = false))
+          .filter(l => isSeparateLhhaElem(l) && l.attValueOpt("for").contains(controlId))
+          .orElse((enclosingGrid descendant (XF -> "label")).find(_.attValueOpt("for").contains(controlId)))
+    } yield
+      labelElem
+
+  def findControlOrSeparateLabelElem(control: NodeInfo): collection.Seq[NodeInfo] = {
+    val localLabels = control / (XF -> "label")
+    if (localLabels.nonEmpty)
+      localLabels
+    else
+      findSeparateLabelForControl(control).toList
+  }
+
   // Return a bind ref or nodeset attribute value if present
   def bindRefOpt(bind: NodeInfo): Option[String] =
     bind attValueOpt "ref"

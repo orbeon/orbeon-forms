@@ -68,6 +68,8 @@ object SectionGridEditor {
       case object ContainerCopy        extends ContainerEditor
       case object ContainerCut         extends ContainerEditor
       case object ContainerMerge       extends ContainerEditor
+      case object GridLabelsLeft       extends ContainerEditor
+      case object GridLabelsTop        extends ContainerEditor
     }
 
     import ContainerEditor.*
@@ -149,6 +151,14 @@ object SectionGridEditor {
           val container = sectionGridBody.el.childrenT(".fr-grid").head
           showMoveDeleteIcons(container)
           container.classList.add("fb-hover")
+          if (! isViewMode && ! container.hasClass("fr-repeat-single-row")) {
+            val canLabelsTop  = container.querySelectorAllT(".fr-grid-td > .xforms-label").exists(ControlEditor.isSeparateLabelElem)
+            val canLabelsLeft = container.querySelectorAllT(".fr-grid-td").exists(ControlEditor.canCellMoveLabelLeft)
+            if (canLabelsLeft)
+              allIconsWith(GridLabelsLeft.className).foreach(_.show())
+            if (canLabelsTop)
+              allIconsWith(GridLabelsTop.className).foreach(_.show())
+          }
           if (canContainerMove(container)) {
             val handle = gridMoveHandleContainer
             handle.dataset("orbeonContainerId") = sectionGridBody.el.id
@@ -207,6 +217,8 @@ object SectionGridEditor {
             case ContainerCopy        => client.containerCopy       (sectionGridId)
             case ContainerCut         => client.containerCut        (sectionGridId)
             case ContainerMerge       => client.containerMerge      (sectionGridId)
+            case GridLabelsLeft       => client.gridMoveLabelsLeft  (sectionGridId)
+            case GridLabelsTop        => client.gridMoveLabelsTop   (sectionGridId)
           }
         }
       }))

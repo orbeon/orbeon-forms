@@ -100,6 +100,8 @@
         <merge-cell>セルを結合</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>コントロール一覧</control-settings-batch>
+        <move-control-label>ラベルの移動</move-control-label>
+        <move-separate-lhha>ラベルの移動</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>セクションテンプレートを統合</label>
@@ -303,6 +305,21 @@
     <grid-details-icon>
         <label>グリッド設定</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>ラベルを左のセルに移動</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>ラベルをコントロールの上に移動</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>すべてのラベルを左のセルに移動</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>すべてのラベルをコントロールの上に移動</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>ラベル</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>上に移動</label>
     </move-up-icon>
@@ -991,6 +1008,11 @@
             <label>自動ヒントを使う</label>
             <hint>「検証とアラート」で指定した最大ファイルサイズと対応タイプからヒントを自動追加</hint>
         </automatic-hint>
+        <label-position>
+            <label>ラベルの位置</label>
+            <top>コントロールの上</top>
+            <separate>別のセル</separate>
+        </label-position>
         <multiple-selection>
             <label>複数選択</label>
             <hint>有効にすると、ユーザーは複数の値を選択できます</hint>
@@ -1029,6 +1051,12 @@
             <item id="1">行</item>
             <item id="2">列</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>コントロールのラベル</label>
+            <unchanged>変更しない</unchanged>
+            <left>すべて左へ移動</left>
+            <top>すべて上へ移動</top>
+        </grid-labels-position>
         <options>
             <label>オプション</label>
             <item>

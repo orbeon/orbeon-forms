@@ -80,6 +80,8 @@
         <merge-cell>slå sammen celle</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>oversikt over kontroller</control-settings-batch>
+        <move-control-label>flytt etikett</move-control-label>
+        <move-separate-lhha>flytt etikett</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Slå sammen seksjonsmal</label>
@@ -283,6 +285,21 @@
     <grid-details-icon>
         <label>Rutenettinnstillinger</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Flytt etikett til venstre celle</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Flytt etikett over kontrollen</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Flytt alle etiketter til venstre celler</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Flytt alle etiketter over kontrollene</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>etikett</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Flytt opp</label>
     </move-up-icon>
@@ -975,6 +992,11 @@
             <label>Bruk automatisk hint</label>
             <hint>Legger til et hint basert på maksimal filstørrelse og støttede filtyper du kan ha spesifisert i fanen Valideringer og varsler</hint>
         </automatic-hint>
+        <label-position>
+            <label>Etikettplassering</label>
+            <top>Over kontrollen</top>
+            <separate>Separat celle</separate>
+        </label-position>
         <multiple-selection>
             <label>Flervalg</label>
             <hint>Hvis aktivert, kan brukere velge flere verdier</hint>
@@ -1013,6 +1035,12 @@
             <item id="1">Rader</item>
             <item id="2">Kolonner</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Kontrolletiketter</label>
+            <unchanged>Behold nåværende</unchanged>
+            <left>Flytt alle til venstre</left>
+            <top>Flytt alle over</top>
+        </grid-labels-position>
         <options>
             <label>Alternativer</label>
             <item>

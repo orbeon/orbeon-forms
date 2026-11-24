@@ -285,6 +285,18 @@
                         ref="value"
                         origin="fbf:getControlLhhtParams($i/control-name, $lhh)"/>
                 </xf:action>
+                <xf:setvalue
+                    ref="$i/label/@position-supported"
+                    value="fbf:canHaveSeparateLabel($control)"/>
+                <xf:setvalue
+                    ref="$i/label/@position"
+                    value="if (fbf:hasSeparateLabel($control)) then 'separate' else 'top'"/>
+                <xf:setvalue
+                    ref="$i/label/@original-position"
+                    value="$i/label/@position"/>
+                <xf:setvalue
+                    ref="$i/label/@can-move-left"
+                    value="fbf:canMoveLabelLeft($control) or fbf:hasSeparateLabel($control)"/>
 
                 <xf:setvalue
                     ref="$i/prev-control-id"
@@ -746,7 +758,14 @@
                                     $lh/fr:param,
                                     $lh/@isHTML = 'true',
                                     $lh/@automatic
-                                )
+                                ),
+                            if ($i/label/@position-supported = 'true' and $i/label/@position != $i/label/@original-position) then
+                                if ($i/label/@position = 'separate') then
+                                    fbf:moveControlLabelToLeft($i/control-name)
+                                else
+                                    fbf:moveControlLabelToTop($i/control-name)
+                            else
+                                ()
                         </xf:action>
                     </xf:action>
                 </xf:action>
@@ -1075,7 +1094,7 @@
                         <default/>
                         <whitespace/>
 
-                        <label isHTML="" supported="">
+                        <label isHTML="" supported="" position="top" original-position="top" can-move-left="false" position-supported="false">
                             <!--<value lang=""/>-->
                             <!--<fr:param/>-->
                         </label>
@@ -2264,6 +2283,19 @@
                                                 <xf:label ref="."/>
                                                 <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                             </xf:itemset>
+                                        </xf:select1>
+                                        <xf:select1
+                                            ref=".[$lhh = 'label' and @position-supported = 'true' and (@can-move-left = 'true' or @position = 'separate')]/@position"
+                                            appearance="full xxf:horizontal">
+                                            <xf:label ref="$resources/dialog-control-settings/label-position/label"/>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-control-settings/label-position/top"/>
+                                                <xf:value>top</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-control-settings/label-position/separate"/>
+                                                <xf:value>separate</xf:value>
+                                            </xf:item>
                                         </xf:select1>
                                     </fr:c>
                                     <fr:c x="1" y="2" w="12">

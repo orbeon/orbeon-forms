@@ -92,6 +92,8 @@
         <merge-cell>Zellen zusammenführen</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>Steuerelemente-Übersicht</control-settings-batch>
+        <move-control-label>Beschriftung verschieben</move-control-label>
+        <move-separate-lhha>Beschriftung verschieben</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Abschnittsvorlage zusammenführen</label>
@@ -295,6 +297,21 @@
     <grid-details-icon>
         <label>Rastereigenschaften</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Beschriftung in linke Zelle verschieben</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Beschriftung über das Steuerelement verschieben</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Alle Beschriftungen in linke Zellen verschieben</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Alle Beschriftungen über die Steuerelemente verschieben</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>Beschriftung</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Nach oben verschieben</label>
     </move-up-icon>
@@ -951,6 +968,11 @@
             <label>Automatischen Hinweis verwenden</label>
             <hint>Fügt basierend auf „Maximale Dateigröße“ und „Erlaubte Dateitypen“ automatisch einen Hinweis hinzu (siehe Registerkarte „Validierungen und Benachrichtigungen“)</hint>
         </automatic-hint>
+        <label-position>
+            <label>Position der Beschriftung</label>
+            <top>Über dem Steuerelement</top>
+            <separate>Separate Zelle</separate>
+        </label-position>
         <multiple-selection>
             <label>Mehrfachauswahl</label>
             <hint>Wenn aktiviert, können Benutzer mehrere Werte auswählen</hint>
@@ -989,6 +1011,12 @@
             <item id="1">Zeilen</item>
             <item id="2">Spalten</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Steuerelement-Beschriftungen</label>
+            <unchanged>Unverändert lassen</unchanged>
+            <left>Alle nach links verschieben</left>
+            <top>Alle nach oben verschieben</top>
+        </grid-labels-position>
         <options>
             <label>Optionen</label>
             <item>

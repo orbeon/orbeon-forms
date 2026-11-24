@@ -80,6 +80,8 @@
         <merge-cell>combinar celdas</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>vista general de controles</control-settings-batch>
+        <move-control-label>mover etiqueta</move-control-label>
+        <move-separate-lhha>mover etiqueta</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Combinar plantilla de sección</label>
@@ -283,6 +285,21 @@
     <grid-details-icon>
         <label>Detalles de la Grilla</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Mover etiqueta a la celda izquierda</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Mover etiqueta encima del control</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Mover todas las etiquetas a celdas a la izquierda</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Mover todas las etiquetas encima de los controles</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>etiqueta</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Mover Arriba</label>
     </move-up-icon>
@@ -967,6 +984,11 @@
             <label>Usar ayuda automática</label>
             <hint>Añade una ayuda basada en el Tamaño máximo de archivo y los Tipos de archivo admitidos que pueda haber especificado en la pestaña Validaciones y alertas</hint>
         </automatic-hint>
+        <label-position>
+            <label>Posición de la etiqueta</label>
+            <top>Encima del control</top>
+            <separate>Celda separada</separate>
+        </label-position>
         <multiple-selection>
             <label>Selección múltiple</label>
             <hint>Si está habilitado, los usuarios pueden seleccionar múltiples valores</hint>
@@ -1005,6 +1027,12 @@
             <item id="1">Filas</item>
             <item id="2">Columnas</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Etiquetas de los controles</label>
+            <unchanged>Mantener actual</unchanged>
+            <left>Mover todas a la izquierda</left>
+            <top>Mover todas encima</top>
+        </grid-labels-position>
         <options>
             <label>Opciones</label>
             <item>

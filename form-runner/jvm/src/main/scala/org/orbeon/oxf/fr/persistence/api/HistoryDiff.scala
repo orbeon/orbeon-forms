@@ -303,7 +303,7 @@ object Diffs {
 
             // TODO: support for section template
             def labelOpt(name: String) = (formDefinition.resourceRootElem / name / "label").headOption.map(_.stringValue)
-            def isHTML(name: String)   = (findControlByName(name).toList / "label" /@ "mediatype").headOption.exists(_.getStringValue == ContentTypes.HtmlContentType)
+            def isHTML(name: String)   = findControlByName(name).toList.flatMap(FormRunner.findControlOrSeparateLabelElem).flatMap(_ /@ "mediatype").headOption.exists(_.getStringValue == ContentTypes.HtmlContentType)
 
             withElement("diff", atts = List("type" -> diffType) ::: formDiff.bind.toList.map("name" -> _) :::  atts) {
               for {

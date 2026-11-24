@@ -88,6 +88,8 @@
         <merge-cell>unisci cella</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>panoramica dei controlli</control-settings-batch>
+        <move-control-label>sposta etichetta</move-control-label>
+        <move-separate-lhha>sposta etichetta</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Unisci modello di sezione</label>
@@ -291,6 +293,21 @@
     <grid-details-icon>
         <label>Impostazioni griglia</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Sposta l'etichetta nella cella a sinistra</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Sposta l'etichetta sopra il controllo</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Sposta tutte le etichette nelle celle a sinistra</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Sposta tutte le etichette sopra i controlli</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>etichetta</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Sposta in sù</label>
     </move-up-icon>
@@ -955,6 +972,11 @@
             <label>Usa suggerimento automatico</label>
             <hint>Aggiunge un suggerimento basato sulla dimensione massima del file e sui tipi di file supportati specificati nella scheda Convalide e avvisi</hint>
         </automatic-hint>
+        <label-position>
+            <label>Posizione dell'etichetta</label>
+            <top>Sopra il controllo</top>
+            <separate>Cella separata</separate>
+        </label-position>
         <multiple-selection>
             <label>Selezione multipla</label>
             <hint>Se abilitato, gli utenti possono selezionare più valori</hint>
@@ -993,6 +1015,12 @@
             <item id="1">Righe</item>
             <item id="2">Colonne</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Etichette dei controlli</label>
+            <unchanged>Mantieni attuale</unchanged>
+            <left>Sposta tutte a sinistra</left>
+            <top>Sposta tutte sopra</top>
+        </grid-labels-position>
         <options>
             <label>Opzioni</label>
             <item>

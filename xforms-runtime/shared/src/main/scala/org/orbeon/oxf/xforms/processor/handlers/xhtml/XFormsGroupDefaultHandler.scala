@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
@@ -50,6 +51,10 @@ class XFormsGroupDefaultHandler(
   override def getContainingElementQName: String =
     matched.elementQName.map(_.qualifiedName)
       .getOrElse(super.getContainingElementQName)
+
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
+    XXFormsComponentHandler.LabelableElemNames(getContainingElementName) option
+      containingDocument.namespaceId(getEffectiveId)
 
   protected def handleControlStart(): Unit = ()
 

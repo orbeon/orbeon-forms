@@ -117,7 +117,7 @@ trait ControlBindingSupport {
   // Refresh the control's binding during update, in case a re-evaluation is not needed
   // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
   // ensure that the chain of bindings is consistent
-  def refreshBindingAndValues(parentContext: BindingContext, collector: ErrorEventCollector): Unit =
+  def refreshBindingAndValues(parentContext: BindingContext, collector: ErrorEventCollector): Unit = {
     setBindingContext(
       bindingContext = bindingContext.copy(parent = parentContext),
       parentRelevant = parentContentRelevant,
@@ -126,6 +126,11 @@ trait ControlBindingSupport {
       state          = None,
       collector      = collector
     )
+    findExternalBeforeAssociatedLhha
+      .foreach { lhhaControl =>
+        lhhaControl.reevaluateForAssociatedControl(collector)
+      }
+  }
 
   // Default binding evaluation
   protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {

@@ -135,9 +135,14 @@ class XFormsLHHAHandler(
 
         if (! mustOmitStaticReadonlyHint(effectiveTargetControl)) {
 
+          val staticReadonly = XFormsBaseHandler.isStaticReadonly(effectiveTargetControl)
+
           val labelForEffectiveIdWithNsOpt =
-            elementAnalysis.lhhaType == LHHA.Label flatOption
+            (elementAnalysis.lhhaType == LHHA.Label && ! staticReadonly) flatOption
               XFormsLHHAHandler.findLabelForEffectiveIdWithNs(elementAnalysis, XFormsId.getEffectiveIdSuffix(lhhaEffectiveId), handlerContext)
+
+          val requestedElementNameOpt =
+            (elementAnalysis.lhhaType == LHHA.Label && staticReadonly) option "span"
 
           if (elementAnalysis.lhhaType == LHHA.Alert) {
 
@@ -157,7 +162,7 @@ class XFormsLHHAHandler(
               lhhaAnalysis               = elementAnalysis,
               controlEffectiveIdOpt      = lhhaEffectiveId.some,
               forEffectiveIdWithNsOpt    = labelForEffectiveIdWithNsOpt,
-              requestedElementNameOpt    = None,
+              requestedElementNameOpt    = requestedElementNameOpt,
               control                    = effectiveTargetControl,
               isExternal                 = true,
               labelHintHelpAlertValueOpt = valueOpt,
@@ -168,7 +173,7 @@ class XFormsLHHAHandler(
               lhhaAnalysis               = elementAnalysis,
               controlEffectiveIdOpt      = lhhaEffectiveId.some,
               forEffectiveIdWithNsOpt    = labelForEffectiveIdWithNsOpt,
-              requestedElementNameOpt    = None,
+              requestedElementNameOpt    = requestedElementNameOpt,
               control                    = effectiveTargetControl,
               isExternal                 = true,
               labelHintHelpAlertValueOpt = currentLHHAControl.valueOpt(handlerContext.collector),

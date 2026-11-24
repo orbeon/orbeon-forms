@@ -81,6 +81,8 @@
         <merge-cell>fundir célula</merge-cell>
         <control-lhha todo="true">label</control-lhha>
         <control-settings-batch>visão geral dos controlos</control-settings-batch>
+        <move-control-label>mover rótulo</move-control-label>
+        <move-separate-lhha>mover rótulo</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Fundir Modelo de Secção</label>
@@ -284,6 +286,21 @@
     <grid-details-icon>
         <label>Configurações da grelha</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Mover rótulo para a célula à esquerda</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Mover rótulo para cima do controle</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Mover todos os rótulos para células à esquerda</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Mover todos os rótulos para cima dos controles</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>rótulo</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Mover para Cima</label>
     </move-up-icon>
@@ -975,6 +992,11 @@
             <label>Usar dica automática</label>
             <hint>Adiciona uma dica baseada no Tamanho Máximo de Ficheiro e Tipos de Ficheiro Suportados que possa ter especificado no separador Validações e Alertas</hint>
         </automatic-hint>
+        <label-position>
+            <label>Posição do rótulo</label>
+            <top>Acima do controle</top>
+            <separate>Célula separada</separate>
+        </label-position>
         <multiple-selection>
             <label>Selecção múltipla</label>
             <hint>Se activado, os utilizadores podem seleccionar múltiplos valores</hint>
@@ -1013,6 +1035,12 @@
             <item id="1">Linhas</item>
             <item id="2">Colunas</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Rótulos dos controles</label>
+            <unchanged>Manter atual</unchanged>
+            <left>Mover todos para a esquerda</left>
+            <top>Mover todos para cima</top>
+        </grid-labels-position>
         <options>
             <label>Opções</label>
             <item>

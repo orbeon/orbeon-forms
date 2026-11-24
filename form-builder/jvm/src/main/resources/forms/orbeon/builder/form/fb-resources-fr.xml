@@ -98,6 +98,8 @@
         <merge-cell>combinaison de cellule</merge-cell>
         <control-lhha>libellé</control-lhha>
         <control-settings-batch>aperçu des contrôles</control-settings-batch>
+        <move-control-label>déplacer le libellé</move-control-label>
+        <move-separate-lhha>déplacer le libellé</move-separate-lhha>
     </undo-redo>
     <merge-section>
         <label>Intégrer modèle de section</label>
@@ -301,6 +303,21 @@
     <grid-details-icon>
         <label>Paramètres de la grille</label>
     </grid-details-icon>
+    <move-label-left-icon>
+        <label>Déplacer le libellé dans la cellule de gauche</label>
+    </move-label-left-icon>
+    <move-label-top-icon>
+        <label>Replacer le libellé au-dessus du contrôle</label>
+    </move-label-top-icon>
+    <grid-labels-left-icon>
+        <label>Déplacer tous les libellés dans des cellules à gauche</label>
+    </grid-labels-left-icon>
+    <grid-labels-top-icon>
+        <label>Replacer tous les libellés au-dessus des contrôles</label>
+    </grid-labels-top-icon>
+    <separate-label-suffix>
+        <label>libellé</label>
+    </separate-label-suffix>
     <move-up-icon>
         <label>Déplacer vers le haut</label>
     </move-up-icon>
@@ -1012,6 +1029,11 @@
             <label>Utiliser une suggestion automatique</label>
             <hint>Ajoute une suggestion en fonction de la Taille Maximale et des Types de fichiers pris en charge que vous pourriez avoir spécifiés dans l'onglet Validations et alertes</hint>
         </automatic-hint>
+        <label-position>
+            <label>Position du libellé</label>
+            <top>Au-dessus du contrôle</top>
+            <separate>Cellule séparée</separate>
+        </label-position>
         <multiple-selection>
             <label>Sélection multiple</label>
             <hint>Si cette option est activée, les utilisateurs peuvent sélectionner plusieurs valeurs</hint>
@@ -1050,6 +1072,12 @@
             <item id="1">Rangées</item>
             <item id="2">Colonnes</item>
         </grid-tab-order>
+        <grid-labels-position>
+            <label>Libellés des contrôles</label>
+            <unchanged>Conserver tel quel</unchanged>
+            <left>Tout déplacer à gauche</left>
+            <top>Tout replacer au-dessus</top>
+        </grid-labels-position>
         <options>
             <label>Options</label>
             <item>

@@ -32,5 +32,9 @@ description: How to use the Orbeon MCP to create Orbeon Form Builder forms
     - For selection controls (Dropdowns, Checkboxes, etc.) set items separately with `control_set_items`.
     - For simple use cases, just insert form controls without specifying a position/size.
     - For more complex use cases, you can specify the x, y, width, and height position of the form control to insert. Remember, it must fit in the grid.
+- By default, control labels appear above their controls (`"top"`). To horizontally align labels beside fields by placing labels in their own grid cells:
+    - For an entire grid at once, call `grid_set_labels_position` with `grid_name` and `position: "left"` (or `"top"` to move separate labels back above their controls).
+    - For a single control, call `control_set_settings` with `settings: {"labelPosition": "separate"}` (or `"top"`), or pass `separateLabelPosition: {x, y, width, height}` for custom cell coordinates in the grid.
+    - `form_get_structure` and `control_get_settings` report `separateLabelPosition` whenever a control's label is placed in its own cell.
 - To persist the form, use `form_save`. This can be called multiple times during the creation/update of the form if desired.
 - When done with a form session, call `form_close`.

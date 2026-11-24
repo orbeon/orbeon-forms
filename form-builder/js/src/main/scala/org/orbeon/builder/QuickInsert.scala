@@ -150,6 +150,10 @@ object QuickInsert {
             ControlOps.controlNameFromIdOpt(elem.id).map { controlName =>
               val label =
                 elem.querySelectorOpt(".xforms-label")
+                  .orElse(
+                    cellEl.closestOpt(".fr-grid")
+                      .flatMap(_.querySelectorOpt(s".fr-grid-td > .xforms-label[id$$='${ControlOps.labelId(controlName)}']"))
+                  )
                   .flatMap(el => Option(el.textContent))
                   .flatMap(_.trimAllToOpt)
                   .getOrElse("")
@@ -487,7 +491,7 @@ object QuickInsert {
         ! elem.hasClass("fb-control-editor-right") &&
         ! elem.hasClass("fb-control-editor-top") &&
         elem.hasAttribute("id") &&
-        ControlOps.controlNameFromIdOpt(elem.id).isDefined
+        ControlOps.controlNameFromControlOrLabelIdOpt(elem.id).isDefined
       }
 
       ! hasControl

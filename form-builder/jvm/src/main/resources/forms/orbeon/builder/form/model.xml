@@ -1298,8 +1298,9 @@
         <xf:bind
             ref="tracked-state"
             calculate="
-                let $cell    := fbf:getCurrentlySelectedCell(),
-                    $control := $cell/*[1]
+                let $cell     := fbf:getCurrentlySelectedCell(),
+                    $cellElem := $cell/*[1],
+                    $control  := if (exists($cellElem/self::xf:label[@for])) then id($cellElem/@for, $cell/root()) else $cellElem
                 return
                     if (exists($control/@id)) then
                         string-join(
@@ -1318,7 +1319,10 @@
         <xf:bind
             ref="tracked-control-name"
             calculate="
-                let $c := fbf:getCurrentlySelectedCell()/*[1]/@id
+                let $cell     := fbf:getCurrentlySelectedCell(),
+                    $cellElem := $cell/*[1],
+                    $control  := if (exists($cellElem/self::xf:label[@for])) then id($cellElem/@for, $cell/root()) else $cellElem,
+                    $c        := $control/@id
                 return
                     if (exists($c)) then frf:controlNameFromId($c) else ''"/>
         <xf:bind

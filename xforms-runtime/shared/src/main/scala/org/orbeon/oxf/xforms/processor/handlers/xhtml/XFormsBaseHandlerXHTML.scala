@@ -321,6 +321,24 @@ abstract class XFormsBaseHandlerXHTML (
 //      if (controlOrNull ne null) {
         if (! control.isRelevant)
           appendWithSpace("xforms-disabled")
+        else if (isExternal && lhha == LHHA.Label)
+          control match {
+            case singleNodeControl: XFormsSingleNodeControl =>
+              if (singleNodeControl.isReadonly)
+                appendWithSpace("xforms-readonly")
+              if (singleNodeControl.isRequired) {
+                appendWithSpace("xforms-required")
+                control match {
+                  case valueControl: XFormsValueControl =>
+                    if (valueControl.isEmptyValue(handlerContext.collector))
+                      appendWithSpace("xforms-empty")
+                    else
+                      appendWithSpace("xforms-filled")
+                  case _ =>
+                }
+              }
+            case _ =>
+          }
 //      } else if (lhha == LHHA.Help) {
 //        // Null control outside of template OR help within template
 //        appendWithSpace("xforms-disabled")

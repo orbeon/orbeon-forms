@@ -34,6 +34,11 @@ trait FormBuilderRpcApi {
   def controlEditDetails  (controlId: String): Future[Unit]
   def controlEditItems    (controlId: String): Future[Unit]
   def controlDnD          (controlId: String, destCellId: String, copy: Boolean): Future[Unit]
+  def controlMoveLabelLeft(controlId: String): Future[Unit]
+  def controlMoveLabelTop (controlId: String): Future[Unit]
+
+  def gridMoveLabelsLeft  (gridId: String): Future[Unit]
+  def gridMoveLabelsTop   (gridId: String): Future[Unit]
 
   def rowInsert           (controlId: String, position: Int, aboveBelowString: String): Future[Unit]
   def rowDelete           (controlId: String, position: Int): Future[Unit]

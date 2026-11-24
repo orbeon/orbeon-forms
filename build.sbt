@@ -188,7 +188,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.9.0"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
-  "org.mockito"                 % "mockito-core"                    % "5.12.0"          % Test,
+  "org.mockito"                 % "mockito-core"                    % "5.23.0"          % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % PostgresqlVersion % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
@@ -512,7 +512,7 @@ lazy val scala3CommonSettings = baseCommonSettings ++ Seq(
 lazy val commonScalaJvmSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scalatestplus" %%% "junit-4-13"    % "3.2.20.0" % Test,
-    "org.scalatestplus" %%% "mockito-5-12"  % "3.2.19.0" % Test,
+    "org.scalatestplus" %%% "mockito-5-23"  % "3.2.20.0" % Test,
     "org.scalatestplus" %%% "selenium-4-21" % "3.2.19.0" % Test,
   )
 )

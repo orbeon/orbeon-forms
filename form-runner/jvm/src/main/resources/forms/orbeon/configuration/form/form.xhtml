@@ -982,8 +982,13 @@
                 </xf:bind>
 
                 <xf:bind ref="custom-properties/property">
-                    <xf:bind ref="@name" required="true()" xxf:whitespace="trim"/>
-                    <xf:bind ref="@type" required="true()"/>
+                    <xf:bind
+                        ref="@name"
+                        required="xxf:non-blank(..) or xxf:non-blank(../@profiles) or xxf:non-blank(../@processor-name)"
+                        xxf:whitespace="trim"/>
+                    <xf:bind
+                        ref="@type"
+                        required="xxf:non-blank(../@name) or xxf:non-blank(..) or xxf:non-blank(../@profiles) or xxf:non-blank(../@processor-name)"/>
                     <xf:bind ref="@profiles | @processor-name" xxf:whitespace="trim"/>
                 </xf:bind>
             </xf:bind>
@@ -9266,7 +9271,14 @@
                         <xf:label
                             mediatype="text/html"
                             value="
-                                let $c := count(instance('fr-configuration-instance')/custom-properties/property)
+                                let $c := count(
+                                    instance('fr-configuration-instance')/custom-properties/property[
+                                        xxf:non-blank(@name) or
+                                        xxf:non-blank(.) or
+                                        xxf:non-blank(@profiles) or
+                                        xxf:non-blank(@processor-name)
+                                    ]
+                                )
                                 return concat(
                                     $form-resources/tabs/custom-properties,
                                     if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''

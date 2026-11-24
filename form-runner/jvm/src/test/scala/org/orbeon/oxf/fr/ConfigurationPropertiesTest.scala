@@ -183,6 +183,22 @@ class ConfigurationPropertiesTest
       assert(FormRunnerConfiguration.formatProcessDefinition("validate then (save") == "validate then (save")
     }
 
+    it("must provide a default empty custom property row when none exist and omit it when saving") {
+      val inputPropsXml     = """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"/>"""
+      val inputPropsDoc     = IOSupport.readOrbeonDom(inputPropsXml)
+      val configDoc         = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputPropsDoc)
+      val customProps       = configDoc.getRootElement.element("custom-properties").elements("property")
+
+      assert(customProps.size == 1)
+      assert(customProps.head.attributeValue("name") == "")
+      assert(customProps.head.attributeValue("type") == "xs:string")
+      assert(customProps.head.attributeValue("profiles") == "")
+      assert(customProps.head.getText == "")
+
+      val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      assert(roundTripPropsDoc.getRootElement.elements("property").isEmpty)
+    }
+
     it("must round-trip global curated properties, app/form overrides, and custom properties") {
       val inputPropsXml =
         """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:saxon="http://saxon.sf.net/">
@@ -995,13 +1011,46 @@ class ConfigurationPropertiesTest
             // Switch back to Global Settings
             activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("select-global-scope-button").get.effectiveId)(ec)
 
-            // Add a custom property
-            val customPropsNodes  = configRoot / "custom-properties"
+            // Verify default empty custom property row: present on load, valid and unbadged when blank,
+            // invalid if a value is entered without a name, and omitted upon save when left blank
+            val customPropsNodes    = configRoot / "custom-properties"
+            val initialCustomProps  = (customPropsNodes / "property").toList
+            assert(initialCustomProps.size == 1)
+            assert((initialCustomProps.head /@ "name").stringValue == "")
+            assert((initialCustomProps.head /@ "type").stringValue == "xs:string")
+            assert(initialCustomProps.head.stringValue == "")
+
+            def customTabLabelHtml: String =
+              ControlsIterator(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-tabs").get, includeSelf = false)
+                .collect { case c: XFormsValueControl => c.getValue(EventCollector.Throw) }
+                .find(_.contains("Custom Properties"))
+                .get
+
+            assert(! customTabLabelHtml.contains("fr-config-tab-badge"))
+
+            val customNameControl   = resolveObject[XFormsValueControl]("custom-property-name-control").get
+            val customValueControl  = resolveObject[XFormsValueControl]("custom-property-value-control").get
+            assert(customNameControl.isValid)
+
+            setControlValueWithEventSearchNested(customValueControl.effectiveId, "orphan-value")
+            assert(! customNameControl.isValid)
+            assert(customTabLabelHtml.contains("fr-config-tab-badge"))
+
+            setControlValueWithEventSearchNested(customValueControl.effectiveId, "")
+            assert(customNameControl.isValid)
+            assert(! customTabLabelHtml.contains("fr-config-tab-badge"))
+
+            // Leave the default first row empty and add a second custom property
             val templatePropNodes = configRoot / "templates" / "property"
-            val inserted          = XFormsAPI.insert(into = customPropsNodes, origin = templatePropNodes)
+            val inserted          = XFormsAPI.insert(into = customPropsNodes, origin = templatePropNodes, after = customPropsNodes / "property")
             XFormsAPI.setvalue(inserted /@ "name", "oxf.test.custom.persistence.prop")
             XFormsAPI.setvalue(inserted /@ "type", "xs:integer")
             XFormsAPI.setvalue(inserted, "42")
+            XFormsAPI.rebuild("fr-form-model")
+            XFormsAPI.recalculate("fr-form-model")
+            XFormsAPI.refresh("fr-form-model")
+            assert((customPropsNodes / "property").size == 2)
+            assert(customTabLabelHtml.contains(">1<"))
 
             // Run save-final process
             SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
@@ -1020,6 +1069,7 @@ class ConfigurationPropertiesTest
               assert(savedXml.contains("oxf.fr.default-language.acme.order"))
               assert(savedXml.contains("oxf.fr.email.smtp.port.acme.*"))
               assert(savedXml.contains("oxf.test.custom.persistence.prop"))
+              assert(! savedXml.contains("""name="""""))
               assert(! savedXml.contains("data-format-version"))
             }
           }
@@ -1106,7 +1156,9 @@ class ConfigurationPropertiesTest
             assert((reloadedOverrides(1) /@ "app").stringValue == "acme" && (reloadedOverrides(1) /@ "form").stringValue == "order")
             assert(((reloadedOverrides(1) / "curated" / "system" / "default-language").head /@ "value").stringValue == "de")
 
-            val customPropNode = (configRoot / "custom-properties" / "property").head
+            val reloadedCustomProps = (configRoot / "custom-properties" / "property").toList
+            assert(reloadedCustomProps.size == 1)
+            val customPropNode = reloadedCustomProps.head
             assert((customPropNode /@ "name").stringValue == "oxf.test.custom.persistence.prop")
             assert((customPropNode /@ "type").stringValue == "xs:integer")
             assert(customPropNode.stringValue == "42")

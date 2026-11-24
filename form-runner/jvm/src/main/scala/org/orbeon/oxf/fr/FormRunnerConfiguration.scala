@@ -2030,15 +2030,28 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       )
     }
 
+    def appendEmptyCustomProperty(parent: Element): Element = {
+      val propElem = parent.addElement("property")
+      propElem.addAttribute("name", "")
+      propElem.addAttribute("type", "xs:string")
+      propElem.addAttribute("profiles", "")
+      propElem.addAttribute("processor-name", "")
+      propElem
+    }
+
     // 3. Custom properties
     val customPropsElem = configRoot.addElement("custom-properties")
-    for (cp <- customProperties) {
-      val propElem = customPropsElem.addElement("property")
-      propElem.addAttribute("name", cp.name)
-      propElem.addAttribute("type", cp.xsType)
-      propElem.addAttribute("profiles", cp.profiles)
-      propElem.addAttribute("processor-name", cp.processorName)
-      propElem.setText(cp.value)
+    if (customProperties.isEmpty) {
+      appendEmptyCustomProperty(customPropsElem)
+    } else {
+      for (cp <- customProperties) {
+        val propElem = customPropsElem.addElement("property")
+        propElem.addAttribute("name", cp.name)
+        propElem.addAttribute("type", cp.xsType)
+        propElem.addAttribute("profiles", cp.profiles)
+        propElem.addAttribute("processor-name", cp.processorName)
+        propElem.setText(cp.value)
+      }
     }
 
     // 4. Custom namespaces preserved for round-trip
@@ -2060,11 +2073,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     appendResourcesBlock(templateOverride, Map.empty, Map.empty)
     appendProcessesBlock(templateOverride, Map.empty)
 
-    val templateProp = templatesElem.addElement("property")
-    templateProp.addAttribute("name", "")
-    templateProp.addAttribute("type", "xs:string")
-    templateProp.addAttribute("profiles", "")
-    templateProp.addAttribute("processor-name", "")
+    appendEmptyCustomProperty(templatesElem)
 
     normalizeOverridesDom(configDoc)
     configDoc

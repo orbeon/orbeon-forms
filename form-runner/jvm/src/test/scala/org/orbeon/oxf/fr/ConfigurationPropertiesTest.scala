@@ -159,9 +159,9 @@ class ConfigurationPropertiesTest
       val configDoc     = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputPropsDoc)
       val configRoot    = configDoc.getRootElement
 
-      // 1. Check <app-form-overrides> contains the 2 profile-capable overrides plus the auto-materialized 0-override parent App row (hr / *)
+      // 1. Check <app-form-overrides> contains the 2 profile-capable overrides plus the auto-materialized 0-override parent rows (hr / * and hr / onboarding)
       val overrides = configRoot.element("app-form-overrides").elements("override")
-      assert(overrides.size == 3)
+      assert(overrides.size == 4)
 
       val firstOverride = overrides.head
       assert(firstOverride.attributeValue("app") == "*")
@@ -177,7 +177,12 @@ class ConfigurationPropertiesTest
       assert(parentHrOverride.attributeValue("form") == "*")
       assert(parentHrOverride.attributeValue("profiles") == "")
 
-      val secondOverride = overrides(2)
+      val parentFormOverride = overrides(2)
+      assert(parentFormOverride.attributeValue("app") == "hr")
+      assert(parentFormOverride.attributeValue("form") == "onboarding")
+      assert(parentFormOverride.attributeValue("profiles") == "")
+
+      val secondOverride = overrides(3)
       assert(secondOverride.attributeValue("app") == "hr")
       assert(secondOverride.attributeValue("form") == "onboarding")
       assert(secondOverride.attributeValue("profiles") == "internal admin")
@@ -353,8 +358,11 @@ class ConfigurationPropertiesTest
         """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
           |    <property as="xs:string" name="oxf.fr.default-language.zeta.claim"   value="es"/>
           |    <property as="xs:string" name="oxf.fr.default-language.acme.order"   value="fr"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.acme.w4"        profiles="admin"    value="pdf"/>
           |    <property as="xs:string" name="oxf.fr.detail.buttons.acme.*"         profiles="admin"    value="save-final"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.acme.quote"     profiles="external" value="send"/>
           |    <property as="xs:string" name="oxf.fr.default-language.acme.invoice" value="de"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.solo.*"         profiles="abc"      value="save-final"/>
           |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"            profiles="internal" value="pdf"/>
           |</properties>""".stripMargin
 
@@ -365,12 +373,20 @@ class ConfigurationPropertiesTest
           (el.attributeValue("app"), el.attributeValue("form"), el.attributeValue("profiles"))
         }.toList
 
+      // Profiled app overrides indent under their unprofiled (app / *) parent, and profiled form overrides
+      // indent under their unprofiled (app / form) parent (with 0-override parents auto-materialized as needed)
       assert(initialScopes == List(
         ("*",    "*",       "internal"),
         ("acme", "*",       ""),
         ("acme", "*",       "admin"),
         ("acme", "invoice", ""),
         ("acme", "order",   ""),
+        ("acme", "quote",   ""),
+        ("acme", "quote",   "external"),
+        ("acme", "w4",      ""),
+        ("acme", "w4",      "admin"),
+        ("solo", "*",       ""),
+        ("solo", "*",       "abc"),
         ("zeta", "*",       ""),
         ("zeta", "claim",   "")
       ))
@@ -397,10 +413,57 @@ class ConfigurationPropertiesTest
       assert(betaApp.attributeValue("id") != "scope-99")
       assert(afterInsert.map(_.attributeValue("id")).distinct.size == afterInsert.size)
 
-      // Round-tripping back to <properties> must emit only the 5 overridden properties (zero noise from 0-override rows)
+      // Round-tripping back to <properties> must emit only the 8 overridden properties (zero noise from 0-override rows)
       val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
       val defs              = PropertyStore.parseToPropertyDefinitions(roundTripPropsDoc).asScala
-      assert(defs.size == 5)
+      assert(defs.size == 8)
+    }
+
+    it("must convert fr:quantity data sizes to exact integer bytes and decompose saved byte values cleanly") {
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("10", "MB").contains(10_000_000L))
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("1.5", "MB").contains(1_500_000L))
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("500", "KB").contains(500_000L))
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("2", "GB").contains(2_000_000_000L))
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("0", "B").contains(0L))
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("0.5", "B").isEmpty)
+      assert(FormRunnerConfiguration.dataSizeQuantityToBytesOpt("-5", "MB").isEmpty)
+
+      assert(FormRunnerConfiguration.bytesToDisplayQuantity(10_000_000L) == ("10", "MB"))
+      assert(FormRunnerConfiguration.bytesToDisplayQuantity(1_500_000L) == ("1.5", "MB"))
+      assert(FormRunnerConfiguration.bytesToDisplayQuantity(500_000L) == ("500", "KB"))
+      assert(FormRunnerConfiguration.bytesToDisplayQuantity(2_000_000_000L) == ("2", "GB"))
+      assert(FormRunnerConfiguration.bytesToDisplayQuantity(1_048_576L) == ("1048576", "B"))
+
+      val propsDoc =
+        IOSupport.readOrbeonDom(
+          """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            |    <property as="xs:string" name="oxf.fr.detail.attachment.max-size-per-file.*.*"              value="10000000"/>
+            |    <property as="xs:string" name="oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*" value="1048576"/>
+            |    <property as="xs:string" name="oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*"    value="-1"/>
+            |    <property as="xs:string" name="oxf.xforms.cache.live-documents.max-size-bytes"              value="256000000"/>
+            |</properties>""".stripMargin
+        )
+      val configDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(propsDoc)
+      val detailEl  = configDoc.getRootElement.element("curated").element("detail")
+      val perFileEl = detailEl.element("attachment-max-size-per-file")
+      assert(perFileEl.element("mode").getText == "size")
+      assert(perFileEl.element("quantity").getText == "10")
+      assert(perFileEl.element("quantity").attributeValue("unit") == "MB")
+
+      val perCtrlEl = detailEl.element("attachment-max-size-aggregate-per-control")
+      assert(perCtrlEl.element("mode").getText == "size")
+      assert(perCtrlEl.element("quantity").getText == "1048576")
+      assert(perCtrlEl.element("quantity").attributeValue("unit") == "B")
+
+      val perFormEl = detailEl.element("attachment-max-size-aggregate-per-form")
+      assert(perFormEl.element("mode").getText == "unlimited")
+      assert(perFormEl.attributeValue("value") == "-1")
+
+      val docsCacheEl = configDoc.getRootElement.element("curated").element("caches").element("cache-documents-max-size-bytes")
+      assert(docsCacheEl.element("mode").getText == "size")
+      assert(docsCacheEl.element("quantity").getText == "256")
+      assert(docsCacheEl.element("quantity").attributeValue("unit") == "MB")
+      assert(docsCacheEl.attributeValue("value") == "256000000")
     }
   }
 
@@ -556,16 +619,44 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(loginValueControl.effectiveId, "/fr/auth?source={xxf:get-request-path()}")
             assert(loginValueControl.isValid)
 
-            // Test curated cache byte-budget, max-idle, and entry-count validation & overrides
+            // Test curated cache byte-budget (<fr:percentage> + <fr:quantity>), max-idle, and entry-count validation & overrides
             val staticBytesOverride       = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-override-control").get
             val staticBytesOverrideSelect = ControlsIterator(staticBytesOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
-            val staticBytesValue          = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-value-control").get
+            val staticBytesModeSelect     = resolveObject[XFormsSelect1Control]("cache-static-state-max-size-bytes-mode-control").get
+            val staticBytesPercent        = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-percent-control").get
+            val staticBytesQuantity       = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-value-control").get
 
             setControlValueWithEventSearchNested(staticBytesOverrideSelect.effectiveId, encodedTrue)
-            setControlValueWithEventSearchNested(staticBytesValue.effectiveId, "150%")
-            assert(! staticBytesValue.isValid)
-            setControlValueWithEventSearchNested(staticBytesValue.effectiveId, "256m")
-            assert(staticBytesValue.isValid)
+            setControlValueWithEventSearchNested(staticBytesPercent.effectiveId, numberExternalValue("150"))
+            assert(! staticBytesPercent.isValid)
+            setControlValueWithEventSearchNested(staticBytesPercent.effectiveId, numberExternalValue("20"))
+            assert(staticBytesPercent.isValid)
+            val fixedSizeItem = staticBytesModeSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("size")).get._1
+            setControlValueWithEventSearchNested(staticBytesModeSelect.effectiveId, fixedSizeItem.externalValue(staticBytesModeSelect.mustEncodeValues))
+            assert(staticBytesQuantity.isRelevant)
+            setControlValueWithEventSearchNested(staticBytesQuantity.effectiveId, numberExternalValue("256"))
+            assert(staticBytesQuantity.isValid)
+
+            // Test <fr:quantity unit-preset="data"> on attachment-max-size-per-file and attachment-max-size-aggregate-per-control
+            val attachPerFileOverride       = resolveObject[XFormsSingleNodeControl]("attachment-max-size-per-file-override-control").get
+            val attachPerFileOverrideSelect = ControlsIterator(attachPerFileOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val attachPerFileQuantity       = resolveObject[XFormsSingleNodeControl]("attachment-max-size-per-file-value-control").get
+
+            setControlValueWithEventSearchNested(attachPerFileOverrideSelect.effectiveId, encodedTrue)
+            assert(attachPerFileQuantity.isRelevant)
+            assert(! attachPerFileQuantity.isValid) // Required when mode = 'size'
+            setControlValueWithEventSearchNested(attachPerFileQuantity.effectiveId, numberExternalValue("10"))
+            assert(attachPerFileQuantity.isValid)
+
+            val attachPerCtrlOverride       = resolveObject[XFormsSingleNodeControl]("attachment-max-size-aggregate-per-control-override-control").get
+            val attachPerCtrlOverrideSelect = ControlsIterator(attachPerCtrlOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val attachPerCtrlQuantity       = resolveObject[XFormsSingleNodeControl]("attachment-max-size-aggregate-per-control-value-control").get
+
+            setControlValueWithEventSearchNested(attachPerCtrlOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(attachPerCtrlQuantity.effectiveId, numberExternalValue("500"))
+            val attachPerCtrlUnitSelect = ControlsIterator(attachPerCtrlQuantity, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            setControlValueWithEventSearchNested(attachPerCtrlUnitSelect.effectiveId, "KB")
+            assert(attachPerCtrlQuantity.isValid)
 
             val staticIdleOverride       = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-idle-override-control").get
             val staticIdleOverrideSelect = ControlsIterator(staticIdleOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
@@ -669,7 +760,7 @@ class ConfigurationPropertiesTest
             activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-scope-dialog-button").get.effectiveId)(ec)
 
             val configInstance = instance("fr-configuration-instance").get
-            val configRoot     = configInstance.rootElement
+            def configRoot     = configInstance.rootElement
             val uiInstance     = instance("fr-configuration-ui-instance").get
 
             // Parent App row (acme / *) must be auto-created before (acme / order), and (acme / order) must be selected
@@ -679,14 +770,103 @@ class ConfigurationPropertiesTest
             assert((overrideNodes(1) /@ "app").stringValue == "acme" && (overrideNodes(1) /@ "form").stringValue == "order")
             assert((uiInstance.rootElement / "selected-scope").stringValue == (overrideNodes(1) /@ "id").stringValue)
 
+            // Verify duplicate detection when editing a profiled app scope onto an existing (app, profiles) combination
+            def setDialogAppValue(appName: String): Unit =
+              resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("scope-dialog-app-select").filter(_.isRelevant) match {
+                case Some(openSelect) =>
+                  val sel1 = ControlsIterator(openSelect, includeSelf = false).collectFirst { case s: XFormsSelect1Control if s.getId == "select1" && s.isRelevant => s }.get
+                  sel1.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left(appName)) match {
+                    case Some((item, _)) =>
+                      setControlValueWithEventSearchNested(sel1.effectiveId, item.externalValue(sel1.mustEncodeValues))
+                    case None =>
+                      val otherItem = sel1.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).toList.last._1
+                      setControlValueWithEventSearchNested(sel1.effectiveId, otherItem.externalValue(sel1.mustEncodeValues))
+                      val otherInput = ControlsIterator(openSelect, includeSelf = false).collectFirst { case vc: XFormsValueControl if vc.getId == "input" && vc.isRelevant => vc }.get
+                      setControlValueWithEventSearchNested(otherInput.effectiveId, appName)
+                  }
+                case None =>
+                  val plainInput = resolveObject[XFormsValueControl]("scope-dialog-app-input").get
+                  setControlValueWithEventSearchNested(plainInput.effectiveId, appName)
+              }
+
+            def openAddAndCreateAppProfile(appName: String, profilesValue: String): Unit = {
+              activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("add-override-button").get.effectiveId)(ec)
+              val lvlSel  = resolveObject[XFormsSelect1Control]("scope-dialog-level-control").get
+              val appItem = lvlSel.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("app")).get._1
+              setControlValueWithEventSearchNested(lvlSel.effectiveId, appItem.externalValue(lvlSel.mustEncodeValues))
+              setDialogAppValue(appName)
+              val profCtrl     = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("scope-dialog-profiles-control").get
+              val closedSelect = ControlsIterator(profCtrl, includeSelf = false).collectFirst { case s: XFormsSelectControl if s.getId == "select" && s.isRelevant => s }.get
+              val closedItems  = closedSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).toList
+              val desiredProfs = profilesValue.split(" ").toList.filter(_.nonEmpty)
+              val matchedItems = desiredProfs.flatMap(p => closedItems.find(_._2 == Left(p)).map(_._1))
+              if (matchedItems.size == desiredProfs.size && matchedItems.nonEmpty) {
+                val encodedSelected = matchedItems.map(_.externalValue(closedSelect.mustEncodeValues)).mkString(" ")
+                setControlValueWithEventSearchNested(closedSelect.effectiveId, encodedSelected)
+              } else {
+                val openTokensCtrl =
+                  ControlsIterator(profCtrl, includeSelf = false)
+                    .collectFirst { case c: org.orbeon.oxf.xforms.control.XFormsComponentControl if c.getId == "open-tokens-input" => c }
+                    .get
+                setControlValueWithEventSearchNested(openTokensCtrl.effectiveId, profilesValue)
+              }
+              activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-scope-dialog-button").get.effectiveId)(ec)
+            }
+
+            openAddAndCreateAppProfile("orbeon", "internal admin")
+            openAddAndCreateAppProfile("acme", "admin internal")
+
+            val editTriggers =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "edit-override-scope-button" && c.isRelevant)
+                .toList
+            assert(editTriggers.size == 5)
+            // Scope order now: acme (0), acme [admin internal] (1), acme / order (2), orbeon (3), orbeon [internal admin] (4)
+            activateControlWithEvent(editTriggers(1).effectiveId)(ec)
+            val scopeDialog = resolveObject[org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl]("fr-config-scope-dialog").get
+            assert(scopeDialog.isDialogVisible)
+
+            // Changing acme [admin internal] -> orbeon must be blocked as a duplicate of orbeon [internal admin]
+            setDialogAppValue("orbeon")
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-scope-dialog-button").get.effectiveId)(ec)
+            assert(scopeDialog.isDialogVisible)
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("cancel-scope-dialog-button").get.effectiveId)(ec)
+            assert(! scopeDialog.isDialogVisible)
+
+            // Clean up temporary profiled scopes and re-select acme / order
+            val removeTriggers =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "remove-override-scope-button" && c.isRelevant)
+                .toList
+            // Remove orbeon [internal admin], then orbeon, then acme [admin internal]
+            activateControlWithEvent(removeTriggers.last.effectiveId)(ec)
+            val removeTriggers2 =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "remove-override-scope-button" && c.isRelevant)
+                .toList
+            activateControlWithEvent(removeTriggers2.last.effectiveId)(ec)
+            val removeTriggers3 =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "remove-override-scope-button" && c.isRelevant)
+                .toList
+            activateControlWithEvent(removeTriggers3.head.effectiveId)(ec)
+
+            val selectAcmeOrder =
+              ControlsIterator(doc.controls.getCurrentControlTree.rootOpt.get, includeSelf = false)
+                .filter(c => c.getId == "select-override-scope-button" && c.isRelevant)
+                .toList(1)
+            activateControlWithEvent(selectAcmeOrder.effectiveId)(ec)
+
             // Global-only controls must be non-relevant while an override scope is selected
             assert(! resolveObject[XFormsSingleNodeControl]("global-available-languages-value-control").get.isRelevant)
             assert(! resolveObject[XFormsSingleNodeControl]("cache-documents-size-value-control").get.isRelevant)
 
-            // Override default-language to "de" on acme / order using the shared controls
+            // Override default-language to "de" and attachment-max-size-per-file back to Unlimited ("-1") on acme / order using the shared controls
             assert(valueControl.isReadonly)
             setControlValueWithEventSearchNested(overrideSelectControl.effectiveId, encodedTrue)
             setControlValueWithEventSearchNested(valueControl.effectiveId, "de")
+            setControlValueWithEventSearchNested(attachPerFileOverrideSelect.effectiveId, encodedTrue)
+            assert(! attachPerFileQuantity.isRelevant) // Mode stays 'unlimited' on override scope -> stores '-1'
 
             // Set an invalid XPath on pdf-filename on acme / order, then switch back to Global Settings:
             // unselected-scopes-validation-repeat must surface the error and prevent save-final from persisting invalid data
@@ -772,8 +952,11 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.fr.detail.warn-when-data-unsafe.my-app.my-form").contains("count(//*[xxf:non-blank()]) gt 0"))
             assert(store.globalPropertySet.getString("oxf.fr.email.smtp.port.my-app.my-form").contains("587"))
             assert(store.globalPropertySet.getString("oxf.fr.email.smtp.port.acme.order").contains("2525"))
+            assert(store.globalPropertySet.getString("oxf.fr.detail.attachment.max-size-per-file.my-app.my-form").contains("10000000"))
+            assert(store.globalPropertySet.getString("oxf.fr.detail.attachment.max-size-per-file.acme.order").contains("-1"))
+            assert(store.globalPropertySet.getString("oxf.fr.detail.attachment.max-size-aggregate-per-control.my-app.my-form").contains("500000"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
-            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256m"))
+            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256000000"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
             assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.live-documents.size").contains(25))
             val savedLandingCards = LandingCardsJSON.parseString(store.globalPropertySet.getString("oxf.fr.landing.cards")).get.get._1
@@ -785,7 +968,7 @@ class ConfigurationPropertiesTest
             // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
             val _ = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)
             ObjectCache.configureAllIfNeeded(store.globalPropertySet)
-            assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxSizeBytes.contains(256L * 1024L * 1024L))
+            assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxSizeBytes.contains(256_000_000L))
             assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxIdleMillis.contains(45L * 60_000L))
             assert(XFormsDocumentCache.getCacheForDiagnostics.getMaxSize == 25)
           }
@@ -811,6 +994,16 @@ class ConfigurationPropertiesTest
 
             assert((defaultLangNode /@ "override").stringValue == "true")
             assert((defaultLangNode /@ "value").stringValue == "fr")
+
+            val reloadedPerFileNode = (configRoot / "curated" / "detail" / "attachment-max-size-per-file").head
+            assert((reloadedPerFileNode /@ "value").stringValue == "10000000")
+            assert((reloadedPerFileNode / "quantity").stringValue == "10")
+            assert((reloadedPerFileNode / "quantity" /@ "unit").stringValue == "MB")
+
+            val reloadedPerCtrlNode = (configRoot / "curated" / "detail" / "attachment-max-size-aggregate-per-control").head
+            assert((reloadedPerCtrlNode /@ "value").stringValue == "500000")
+            assert((reloadedPerCtrlNode / "quantity").stringValue == "500")
+            assert((reloadedPerCtrlNode / "quantity" /@ "unit").stringValue == "KB")
 
             val reloadedLandingCardsJson = resolveObject[XFormsValueControl]("landing-cards-value-control").get.getValue(EventCollector.Throw)
             assert(LandingCardsJSON.parseString(reloadedLandingCardsJson).get.get._1.head == LandingCard.QuickLinks(

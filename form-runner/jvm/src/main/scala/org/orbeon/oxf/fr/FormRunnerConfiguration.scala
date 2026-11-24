@@ -17,13 +17,16 @@ import org.orbeon.dom.{Document, Element, Namespace}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.fr.persistence.PersistencePropertyProvider
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.xbl.QuantitySupport
 
 import scala.collection.mutable
+import scala.util.Try
 
 
 trait FormRunnerConfiguration {
@@ -33,6 +36,10 @@ trait FormRunnerConfiguration {
   //@XPathFunction
   def invalidatePersistencePropertiesCache(): Unit =
     PersistencePropertyProvider.invalidateCache()
+
+  //@XPathFunction
+  def configuredPropertyProfiles(): Array[String] =
+    Properties.instance.getPropertySet.allProfiles.toArray.sorted
 
   //@XPathFunction
   def propertiesToConfigurationXml(propertiesNode: NodeInfo): DocumentNodeInfoType = {
@@ -59,6 +66,44 @@ trait FormRunnerConfiguration {
     value.trimAllToOpt match {
       case None | Some("0") | Some("-1") => true
       case Some(nonEmpty)                => ObjectCache.parseMaxSizeBytes(nonEmpty, 1024L * 1024L * 1024L).isDefined
+    }
+
+  //@XPathFunction
+  def isValidAttachmentMaxSizeBytes(value: String): Boolean =
+    value.trimAllToOpt match {
+      case Some("-1")     => true
+      case Some(nonEmpty) => Try(nonEmpty.toLong).toOption.exists(_ >= 0L)
+      case None           => false
+    }
+
+  //@XPathFunction
+  def dataSizeQuantityToBytes(rawAmount: String, unitCode: String): String =
+    dataSizeQuantityToBytesOpt(rawAmount, unitCode) match {
+      case Some(bytes) => bytes.toString
+      case None        => Option(rawAmount).map(_.trimAllToEmpty).getOrElse("")
+    }
+
+  //@XPathFunction
+  def isValidAttachmentSizeQuantity(rawAmount: String, unitCode: String): Boolean =
+    dataSizeQuantityToBytesOpt(rawAmount, unitCode).exists(_ >= 0L)
+
+  //@XPathFunction
+  def isValidPositiveByteSizeQuantity(rawAmount: String, unitCode: String): Boolean =
+    dataSizeQuantityToBytesOpt(rawAmount, unitCode).exists(_ > 0L)
+
+  //@XPathFunction
+  def isValidHeapPercentage(rawRatio: String): Boolean =
+    Option(rawRatio).flatMap(_.trimAllToOpt).flatMap(s => Try(BigDecimal(s)).toOption).exists { ratio =>
+      ratio > BigDecimal(0) && ratio <= BigDecimal(1)
+    }
+
+  //@XPathFunction
+  def heapRatioToPercentString(rawRatio: String): String =
+    Option(rawRatio).flatMap(_.trimAllToOpt).flatMap(s => Try(BigDecimal(s)).toOption) match {
+      case Some(ratio) if ratio > BigDecimal(0) && ratio <= BigDecimal(1) =>
+        s"${QuantitySupport.formatBigDecimalPlain(ratio * BigDecimal(100))}%"
+      case _ =>
+        Option(rawRatio).map(_.trimAllToEmpty).getOrElse("")
     }
 
   //@XPathFunction
@@ -759,31 +804,34 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "index"
     ),
     CuratedPropertyDef(
-      key          = "attachment-max-size-per-file",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.attachment.max-size-per-file",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "attachment-max-size-per-file",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.attachment.max-size-per-file",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("attachment-max-size")
     ),
     CuratedPropertyDef(
-      key          = "attachment-max-size-aggregate-per-control",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.attachment.max-size-aggregate-per-control",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "attachment-max-size-aggregate-per-control",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.attachment.max-size-aggregate-per-control",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("attachment-max-size")
     ),
     CuratedPropertyDef(
-      key          = "attachment-max-size-aggregate-per-form",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.attachment.max-size-aggregate-per-form",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "attachment-max-size-aggregate-per-form",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.attachment.max-size-aggregate-per-form",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("attachment-max-size")
     ),
     CuratedPropertyDef(
       key           = "attachment-max-files-per-control",
@@ -1917,6 +1965,47 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     configDoc
   }
 
+  private val DataUnitFactorsDesc: List[(String, Long)] = List(
+    ("TB", 1_000_000_000_000L),
+    ("GB", 1_000_000_000L),
+    ("MB", 1_000_000L),
+    ("KB", 1_000L)
+  )
+
+  private val DataUnitFactorByCode: Map[String, BigDecimal] = Map(
+    "B"  -> BigDecimal(1L),
+    "KB" -> BigDecimal(1_000L),
+    "MB" -> BigDecimal(1_000_000L),
+    "GB" -> BigDecimal(1_000_000_000L),
+    "TB" -> BigDecimal(1_000_000_000_000L)
+  )
+
+  def dataSizeQuantityToBytesOpt(rawAmount: String, unitCode: String): Option[Long] =
+    for {
+      trimmed <- Option(rawAmount).flatMap(_.trimAllToOpt)
+      bd      <- Try(BigDecimal(trimmed)).toOption
+      if bd >= BigDecimal(0)
+      unit     = Option(unitCode).flatMap(_.trimAllToOpt).getOrElse("MB")
+      factor  <- DataUnitFactorByCode.get(unit)
+      bytesBd  = bd * factor
+      if bytesBd.isWhole && bytesBd <= BigDecimal(Long.MaxValue)
+    } yield bytesBd.bigDecimal.longValueExact()
+
+  def bytesToDisplayQuantity(bytes: Long): (String, String) =
+    if (bytes <= 0L) {
+      (bytes.toString, "B")
+    } else {
+      DataUnitFactorsDesc.iterator
+        .filter { case (_, factor) => bytes >= factor }
+        .flatMap { case (code, factor) =>
+          val bd       = BigDecimal(bytes) / BigDecimal(factor)
+          val stripped = BigDecimal(bd.bigDecimal.stripTrailingZeros())
+          Option.when(stripped.scale <= 2)((QuantitySupport.formatBigDecimalPlain(bd), code))
+        }
+        .nextOption()
+        .getOrElse((bytes.toString, "B"))
+    }
+
   private def appendCuratedBlock(parent: Element, values: scala.collection.Map[String, String], appFormOnly: Boolean): Unit = {
     val curatedElem = parent.addElement("curated")
     for (category <- Categories) {
@@ -1930,7 +2019,9 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           elem.addAttribute("name", if (appFormOnly) c.baseName else c.globalPropertyName)
           elem.addAttribute("has-profiles", c.hasProfiles.toString)
           c.validationOpt.foreach(elem.addAttribute("validation", _))
-          values.get(c.key) match {
+
+          val rawOverrideOpt = values.get(c.key)
+          rawOverrideOpt match {
             case Some(v) =>
               elem.addAttribute("override", "true")
               elem.addAttribute("value", v)
@@ -1939,6 +2030,78 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
               elem.addAttribute("override", "false")
               elem.addAttribute("value", c.defaultValue)
               elem.addAttribute("selection", "__default__")
+          }
+
+          if (c.validationOpt.contains("attachment-max-size")) {
+            val modeElem = elem.addElement("mode")
+            val qtyElem  = elem.addElement("quantity")
+            rawOverrideOpt match {
+              case None =>
+                modeElem.setText("unlimited")
+                qtyElem.addAttribute("unit", "MB")
+              case Some(v) =>
+                val trimmed = v.trim
+                if (trimmed.isEmpty || trimmed == "-1") {
+                  elem.addAttribute("value", "-1")
+                  modeElem.setText("unlimited")
+                  qtyElem.addAttribute("unit", "MB")
+                } else {
+                  Try(trimmed.toLong).toOption.filter(_ >= 0L) match {
+                    case Some(bytes) =>
+                      val (numStr, unitCode) = bytesToDisplayQuantity(bytes)
+                      elem.addAttribute("value", bytes.toString)
+                      modeElem.setText("size")
+                      qtyElem.addAttribute("unit", unitCode)
+                      qtyElem.setText(numStr)
+                    case None =>
+                      modeElem.setText("size")
+                      qtyElem.addAttribute("unit", "B")
+                      qtyElem.setText(trimmed)
+                  }
+                }
+            }
+          } else if (c.validationOpt.contains("byte-size-or-percent")) {
+            val modeElem = elem.addElement("mode")
+            val pctElem  = elem.addElement("percentage")
+            val qtyElem  = elem.addElement("quantity")
+            val effectiveRaw = rawOverrideOpt.getOrElse(c.defaultValue).trim
+            if (effectiveRaw.isEmpty || effectiveRaw == "0" || effectiveRaw == "-1") {
+              if (rawOverrideOpt.isDefined)
+                elem.addAttribute("value", "0")
+              modeElem.setText("unlimited")
+              pctElem.setText("0.15")
+              qtyElem.addAttribute("unit", "MB")
+            } else if (effectiveRaw.endsWith("%")) {
+              val pctNumStr = effectiveRaw.dropRight(1).trim
+              Try(BigDecimal(pctNumStr)).toOption.filter(p => p > BigDecimal(0) && p <= BigDecimal(100)) match {
+                case Some(pctBd) =>
+                  val ratioStr = QuantitySupport.formatBigDecimalPlain(pctBd / BigDecimal(100))
+                  val normPct  = s"${QuantitySupport.formatBigDecimalPlain(pctBd)}%"
+                  elem.addAttribute("value", normPct)
+                  modeElem.setText("percent")
+                  pctElem.setText(ratioStr)
+                  qtyElem.addAttribute("unit", "MB")
+                case None =>
+                  modeElem.setText("percent")
+                  pctElem.setText(Try(BigDecimal(pctNumStr) / BigDecimal(100)).map(QuantitySupport.formatBigDecimalPlain(_)).getOrElse(pctNumStr))
+                  qtyElem.addAttribute("unit", "MB")
+              }
+            } else {
+              ObjectCache.parseMaxSizeBytes(effectiveRaw, 0L) match {
+                case Some(bytes) =>
+                  val (numStr, unitCode) = bytesToDisplayQuantity(bytes)
+                  elem.addAttribute("value", bytes.toString)
+                  modeElem.setText("size")
+                  pctElem.setText("0.15")
+                  qtyElem.addAttribute("unit", unitCode)
+                  qtyElem.setText(numStr)
+                case None =>
+                  modeElem.setText("size")
+                  pctElem.setText("0.15")
+                  qtyElem.addAttribute("unit", "B")
+                  qtyElem.setText(effectiveRaw)
+              }
+            }
           }
         }
       }
@@ -1970,10 +2133,11 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       val keptElems    = mutable.ListBuffer.empty[Element]
 
       for (elem <- initialElems) {
-        val app      = elem.attributeValueOpt("app").flatMap(_.trimAllToOpt).getOrElse("*")
-        val form     = elem.attributeValueOpt("form").flatMap(_.trimAllToOpt).getOrElse("*")
-        val profiles = elem.attributeValueOpt("profiles").map(_.splitTo[List]().mkString(" ")).getOrElse("")
-        val scope    = OverrideScope(app, form, profiles)
+        val app         = elem.attributeValueOpt("app").flatMap(_.trimAllToOpt).getOrElse("*")
+        val form        = elem.attributeValueOpt("form").flatMap(_.trimAllToOpt).getOrElse("*")
+        val profileList = elem.attributeValueOpt("profiles").toList.flatMap(_.splitTo[List]()).distinct
+        val profiles    = profileList.mkString(" ")
+        val scope       = OverrideScope(app, form, profileList.sorted.mkString(" "))
 
         elem.addAttribute("app", app)
         elem.addAttribute("form", form)
@@ -1985,9 +2149,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         }
       }
 
-      // Ensure every non-wildcard application has an unprofiled parent Application row (app / *)
-      val distinctApps = seenScopes.iterator.map(_.app).filter(a => a.nonEmpty && a != "*").toList.distinct
-      for (app <- distinctApps) {
+      // Ensure an unprofiled parent Application row (app / *) exists whenever any override references `app`
+      // (whether a profiled app override `app / * [p]`, a form override `app / form`, or a profiled form override `app / form [p]`)
+      val appsNeedingParent =
+        seenScopes.iterator.collect {
+          case OverrideScope(app, _, _) if app.nonEmpty && app != "*" => app
+        }.toList.distinct
+
+      for (app <- appsNeedingParent) {
         val parentScope = OverrideScope(app, "*", "")
         if (! seenScopes.contains(parentScope)) {
           val parentElem = Element("override")
@@ -2002,20 +2171,40 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         }
       }
 
-      // Sort in canonical tree order: Global-profile -> App -> App-profile -> Form
-      def treeSortKey(elem: Element): (Int, String, String, Int, String, String, Int, String) = {
+      // Ensure an unprofiled parent Form row (app / form) exists whenever a profiled form override (app / form [p]) exists,
+      // so profiled form overrides indent cleanly under their unprofiled (app / form) row
+      val appFormsNeedingParent =
+        seenScopes.iterator.collect {
+          case OverrideScope(app, form, profiles)
+            if app.nonEmpty && app != "*" && form.nonEmpty && form != "*" && profiles.nonEmpty =>
+            (app, form)
+        }.toList.distinct
+
+      for ((app, form) <- appFormsNeedingParent) {
+        val parentScope = OverrideScope(app, form, "")
+        if (! seenScopes.contains(parentScope)) {
+          val parentElem = Element("override")
+          parentElem.addAttribute("id", "")
+          parentElem.addAttribute("app", app)
+          parentElem.addAttribute("form", form)
+          parentElem.addAttribute("profiles", "")
+          appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
+          appendResourcesBlock(parentElem, Map.empty, Map.empty)
+          seenScopes += parentScope
+          keptElems  += parentElem
+        }
+      }
+
+      // Sort in canonical tree order:
+      // Global [profile] (L1) -> App (L1) -> App [profile] (L2) -> Form (L2) -> Form [profile] (L3)
+      def treeSortKey(elem: Element): ((Int, String, String), (Int, String, String), (Int, String)) = {
         val app      = elem.attributeValueOpt("app").flatMap(_.trimAllToOpt).getOrElse("*")
         val form     = elem.attributeValueOpt("form").flatMap(_.trimAllToOpt).getOrElse("*")
         val profiles = elem.attributeValueOpt("profiles").getOrElse("")
         (
-          if (app == "*") 0 else 1,
-          app.toLowerCase,
-          app,
-          if (form == "*") 0 else 1,
-          form.toLowerCase,
-          form,
-          if (profiles.isEmpty) 0 else 1,
-          profiles
+          (if (app == "*") 0 else 1, app.toLowerCase, app),
+          (if (form == "*") 0 else 1, form.toLowerCase, form),
+          (if (profiles.isEmpty) 0 else 1, profiles)
         )
       }
 

@@ -35,7 +35,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.scaxon.XPath.*
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{NonRelevantPolicy, XFormsNames}
 import org.orbeon.xforms.XFormsNames.{MEDIATYPE_QNAME, TYPE_QNAME, XFORMS_INPUT_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
@@ -526,9 +526,10 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           case MipName.Constraint => trimmed.isEmpty
           case MipName.Calculate  => trimmed.isEmpty
           case MipName.Default    => trimmed.isEmpty
-          case MipName.Type       => isTypeString(trimmed)
-          case MipName.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
-          case MipName.Custom(v)  => throw new UnsupportedOperationException(v.qualifiedName)
+          case MipName.Type        => isTypeString(trimmed)
+          case MipName.Whitespace  => trimmed == Whitespace.Policy.Preserve.entryName
+          case MipName.NonRelevant => trimmed == "default" || NonRelevantPolicy.withNameOption(trimmed).isEmpty
+          case MipName.Custom(v)   => throw new UnsupportedOperationException(v.qualifiedName)
         }
 
       ! isDefault option trimmed
@@ -606,8 +607,9 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             case MipName.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
             case MipName.Required   => FalseExpr
             case MipName.Calculate  => ""
-            case MipName.Default    => ""
-            case MipName.Whitespace => Whitespace.Policy.Preserve.entryName
+            case MipName.Default     => ""
+            case MipName.Whitespace  => Whitespace.Policy.Preserve.entryName
+            case MipName.NonRelevant => "default"
           }
       }
     }

@@ -8,6 +8,7 @@ import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.xforms.NonRelevantPolicy
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -28,6 +29,7 @@ class StaticBind(
   val nameOpt                    : Option[String],
   val typeMIPOpt                 : Option[TypeMIP], // `Type` MIP is special as it is not an XPath expression
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP],
+  val nonRelevantMIPOpt          : Option[NonRelevantMIP],
   val mipNameToXPathMIP          : Iterable[(MipName.XPath, List[XPathMIP])],
   val customMipNameToXPathMIP    : Map[MipName.Custom, List[XPathMIP]],
   val bindTree                   : BindTree
@@ -66,7 +68,7 @@ class StaticBind(
   val hasCalculateComputedMIPs = mipNameToXPathMIP exists { case (_, mips) => mips exists (_.isCalculateComputedMIP)}
   val hasValidateMIPs          = typeMIPOpt.nonEmpty || (mipNameToXPathMIP exists { case (_, mips) => mips exists (_.isValidateMIP) })
   val hasCustomMIPs            = customMipNameToXPathMIP.nonEmpty
-  val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
+  val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined || nonRelevantMIPOpt.isDefined
 
   // Update `BindTree` during construction
   locally {
@@ -88,10 +90,13 @@ class StaticBind(
     bindTree.hasTypeBind              ||= typeMIPOpt.nonEmpty
     bindTree.hasConstraintBind        ||= constraintsByLevel.nonEmpty
 
-    bindTree.mustRecalculate          ||= hasCalculateComputedMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
+    val isEmptyNonRelevant = nonRelevantMIPOpt.exists(_.policy == NonRelevantPolicy.Empty)
+
+    bindTree.mustRecalculate          ||= hasCalculateComputedMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined || isEmptyNonRelevant
     bindTree.mustRevalidate           ||= hasValidateMIPs
 
     bindTree.hasNonPreserveWhitespace ||= nonPreserveWhitespaceMIPOpt.isDefined
+    bindTree.hasEmptyNonRelevantBind  ||= isEmptyNonRelevant
   }
 
   // Used by `BindVariableResolver`
@@ -258,6 +263,14 @@ object StaticBind {
     val policy            : Policy
   ) extends MIP {
     override val name     : MipName         = MipName.Whitespace
+    override val level    : ValidationLevel = ValidationLevel.ErrorLevel
+  }
+
+  class NonRelevantMIP(
+    override val id       : String,
+    val policy            : NonRelevantPolicy
+  ) extends MIP {
+    override val name     : MipName         = MipName.NonRelevant
     override val level    : ValidationLevel = ValidationLevel.ErrorLevel
   }
 }

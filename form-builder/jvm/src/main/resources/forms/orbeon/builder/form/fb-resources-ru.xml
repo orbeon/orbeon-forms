@@ -583,6 +583,10 @@
             <item id="false">Включить</item>
             <item id="true">Отключить</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Очищать скрытые значения</label>
+            <hint>Немедленно очищать значения скрытых элементов управления, таблиц и секций</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Макет страницы в браузере</label>
             <hint>Занимает ли форма фиксированную или резиновую ширину</hint>
@@ -1014,6 +1018,10 @@
             <item id="1">Да</item>
             <item id="2">Нет</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Очищать значение при скрытии</label>
+            <hint>Немедленно очищать значение этого элемента управления, когда он скрыт</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>Настройки раздела: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
@@ -1064,6 +1072,10 @@
             <alert>Некорректное выражение XPath</alert>
             <hint>Булево выражение XPath</hint>
         </readonly>
+        <nonrelevant>
+            <label>Очищать скрытые значения</label>
+            <hint>Немедленно очищать значения элементов управления в этом контейнере, когда он скрыт</hint>
+        </nonrelevant>
         <repeat>
             <label>Повторяющееся содержимое</label>
         </repeat>

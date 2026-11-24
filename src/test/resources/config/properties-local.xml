@@ -117,4 +117,8 @@
     <property as="xs:string" name="oxf.fr.import.complete.uri.sqlite.import-configured"       value="/portal/{fr:app-name()}/done?version={fr:import-form-version()}"/>
     <property as="xs:string" name="oxf.fr.import.forward-parameters.sqlite.import-configured" value="tenant"/>
 
+    <!-- Tests for #2760: clear values of non-relevant controls -->
+    <property as="xs:string" name="oxf.fr.detail.nonrelevant.issue.2760-prop-empty" value="empty"/>
+    <property as="xs:string" name="oxf.fr.detail.nonrelevant.issue.2760-meta-keep"  value="empty"/>
+
 </properties>

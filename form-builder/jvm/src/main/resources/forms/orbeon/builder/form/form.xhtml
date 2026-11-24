@@ -1261,6 +1261,14 @@
                         origin="xf:element('readonly-disable-calculate', event('readonly-disable-calculate'))"/>
 
                     <xf:delete
+                        bind="nonrelevant-bind"/>
+                    <xf:insert
+                        if="event('nonrelevant') = ('keep', 'empty')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('nonrelevant', event('nonrelevant'))"/>
+
+                    <xf:delete
                         bind="initial-focus-bind"/>
                     <xf:insert
                         if="event('initial-focus') = ('true', 'false')"

@@ -603,6 +603,10 @@
             <item id="false">Enable</item>
             <item id="true">Disable</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Clear Hidden Values</label>
+            <hint>Immediately clear values of hidden controls, grids, and sections</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Browser Page Layout</label>
             <hint>Whether the form take a fixed or fluid width</hint>
@@ -1052,6 +1056,10 @@
             <item id="1">Yes</item>
             <item id="2">No</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Clear Value When Hidden</label>
+            <hint>Immediately clear this control's value when hidden</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Section Settings: "{2}" / "{1}"|1#Grid Settings: "{1}"}</label>
@@ -1102,6 +1110,10 @@
             <alert>Incorrect XPath expression</alert>
             <hint>Boolean XPath expression</hint>
         </readonly>
+        <nonrelevant>
+            <label>Clear Hidden Values</label>
+            <hint>Immediately clear values of controls in this container when hidden</hint>
+        </nonrelevant>
         <repeat>
             <label>Repeat content</label>
         </repeat>

@@ -44,6 +44,7 @@ trait BindTree {
   var hasRequiredBind                = false
   var hasConstraintBind              = false
   var hasNonPreserveWhitespace       = false
+  var hasEmptyNonRelevantBind        = false
 
   var mustRecalculate                = false
   var mustRevalidate                 = false
@@ -137,6 +138,7 @@ trait BindTree {
     hasRequiredBind                = false
     hasConstraintBind              = false
     hasNonPreserveWhitespace       = false
+    hasEmptyNonRelevantBind        = false
 
     mustRecalculate                = false
     mustRevalidate                 = false

@@ -603,6 +603,10 @@
             <item id="false">Włącz</item>
             <item id="true">Wyłącz</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Wyczyść ukryte wartości</label>
+            <hint>Natychmiast wyczyść wartości ukrytych kontrolek, siatek i sekcji</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Układ strony w przeglądarce</label>
             <hint>Czy formularz ma stałą czy zmienną szerokość</hint>
@@ -1033,6 +1037,10 @@
             <item id="1">Tak</item>
             <item id="2">Nie</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Wyczyść wartość po ukryciu</label>
+            <hint>Natychmiast wyczyść wartość tej kontrolki, gdy jest ukryta</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Ustawienia sekcji: "{2}" / "{1}"|1#Ustawienia siatki: "{1}"}</label>
@@ -1083,6 +1091,10 @@
             <alert>Niepoprawne wyrażenie XPath</alert>
             <hint>Logiczne wyrażenie XPath</hint>
         </readonly>
+        <nonrelevant>
+            <label>Wyczyść ukryte wartości</label>
+            <hint>Natychmiast wyczyść wartości kontrolek w tym kontenerze, gdy jest ukryty</hint>
+        </nonrelevant>
         <repeat>
             <label>Powtarzaj zawartość</label>
         </repeat>

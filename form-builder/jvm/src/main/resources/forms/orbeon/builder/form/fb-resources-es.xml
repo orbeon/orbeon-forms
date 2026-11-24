@@ -583,6 +583,10 @@
             <item id="false">Habilitar</item>
             <item id="true">Deshabilitar</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Borrar valores ocultos</label>
+            <hint>Borrar inmediatamente los valores de controles, cuadrículas y secciones ocultos</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Diseño de página del navegador</label>
             <hint>Si el formulario tiene un ancho fijo o fluido</hint>
@@ -1007,6 +1011,10 @@
             <item id="1">Sí</item>
             <item id="2">No</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Borrar valor al ocultar</label>
+            <hint>Borrar inmediatamente el valor de este control cuando esté oculto</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Detalles de Sección: "{2}" / "{1}"|1#Detalles de Grilla: "{1}"}</label>
@@ -1057,6 +1065,10 @@
             <alert>Expresión XPath incorrecta</alert>
             <hint>Expresión XPath booleana</hint>
         </readonly>
+        <nonrelevant>
+            <label>Borrar valores ocultos</label>
+            <hint>Borrar inmediatamente los valores de los controles de este contenedor cuando esté oculto</hint>
+        </nonrelevant>
         <repeat>
             <label>Repetir Contenido</label>
         </repeat>

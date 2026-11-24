@@ -583,6 +583,10 @@
             <item id="false">Aktiver</item>
             <item id="true">Deaktiver</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Tøm skjulte verdier</label>
+            <hint>Tøm umiddelbart verdiene til skjulte kontroller, rutenett og seksjoner</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Nettleser sideoppsett</label>
             <hint>Om skjemaet har en fast eller flytende bredde</hint>
@@ -1015,6 +1019,10 @@
             <item id="1">Ja</item>
             <item id="2">Nei</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Tøm verdi når skjult</label>
+            <hint>Tøm umiddelbart verdien til denne kontrollen når den er skjult</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>Rediger {0,choice,0#seksjonsdetaljer: "{2}" / "{1}"|1#rutenettinnstillinger: "{1}"}</label>
@@ -1065,6 +1073,10 @@
             <alert>Galt XPath-uttrykk</alert>
             <hint>Boolsk XPath-uttrykk</hint>
         </readonly>
+        <nonrelevant>
+            <label>Tøm skjulte verdier</label>
+            <hint>Tøm umiddelbart verdiene til kontrollene i denne beholderen når den er skjult</hint>
+        </nonrelevant>
         <repeat>
             <label>Gjenta innhold</label>
         </repeat>

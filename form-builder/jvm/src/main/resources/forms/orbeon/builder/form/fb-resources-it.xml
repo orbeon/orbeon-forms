@@ -591,6 +591,10 @@
             <item id="false">Abilita</item>
             <item id="true">Disabilita</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Cancella valori nascosti</label>
+            <hint>Cancella immediatamente i valori di controlli, griglie e sezioni nascosti</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Layout della pagina del browser</label>
             <hint>Se il modulo ha larghezza fissa o fluida</hint>
@@ -995,6 +999,10 @@
             <item id="1">Sì</item>
             <item id="2">No</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Cancella valore quando nascosto</label>
+            <hint>Cancella immediatamente il valore di questo controllo quando è nascosto</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Impostazioni sezione: "{2}" / "{1}"|1#Impostazioni griglia: "{1}"}</label>
@@ -1045,6 +1053,10 @@
             <alert>Espressione XPath non valida</alert>
             <hint>Espressione XPath booleana</hint>
         </readonly>
+        <nonrelevant>
+            <label>Cancella valori nascosti</label>
+            <hint>Cancella immediatamente i valori dei controlli in questo contenitore quando è nascosto</hint>
+        </nonrelevant>
         <repeat>
             <label>Ripeti contenuto</label>
         </repeat>

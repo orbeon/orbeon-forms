@@ -73,8 +73,9 @@ class XFormsModelBinds(protected val model: XFormsModel)
         case MipName.Required   => evaluateBooleanMIP(bindNode, MipName.Required, Types.DEFAULT_REQUIRED, collector) map booleanToBooleanValue
         case MipName.Constraint => hasSuccessfulErrorConstraints                                                     map booleanToBooleanValue
         case MipName.Calculate  => evaluateCalculatedBind(bindNode, MipName.Calculate, collector)                    map stringToStringValue
-        case MipName.Default    => evaluateCalculatedBind(bindNode, MipName.Default, collector)                      map stringToStringValue
-        case MipName.Whitespace => bind.staticBind.nonPreserveWhitespaceMIPOpt.map(_.policy.entryName)               map stringToStringValue
+        case MipName.Default     => evaluateCalculatedBind(bindNode, MipName.Default, collector)                      map stringToStringValue
+        case MipName.Whitespace  => bind.staticBind.nonPreserveWhitespaceMIPOpt.map(_.policy.entryName)               map stringToStringValue
+        case MipName.NonRelevant => bind.staticBind.nonRelevantMIPOpt.map(_.policy.entryName)                         map stringToStringValue
         case custom @ MipName.Custom(_) =>
           // 2024-08-06: This also catches `MipName.Whitespace`.
           // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple

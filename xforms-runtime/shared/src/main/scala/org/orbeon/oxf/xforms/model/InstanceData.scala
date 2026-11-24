@@ -22,6 +22,7 @@ import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
+import org.orbeon.xforms.NonRelevantPolicy
 
 import java.util as ju
 import scala.collection.mutable
@@ -125,6 +126,31 @@ object InstanceData {
       Types.DEFAULT_RELEVANT
     else
       currentInstanceData.getLocalRelevant
+  }
+
+  def getInheritedNonRelevantPolicy(nodeInfo: om.NodeInfo): NonRelevantPolicy =
+    if (nodeInfo.isInstanceOf[VirtualNodeType])
+      getInheritedNonRelevantPolicy(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
+    else if (nodeInfo ne null)
+      NonRelevantPolicy.Keep
+    else
+      throw new OXFException("Cannot get nonrelevant Model Item Property on null object.")
+
+  def getInheritedNonRelevantPolicy(node: Node): NonRelevantPolicy = {
+    var currentNode = node
+    var result: Option[NonRelevantPolicy] = None
+    while ((currentNode ne null) && result.isEmpty) {
+      val currentInstanceData = getLocalInstanceData(currentNode)
+      if (currentInstanceData ne null)
+        result = currentInstanceData.getLocalNonRelevantPolicy
+      currentNode = currentNode.getParent
+    }
+    result.getOrElse(NonRelevantPolicy.Keep)
+  }
+
+  def hasBindNodes(nodeInfo: om.NodeInfo): Boolean = {
+    val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
+    (existingInstanceData ne null) && ! existingInstanceData.getBindNodes.isEmpty
   }
 
   def getRequired(nodeInfo: om.NodeInfo): Boolean = {
@@ -392,6 +418,19 @@ class InstanceData private {
 
   private def getLocalRelevant: Boolean =
     testMipForNonDefault(_.relevant, Types.DEFAULT_RELEVANT)
+
+  private def getLocalNonRelevantPolicy: Option[NonRelevantPolicy] = {
+    var result: Option[NonRelevantPolicy] = None
+    if ((bindNodes ne null) && ! bindNodes.isEmpty) {
+      val it = bindNodes.iterator
+      while (it.hasNext) {
+        val mipOpt = it.next().staticBind.nonRelevantMIPOpt
+        if (mipOpt.isDefined)
+          result = Some(mipOpt.get.policy)
+      }
+    }
+    result
+  }
 
   private def getLocalReadonly: Boolean =
     testMipForNonDefault(_.readonly, Types.DEFAULT_READONLY)

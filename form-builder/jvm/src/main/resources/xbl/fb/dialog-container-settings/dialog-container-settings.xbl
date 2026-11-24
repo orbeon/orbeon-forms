@@ -81,6 +81,7 @@
 
                 <xf:setvalue ref="$i/relevant"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"                       value="fbf:readDenormalizedCalculatedMip($i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/nonrelevant"                    value="fbf:readDenormalizedCalculatedMip($i/control-name, 'nonrelevant')"/>
 
                 <xf:setvalue ref="$i/control-names"                  value="fbf:getAllNamesInUseAsString()"/>
 
@@ -196,7 +197,7 @@
                         else
                             (),
                         fbf:renameControlIfNeeded($old-name, $new-name, false()),
-                        for $mip in ('relevant', 'readonly') return
+                        for $mip in ('relevant', 'readonly', 'nonrelevant') return
                             fbf:writeAndNormalizeCalculatedMip($new-name, $mip, $i/*[name() = $mip]),
                         fbf:setRepeatProperties(
                             $new-name,
@@ -380,6 +381,7 @@
 
                         <relevant/>
                         <readonly/>
+                        <nonrelevant/>
 
                         <was-repeat/>
                         <is-repeat/>
@@ -781,6 +783,19 @@
                                             <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
                                         </fr:boolean-or-formula>
                                     </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td colspan="2">
+                                        <xf:select1 ref="nonrelevant" appearance="full xxf:horizontal">
+                                            <xf:label ref="$resources/dialog-container-settings/nonrelevant/label"/>
+                                            <xf:hint  ref="$resources/dialog-container-settings/nonrelevant/hint"/>
+                                            <xf:itemset ref="$resources/dialog-control-settings/default-yes-no/item">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'empty' else 'keep'"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td colspan="2"/>
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>

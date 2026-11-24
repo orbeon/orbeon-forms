@@ -668,6 +668,13 @@ object XFormsStaticStateDeserializer {
                 } yield
                   new StaticBind.WhitespaceMIP(id, policy)
 
+              implicit val decodeNonRelevantMIP: Decoder[StaticBind.NonRelevantMIP] = (c: HCursor) =>
+                for {
+                  id         <- c.get[String]("id")
+                  policy     <- c.get[org.orbeon.xforms.NonRelevantPolicy]("policy")
+                } yield
+                  new StaticBind.NonRelevantMIP(id, policy)
+
               implicit val decodeXPathMipName: Decoder[MipName.XPath] = (c: HCursor) =>
                 implicitly[Decoder[dom.QName]].apply(c).map(s => MipName.fromQName(s).asInstanceOf[MipName.XPath])
 
@@ -694,6 +701,7 @@ object XFormsStaticStateDeserializer {
                   nameOpt                     <- c.getOrElse[Option[String]]("nameOpt")(None)
                   typeMIPOpt                  <- c.getOrElse[Option[StaticBind.TypeMIP]]("typeMIPOpt")(None)
                   whitespaceMipOpt            <- c.getOrElse[Option[StaticBind.WhitespaceMIP]]("whitespaceMipOpt")(None)
+                  nonRelevantMipOpt           <- c.getOrElse[Option[StaticBind.NonRelevantMIP]]("nonRelevantMipOpt")(None)
                   customMIPNameToXPathMIP     <- c.getOrElse[Map[MipName.Custom, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")(Map.empty)
                   mipNameToXPathMIP           <- c.getOrElse[Iterable[(MipName.XPath, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")(Nil)
                 } yield
@@ -711,6 +719,7 @@ object XFormsStaticStateDeserializer {
                     nameOpt,
                     typeMIPOpt,
                     whitespaceMipOpt,
+                    nonRelevantMipOpt,
                     mipNameToXPathMIP,
                     customMIPNameToXPathMIP,
                     StaticBind.getBindTree(controlStack.headOption)

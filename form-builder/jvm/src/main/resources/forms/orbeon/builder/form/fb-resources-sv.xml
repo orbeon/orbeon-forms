@@ -603,6 +603,10 @@
             <item id="false">Aktivera</item>
             <item id="true">Inaktivera</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Rensa dolda värden</label>
+            <hint>Rensa omedelbart värden för dolda kontroller, rutnät och sektioner</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Webbläsarsidelayout</label>
             <hint>Om formuläret har fast eller flytande bredd</hint>
@@ -1034,6 +1038,10 @@
             <item id="1">Ja</item>
             <item id="2">Nej</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Rensa värde när dold</label>
+            <hint>Rensa omedelbart värdet för denna kontroll när den är dold</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Sektionsinställningar: "{2}" / "{1}"|1#Rutnätsinställningar: "{1}"}</label>
@@ -1084,6 +1092,10 @@
             <alert>Felaktigt XPath-uttryck</alert>
             <hint>Booleskt XPath-uttryck</hint>
         </readonly>
+        <nonrelevant>
+            <label>Rensa dolda värden</label>
+            <hint>Rensa omedelbart värden för kontroller i denna behållare när den är dold</hint>
+        </nonrelevant>
         <repeat>
             <label>Upprepa</label>
         </repeat>

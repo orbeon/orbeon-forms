@@ -54,7 +54,7 @@ trait ControlOps extends ResourcesOps {
   self: GridOps => // funky dependency, to resolve at some point
 
   private val MIPsToRewrite =
-    MipName.AllMipNames - MipName.Type - MipName.Required - MipName.Whitespace
+    MipName.AllMipNames - MipName.Type - MipName.Required - MipName.Whitespace - MipName.NonRelevant
 
   private val RewrittenMIPs =
     MIPsToRewrite

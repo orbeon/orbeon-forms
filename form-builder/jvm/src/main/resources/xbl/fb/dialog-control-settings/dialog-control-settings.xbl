@@ -251,8 +251,9 @@
                 <xf:setvalue ref="$i/relevant"   value="fbf:readDenormalizedCalculatedMip($i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"   value="fbf:readDenormalizedCalculatedMip($i/control-name, 'readonly')"/>
                 <xf:setvalue ref="$i/calculate"  value="fbf:readDenormalizedCalculatedMip($i/control-name, 'calculate')"/>
-                <xf:setvalue ref="$i/default"    value="fbf:readDenormalizedCalculatedMip($i/control-name, 'default')"/>
-                <xf:setvalue ref="$i/whitespace" value="fbf:readDenormalizedCalculatedMip($i/control-name, 'whitespace')"/>
+                <xf:setvalue ref="$i/default"     value="fbf:readDenormalizedCalculatedMip($i/control-name, 'default')"/>
+                <xf:setvalue ref="$i/whitespace"  value="fbf:readDenormalizedCalculatedMip($i/control-name, 'whitespace')"/>
+                <xf:setvalue ref="$i/nonrelevant" value="fbf:readDenormalizedCalculatedMip($i/control-name, 'nonrelevant')"/>
 
                 <!-- If opening directly via a toolbar `fx` button, switch boolean MIPs to formula mode so the textarea is visible -->
                 <xf:var name="focus-formula" value="event('focus-formula')"/>
@@ -748,7 +749,7 @@
                             ),
                             (: Write MIPs :)
                             (: `calculate` must come before `readonly` :)
-                            for $mip in ('default', 'calculate', 'relevant', 'readonly', 'whitespace') return
+                            for $mip in ('default', 'calculate', 'relevant', 'readonly', 'whitespace', 'nonrelevant') return
                                 fbf:writeAndNormalizeCalculatedMip($i/control-name, $mip, $i/*[name() = $mip]),
                             for $lh in $i/(label, hint, help, text)[@supported = 'true'] return
                                 fbf:setControlLabelHintHelpOrTextForAllLangs(
@@ -1093,6 +1094,7 @@
                         <calculate/>
                         <default/>
                         <whitespace/>
+                        <nonrelevant/>
 
                         <label isHTML="" supported="" position="top" original-position="top" can-move-left="false" position-supported="false">
                             <!--<value lang=""/>-->
@@ -2244,6 +2246,19 @@
                                             <xf:help  ref="$resources/dialog-control-settings/readonly/help" mediatype="text/html"/>
                                         </fr:boolean-or-formula>
                                     </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select1 id="fb-nonrelevant-control" ref="nonrelevant" appearance="full xxf:horizontal">
+                                            <xf:label ref="$resources/dialog-control-settings/nonrelevant/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/nonrelevant/hint"/>
+                                            <xf:itemset ref="$resources/dialog-control-settings/default-yes-no/item">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'empty' else 'keep'"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td/>
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>

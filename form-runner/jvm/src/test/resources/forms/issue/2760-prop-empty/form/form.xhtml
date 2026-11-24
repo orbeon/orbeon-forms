@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <toggles>
+                        <toggles-grid>
+                            <show-s1>true</show-s1>
+                            <show-s2>true</show-s2>
+                            <show-row2>true</show-row2>
+                        </toggles-grid>
+                    </toggles>
+                    <section-1>
+                        <grid-1>
+                            <c11>v11</c11>
+                            <c12>v12</c12>
+                        </grid-1>
+                        <rep-grid>
+                            <rep-grid-iteration>
+                                <rc>row-1</rc>
+                            </rep-grid-iteration>
+                            <rep-grid-iteration>
+                                <rc>row-2</rc>
+                            </rep-grid-iteration>
+                        </rep-grid>
+                    </section-1>
+                    <section-2>
+                        <grid-21>
+                            <c211>v211</c211>
+                            <c212>v212</c212>
+                        </grid-21>
+                        <grid-22>
+                            <c221>v221</c221>
+                            <c222>v222</c222>
+                        </grid-22>
+                    </section-2>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="toggles-bind" name="toggles" ref="toggles">
+                    <xf:bind id="toggles-grid-bind" name="toggles-grid" ref="toggles-grid">
+                        <xf:bind id="show-s1-bind" name="show-s1" ref="show-s1" type="xs:boolean"/>
+                        <xf:bind id="show-s2-bind" name="show-s2" ref="show-s2" type="xs:boolean"/>
+                        <xf:bind id="show-row2-bind" name="show-row2" ref="show-row2" type="xs:boolean"/>
+                    </xf:bind>
+                </xf:bind>
+                <!-- Inherits property `empty` from `fr-form-binds` -->
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1" relevant="$show-s1 = true()">
+                    <xf:bind id="grid-1-bind" name="grid-1" ref="grid-1">
+                        <xf:bind id="c11-bind" name="c11" ref="c11"/>
+                        <xf:bind id="c12-bind" name="c12" ref="c12" xxf:nonrelevant="keep"/>
+                    </xf:bind>
+                    <xf:bind id="rep-grid-bind" name="rep-grid" ref="rep-grid">
+                        <xf:bind id="rep-grid-iteration-bind" name="rep-grid-iteration" ref="rep-grid-iteration" relevant="position() = 1 or $show-row2 = true()">
+                            <xf:bind id="rc-bind" name="rc" ref="rc"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <!-- Overrides section to `keep`, grid-22 back to `empty`, and c222 back to `keep` -->
+                <xf:bind id="section-2-bind" name="section-2" ref="section-2" relevant="$show-s2 = true()" xxf:nonrelevant="keep">
+                    <xf:bind id="grid-21-bind" name="grid-21" ref="grid-21">
+                        <xf:bind id="c211-bind" name="c211" ref="c211"/>
+                        <xf:bind id="c212-bind" name="c212" ref="c212" xxf:nonrelevant="empty"/>
+                    </xf:bind>
+                    <xf:bind id="grid-22-bind" name="grid-22" ref="grid-22" xxf:nonrelevant="empty">
+                        <xf:bind id="c221-bind" name="c221" ref="c221"/>
+                        <xf:bind id="c222-bind" name="c222" ref="c222" xxf:nonrelevant="keep"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>2760-prop-empty</form-name>
+                    <title xml:lang="en">Issue #2760 5-Level Hierarchy</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <toggles><label>Toggles</label></toggles>
+                        <show-s1><label>Show S1</label><hint/></show-s1>
+                        <show-s2><label>Show S2</label><hint/></show-s2>
+                        <show-row2><label>Show Row 2</label><hint/></show-row2>
+                        <section-1><label>S1</label></section-1>
+                        <c11><label>C11</label><hint/></c11>
+                        <c12><label>C12</label><hint/></c12>
+                        <rc><label>RC</label><hint/></rc>
+                        <section-2><label>S2</label></section-2>
+                        <c211><label>C211</label><hint/></c211>
+                        <c212><label>C212</label><hint/></c212>
+                        <c221><label>C221</label><hint/></c221>
+                        <c222><label>C222</label><hint/></c222>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance id="rep-grid-template">
+                <rep-grid-iteration>
+                    <rc/>
+                </rep-grid-iteration>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="toggles-section" bind="toggles-bind">
+                    <xf:label ref="$form-resources/toggles/label"/>
+                    <fr:grid id="toggles-grid-grid" bind="toggles-grid-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="show-s1-control" bind="show-s1-bind"><xf:label ref="$form-resources/show-s1/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <xf:input id="show-s2-control" bind="show-s2-bind"><xf:label ref="$form-resources/show-s2/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4">
+                            <xf:input id="show-row2-control" bind="show-row2-bind"><xf:label ref="$form-resources/show-row2/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="c11-control" bind="c11-bind"><xf:label ref="$form-resources/c11/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="c12-control" bind="c12-bind"><xf:label ref="$form-resources/c12/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="rep-grid-grid" bind="rep-grid-bind" repeat="content" min="1" template="instance('rep-grid-template')">
+                        <fr:c x="1" y="1" w="12">
+                            <xf:input id="rc-control" bind="rc-bind"><xf:label ref="$form-resources/rc/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-21-grid" bind="grid-21-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="c211-control" bind="c211-bind"><xf:label ref="$form-resources/c211/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="c212-control" bind="c212-bind"><xf:label ref="$form-resources/c212/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-22-grid" bind="grid-22-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="c221-control" bind="c221-bind"><xf:label ref="$form-resources/c221/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="c222-control" bind="c222-bind"><xf:label ref="$form-resources/c222/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

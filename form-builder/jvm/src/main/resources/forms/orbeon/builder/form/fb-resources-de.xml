@@ -595,6 +595,10 @@
             <item id="false">Aktivieren</item>
             <item id="true">Deaktivieren</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Ausgeblendete Werte löschen</label>
+            <hint>Werte von ausgeblendeten Steuerelementen, Rastern und Abschnitten sofort löschen</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Layout der Browserseite</label>
             <hint>Ob das Formular eine feste oder variable Breite hat</hint>
@@ -991,6 +995,10 @@
             <item id="1">Ja</item>
             <item id="2">Nein</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Wert beim Ausblenden löschen</label>
+            <hint>Den Wert dieses Steuerelements sofort löschen, wenn es ausgeblendet ist</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Abschnitteigenschaften: "{2}" / "{1}"|1#Tabelleneigenschaften: "{1}"}</label>
@@ -1041,6 +1049,10 @@
             <alert>Ungültiger XPath-Ausdruck</alert>
             <hint>Boolescher XPath-Ausdruck</hint>
         </readonly>
+        <nonrelevant>
+            <label>Ausgeblendete Werte löschen</label>
+            <hint>Werte der Steuerelemente in diesem Container sofort löschen, wenn er ausgeblendet ist</hint>
+        </nonrelevant>
         <repeat>
             <label>Inhalt wiederholen</label>
         </repeat>

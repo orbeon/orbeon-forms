@@ -601,6 +601,10 @@
             <item id="false">Activées</item>
             <item id="true">Désactivées</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Effacer les valeurs masquées</label>
+            <hint>Effacer immédiatement les valeurs des contrôles, grilles et sections masqués</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Mise en page dans le navigateur</label>
             <hint>Montrer le formulaire en largeur fixe ou fluide dans le navigateur</hint>
@@ -1052,6 +1056,10 @@
             <item id="1">Oui</item>
             <item id="2">Non</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Effacer la valeur lorsque masqué</label>
+            <hint>Effacer immédiatement la valeur de ce contrôle lorsqu'il est masqué</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>Paramètres de la {0,choice,0#section: "{2}" / "{1}"|1#grille: "{1}"}</label>
@@ -1102,6 +1110,10 @@
             <alert>Expression XPath incorrecte</alert>
             <hint>Expression XPath booléenne</hint>
         </readonly>
+        <nonrelevant>
+            <label>Effacer les valeurs masquées</label>
+            <hint>Effacer immédiatement les valeurs des contrôles de ce conteneur lorsqu'il est masqué</hint>
+        </nonrelevant>
         <repeat>
             <label>Répéter le contenu</label>
         </repeat>

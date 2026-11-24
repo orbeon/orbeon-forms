@@ -33,14 +33,15 @@ object MipName {
   // NOTE: `required` is special: it is evaluated during recalculate, but used during revalidate. In effect both
   // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the *value* of the
   // `required` MIP, not on the XPath of it. See also what we would need for `valid()`, etc. functions.
-  case object Relevant   extends Std with BooleanXPath with Computed               { val name = "relevant"   }
-  case object Readonly   extends Std with BooleanXPath with Computed               { val name = "readonly"   }
-  case object Required   extends Std with BooleanXPath with Computed with Validate { val name = "required"   }
-  case object Constraint extends Std with BooleanXPath with Validate               { val name = "constraint" }
-  case object Calculate  extends Std with StringXPath  with Computed               { val name = "calculate"  }
-  case object Default    extends Ext with StringXPath  with Computed               { val name = "default"    }
-  case object Type       extends Std with Validate                                 { val name = "type"       }
-  case object Whitespace extends Ext with Computed                                 { val name = "whitespace" }
+  case object Relevant    extends Std with BooleanXPath with Computed               { val name = "relevant"    }
+  case object Readonly    extends Std with BooleanXPath with Computed               { val name = "readonly"    }
+  case object Required    extends Std with BooleanXPath with Computed with Validate { val name = "required"    }
+  case object Constraint  extends Std with BooleanXPath with Validate               { val name = "constraint"  }
+  case object Calculate   extends Std with StringXPath  with Computed               { val name = "calculate"   }
+  case object Default     extends Ext with StringXPath  with Computed               { val name = "default"     }
+  case object Type        extends Std with Validate                                 { val name = "type"        }
+  case object Whitespace  extends Ext with Computed                                 { val name = "whitespace"  }
+  case object NonRelevant extends Ext with Computed                                 { val name = "nonrelevant" }
 
   case class Custom(qName: QName) extends StringXPath { // with `ComputedMIP`?
     def name = buildInternalCustomMIPName(qName)
@@ -48,7 +49,7 @@ object MipName {
     def eName: QName = qName
   }
 
-  val AllMipNames            : Set[MipName]          = Set(Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
+  val AllMipNames            : Set[MipName]          = Set(Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace, NonRelevant)
   val AllMipNamesInOrder     : List[String]          = AllMipNames.toList.sortBy(_.name).map(_.name)
 
   val AllComputedMipsByName  : Map[String, Computed] = AllMipNames.collect { case m: Computed => m.name -> m } .toMap

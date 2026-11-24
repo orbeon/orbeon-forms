@@ -584,6 +584,10 @@
             <item id="false">Activar</item>
             <item id="true">Desactivar</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Limpar valores ocultos</label>
+            <hint>Limpar imediatamente os valores de controlos, grelhas e secções ocultos</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Disposição da Página do Navegador</label>
             <hint>Se o formulário tem largura fixa ou fluida</hint>
@@ -1015,6 +1019,10 @@
             <item id="1">Sim</item>
             <item id="2">Não</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Limpar valor quando oculto</label>
+            <hint>Limpar imediatamente o valor deste controlo quando oculto</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Configurações da Secção: "{2}" / "{1}"|1#Configurações da Grelha: "{1}"}</label>
@@ -1065,6 +1073,10 @@
             <alert>Expressão de XPath incorrecta</alert>
             <hint>Expressão XPath do tipo Boolean</hint>
         </readonly>
+        <nonrelevant>
+            <label>Limpar valores ocultos</label>
+            <hint>Limpar imediatamente os valores dos controlos neste contentor quando oculto</hint>
+        </nonrelevant>
         <repeat>
             <label>Repetir conteúdo</label>
         </repeat>

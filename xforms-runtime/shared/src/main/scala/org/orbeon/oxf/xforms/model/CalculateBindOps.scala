@@ -13,14 +13,19 @@
   */
 package org.orbeon.oxf.xforms.model
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.Whitespace.applyPolicy
 import org.orbeon.oxf.xforms.analysis.model.MipName.*
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, MipName, StaticBind, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.model.XFormsModelBinds.*
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
+import org.orbeon.xforms.NonRelevantPolicy
+import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
+import scala.collection.mutable
 import scala.util.control.NonFatal
 
 
@@ -43,23 +48,63 @@ trait CalculateBindOps {
           (if (isFirstCalculate) DefaultsStrategy.All else defaultsStrategy) match {
             case strategy: DefaultsStrategy.Some =>
               applyCalculatedBindsUseOrderIfNeeded(
-                MipName.Default,
-                staticModel.defaultValueOrder,
-                strategy,
-                collector
+                mip                  = MipName.Default,
+                orderOpt             = staticModel.defaultValueOrder,
+                defaultsStrategy     = strategy,
+                collector            = collector,
+                skipNonRelevantEmpty = false
               )
             case _ =>
           }
 
-        if (staticModel.hasCalculateBind)
-          applyCalculatedBindsUseOrderIfNeeded(
-            MipName.Calculate,
-            staticModel.recalculateOrder,
-            DefaultsStrategy.All,
-            collector
-          )
+        if (! staticModel.hasEmptyNonRelevantBind) {
+          if (staticModel.hasCalculateBind)
+            applyCalculatedBindsUseOrderIfNeeded(
+              mip                  = MipName.Calculate,
+              orderOpt             = staticModel.recalculateOrder,
+              defaultsStrategy     = DefaultsStrategy.All,
+              collector            = collector,
+              skipNonRelevantEmpty = false
+            )
 
-        applyComputedExpressionBinds(collector)
+          applyComputedExpressionBinds(collector)
+        } else {
+          var pass         = 0
+          var continueLoop = true
+
+          while (continueLoop) {
+            if (staticModel.hasCalculateBind)
+              applyCalculatedBindsUseOrderIfNeeded(
+                mip                  = MipName.Calculate,
+                orderOpt             = staticModel.recalculateOrder,
+                defaultsStrategy     = DefaultsStrategy.All,
+                collector            = collector,
+                skipNonRelevantEmpty = pass > 0 || ! isFirstCalculate
+              )
+
+            val previouslyClearedCalculateNodes =
+              if (staticModel.hasCalculateBind)
+                collectNonRelevantEmptyCalculateNodes()
+              else
+                Set.empty[om.NodeInfo]
+
+            applyComputedExpressionBinds(collector)
+            dependencies.recalculateDone(model)
+
+            val needAnotherPass = applyNonRelevantBinds(previouslyClearedCalculateNodes, collector)
+            pass += 1
+
+            if (! needAnotherPass) {
+              continueLoop = false
+            } else if (pass >= MaxNonRelevantClearIterations) {
+              warn(
+                "maximum iterations reached when clearing non-relevant values",
+                List("model id" -> model.effectiveId, "iterations" -> pass.toString)
+              )
+              continueLoop = false
+            }
+          }
+        }
       }
     }
     isFirstCalculate = false
@@ -115,8 +160,108 @@ trait CalculateBindOps {
 
   private object Private {
 
+    val MaxNonRelevantClearIterations = 10
+
     // Whether this is the first recalculate for the associated XForms model
     var isFirstCalculate = model.containingDocument.initializing
+
+    def isNonRelevantAndEmpty(bindNode: BindNode): Boolean =
+      (bindNode.node ne null)                                      &&
+      ! InstanceData.getInheritedRelevant(bindNode.node)           &&
+      InstanceData.getInheritedNonRelevantPolicy(bindNode.node) == NonRelevantPolicy.Empty
+
+    def collectNonRelevantEmptyCalculateNodes(): Set[om.NodeInfo] = {
+      val result = mutable.LinkedHashSet.empty[om.NodeInfo]
+      iterateBinds(
+        topLevelBinds,
+        bindNode =>
+          if (bindNode.staticBind.hasXPathMIP(MipName.Calculate) && isNonRelevantAndEmpty(bindNode))
+            result += bindNode.node
+      )
+      result.toSet
+    }
+
+    def applyNonRelevantBinds(
+      previouslyClearedCalculateNodes: Set[om.NodeInfo],
+      collector                      : ErrorEventCollector
+    ): Boolean = {
+      var changed = false
+
+      def setEmptyIfChanged(node: om.NodeInfo, locationData: LocationData): Boolean =
+        DataModel.setValueIfChangedHandleErrors(
+          eventTarget  = model,
+          locationData = locationData,
+          nodeInfo     = node,
+          valueToSet   = "",
+          source       = MipName.NonRelevant.name,
+          isCalculate  = true,
+          collector    = collector
+        )
+
+      def clearElementAndUnboundDescendants(elem: om.NodeInfo, locationData: LocationData): Boolean = {
+        var elemChanged = false
+
+        locally {
+          val attIt = elem.iterateAxis(SaxonUtils.AttributeAxisInfo)
+          var next  = attIt.next()
+          while (next ne null) {
+            val att = next.asInstanceOf[om.NodeInfo]
+            if (att.getURI.isEmpty && ! InstanceData.hasBindNodes(att))
+              elemChanged = setEmptyIfChanged(att, locationData) || elemChanged
+            next = attIt.next()
+          }
+        }
+
+        var hasChildElement = false
+        locally {
+          val childIt = elem.iterateAxis(SaxonUtils.ChildAxisInfo)
+          var next    = childIt.next()
+          while (next ne null) {
+            next match {
+              case child: om.NodeInfo if child.getNodeKind == ELEMENT_NODE =>
+                hasChildElement = true
+                if (! InstanceData.hasBindNodes(child))
+                  elemChanged = clearElementAndUnboundDescendants(child, locationData) || elemChanged
+              case _ =>
+            }
+            next = childIt.next()
+          }
+        }
+
+        if (! hasChildElement)
+          elemChanged = setEmptyIfChanged(elem, locationData) || elemChanged
+
+        elemChanged
+      }
+
+      iterateBinds(
+        topLevelBinds,
+        bindNode =>
+          if (isNonRelevantAndEmpty(bindNode)) {
+            val node = bindNode.node
+            node.getNodeKind match {
+              case ATTRIBUTE_NODE =>
+                changed = setEmptyIfChanged(node, bindNode.locationData) || changed
+              case ELEMENT_NODE =>
+                changed = clearElementAndUnboundDescendants(node, bindNode.locationData) || changed
+              case _ =>
+            }
+          }
+      )
+
+      if (previouslyClearedCalculateNodes.nonEmpty) {
+        val it = previouslyClearedCalculateNodes.iterator
+        while (it.hasNext) {
+          val calcNode = it.next()
+          if (InstanceData.getInheritedRelevant(calcNode)) {
+            model.markValueChange(Some(calcNode), isCalculate = true)
+            changed = true
+          }
+        }
+      }
+
+      changed
+    }
 
     private def evaluateAndSetCustomMIPs(
       bindNode  : BindNode,
@@ -191,14 +336,15 @@ trait CalculateBindOps {
       defaultsStrategy == DefaultsStrategy.All || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(
-      mip              : StringXPath,
-      orderOpt         : Option[List[StaticBind]],
-      defaultsStrategy : DefaultsStrategy.Some,
-      collector        : ErrorEventCollector
+      mip                  : StringXPath,
+      orderOpt             : Option[List[StaticBind]],
+      defaultsStrategy     : DefaultsStrategy.Some,
+      collector            : ErrorEventCollector,
+      skipNonRelevantEmpty : Boolean
     ): Unit = {
       orderOpt match {
         case Some(order) =>
-          applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy, collector)
+          applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy, collector, skipNonRelevantEmpty)
         case None =>
           iterateBinds(
             topLevelBinds,
@@ -207,7 +353,8 @@ trait CalculateBindOps {
               if (
                 staticBind.hasXPathMIP(mip)                                      &&
                 dependencies.requireModelMIPUpdate(model, staticBind, mip, null) &&
-                mustEvaluateNode(bindNode.node, defaultsStrategy)
+                mustEvaluateNode(bindNode.node, defaultsStrategy)                &&
+                ! (skipNonRelevantEmpty && isNonRelevantAndEmpty(bindNode))
               ) {
                 evaluateAndSetCalculatedBind(bindNode, mip, collector)
               }
@@ -217,10 +364,11 @@ trait CalculateBindOps {
     }
 
     private def applyCalculatedBindsFollowDependencies(
-      order            : List[StaticBind],
-      mip              : StringXPath,
-      defaultsStrategy : DefaultsStrategy.Some,
-      collector        : ErrorEventCollector
+      order                : List[StaticBind],
+      mip                  : StringXPath,
+      defaultsStrategy     : DefaultsStrategy.Some,
+      collector            : ErrorEventCollector,
+      skipNonRelevantEmpty : Boolean
     ): Unit =
       order.foreach { staticBind =>
 
@@ -233,7 +381,10 @@ trait CalculateBindOps {
             runtimeBindIt flatMap (_.bindNodes) foreach { bindNode =>
 
               // Skip if we must process only flagged nodes and the node is not flagged
-              if (mustEvaluateNode(bindNode.node, defaultsStrategy)) {
+              if (
+                mustEvaluateNode(bindNode.node, defaultsStrategy) &&
+                ! (skipNonRelevantEmpty && isNonRelevantAndEmpty(bindNode))
+              ) {
                 evaluationCount += 1
                 evaluateAndSetCalculatedBind(bindNode, mip, collector)
               }

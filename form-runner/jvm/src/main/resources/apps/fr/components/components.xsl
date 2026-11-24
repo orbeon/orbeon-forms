@@ -146,6 +146,19 @@
         select="exists(doc('input:form-runner-config')/*/disable-calculate[.  = 'true'])"
         as="xs:boolean"/>
 
+    <xsl:variable
+        name="nonrelevant-policy"
+        as="xs:string"
+        select="
+            if ($disable-relevant or $disable-calculate) then
+                'keep'
+            else
+                (
+                    $fr-form-metadata/nonrelevant[. = ('keep', 'empty')],
+                    p:property(string-join(('oxf.fr.detail.nonrelevant', $app, $form), '.'), $property-profile-opt)[. = ('keep', 'empty')],
+                    'keep'
+                )[1]"/>
+
     <!-- Itemset validation -->
     <xsl:variable
         name="validate-selection-controls-choices"
@@ -1394,6 +1407,10 @@
         match="xf:bind/@calculate[$disable-calculate]"
         mode="filter-mips"/>
 
+    <xsl:template
+        match="xf:bind/@xxf:nonrelevant[$disable-relevant or $disable-calculate]"
+        mode="#all"/>
+
     <!-- Strip any author-provided xxf:functions or xxf:allowed-functions attribute -->
     <xsl:template match="@xxf:functions[$is-restricted-form] | @xxf:allowed-functions[$is-restricted-form]" mode="#all"/>
 
@@ -1431,6 +1448,9 @@
             <xsl:apply-templates select="@*"/>
             <xsl:if test="$is-restricted-form">
                 <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
+            <xsl:if test="$nonrelevant-policy = 'empty' and empty(@xxf:nonrelevant)">
+                <xsl:attribute name="xxf:nonrelevant" select="'empty'"/>
             </xsl:if>
 
             <xsl:variable

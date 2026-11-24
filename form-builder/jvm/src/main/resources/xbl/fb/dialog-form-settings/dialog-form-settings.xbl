@@ -176,6 +176,10 @@
                     value="(event('readonly-disable-calculate')[. = ('true', 'false')], 'default')[1]"/>
 
                 <xf:setvalue
+                    ref="$i/nonrelevant"
+                    value="(event('nonrelevant')[. = ('keep', 'empty')], 'default')[1]"/>
+
+                <xf:setvalue
                     iterate="'relevant', 'readonly'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
@@ -534,6 +538,7 @@
                         <xf:property name="rendered-page-orientation"              value="$i/rendered-page-orientation/string()"/>
                         <xf:property name="rendered-page-size"                     value="$i/rendered-page-size/string()"/>
                         <xf:property name="readonly-disable-calculate"             value="$i/readonly-disable-calculate/string()"/>
+                        <xf:property name="nonrelevant"                            value="$i/nonrelevant/string()"/>
                         <xf:property name="relevant"                               value="$i/relevant/string()"/>
                         <xf:property name="readonly"                               value="$i/readonly/string()"/>
                         <xf:property name="html-page-layout"                       value="$i/html-page-layout/string()"/>
@@ -657,7 +662,7 @@
                         <rendered-page-orientation/>
                         <rendered-page-size/>
                         <readonly-disable-calculate/>
-<!--                        <relevant/>-->
+                        <nonrelevant/>
                         <readonly/>
                         <html-page-layout/>
                         <density/>
@@ -1823,6 +1828,18 @@
                                                 <xf:itemset ref="$resources/dialog-form-settings/readonly-disable-calculate/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="@id"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="nonrelevant" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/nonrelevant/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/nonrelevant/hint"/>
+                                                <xf:itemset ref="$resources/property-yes-no/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'empty' else 'keep'"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>

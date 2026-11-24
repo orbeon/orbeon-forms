@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler.*
 import org.orbeon.oxf.xforms.analysis.model.*
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, WhitespaceMIP, XPathMIP}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{NonRelevantMIP, TypeMIP, WhitespaceMIP, XPathMIP}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.xbl.CommonBinding
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
@@ -697,6 +697,11 @@ object StaticBindBuilder {
         .filterNot(_ == Policy.Preserve)
         .map(new WhitespaceMIP(element.idOrNull, _))
 
+    val nonRelevantMipOpt: Option[NonRelevantMIP] =
+      element.attributeValueOpt(MipName.NonRelevant.aName)
+        .flatMap(v => org.orbeon.xforms.NonRelevantPolicy.withNameOption(v.trimAllToEmpty))
+        .map(new NonRelevantMIP(element.idOrNull, _))
+
     val (newTypeMipOpt, newConstraintXPathMipOpt) = {
 
       def findXblBindingValidations(typeQName: QName): Option[(Option[QName], Option[String], NamespaceMapping)] =
@@ -818,6 +823,7 @@ object StaticBindBuilder {
       bindNameOpt,
       newTypeMipOpt orElse originalTypeMIPOpt,
       whitespaceMipOpt,
+      nonRelevantMipOpt,
       newMipNameToXPathMIPs,
       customMipNameToXPathMIP.toMap,
       bindTree

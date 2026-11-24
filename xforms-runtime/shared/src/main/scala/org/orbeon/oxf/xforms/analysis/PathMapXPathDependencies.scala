@@ -743,6 +743,7 @@ class PathMapXPathDependencies(
       case MipName.Constraint      => bind.constraintsByLevel.getOrElse(level, Nil)
       case MipName.Type            => bind.typeMIPOpt.toList
       case MipName.Whitespace      => bind.nonPreserveWhitespaceMIPOpt.toList
+      case MipName.NonRelevant     => bind.nonRelevantMIPOpt.toList
       case xpathMip: MipName.XPath => bind.getXPathMIPs(xpathMip)
     }
 
@@ -765,6 +766,7 @@ class PathMapXPathDependencies(
           case xpathMIP: StaticBind.XPathMIP => Iterator.single(Some(xpathMIP.analysis))
           case _: StaticBind.TypeMIP         => Iterator.single(bind.valueAnalysis)
           case _: StaticBind.WhitespaceMIP   => Iterator.single(bind.valueAnalysis)
+          case _: StaticBind.NonRelevantMIP  => Iterator.single(bind.valueAnalysis)
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <hidden-keep>from-meta-keep</hidden-keep>
+                            <hidden-empty>from-control-empty</hidden-empty>
+                            <summary/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" name="grid-1" ref="grid-1">
+                        <xf:bind id="hidden-keep-bind" name="hidden-keep" ref="hidden-keep" relevant="false()"/>
+                        <xf:bind id="hidden-empty-bind" name="hidden-empty" ref="hidden-empty" relevant="false()" xxf:nonrelevant="empty"/>
+                        <xf:bind id="summary-bind" name="summary" ref="summary" calculate="concat($hidden-keep, '|', $hidden-empty)"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>2760-meta-keep</form-name>
+                    <title xml:lang="en">Issue #2760 Metadata Keep &amp; Readonly Mode</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                    <nonrelevant>keep</nonrelevant>
+                    <readonly-disable-calculate>true</readonly-disable-calculate>
+                    <permissions>
+                        <permission operations="create read update"/>
+                    </permissions>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>S1</label></section-1>
+                        <hidden-keep><label>Hidden Keep</label><hint/></hidden-keep>
+                        <hidden-empty><label>Hidden Empty</label><hint/></hidden-empty>
+                        <summary><label>Summary</label><hint/></summary>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <xf:input id="hidden-keep-control" bind="hidden-keep-bind"><xf:label ref="$form-resources/hidden-keep/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <xf:input id="hidden-empty-control" bind="hidden-empty-bind"><xf:label ref="$form-resources/hidden-empty/label"/></xf:input>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4">
+                            <xf:input id="summary-control" bind="summary-bind"><xf:label ref="$form-resources/summary/label"/></xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

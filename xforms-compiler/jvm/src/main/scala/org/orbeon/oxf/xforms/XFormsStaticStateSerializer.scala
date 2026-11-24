@@ -539,6 +539,11 @@ object XFormsStaticStateSerializer {
             "policy"     -> a.policy.asJson
           )
 
+          implicit val encodeNonRelevantMIP: Encoder[StaticBind.NonRelevantMIP] = (a: StaticBind.NonRelevantMIP) => Json.obj(
+            "id"         -> Json.fromString(a.id),
+            "policy"     -> a.policy.asJson
+          )
+
           implicit val encodeXPathMipName: Encoder[MipName.XPath] = (a: MipName.XPath) => a.aName.asJson
 
           // This will lose the prefix, is that ok?
@@ -569,6 +574,8 @@ object XFormsStaticStateSerializer {
   //            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
           if (c.nonPreserveWhitespaceMIPOpt.isDefined)
             b += "whitespaceMipOpt"            -> c.nonPreserveWhitespaceMIPOpt.asJson
+          if (c.nonRelevantMIPOpt.isDefined)
+            b += "nonRelevantMipOpt"           -> c.nonRelevantMIPOpt.asJson
           if (c.mipNameToXPathMIP.nonEmpty)
             b += "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson
           if (c.customMipNameToXPathMIP.nonEmpty)

@@ -189,8 +189,9 @@ object Attachment {
     val mediaTypeOpt = (attachment /@ "mediatype") .headOption.flatMap(_.stringValue.trimAllToOpt)
     val contentType  = mediaTypeOpt.getOrElse(ContentTypes.OctetStreamContentType)
     val filenameOpt  = (attachment /@ "filename")  .headOption.flatMap(_.stringValue.trimAllToOpt)
-    val tmpFileOpt   = (attachment /@ "*:tmp-file").headOption.flatMap(_.stringValue.trimAllToOpt)
-    val valueOpt     = tmpFileOpt.orElse(attachment.getStringValue.trimAllToOpt)
+    val mainValueOpt = attachment.getStringValue.trimAllToOpt
+    val tmpFileOpt   = mainValueOpt.flatMap(_ => (attachment /@ "*:tmp-file").headOption.flatMap(_.stringValue.trimAllToOpt))
+    val valueOpt     = tmpFileOpt.orElse(mainValueOpt)
     valueOpt.flatMap { value =>
       if (tmpFileOpt.isEmpty && Option(InstanceData.getType(attachment)).exists(XFormsUploadControl.Base64BinaryQNames)) {
         Option(Base64.decode(value)) match {

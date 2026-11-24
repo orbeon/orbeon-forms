@@ -39,6 +39,17 @@ object RelevanceHandling extends Enum[RelevanceHandling] {
   case object Empty  extends RelevanceHandling
 }
 
+sealed trait NonRelevantPolicy extends EnumEntry with Lowercase
+
+object NonRelevantPolicy extends Enum[NonRelevantPolicy] with CirceEnum[NonRelevantPolicy] {
+
+  val values     = findValues
+  val valuesList = values.toList
+
+  case object Keep  extends NonRelevantPolicy
+  case object Empty extends NonRelevantPolicy
+}
+
 
 sealed trait  UrlType extends EnumEntry
 

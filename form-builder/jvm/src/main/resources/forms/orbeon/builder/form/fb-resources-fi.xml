@@ -604,6 +604,10 @@
             <item id="false">Käytä</item>
             <item id="true">Poista käytöstä</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Tyhjennä piilotetut arvot</label>
+            <hint>Tyhjennä piilotettujen kenttien, ruudukoiden ja osioiden arvot välittömästi</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Selaimen sivun asettelu</label>
             <hint>Käyttääkö lomake kiinteää vai joustavaa leveyttä</hint>
@@ -1035,6 +1039,10 @@
             <item id="1">Kyllä</item>
             <item id="2">Ei</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Tyhjennä arvo piilotettaessa</label>
+            <hint>Tyhjennä tämän kentän arvo välittömästi, kun se on piilotettu</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>Lohkon yksityiskohdat: {0,choice,0#"{2}" / "{1}"|1#"{1}"}</label>
@@ -1085,6 +1093,10 @@
             <alert>Virheellinen XPath-lauseke</alert>
             <hint>Boolean XPath-lauseke</hint>
         </readonly>
+        <nonrelevant>
+            <label>Tyhjennä piilotetut arvot</label>
+            <hint>Tyhjennä tämän säilön kenttien arvot välittömästi, kun se on piilotettu</hint>
+        </nonrelevant>
         <repeat>
             <label>Toista osion sisältö</label>
         </repeat>

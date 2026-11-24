@@ -584,6 +584,10 @@
             <item id="false">Inschakelen</item>
             <item id="true">Uitschakelen</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>Verborgen waarden wissen</label>
+            <hint>Wis onmiddellijk de waarden van verborgen velden, rasters en secties</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>Browserpagina-indeling</label>
             <hint>Of het formulier een vaste of vloeiende breedte heeft</hint>
@@ -1015,6 +1019,10 @@
             <item id="1">Ja</item>
             <item id="2">Nee</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>Waarde wissen indien verborgen</label>
+            <hint>Wis onmiddellijk de waarde van dit veld wanneer het verborgen is</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#Sectie instellingen: "{2}" / "{1}"|1#Grid instellingen: "{1}"}</label>
@@ -1065,6 +1073,10 @@
             <alert>Oneldige XPath expressie</alert>
             <hint>Boolean XPath expressie</hint>
         </readonly>
+        <nonrelevant>
+            <label>Verborgen waarden wissen</label>
+            <hint>Wis onmiddellijk de waarden van velden in deze container wanneer deze verborgen is</hint>
+        </nonrelevant>
         <repeat>
             <label>Herhaal inhoud</label>
         </repeat>

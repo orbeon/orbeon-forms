@@ -603,6 +603,10 @@
             <item id="false">تمكين</item>
             <item id="true">تعطيل</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>مسح القيم المخفية</label>
+            <hint>مسح قيم عناصر التحكم والشبكات والأقسام فور إخفائها</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>تخطيط صفحة المتصفح</label>
             <hint>ما إذا كان النموذج ذو عرض ثابت أو مرن</hint>
@@ -1034,6 +1038,10 @@
             <item id="1">نعم</item>
             <item id="2">لا</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>مسح القيمة عند الإخفاء</label>
+            <hint>مسح قيمة عنصر التحكم هذا فور إخفائه</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#إعدادات القسم: "{2}" / "{1}"|1#إعدادات الشبكة: "{1}"}</label>
@@ -1084,6 +1092,10 @@
             <alert>تعبير XPath غير صحيح</alert>
             <hint>تعبير XPath منطقي</hint>
         </readonly>
+        <nonrelevant>
+            <label>مسح القيم المخفية</label>
+            <hint>مسح قيم عناصر التحكم في هذا الحاوي فور إخفائه</hint>
+        </nonrelevant>
         <repeat>
             <label>تكرار المحتوى</label>
         </repeat>

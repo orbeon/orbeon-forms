@@ -603,6 +603,10 @@
             <item id="false">有効</item>
             <item id="true">無効</item>
         </readonly-disable-calculate>
+        <nonrelevant>
+            <label>非表示の値をクリア</label>
+            <hint>非表示のコントロール、グリッド、セクションの値を即座にクリアします</hint>
+        </nonrelevant>
         <html-page-layout>
             <label>ブラウザ表示幅</label>
             <hint>フォームの幅を固定か可変か</hint>
@@ -1031,6 +1035,10 @@
             <item id="1">はい</item>
             <item id="2">いいえ</item>
         </default-yes-no>
+        <nonrelevant>
+            <label>非表示時に値をクリア</label>
+            <hint>非表示になったときにこのコントロールの値を即座にクリアします</hint>
+        </nonrelevant>
     </dialog-control-settings>
     <dialog-container-settings>
         <label>{0,choice,0#セクション設定: "{2}" / "{1}"|1#グリッド設定: "{1}"}</label>
@@ -1081,6 +1089,10 @@
             <alert>XPath式が不正です</alert>
             <hint>真偽値を返すXPath式</hint>
         </readonly>
+        <nonrelevant>
+            <label>非表示の値をクリア</label>
+            <hint>非表示になったときにこのコンテナ内のコントロールの値を即座にクリアします</hint>
+        </nonrelevant>
         <repeat>
             <label>繰り返しコンテンツ</label>
         </repeat>

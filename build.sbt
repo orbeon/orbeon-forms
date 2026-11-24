@@ -409,6 +409,10 @@ def jUnitTestOptions =
     Test / parallelExecution           := false,
     Test / fork                        := true, // "By default, tests executed in a forked JVM are executed sequentially"
     Test / javaOptions                 ++= testJavaOptions((ThisBuild / baseDirectory).value),
+    Test / javaOptions                 ++= (Test / managedClasspath).value
+      .find(_.get(moduleID.key).exists(m => m.organization == "net.bytebuddy" && m.name == "byte-buddy-agent"))
+      .map(entry => s"-javaagent:${entry.data.getAbsolutePath}")
+      .toList,
     Test / baseDirectory               := Path.absolute(baseDirectory.value / "..")
   )
 

@@ -304,15 +304,24 @@ trait FormRunnerComponentsCompileTime {
     implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     val profileOpt = propertyProfile.trimAllToOpt
 
-    val (valid, invalid) =
-      StyleVariables.fromProperties(app, form, profileOpt)
-        .partition { case (_, value) => StyleVariables.isValidValue(value) }
+    def validVariables(variant: Option[String]): List[(String, String)] = {
 
-    invalid.foreach { case (name, _) =>
-      FormRunnerLogger.warn(s"Ignoring property `${StyleVariables.declaredPropertyName(name, app, form, profileOpt)}` for `$app/$form`, as its value is not an allowed CSS value")
+      val (valid, invalid) =
+        StyleVariables.fromProperties(app, form, profileOpt, variant)
+          .partition { case (_, value) => StyleVariables.isValidValue(value) }
+
+      invalid.foreach { case (name, _) =>
+        FormRunnerLogger.warn(s"Ignoring property `${StyleVariables.declaredPropertyName(name, app, form, profileOpt, variant)}` for `$app/$form`, as its value is not an allowed CSS value")
+      }
+
+      valid
     }
 
-    StyleVariables.toCss(valid)
+    val light = validVariables(None)
+    val dark  = validVariables(Some(StyleVariables.DarkVariant))
+    val print = validVariables(Some(StyleVariables.PrintVariant))
+
+    StyleVariables.toCss(light, dark, print)
   }
 
   // Used by components.xsl

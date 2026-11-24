@@ -1,8 +1,9 @@
 package org.orbeon.fr.rpc
 
 import cats.syntax.option.*
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
@@ -28,7 +29,9 @@ object FormRunnerRpcApiImpl extends FormRunnerRpcApi {
         ImageAttachmentSupport.retrieveResource(
           containingDocument,
           clientId,
-          URI.create(node.getStringValue),
+          // Encode HRRI characters (including spaces) for backwards compatibility with previously persisted
+          // attachment paths saved with unencoded spaces before path-segment percent-encoding was added.
+          URI.create(node.getStringValue.encodeHRRI(processSpace = true)),
           node.attValueOpt("mediatype")
         )
         .map(URI.create(_).some)

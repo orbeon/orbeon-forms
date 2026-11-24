@@ -16,7 +16,9 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.StringUtils.*
 
+import java.io.ByteArrayOutputStream
 import java.lang as jl
+import java.nio.charset.StandardCharsets
 
 
 object PathUtils {
@@ -210,4 +212,79 @@ object PathUtils {
         )
       }
     ).toMap
+
+  private val HexDigits = "0123456789ABCDEF"
+
+  private def isUnreservedUriByte(b: Int): Boolean =
+    (b >= 'A' && b <= 'Z') ||
+    (b >= 'a' && b <= 'z') ||
+    (b >= '0' && b <= '9') ||
+    b == '-' ||
+    b == '.' ||
+    b == '_' ||
+    b == '~'
+
+  def encodePathSegment(s: String): String = {
+    val bytes = s.getBytes(StandardCharsets.UTF_8)
+    val sb    = new jl.StringBuilder(bytes.length * 2)
+    var i     = 0
+    while (i < bytes.length) {
+      val b = bytes(i) & 0xff
+      if (isUnreservedUriByte(b)) {
+        sb.append(b.toChar)
+      } else {
+        sb.append('%')
+        sb.append(HexDigits.charAt(b >>> 4))
+        sb.append(HexDigits.charAt(b & 0x0f))
+      }
+      i += 1
+    }
+    sb.toString
+  }
+
+  def encodePath(path: String): String =
+    path.split("/", -1).map(encodePathSegment).mkString("/")
+
+  def decodePath(path: String): String =
+    if (path.indexOf('%') == -1) {
+      path
+    } else {
+      val sb    = new jl.StringBuilder(path.length)
+      val bytes = new ByteArrayOutputStream
+
+      def flushBytes(): Unit =
+        if (bytes.size() > 0) {
+          sb.append(new String(bytes.toByteArray, StandardCharsets.UTF_8))
+          bytes.reset()
+        }
+
+      var i = 0
+      while (i < path.length) {
+        val c = path.charAt(i)
+        if (c == '%' && i + 2 < path.length) {
+          val hi = Character.digit(path.charAt(i + 1), 16)
+          val lo = Character.digit(path.charAt(i + 2), 16)
+          if (hi >= 0 && lo >= 0) {
+            val b = (hi << 4) | lo
+            if (b == '/') {
+              flushBytes()
+              sb.append(path, i, i + 3)
+            } else {
+              bytes.write(b)
+            }
+            i += 3
+          } else {
+            flushBytes()
+            sb.append(c)
+            i += 1
+          }
+        } else {
+          flushBytes()
+          sb.append(c)
+          i += 1
+        }
+      }
+      flushBytes()
+      sb.toString
+    }
 }

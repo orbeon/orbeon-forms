@@ -222,7 +222,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       getPersistenceURLHeaders(appForm, formOrData)
 
     val serviceURI = PathUtils.appendQueryString(
-      persistenceBaseURL.dropTrailingSlash + path,
+      persistenceBaseURL.dropTrailingSlash + PathUtils.encodePath(path),
       PathUtils.encodeQueryString(request.parameters)
     )
 
@@ -296,7 +296,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
     def buildServiceUri(path: String): String =
       PathUtils.appendQueryString(
-        persistenceBaseURL.dropTrailingSlash + path,
+        persistenceBaseURL.dropTrailingSlash + PathUtils.encodePath(path),
         PathUtils.encodeQueryString(request.parameters)
       )
     val serviceUri           = buildServiceUri(path)
@@ -735,7 +735,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     if (isAttachment) {
       findAttachmentsProvider(appForm, formOrData).map { provider =>
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
-        val serviceURI         = baseURI + path
+        val serviceURI         = baseURI + PathUtils.encodePath(path)
 
         proxyEstablishConnection(OutgoingRequest(request), streamedContent, serviceURI, headers ++ outgoingVersionHeaderOpt)
       }

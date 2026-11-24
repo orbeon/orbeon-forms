@@ -18,6 +18,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{PathUtils, ResourceResolver, URLRewriterUtils}
 import org.orbeon.oxf.xforms.XFormsContextStack
@@ -189,10 +190,13 @@ class XFormsOutputControl(
                 if (urlNorewrite)
                   trimmedInternalValue
                 else
-                  // Resolve `xml:base` and try to obtain a path which is an absolute path without the context
+                  // Resolve `xml:base` and try to obtain a path which is an absolute path without the context.
+                  // Encode HRRI characters (including spaces) for backwards compatibility with previously persisted
+                  // attachment paths saved with unencoded spaces before path-segment percent-encoding was added,
+                  // which would otherwise fail `URI.create` inside `resolveXMLBase`.
                   URLRewriterUtils.rewriteResourceURL(
                     XFormsCrossPlatformSupport.externalContext.getRequest,
-                    containingDocument.resolveXMLBase(staticControl, trimmedInternalValue).toString,
+                    containingDocument.resolveXMLBase(staticControl, trimmedInternalValue.encodeHRRI(processSpace = true)).toString,
                     URLRewriterUtils.getPathMatchers,
                     UrlRewriteMode.AbsolutePathNoContext
                   )

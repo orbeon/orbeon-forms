@@ -30,6 +30,7 @@ import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.resources.handler.DataURLDecoder
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{Base64, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, Mediatypes, PathUtils}
@@ -204,7 +205,9 @@ object Attachment {
             None
         }
       } else if (isUploadedFileOrPersistenceURL(value)) {
-        val uri = new URI(value)
+        // Encode HRRI characters (including spaces) for backwards compatibility with previously persisted
+        // attachment paths saved with unencoded spaces before path-segment percent-encoding was added.
+        val uri = new URI(value.encodeHRRI(processSpace = true))
         Attachment(
           filename       = filenameOpt.orElse(uri.getPath.splitTo[List]("/").lastOption).getOrElse("unknown"),
           contentType    = contentType,

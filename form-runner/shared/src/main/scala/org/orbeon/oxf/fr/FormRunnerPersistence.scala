@@ -858,9 +858,11 @@ trait FormRunnerPersistence {
   ): String = {
     val filename =
       if (XFormsUploadControl.isUploadedFileURL(url))
-        uploadedAttachmentFilename(attachmentHolder)
+        PathUtils.encodePathSegment(uploadedAttachmentFilename(attachmentHolder))
       else
-        getAttachmentPathFilenameRemoveQuery(url)
+        // Encode unencoded spaces in attachment paths saved before path-segment percent-encoding was added,
+        // e.g. when re-saving or moving an attachment from draft to data.
+        getAttachmentPathFilenameRemoveQuery(url).encodeHRRI(processSpace = true)
 
     basePath.appendSlash + filename
   }

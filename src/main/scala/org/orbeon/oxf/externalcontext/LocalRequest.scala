@@ -115,11 +115,13 @@ class LocalRequest private (
   }
 
   // Must return the path including the context
-  def getRequestURI: String =
+  def getRequestURI: String = {
+    val encodedRequestPath = PathUtils.encodePath(getRequestPath)
     if (getContextPath == "/")
-      getRequestPath
+      encodedRequestPath
     else
-      getContextPath + getRequestPath
+      getContextPath + encodedRequestPath
+  }
 
   // 2014-09-10: Only used by `XHTMLToPDFProcessor`
   // Get absolute URL w/o query string e.g. `http://foo.com/a/b/c`
@@ -176,7 +178,8 @@ object LocalRequest {
     content                : Option[StreamedContent]
   ): LocalRequest = {
 
-    val (pathInfo, queryStringOpt) = splitQuery(pathQuery)
+    val (rawPathInfo, queryStringOpt) = splitQuery(pathQuery)
+    val decodedPathInfo               = PathUtils.decodePath(rawPathInfo)
 
     val contentLengthOpt = content.flatMap(_.contentLength)
     val contentTypeOpt   = content.flatMap(_.contentType)
@@ -240,7 +243,7 @@ object LocalRequest {
       getContainerType          = safeRequestCtx.containerType,
       getContainerNamespace     = safeRequestCtx.containerNamespace,
 
-      getPathInfo               = pathInfo,
+      getPathInfo               = decodedPathInfo,
       getContextPath            = safeRequestCtx.contextPath,
       getServletPath            = "",
 

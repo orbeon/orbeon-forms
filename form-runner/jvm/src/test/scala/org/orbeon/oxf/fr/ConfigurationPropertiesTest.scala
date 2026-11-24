@@ -434,6 +434,12 @@ class ConfigurationPropertiesTest
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "published-forms", "title": {"_": "   "}}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "orbeon", "form": ""}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "bad slug!", "form": "bookshelf"}]"""))
+
+      assert(FormRunnerConfiguration.isValidPermissionsJson(""))
+      assert(FormRunnerConfiguration.isValidPermissionsJson("{}"))
+      assert(FormRunnerConfiguration.isValidPermissionsJson("""{"anyone": ["create"], "anyone-with-token": ["read"], "any-authenticated-user": ["read"], "roles": {"clerk": ["read", "list"]}}"""))
+      assert(! FormRunnerConfiguration.isValidPermissionsJson("""{"anybody": ["create"]}"""))
+      assert(! FormRunnerConfiguration.isValidPermissionsJson("""{"roles": {"": ["read"]}}"""))
     }
 
     it("must auto-create 0-override parent Application rows, sort scopes in canonical tree order, preserve unique @id attributes, and omit empty parent rows on save") {

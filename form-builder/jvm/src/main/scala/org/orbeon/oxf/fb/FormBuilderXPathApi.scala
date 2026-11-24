@@ -1375,67 +1375,22 @@ object FormBuilderXPathApi {
     }
 
   //@XPathFunction
+  def alwaysShowRolesJson: String =
+    Property.propertyAsString("oxf.fb.permissions.role.always-show", inScopeContainingDocument.staticState.propertyProfileOpt)
+      .getOrElse("")
+
+  //@XPathFunction
   def propertyProfiles: List[String] =
     CoreCrossPlatformSupport.properties.allProfiles.toList.sorted
 
-  // Called by `permissions.xbl` when loading `instance('fr-form-metadata')/permissions`
-  // TODO: Should just create the UI XML!
   //@XPathFunction
   def normalizePermissionsHandleList(permissionsElOrNull: NodeInfo): NodeInfo =
     PermissionsXML.serialize(PermissionsXML.parse(Option(permissionsElOrNull)), normalized = true)
       .map(NodeConversions.elemToNodeInfo).orNull
 
-  private val PermissionElemName = "permission"
-  private val OperationsElemName = "operations"
-  private val RoleElemName       = "role"
-
   //@XPathFunction
-  def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo = {
-
-    val findAnyonePermissionElem: String => Option[NodeInfo] =
-      (_: String) => (permissionsEl / PermissionElemName).headOption
-
-    val findForPermissionElem: String => Option[NodeInfo] =
-      (condition: String) => (permissionsEl / PermissionElemName).find(_.attValue("for") == condition)
-
-    // NOTE: In `permissions.xbl`, all elements *are* present
-    def findPermissionsFor(conditionOpt: Option[Condition], findElem: String => Option[NodeInfo]): Option[Permission] =
-      findElem(Condition.simpleConditionToStringName(conditionOpt)) flatMap { permissionElem =>
-
-        val specificOperations =
-          Operations.parseFromStringTokensNoWildcard(permissionElem.elemValue(OperationsElemName))
-
-        specificOperations != Operations.None option
-          Permission(
-            conditionOpt.toList,
-            specificOperations
-          )
-      }
-
-    val rawRolePermissions =
-      for {
-        rolePermissionElem <- (permissionsEl / PermissionElemName).toList
-        nonEmptyRoleName   <- rolePermissionElem.elemValueOpt(RoleElemName).flatMap(_.trimAllToOpt)
-        operations         = Operations.parseFromStringTokensNoWildcard(rolePermissionElem.elemValue(OperationsElemName))
-      } yield
-        Permission(List(Condition.RolesAnyOf(List(nonEmptyRoleName))), operations)
-
-    NodeConversions.elemToNodeInfo(
-      PermissionsXML.serialize(
-        Permissions.normalizePermissions(
-          Permissions.Defined(
-            findPermissionsFor(None,                                 findAnyonePermissionElem).toList :::
-            findPermissionsFor(Some(Condition.AnyoneWithToken),      findForPermissionElem).toList    :::
-            findPermissionsFor(Some(Condition.AnyAuthenticatedUser), findForPermissionElem).toList    :::
-            findPermissionsFor(Some(Condition.Owner),                findForPermissionElem).toList    :::
-            findPermissionsFor(Some(Condition.Group),                findForPermissionElem).toList    :::
-            rawRolePermissions
-          )
-        ),
-        normalized = false
-      ).getOrElse(throw new IllegalStateException)
-    )
-  }
+  def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo =
+    PermissionsEditorUI.uiXmlToFormDefinitionXml(permissionsEl)
 
   //@XPathFunction
   def buildFormBuilderControlEffectiveIdOrEmpty(staticId: String): String =

@@ -126,6 +126,10 @@ trait FormRunnerConfiguration {
     LandingCardsConfigXml.isValidLandingCards(value)
 
   //@XPathFunction
+  def isValidPermissionsJson(value: String): Boolean =
+    org.orbeon.oxf.fr.permission.PermissionsEditorUI.isValidPermissionsJson(value)
+
+  //@XPathFunction
   def landingCardsToEditorXml(rawValue: String, fallbackValue: String): DocumentNodeInfoType = {
     val editorDoc = LandingCardsConfigXml.toEditorDom(rawValue, fallbackValue)
     new DocumentWrapper(editorDoc, null, StaticXPath.GlobalConfiguration)
@@ -1756,7 +1760,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       xsType        = "xs:string",
       hasAppForm    = true,
       defaultValue  = "",
-      validationOpt = Some("json")
+      validationOpt = Some("permissions-json")
     ),
     CuratedPropertyDef(
       key           = "access-token-validity",

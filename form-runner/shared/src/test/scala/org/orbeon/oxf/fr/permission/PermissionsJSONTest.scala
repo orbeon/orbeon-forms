@@ -102,5 +102,82 @@ class PermissionsJSONTest extends AnyFunSpecLike {
     it(s"must not parse `$json5`") {
       assertThrows[IllegalArgumentException](PermissionsJSON.parseString(json5).get)
     }
+
+    val jsonTokenAndAuthenticated =
+      """{
+        |  "anyone":                 [ "create" ],
+        |  "anyone-with-token":      [ "read", "update" ],
+        |  "any-authenticated-user": [ "read" ],
+        |  "owner":                  [ "read", "update", "delete" ],
+        |  "group-member":           [ "read" ],
+        |  "roles": {
+        |    "Power User": [ "create", "read", "update", "list" ],
+        |    "admin":      [ "delete", "list" ]
+        |  }
+        |}""".stripMargin
+
+    val adtTokenAndAuthenticated =
+      Permissions.Defined(
+        List(
+          Permission(Nil,                                        SpecificOperations(Set(Operation.Create))),
+          Permission(List(Condition.AnyoneWithToken),            SpecificOperations(Set(Operation.Read, Operation.Update))),
+          Permission(List(Condition.AnyAuthenticatedUser),       SpecificOperations(Set(Operation.Read))),
+          Permission(List(Condition.Owner),                      SpecificOperations(Set(Operation.Read, Operation.Update, Operation.Delete))),
+          Permission(List(Condition.Group),                      SpecificOperations(Set(Operation.Read))),
+          Permission(List(Condition.RolesAnyOf(List("Power User"))), SpecificOperations(Set(Operation.Create, Operation.Read, Operation.Update, Operation.List))),
+          Permission(List(Condition.RolesAnyOf(List("admin"))),      SpecificOperations(Set(Operation.Delete, Operation.List)))
+        )
+      )
+
+    it("must parse `anyone-with-token`, `any-authenticated-user`, and role names with spaces") {
+      assert(Success(adtTokenAndAuthenticated) == PermissionsJSON.parseString(jsonTokenAndAuthenticated))
+    }
+
+    it("must parse `{}` as `Permissions.Defined(Nil)`") {
+      assert(Success(Permissions.Defined(Nil)) == PermissionsJSON.parseString("{}"))
+    }
+
+    it("must reject blank role names") {
+      assert(PermissionsJSON.parseString("""{ "roles": { "": [ "read" ] } }""").isFailure)
+      assert(PermissionsJSON.parseString("""{ "roles": { "   ": [ "read" ] } }""").isFailure)
+    }
+  }
+
+  describe("Serializing JSON permissions format") {
+
+    it("must format `Permissions.Undefined` as empty string and `Permissions.Defined(Nil)` as `{}`") {
+      assert(PermissionsJSON.formatToString(Permissions.Undefined)    == "")
+      assert(PermissionsJSON.formatToString(Permissions.Defined(Nil)) == "{}")
+    }
+
+    it("must expand grouped `RolesAnyOf` permissions per role and round-trip cleanly") {
+      val groupedRolesAdt =
+        Permissions.Defined(
+          List(
+            Permission(List(Condition.AnyoneWithToken),                              SpecificOperations(Set(Operation.Read, Operation.Update))),
+            Permission(List(Condition.AnyAuthenticatedUser),                         SpecificOperations(Set(Operation.Create))),
+            Permission(List(Condition.Owner),                                        SpecificOperations(Set(Operation.Read, Operation.Update))),
+            Permission(List(Condition.RolesAnyOf(List("orbeon-admin", "orbeon-user"))), SpecificOperations(Set(Operation.Read, Operation.Update, Operation.List))),
+            Permission(List(Condition.RolesAnyOf(List("orbeon-admin"))),             SpecificOperations(Set(Operation.Delete)))
+          )
+        )
+
+      val expectedFormatted =
+        """{
+          |  "anyone-with-token": [ "read", "update" ],
+          |  "any-authenticated-user": [ "create" ],
+          |  "owner": [ "read", "update" ],
+          |  "roles": {
+          |    "orbeon-admin": [ "read", "update", "delete", "list" ],
+          |    "orbeon-user": [ "read", "update", "list" ]
+          |  }
+          |}""".stripMargin
+
+      val formatted = PermissionsJSON.formatToString(groupedRolesAdt)
+      assert(formatted == expectedFormatted)
+
+      val reparsed = PermissionsJSON.parseString(formatted).get
+      assert(PermissionsJSON.formatToString(reparsed) == expectedFormatted)
+    }
   }
 }

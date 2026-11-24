@@ -1,0 +1,1037 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:pui="java:org.orbeon.oxf.fr.permission.PermissionsEditorUI">
+
+    <xbl:binding
+        id="fr-permissions-editor"
+        element="fr|permissions-editor"
+        xxbl:mode="lhha binding value">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/permissions-editor/permissions-editor.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="fr-permissions-reload" phase="target">
+                <xf:setvalue ref="instance('state')/@initialized" value="'false'"/>
+                <xf:setvalue ref="instance('state')/@reload-seq"  value="xs:integer(.) + 1"/>
+                <xxf:setvisited control="fr-permissions-editor-root" visited="false" recurse="true"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="permissions-editor-model">
+
+                <xf:instance id="editor" xxf:exclude-result-prefixes="#all">
+                    <editor>
+                        <has-permissions/>
+                        <always-show-roles/>
+                        <permissions/>
+                    </editor>
+                </xf:instance>
+
+                <xf:instance id="state" xxf:exclude-result-prefixes="#all">
+                    <state
+                        initialized="false"
+                        readonly="true"
+                        syncing="false"
+                        mode="visual"
+                        reload-seq="0"
+                        last-json="">
+                        <raw-json/>
+                        <readonly-checked>create read update delete list</readonly-checked>
+                        <readonly-unchecked/>
+                    </state>
+                </xf:instance>
+
+                <xf:instance id="permission-with-role-template" xxf:exclude-result-prefixes="#all">
+                    <permission>
+                        <operations/>
+                        <role/>
+                    </permission>
+                </xf:instance>
+
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <readonly-hint>Enable Override to configure permissions.</readonly-hint>
+                            <enable-permissions>Enable permissions</enable-permissions>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Format</format-json>
+                            <copy-json>Copy</copy-json>
+                            <role>Role</role>
+                            <anyone>Anyone</anyone>
+                            <anyone-with-token>Require token</anyone-with-token>
+                            <any-authenticated-user>Any authenticated user</any-authenticated-user>
+                            <owner>Owner</owner>
+                            <group-member>Group members</group-member>
+                            <create>Create</create>
+                            <read>Read</read>
+                            <update>Update</update>
+                            <delete>Delete</delete>
+                            <list>List</list>
+                            <role-required>Role name is required</role-required>
+                            <role-duplicate>Duplicate role name</role-duplicate>
+                            <invalid-json>Invalid permissions JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <readonly-hint>Activez Surcharger pour configurer les permissions.</readonly-hint>
+                            <enable-permissions>Activer les permissions</enable-permissions>
+                            <visual-mode>Visuel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formater</format-json>
+                            <copy-json>Copier</copy-json>
+                            <role>Rôle</role>
+                            <anyone>Tout le monde</anyone>
+                            <anyone-with-token>Nécessiter un jeton</anyone-with-token>
+                            <any-authenticated-user>Utilisateurs authentifiés</any-authenticated-user>
+                            <owner>Propriétaire</owner>
+                            <group-member>Membres du groupe</group-member>
+                            <create>Créer</create>
+                            <read>Lire</read>
+                            <update>Mettre à jour</update>
+                            <delete>Supprimer</delete>
+                            <list>Lister</list>
+                            <role-required>Le nom du rôle est requis</role-required>
+                            <role-duplicate>Nom de rôle en double</role-duplicate>
+                            <invalid-json>JSON de permissions invalide</invalid-json>
+                        </resource>
+                        <resource xml:lang="de">
+                            <readonly-hint>Aktivieren Sie Überschreiben, um Berechtigungen zu konfigurieren.</readonly-hint>
+                            <enable-permissions>Berechtigungen aktivieren</enable-permissions>
+                            <visual-mode>Visuell</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatieren</format-json>
+                            <copy-json>Kopieren</copy-json>
+                            <role>Rolle</role>
+                            <anyone>Alle</anyone>
+                            <anyone-with-token>Token erforderlich</anyone-with-token>
+                            <any-authenticated-user>Jeder authentifizierte Benutzer</any-authenticated-user>
+                            <owner>Inhaber</owner>
+                            <group-member>Gruppenmitglieder</group-member>
+                            <create>Erstellen</create>
+                            <read>Lesen</read>
+                            <update>Aktualisieren</update>
+                            <delete>Löschen</delete>
+                            <list>Auflisten</list>
+                            <role-required>Rollenname ist erforderlich</role-required>
+                            <role-duplicate>Doppelter Rollenname</role-duplicate>
+                            <invalid-json>Ungültiges Berechtigungs-JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="es">
+                            <readonly-hint>Active Sobrescribir para configurar los permisos.</readonly-hint>
+                            <enable-permissions>Habilitar permisos</enable-permissions>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatear</format-json>
+                            <copy-json>Copiar</copy-json>
+                            <role>Rol</role>
+                            <anyone>Todos</anyone>
+                            <anyone-with-token>Requerir token</anyone-with-token>
+                            <any-authenticated-user>Cualquier usuario autenticado</any-authenticated-user>
+                            <owner>Propietario</owner>
+                            <group-member>Miembros del grupo</group-member>
+                            <create>Crear</create>
+                            <read>Acceder</read>
+                            <update>Modificar</update>
+                            <delete>Eliminar</delete>
+                            <list>Listar</list>
+                            <role-required>El nombre del rol es obligatorio</role-required>
+                            <role-duplicate>Nombre de rol duplicado</role-duplicate>
+                            <invalid-json>JSON de permisos no válido</invalid-json>
+                        </resource>
+                        <resource xml:lang="it">
+                            <readonly-hint>Attiva Sovrascrivi per configurare le autorizzazioni.</readonly-hint>
+                            <enable-permissions>Abilita autorizzazioni</enable-permissions>
+                            <visual-mode>Visuale</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatta</format-json>
+                            <copy-json>Copia</copy-json>
+                            <role>Ruolo</role>
+                            <anyone>Tutti</anyone>
+                            <anyone-with-token>Richiede token</anyone-with-token>
+                            <any-authenticated-user>Qualsiasi utente autenticato</any-authenticated-user>
+                            <owner>Proprietario</owner>
+                            <group-member>Membri del gruppo</group-member>
+                            <create>Crea</create>
+                            <read>Leggi</read>
+                            <update>Aggiorna</update>
+                            <delete>Cancella</delete>
+                            <list>Elenco</list>
+                            <role-required>Il nome del ruolo è obbligatorio</role-required>
+                            <role-duplicate>Nome del ruolo duplicato</role-duplicate>
+                            <invalid-json>JSON delle autorizzazioni non valido</invalid-json>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <readonly-hint>Ative Substituir para configurar as permissões.</readonly-hint>
+                            <enable-permissions>Ativar permissões</enable-permissions>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatar</format-json>
+                            <copy-json>Copiar</copy-json>
+                            <role>Perfil</role>
+                            <anyone>Qualquer um</anyone>
+                            <anyone-with-token>Requer token</anyone-with-token>
+                            <any-authenticated-user>Qualquer utilizador autenticado</any-authenticated-user>
+                            <owner>Proprietário</owner>
+                            <group-member>Membros do grupo</group-member>
+                            <create>Criar</create>
+                            <read>Ler</read>
+                            <update>Atualizar</update>
+                            <delete>Apagar</delete>
+                            <list>Listar</list>
+                            <role-required>O nome do perfil é obrigatório</role-required>
+                            <role-duplicate>Nome de perfil duplicado</role-duplicate>
+                            <invalid-json>JSON de permissões inválido</invalid-json>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <readonly-hint>Aktivera Åsidosätt för att konfigurera rättigheter.</readonly-hint>
+                            <enable-permissions>Aktivera rättigheter</enable-permissions>
+                            <visual-mode>Visuellt</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatera</format-json>
+                            <copy-json>Kopiera</copy-json>
+                            <role>Roll</role>
+                            <anyone>Alla</anyone>
+                            <anyone-with-token>Kräv token</anyone-with-token>
+                            <any-authenticated-user>Alla autentiserade användare</any-authenticated-user>
+                            <owner>Ägare</owner>
+                            <group-member>Gruppmedlemmar</group-member>
+                            <create>Skapa</create>
+                            <read>Läsa</read>
+                            <update>Ändra</update>
+                            <delete>Ta bort</delete>
+                            <list>Lista</list>
+                            <role-required>Rollnamn krävs</role-required>
+                            <role-duplicate>Dubblett av rollnamn</role-duplicate>
+                            <invalid-json>Ogiltig JSON för rättigheter</invalid-json>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <readonly-hint>Ota Korvaa käyttöön määrittääksesi käyttöoikeudet.</readonly-hint>
+                            <enable-permissions>Ota käyttöoikeudet käyttöön</enable-permissions>
+                            <visual-mode>Visuaalinen</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Muotoile</format-json>
+                            <copy-json>Kopioi</copy-json>
+                            <role>Rooli</role>
+                            <anyone>Kuka tahansa</anyone>
+                            <anyone-with-token>Vaadi tunniste</anyone-with-token>
+                            <any-authenticated-user>Kuka tahansa todennettu käyttäjä</any-authenticated-user>
+                            <owner>Omistaja</owner>
+                            <group-member>Ryhmän jäsenet</group-member>
+                            <create>Luo</create>
+                            <read>Lue</read>
+                            <update>Päivitä</update>
+                            <delete>Poista</delete>
+                            <list>Lista</list>
+                            <role-required>Roolin nimi on pakollinen</role-required>
+                            <role-duplicate>Roolin nimi on jo käytössä</role-duplicate>
+                            <invalid-json>Virheellinen käyttöoikeuksien JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <readonly-hint>Schakel Overschrijven in om bevoegdheden te configureren.</readonly-hint>
+                            <enable-permissions>Bevoegdheden inschakelen</enable-permissions>
+                            <visual-mode>Visueel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Opmaak</format-json>
+                            <copy-json>Kopiëren</copy-json>
+                            <role>Rol</role>
+                            <anyone>Iedereen</anyone>
+                            <anyone-with-token>Vereist token</anyone-with-token>
+                            <any-authenticated-user>Elke geauthenticeerde gebruiker</any-authenticated-user>
+                            <owner>Eigenaar</owner>
+                            <group-member>Groepsleden</group-member>
+                            <create>Maken</create>
+                            <read>Lezen</read>
+                            <update>Bijwerken</update>
+                            <delete>Verwijderen</delete>
+                            <list>Lijst</list>
+                            <role-required>Rolnaam is verplicht</role-required>
+                            <role-duplicate>Dubbele rolnaam</role-duplicate>
+                            <invalid-json>Ongeldige bevoegdheden-JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="no">
+                            <readonly-hint>Aktiver Overstyr for å konfigurere tillatelser.</readonly-hint>
+                            <enable-permissions>Aktiver tillatelser</enable-permissions>
+                            <visual-mode>Visuell</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formater</format-json>
+                            <copy-json>Kopier</copy-json>
+                            <role>Rolle</role>
+                            <anyone>Alle</anyone>
+                            <anyone-with-token>Krev token</anyone-with-token>
+                            <any-authenticated-user>Enhver autentisert bruker</any-authenticated-user>
+                            <owner>Eier</owner>
+                            <group-member>Gruppemedlemmer</group-member>
+                            <create>Opprett</create>
+                            <read>Les</read>
+                            <update>Oppdater</update>
+                            <delete>Slett</delete>
+                            <list>Liste</list>
+                            <role-required>Rollenavn er påkrevd</role-required>
+                            <role-duplicate>Duplisert rollenavn</role-duplicate>
+                            <invalid-json>Ugyldig tillatelses-JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <readonly-hint>Włącz Nadpisz, aby skonfigurować uprawnienia.</readonly-hint>
+                            <enable-permissions>Włącz uprawnienia</enable-permissions>
+                            <visual-mode>Wizualny</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatuj</format-json>
+                            <copy-json>Kopiuj</copy-json>
+                            <role>Rola</role>
+                            <anyone>Każdy</anyone>
+                            <anyone-with-token>Wymaga tokenu</anyone-with-token>
+                            <any-authenticated-user>Dowolny uwierzytelniony użytkownik</any-authenticated-user>
+                            <owner>Właściciel</owner>
+                            <group-member>Członkowie grupy</group-member>
+                            <create>Tworzenie</create>
+                            <read>Odczyt</read>
+                            <update>Aktualizacja</update>
+                            <delete>Usuwanie</delete>
+                            <list>Lista</list>
+                            <role-required>Nazwa roli jest wymagana</role-required>
+                            <role-duplicate>Zduplikowana nazwa roli</role-duplicate>
+                            <invalid-json>Nieprawidłowy kod JSON uprawnień</invalid-json>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <readonly-hint>Включите Переопределить, чтобы настроить права доступа.</readonly-hint>
+                            <enable-permissions>Включить управление доступом</enable-permissions>
+                            <visual-mode>Визуально</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Форматировать</format-json>
+                            <copy-json>Копировать</copy-json>
+                            <role>Роль</role>
+                            <anyone>Любой пользователь</anyone>
+                            <anyone-with-token>Требуется токен</anyone-with-token>
+                            <any-authenticated-user>Любой аутентифицированный пользователь</any-authenticated-user>
+                            <owner>Владелец</owner>
+                            <group-member>Члены группы</group-member>
+                            <create>Создание</create>
+                            <read>Чтение</read>
+                            <update>Изменение</update>
+                            <delete>Удаление</delete>
+                            <list>Список</list>
+                            <role-required>Укажите имя роли</role-required>
+                            <role-duplicate>Повторяющееся имя роли</role-duplicate>
+                            <invalid-json>Некорректный JSON прав доступа</invalid-json>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <readonly-hint>権限を設定するには「上書き」を有効にしてください。</readonly-hint>
+                            <enable-permissions>権限を有効にする</enable-permissions>
+                            <visual-mode>ビジュアル</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>整形</format-json>
+                            <copy-json>コピー</copy-json>
+                            <role>ロール</role>
+                            <anyone>誰でも</anyone>
+                            <anyone-with-token>トークン必須</anyone-with-token>
+                            <any-authenticated-user>認証済みユーザー</any-authenticated-user>
+                            <owner>所有者</owner>
+                            <group-member>グループメンバー</group-member>
+                            <create>作成</create>
+                            <read>閲覧</read>
+                            <update>更新</update>
+                            <delete>削除</delete>
+                            <list>一覧</list>
+                            <role-required>ロール名は必須です</role-required>
+                            <role-duplicate>ロール名が重複しています</role-duplicate>
+                            <invalid-json>権限のJSONが無効です</invalid-json>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <readonly-hint>فعّل التجاوز لتكوين الأذونات.</readonly-hint>
+                            <enable-permissions>تمكين الأذونات</enable-permissions>
+                            <visual-mode>مرئي</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>تنسيق</format-json>
+                            <copy-json>نسخ</copy-json>
+                            <role>الدور</role>
+                            <anyone>أي شخص</anyone>
+                            <anyone-with-token>يتطلب رمز</anyone-with-token>
+                            <any-authenticated-user>أي مستخدم مصادق عليه</any-authenticated-user>
+                            <owner>المالك</owner>
+                            <group-member>أعضاء المجموعة</group-member>
+                            <create>إنشاء</create>
+                            <read>قراءة</read>
+                            <update>تحديث</update>
+                            <delete>حذف</delete>
+                            <list>قائمة</list>
+                            <role-required>اسم الدور مطلوب</role-required>
+                            <role-duplicate>اسم الدور مكرر</role-duplicate>
+                            <invalid-json>تنسيق JSON للأذونات غير صالح</invalid-json>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <readonly-hint>Activeu Sobreescriure per configurar els permisos.</readonly-hint>
+                            <enable-permissions>Habilita els permisos</enable-permissions>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formata</format-json>
+                            <copy-json>Copia</copy-json>
+                            <role>Rol</role>
+                            <anyone>Qualsevol</anyone>
+                            <anyone-with-token>Requereix testimoni</anyone-with-token>
+                            <any-authenticated-user>Qualsevol usuari autenticat</any-authenticated-user>
+                            <owner>Propietari</owner>
+                            <group-member>Membres del grup</group-member>
+                            <create>Crea</create>
+                            <read>Llegeix</read>
+                            <update>Actualitza</update>
+                            <delete>Suprimeix</delete>
+                            <list>Llista</list>
+                            <role-required>El nom del rol és obligatori</role-required>
+                            <role-duplicate>Nom de rol duplicat</role-duplicate>
+                            <invalid-json>JSON de permisos no vàlid</invalid-json>
+                        </resource>
+                        <resource xml:lang="da">
+                            <readonly-hint>Aktivér Tilsidesæt for at konfigurere tilladelser.</readonly-hint>
+                            <enable-permissions>Aktivér tilladelser</enable-permissions>
+                            <visual-mode>Visuel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatér</format-json>
+                            <copy-json>Kopiér</copy-json>
+                            <role>Rolle</role>
+                            <anyone>Alle</anyone>
+                            <anyone-with-token>Kræv token</anyone-with-token>
+                            <any-authenticated-user>Enhver godkendt bruger</any-authenticated-user>
+                            <owner>Ejer</owner>
+                            <group-member>Gruppemedlemmer</group-member>
+                            <create>Opret</create>
+                            <read>Læs</read>
+                            <update>Opdater</update>
+                            <delete>Slet</delete>
+                            <list>Liste</list>
+                            <role-required>Rollenavn er påkrævet</role-required>
+                            <role-duplicate>Dubleret rollenavn</role-duplicate>
+                            <invalid-json>Ugyldig tilladelses-JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <readonly-hint>Engedélyezze a Felülbírálást a jogosultságok beállításához.</readonly-hint>
+                            <enable-permissions>Jogosultságok engedélyezése</enable-permissions>
+                            <visual-mode>Vizuális</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formázás</format-json>
+                            <copy-json>Másolás</copy-json>
+                            <role>Szerepkör</role>
+                            <anyone>Bárki</anyone>
+                            <anyone-with-token>Token szükséges</anyone-with-token>
+                            <any-authenticated-user>Bármely hitelesített felhasználó</any-authenticated-user>
+                            <owner>Tulajdonos</owner>
+                            <group-member>Csoporttagok</group-member>
+                            <create>Létrehozás</create>
+                            <read>Olvasás</read>
+                            <update>Módosítás</update>
+                            <delete>Törlés</delete>
+                            <list>Listázás</list>
+                            <role-required>A szerepkör neve kötelező</role-required>
+                            <role-duplicate>Ismétlődő szerepkörnév</role-duplicate>
+                            <invalid-json>Érvénytelen jogosultsági JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <readonly-hint>İzinleri yapılandırmak için Geçersiz Kıl'ı etkinleştirin.</readonly-hint>
+                            <enable-permissions>İzinleri etkinleştir</enable-permissions>
+                            <visual-mode>Görsel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Biçimlendir</format-json>
+                            <copy-json>Kopyala</copy-json>
+                            <role>Rol</role>
+                            <anyone>Herkes</anyone>
+                            <anyone-with-token>Belirteç gerekli</anyone-with-token>
+                            <any-authenticated-user>Kimliği doğrulanmış herhangi bir kullanıcı</any-authenticated-user>
+                            <owner>Sahip</owner>
+                            <group-member>Grup üyeleri</group-member>
+                            <create>Oluştur</create>
+                            <read>Oku</read>
+                            <update>Güncelle</update>
+                            <delete>Sil</delete>
+                            <list>Listele</list>
+                            <role-required>Rol adı gereklidir</role-required>
+                            <role-duplicate>Yinelenen rol adı</role-duplicate>
+                            <invalid-json>Geçersiz izin JSON'u</invalid-json>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <readonly-hint>启用“覆盖”以配置权限。</readonly-hint>
+                            <enable-permissions>启用权限</enable-permissions>
+                            <visual-mode>可视化</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>格式化</format-json>
+                            <copy-json>复制</copy-json>
+                            <role>角色</role>
+                            <anyone>所有人</anyone>
+                            <anyone-with-token>需要令牌</anyone-with-token>
+                            <any-authenticated-user>任何已认证用户</any-authenticated-user>
+                            <owner>所有者</owner>
+                            <group-member>组成员</group-member>
+                            <create>创建</create>
+                            <read>读取</read>
+                            <update>更新</update>
+                            <delete>删除</delete>
+                            <list>列出</list>
+                            <role-required>角色名称为必填项</role-required>
+                            <role-duplicate>角色名称重复</role-duplicate>
+                            <invalid-json>无效的权限 JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <readonly-hint>啟用「覆寫」以設定權限。</readonly-hint>
+                            <enable-permissions>啟用權限</enable-permissions>
+                            <visual-mode>視覺化</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>格式化</format-json>
+                            <copy-json>複製</copy-json>
+                            <role>角色</role>
+                            <anyone>所有人</anyone>
+                            <anyone-with-token>需要權杖</anyone-with-token>
+                            <any-authenticated-user>任何已驗證使用者</any-authenticated-user>
+                            <owner>擁有者</owner>
+                            <group-member>群組成員</group-member>
+                            <create>建立</create>
+                            <read>讀取</read>
+                            <update>更新</update>
+                            <delete>刪除</delete>
+                            <list>列出</list>
+                            <role-required>角色名稱為必填項</role-required>
+                            <role-duplicate>角色名稱重複</role-duplicate>
+                            <invalid-json>無效的權限 JSON</invalid-json>
+                        </resource>
+                    </_>
+                </xf:instance>
+
+                <xf:var name="show-token-permissions"       value="not(string(fr:component-param-value('show-token'))       = 'false')"/>
+                <xf:var name="show-owner-group-permissions" value="not(string(fr:component-param-value('show-owner-group')) = 'false')"/>
+                <xf:var name="show-list-permissions"        value="not(string(fr:component-param-value('show-list'))        = 'false')"/>
+
+                <xf:bind
+                    ref="instance('editor')/descendant-or-self::*"
+                    readonly="instance('state')/@readonly = 'true'"/>
+
+                <xf:bind ref="instance('state')">
+                    <xf:bind ref="readonly-checked | readonly-unchecked" readonly="true()"/>
+                    <xf:bind
+                        ref="raw-json"
+                        readonly="instance('state')/@readonly = 'true'"
+                        constraint="instance('state')/@readonly = 'true' or pui:isValidPermissionsJson(.)"/>
+                </xf:bind>
+
+                <xf:bind ref="instance('editor')/permissions" id="permissions-bind">
+                    <xf:bind ref="permission[1]"                               id="anyone-permission-bind"/>
+                    <xf:bind
+                        id="anyone-with-token-bind"
+                        ref="permission[@for = 'anyone-with-token']"
+                        relevant="$show-token-permissions"/>
+                    <xf:bind ref="permission[@for = 'any-authenticated-user']" id="any-authenticated-user-bind"/>
+                    <xf:bind
+                        id="permission-bind"
+                        ref="permission"
+                        relevant="$show-owner-group-permissions or not(@for = ('owner', 'group-member'))">
+
+                        <xf:bind
+                            ref="role"
+                            required="instance('state')/@readonly != 'true'"
+                            xxf:whitespace="trim"
+                            constraint="
+                                instance('state')/@readonly = 'true' or (
+                                    xxf:non-blank() and
+                                    not((../../permission/role except .) = .)
+                                )"/>
+                    </xf:bind>
+                </xf:bind>
+
+                <xf:action
+                    observer="editor permissions-editor-model"
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed fr-pe-push-json"
+                    if="
+                        instance('state')/@initialized = 'true' and
+                        instance('state')/@syncing != 'true' and
+                        instance('state')/@readonly != 'true' and
+                        instance('state')/@mode = 'visual'">
+                    <xf:var
+                        name="new-json"
+                        value="pui:uiXmlToJson(instance('editor')/has-permissions = 'true', instance('editor')/permissions)"/>
+                    <xf:action if="$new-json != string(instance('state')/@last-json)">
+                        <xf:setvalue ref="instance('state')/@last-json" value="$new-json"/>
+                        <xf:setvalue ref="instance('state')/raw-json"   value="$new-json"/>
+                        <xf:setvalue ref="xxf:binding('fr-permissions-editor')" value="$new-json"/>
+                    </xf:action>
+                </xf:action>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal" id="fr-permissions-editor-root">
+
+                <xf:var name="binding"                  value="xxf:binding('fr-permissions-editor')"/>
+                <xf:var name="state"                    value="instance('state')"/>
+                <xf:var name="editor"                   value="instance('editor')"/>
+                <xf:var name="show-token-permissions"   value="not(string(fr:component-param-value('show-token'))       = 'false')"/>
+                <xf:var name="show-owner-group-permissions" value="not(string(fr:component-param-value('show-owner-group')) = 'false')"/>
+                <xf:var name="show-list-permissions"    value="not(string(fr:component-param-value('show-list'))        = 'false')"/>
+                <xf:var name="show-json-tab"            value="not(string(fr:component-param-value('show-json-tab'))    = 'false')"/>
+                <xf:var name="always-show-roles-json"   value="string(fr:component-param-value('always-show-roles'))"/>
+                <xf:var name="custom-enable-label"      value="string(fr:component-param-value('enable-label'))"/>
+                <xf:var name="effective-enable-label"   value="($custom-enable-label[xxf:non-blank()], fr:r('enable-permissions'))[1]"/>
+                <xf:var name="inherited-json"           value="string(fr:component-param-value('inherited-value'))"/>
+
+                <xf:var
+                    name="is-overridden"
+                    value="(
+                        string(fr:component-param-value('override'))[xxf:non-blank()],
+                        $binding/../@override/string()[xxf:non-blank()],
+                        'true'
+                    )[1]"/>
+
+                <xf:var
+                    name="effective-source-json"
+                    value="
+                        if ($is-overridden = 'true') then
+                            string($binding)
+                        else
+                            (
+                                $inherited-json[xxf:non-blank()],
+                                string($binding)[xxf:non-blank()],
+                                ''
+                            )[1]"/>
+
+                <xf:var
+                    name="sync-trigger"
+                    value="concat($state/@reload-seq, '|', $always-show-roles-json, '|', $effective-source-json)">
+                    <xf:action
+                        event="xforms-enabled xforms-value-changed"
+                        if="$state/@initialized != 'true' or $effective-source-json != string($state/@last-json)">
+                        <xf:setvalue ref="$state/@syncing" value="'true'"/>
+                        <xf:var name="is-valid-source" value="pui:isValidPermissionsJson($effective-source-json)"/>
+                        <xf:insert
+                            ref="$editor"
+                            origin="pui:jsonToUiXml($effective-source-json, $always-show-roles-json)"/>
+                        <xf:setvalue ref="$state/raw-json"    value="pui:formatPermissionsJson($effective-source-json)"/>
+                        <xf:setvalue ref="$state/@last-json"  value="$effective-source-json"/>
+                        <xf:setvalue
+                            if="not($is-valid-source) and $show-json-tab"
+                            ref="$state/@mode"
+                            value="'json'"/>
+                        <xf:setvalue
+                            if="$is-valid-source and not($show-json-tab)"
+                            ref="$state/@mode"
+                            value="'visual'"/>
+                        <xf:setvalue ref="$state/@initialized" value="'true'"/>
+                        <xf:setvalue ref="$state/@syncing"     value="'false'"/>
+                    </xf:action>
+                </xf:var>
+
+                <xf:var
+                    name="is-readonly"
+                    value="fr:is-readonly-mode() or xxf:readonly($binding)">
+                    <xf:action event="xforms-enabled">
+                        <xf:setvalue ref="$state/@readonly" value="string($is-readonly)"/>
+                    </xf:action>
+                    <xf:action event="xforms-value-changed">
+                        <xf:setvalue ref="$state/@readonly" value="string($is-readonly)"/>
+                        <xf:action if="not($is-readonly) and $state/@mode = 'visual'">
+                            <xf:dispatch name="fr-pe-push-json" targetid="permissions-editor-model"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:var>
+
+                <xh:div class="fr-permissions-editor {'fr-permissions-is-readonly'[$is-readonly]} {'fr-permissions-with-tabs'[$show-json-tab]}">
+
+                    <!-- Mode switcher tabs (Visual | JSON) when enabled -->
+                    <xf:group ref=".[$show-json-tab]">
+                        <xh:div class="fr-permissions-mode-tabs" role="tablist">
+                            <xf:trigger
+                                appearance="minimal"
+                                id="fr-permissions-visual-tab"
+                                class="fr-permissions-mode-tab {'fr-permissions-mode-active'[$state/@mode != 'json']}">
+                                <xf:label value="fr:r('visual-mode')"/>
+                                <xf:action event="DOMActivate" if="$state/@mode = 'json'">
+                                    <xf:action if="pui:isValidPermissionsJson($state/raw-json)">
+                                        <xf:setvalue ref="$state/@syncing" value="'true'"/>
+                                        <xf:insert
+                                            ref="$editor"
+                                            origin="pui:jsonToUiXml($state/raw-json, $always-show-roles-json)"/>
+                                        <xf:setvalue ref="$state/@mode"    value="'visual'"/>
+                                        <xf:setvalue ref="$state/@syncing" value="'false'"/>
+                                    </xf:action>
+                                    <xf:action if="not(pui:isValidPermissionsJson($state/raw-json))">
+                                        <xxf:setvisited control="fr-permissions-json-editor" visited="true"/>
+                                    </xf:action>
+                                </xf:action>
+                            </xf:trigger>
+
+                            <xf:trigger
+                                appearance="minimal"
+                                id="fr-permissions-json-tab"
+                                class="fr-permissions-mode-tab {'fr-permissions-mode-active'[$state/@mode = 'json']}">
+                                <xf:label value="fr:r('json-mode')"/>
+                                <xf:action event="DOMActivate" if="$state/@mode != 'json'">
+                                    <xf:setvalue
+                                        ref="$state/raw-json"
+                                        value="pui:uiXmlToJson($editor/has-permissions = 'true', $editor/permissions)"/>
+                                    <xf:setvalue ref="$state/@mode" value="'json'"/>
+                                    <xf:action type="javascript">
+                                        <xf:body>
+                                            const root = (this instanceof Element &amp;&amp; this.closest('.fr-permissions-editor')) || document.querySelector('.fr-permissions-editor');
+                                            if (root) {
+                                                requestAnimationFrame(() =&gt; {
+                                                    const cmEl = root.querySelector('.CodeMirror');
+                                                    if (cmEl &amp;&amp; cmEl.CodeMirror) cmEl.CodeMirror.refresh();
+                                                });
+                                            }
+                                        </xf:body>
+                                    </xf:action>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:div>
+                    </xf:group>
+
+                    <xh:div class="fr-permissions-panel">
+
+                        <!-- Read-only note when Override is off -->
+                        <xf:group ref=".[$is-readonly and exists($binding/../@override)]" class="fr-permissions-readonly-note">
+                            <xh:i class="fa fa-fw fa-lock" aria-hidden="true"/>
+                            <xh:span><xf:output value="fr:r('readonly-hint')"/></xh:span>
+                        </xf:group>
+
+                        <xf:switch caseref="$state/@mode" class="fr-permissions-mode-switch">
+
+                            <!-- Visual Mode -->
+                            <xf:case value="'visual'">
+                                <xh:div class="fr-permissions-visual-body">
+                                    <xf:select ref="$editor/has-permissions" appearance="full" class="fr-has-permissions">
+                                        <xf:item>
+                                            <xf:label value="$effective-enable-label"/>
+                                            <xf:value>true</xf:value>
+                                        </xf:item>
+                                    </xf:select>
+
+                                    <xf:group ref=".[$editor/has-permissions = 'true']">
+                                        <xf:var name="anyone-operations"                 value="xxf:split(bind('anyone-permission-bind')/operations)"/>
+                                        <xf:var name="anyone-with-token-operations"      value="xxf:split(bind('anyone-with-token-bind')/operations)"/>
+                                        <xf:var name="any-authenticated-user-operations" value="xxf:split(bind('any-authenticated-user-bind')/operations)"/>
+
+                                        <!-- Heading fallback shadowed inside each repeat iteration -->
+                                        <xf:var name="is-anyone-with-token" value="false()"/>
+
+                                        <fr:grid
+                                            id="fr-permissions-grid"
+                                            repeat="content"
+                                            bind="permissions-bind"
+                                            template="instance('permission-with-role-template')"
+                                            iteration-name="permission"
+                                            freeze="{
+                                                2 +
+                                                (if ($show-token-permissions)       then 1 else 0) +
+                                                (if ($show-owner-group-permissions) then 2 else 0) +
+                                                count($editor/always-show-roles/role)
+                                            }"
+                                            clear-constraint="exists(role)"
+                                            columns="24"
+                                            class="fr-permissions-grid">
+
+                                            <xf:var name="is-anyone"                 value="empty(role) and empty(@for)"/>
+                                            <xf:var name="is-anyone-with-token"      value="@for = 'anyone-with-token'"/>
+                                            <xf:var name="is-any-authenticated-user" value="@for = 'any-authenticated-user'"/>
+                                            <xf:var name="is-owner-group"            value="@for = ('owner', 'group-member')"/>
+                                            <xf:var name="current-ops"               value="xxf:split(operations)"/>
+
+                                            <!-- Column 1: Role name or condition label -->
+                                            <fr:c class="fr-role" x="1" w="9">
+                                                <xf:output
+                                                    appearance="minimal"
+                                                    ref=".[$is-anyone or exists(@for)]"
+                                                    class="fr-permission-condition-label{' fr-permission-token-label'[$is-anyone-with-token]}"
+                                                    value="
+                                                        let $for-value := string(context()/@for)
+                                                        return
+                                                            if (xxf:non-blank($for-value)) then
+                                                                fr:r($for-value)
+                                                            else
+                                                                fr:r('anyone')">
+                                                    <xf:label value="fr:r('role')"/>
+                                                </xf:output>
+                                                <xf:group ref=".[exists(role)]">
+                                                    <xf:var name="is-always-show-roles" value="role = $editor/always-show-roles/role"/>
+                                                    <xf:output appearance="minimal" ref="role[$is-always-show-roles]" class="fr-permission-condition-label"/>
+                                                    <xf:input
+                                                        id="fr-permissions-role-input"
+                                                        ref="role[not($is-always-show-roles)]"
+                                                        incremental="true"
+                                                        class="fr-role-name">
+                                                        <xf:alert value="if (xxf:is-blank()) then fr:r('role-required') else fr:r('role-duplicate')"/>
+                                                    </xf:input>
+                                                </xf:group>
+                                            </fr:c>
+
+                                            <!-- Column 2: Create -->
+                                            <fr:c x="10" w="3">
+                                                <xf:select
+                                                    id="fr-permissions-create-checkbox"
+                                                    ref="
+                                                        if ($is-anyone) then
+                                                            operations
+                                                        else if ($is-anyone-with-token) then
+                                                            ()
+                                                        else if ($is-any-authenticated-user) then
+                                                            if ($anyone-operations = 'create' and not($anyone-with-token-operations = 'create')) then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations
+                                                        else if ($is-owner-group) then
+                                                            ()
+                                                        else if (
+                                                            $anyone-operations = 'create' and not($anyone-with-token-operations = 'create') or
+                                                            $any-authenticated-user-operations = 'create'
+                                                        ) then
+                                                            $state/readonly-checked
+                                                        else
+                                                            operations"
+                                                    appearance="full"
+                                                    class="fr-create-permission{' fr-align-right'[$is-anyone-with-token]}">
+                                                    <xf:label value="fr:r('create')"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('create')"/>
+                                                        <xf:value>create</xf:value>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </fr:c>
+
+                                            <!-- Column 3: Read -->
+                                            <fr:c x="13" w="3">
+                                                <xf:select
+                                                    id="fr-permissions-read-checkbox"
+                                                    ref="
+                                                        if ($is-anyone) then
+                                                            if (xxf:split(operations) = 'update') then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations
+                                                        else if ($is-anyone-with-token) then
+                                                            if ($anyone-with-token-operations = 'update') then
+                                                                $state/readonly-checked
+                                                            else if ($anyone-operations = ('read', 'update')) then
+                                                                operations
+                                                            else
+                                                                $state/readonly-unchecked
+                                                        else if ($is-any-authenticated-user) then
+                                                            if (
+                                                                $anyone-operations = ('read', 'update') and
+                                                                not($anyone-with-token-operations = ('read', 'update')) or
+                                                                $any-authenticated-user-operations = 'update'
+                                                            ) then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations
+                                                        else if (
+                                                            $anyone-operations = ('read', 'update') and
+                                                            not($anyone-with-token-operations = ('read', 'update')) or
+                                                            $any-authenticated-user-operations = ('read', 'update') or
+                                                            $current-ops = 'update'
+                                                        ) then
+                                                            $state/readonly-checked
+                                                        else
+                                                            operations"
+                                                    appearance="full"
+                                                    class="fr-read-permission{' fr-align-right'[$is-anyone-with-token]}">
+                                                    <xf:label value="fr:r('read')"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('read')"/>
+                                                        <xf:value>read</xf:value>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </fr:c>
+
+                                            <!-- Column 4: Update -->
+                                            <fr:c x="16" w="3">
+                                                <xf:select
+                                                    id="fr-permissions-update-checkbox"
+                                                    ref="
+                                                        let $op := 'update'
+                                                        return
+                                                            if ($is-anyone) then
+                                                                operations
+                                                            else if ($is-anyone-with-token) then
+                                                                if ($anyone-operations = $op) then
+                                                                    operations
+                                                                else
+                                                                    $state/readonly-unchecked
+                                                            else if ($is-any-authenticated-user) then
+                                                                if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                                    $state/readonly-checked
+                                                                else
+                                                                    operations
+                                                            else if (
+                                                                $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                                $any-authenticated-user-operations = $op
+                                                            ) then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations"
+                                                    appearance="full"
+                                                    class="fr-update-permission{' fr-align-right'[$is-anyone-with-token]}">
+                                                    <xf:label value="fr:r('update')"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('update')"/>
+                                                        <xf:value>update</xf:value>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </fr:c>
+
+                                            <!-- Column 5: Delete -->
+                                            <fr:c x="19" w="3">
+                                                <xf:select
+                                                    id="fr-permissions-delete-checkbox"
+                                                    ref="
+                                                        let $op := 'delete'
+                                                        return
+                                                            if ($is-anyone) then
+                                                                operations
+                                                            else if ($is-anyone-with-token) then
+                                                                ()
+                                                            else if ($is-any-authenticated-user) then
+                                                                if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                                    $state/readonly-checked
+                                                                else
+                                                                    operations
+                                                            else if (
+                                                                $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                                $any-authenticated-user-operations = $op
+                                                            ) then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations"
+                                                    appearance="full"
+                                                    class="fr-delete-permission{' fr-align-right'[$is-anyone-with-token]}">
+                                                    <xf:label value="fr:r('delete')"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('delete')"/>
+                                                        <xf:value>delete</xf:value>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </fr:c>
+
+                                            <!-- Column 6: List -->
+                                            <fr:c x="22" w="3">
+                                                <xf:select
+                                                    id="fr-permissions-list-checkbox"
+                                                    ref="
+                                                        let $op := 'list'
+                                                        return
+                                                            if (not($show-list-permissions)) then
+                                                                ()
+                                                            else if ($is-anyone) then
+                                                                operations
+                                                            else if ($is-anyone-with-token) then
+                                                                ()
+                                                            else if ($is-any-authenticated-user) then
+                                                                if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                                    $state/readonly-checked
+                                                                else
+                                                                    operations
+                                                            else if ($is-owner-group) then
+                                                                ()
+                                                            else if (
+                                                                $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                                $any-authenticated-user-operations = $op
+                                                            ) then
+                                                                $state/readonly-checked
+                                                            else
+                                                                operations"
+                                                    appearance="full"
+                                                    class="fr-list-permission{' fr-align-right'[$is-anyone-with-token]}">
+                                                    <xf:label value="fr:r('list')"/>
+                                                    <xf:item>
+                                                        <xf:label value="fr:r('list')"/>
+                                                        <xf:value>list</xf:value>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </fr:c>
+                                        </fr:grid>
+                                    </xf:group>
+                                </xh:div>
+                            </xf:case>
+
+                            <!-- JSON Mode -->
+                            <xf:case value="'json'">
+                                <xh:div class="fr-permissions-json-wrap">
+                                    <xh:div class="fr-permissions-json-overlay">
+                                        <fr:code-mirror
+                                            id="fr-permissions-json-editor"
+                                            ref="$state/raw-json"
+                                            mediatype="application/json"
+                                            class="fr-permissions-json-codemirror">
+                                            <xf:alert value="fr:r('invalid-json')"/>
+                                            <xf:action event="xforms-value-changed" if="not($is-readonly)">
+                                                <xf:var name="raw" value="string($state/raw-json)"/>
+                                                <xf:action if="$raw != string($state/@last-json)">
+                                                    <xf:setvalue ref="$state/@last-json" value="$raw"/>
+                                                    <xf:setvalue ref="$binding"          value="$raw"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </fr:code-mirror>
+
+                                        <xh:div class="fr-permissions-json-buttons">
+                                            <xf:group ref=".[not($is-readonly)]">
+                                                <xf:trigger appearance="minimal" id="fr-permissions-format-json" class="fr-permissions-json-btn">
+                                                    <xf:label><xh:i class="fa fa-fw fa-align-left" aria-hidden="true"/></xf:label>
+                                                    <xf:hint value="fr:r('format-json')"/>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:var name="formatted" value="pui:formatPermissionsJson($state/raw-json)"/>
+                                                        <xf:setvalue ref="$state/raw-json"   value="$formatted"/>
+                                                        <xf:setvalue ref="$state/@last-json" value="$formatted"/>
+                                                        <xf:setvalue ref="$binding"          value="$formatted"/>
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xf:group>
+                                            <xf:trigger appearance="minimal" id="fr-permissions-copy-json" class="fr-permissions-json-btn">
+                                                <xf:label><xh:i class="fa fa-fw fa-copy" aria-hidden="true"/></xf:label>
+                                                <xf:hint value="fr:r('copy-json')"/>
+                                                <xf:action event="DOMActivate" type="javascript">
+                                                    <xf:param name="text" value="string($state/raw-json)"/>
+                                                    <xf:body>
+                                                        const btn = (this instanceof Element &amp;&amp; this.querySelector('button')) || this;
+                                                        if (navigator.clipboard &amp;&amp; navigator.clipboard.writeText) {
+                                                            navigator.clipboard.writeText(text).then(() =&gt; {
+                                                                if (btn &amp;&amp; btn.classList) {
+                                                                    btn.classList.add('fr-permissions-copy-success');
+                                                                    const icon = btn.querySelector('i');
+                                                                    if (icon) icon.className = 'fa fa-fw fa-check';
+                                                                    setTimeout(() =&gt; {
+                                                                        btn.classList.remove('fr-permissions-copy-success');
+                                                                        if (icon) icon.className = 'fa fa-fw fa-copy';
+                                                                    }, 1200);
+                                                                }
+                                                            });
+                                                        }
+                                                    </xf:body>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:div>
+                                    </xh:div>
+                                </xh:div>
+                            </xf:case>
+                        </xf:switch>
+                    </xh:div>
+                </xh:div>
+
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

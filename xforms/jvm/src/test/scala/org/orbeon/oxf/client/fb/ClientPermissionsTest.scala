@@ -22,11 +22,11 @@ import org.scalatestplus.junit.AssertionsForJUnit
 trait ClientPermissionsTest extends AssertionsForJUnit with FormBuilderOps {
 
   private def permissionSelector(selector: String): CssSelectorQuery = cssSelector(s".fb-permissions-dialog $selector")
-  private def role(line: Int): CssSelectorQuery = permissionSelector(s".fb-role-name[id $$= '${RepeatSeparatorString + line}'] input")
-  private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fb-$crud-permission[id $$= '${RepeatSeparatorString + line}'] input")
+  private def role(line: Int): CssSelectorQuery = permissionSelector(s".fr-role-name[id $$= '${RepeatSeparatorString + line}'] input")
+  private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fr-$crud-permission[id $$= '${RepeatSeparatorString + line}'] input")
 
   private val OpenPermissions  = cssSelector("#fb-permissions-button button")
-  private val HasPermissions   = permissionSelector(".fb-has-permissions input")
+  private val HasPermissions   = permissionSelector(".fr-has-permissions input")
   private val AddPermission    = permissionSelector(".fb-add-permission a")
   private val Apply            = permissionSelector("[id $= 'save-trigger']")
 

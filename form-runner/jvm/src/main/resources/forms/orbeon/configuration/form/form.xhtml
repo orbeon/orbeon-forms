@@ -951,6 +951,7 @@
                             frf:isValidAttachmentSizeQuantity(string(../quantity), string(../quantity/@unit))"/>
                     <xf:bind ref="@value[../@validation = 'duration']"                                                         xxf:whitespace="trim" constraint="frf:isValidCacheDuration(.)"/>
                     <xf:bind ref="@value[../@validation = 'json']"                                                             xxf:whitespace="trim" constraint="frf:isValidJson(.)"/>
+                    <xf:bind ref="@value[../@validation = 'permissions-json']"                                                 xxf:whitespace="trim" constraint="frf:isValidPermissionsJson(.)"/>
                     <xf:bind ref="@value[../@validation = 'landing-cards']"                                                    xxf:whitespace="trim" constraint="frf:isValidLandingCards(.)"/>
                 </xf:bind>
 
@@ -1102,6 +1103,7 @@
                             <port>Enter a valid TCP port (1–65535) or leave blank</port>
                             <percentage>Enter a percentage between 0% and 100%</percentage>
                             <json>Invalid JSON syntax</json>
+                            <permissions-json>Complete all required role names or fix invalid permissions JSON</permissions-json>
                             <landing-cards>Complete all required card fields</landing-cards>
                             <byte-size>Enter a byte size or max-heap percentage (1–100%), e.g. 15%, 256m, 1g, or 0</byte-size>
                             <attachment-size>Enter a non-negative size yielding a whole number of bytes</attachment-size>
@@ -3273,8 +3275,8 @@
                             <hint>Registration URI template for the user menu &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
                         </auth-user-menu-uri-register>
                         <permissions>
-                            <label>Form Runner Permissions (JSON)</label>
-                            <hint>JSON permissions definition &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+                            <label>Form Runner Permissions</label>
+                            <hint>Permissions definition &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
                         </permissions>
                         <access-token-validity>
                             <label>Access Token Validity (Minutes)</label>
@@ -3340,6 +3342,7 @@
                             <port>Saisissez un port TCP valide (1–65535) ou laissez vide</port>
                             <percentage>Saisissez un pourcentage compris entre 0 % et 100 %</percentage>
                             <json>Syntaxe JSON invalide</json>
+                            <permissions-json>Complétez tous les noms de rôles requis ou corrigez le JSON des permissions</permissions-json>
                             <landing-cards>Complétez tous les champs requis des cartes</landing-cards>
                             <byte-size>Saisissez une taille en octets ou un pourcentage du tas max (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
                             <attachment-size>Saisissez une taille positive ou nulle correspondant à un nombre entier d'octets</attachment-size>
@@ -5511,8 +5514,8 @@
                             <hint>URI d'inscription pour le menu utilisateur &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
                         </auth-user-menu-uri-register>
                         <permissions>
-                            <label>Permissions Form Runner (JSON)</label>
-                            <hint>Définition JSON des permissions &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+                            <label>Permissions Form Runner</label>
+                            <hint>Définition des permissions &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
                         </permissions>
                         <access-token-validity>
                             <label>Validité du jeton d'accès (Minutes)</label>
@@ -8804,17 +8807,50 @@
                                     </fr:c>
 
                                     <fr:c x="1" y="5" w="12" class="fr-config-has-override">
+                                        <xf:var
+                                            name="active-app"
+                                            value="if ($is-global-scope) then '*' else string($active-override/@app)"/>
+                                        <xf:var
+                                            name="active-form"
+                                            value="if ($is-global-scope) then '*' else string($active-override/@form)"/>
+                                        <xf:var
+                                            name="inherited-permissions-json"
+                                            value="
+                                                (
+                                                    if (not($is-global-scope) and $active-form != '*') then
+                                                        instance('fr-configuration-instance')/app-form-overrides/override[@app = $active-app and @form = '*' and xxf:is-blank(@profiles)]/curated/security/permissions[@override = 'true']/@value/string()
+                                                    else (),
+                                                    if (not($is-global-scope)) then
+                                                        instance('fr-configuration-instance')/curated/security/permissions[@override = 'true']/@value/string()
+                                                    else (),
+                                                    if (not($is-global-scope) and $active-form != '*') then
+                                                        xxf:property(concat('oxf.fr.permissions.', $active-app, '.', $active-form))
+                                                    else (),
+                                                    if (not($is-global-scope)) then
+                                                        xxf:property(concat('oxf.fr.permissions.', $active-app, '.*'))
+                                                    else (),
+                                                    xxf:property('oxf.fr.permissions.*.*'),
+                                                    string(permissions/@default)
+                                                )[xxf:non-blank()][1]"/>
                                         <fr:checkbox-input id="permissions-override-control" ref="permissions/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'true' and xxf:is-blank(../@value)">
+                                                <xf:setvalue ref="../@value" value="($inherited-permissions-json[xxf:non-blank()], '{}')[1]"/>
+                                            </xf:action>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <fr:code-mirror id="permissions-value-control" ref="permissions/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
+                                        <fr:permissions-editor
+                                            id="permissions-value-control"
+                                            ref="permissions/@value"
+                                            inherited-value="{$inherited-permissions-json}"
+                                            show-json-tab="true"
+                                            class="fr-config-value-control">
                                             <xf:label ref="$form-resources/permissions/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/permissions/hint else replace($form-resources/permissions/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/json"/>
-                                        </fr:code-mirror>
+                                            <xf:alert ref="$form-resources/alerts/permissions-json"/>
+                                        </fr:permissions-editor>
                                     </fr:c>
 
                                     <fr:c x="1" y="6" w="12" class="fr-config-has-override">

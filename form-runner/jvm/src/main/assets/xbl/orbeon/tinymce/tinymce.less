@@ -34,7 +34,7 @@
         .focusHighlight();
     }
 
-    .tox-tinymce {
+    .tox-hugerte {
         border-radius: var(--orbeon-control-border-radius); // Slightly rounded border, like we do for other controls
     }
 }
@@ -54,18 +54,18 @@ body {
         }
     }
 
-    .xforms-dialog .tox-tinymce--toolbar-sticky-off {
+    .xforms-dialog .tox-hugerte--toolbar-sticky-off {
         // For the `top` and `left` to be relative to the viewport, not the dialog,
         // as TinyMCE sets those assuming the toolbar is in the document body.
         position: fixed !important;
     }
-    .tox.tox-tinymce-inline {
+    .tox.tox-hugerte-inline {
         .tox-editor-header {
             z-index: 1500; // so it shows in front of modals
         }
     }
 
-    .tox:not(.tox-tinymce-inline) .tox-editor-header {
+    .tox:not(.tox-hugerte-inline) .tox-editor-header {
         box-shadow: none;
         padding-top: 0;
     }

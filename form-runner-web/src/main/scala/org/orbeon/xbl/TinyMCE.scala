@@ -38,8 +38,8 @@ object TinyMCE {
   document.addEventListener("DOMContentLoaded", { (_: dom.Event) =>
 
     val PositionedElementClasses = List(
-      "tox-tinymce-inline", // Inline toolbar
-      "tox-tinymce-aux"     // Dialog, e.g. link editor
+      "tox-hugerte-inline", // Inline toolbar
+      "tox-hugerte-aux"     // Dialog, e.g. link editor
     )
 
     // TODO: see if we can use the `MutationObserver` code in `DomSupport.scala`

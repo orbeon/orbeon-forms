@@ -4,9 +4,10 @@ import org.log4s.Logger
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory, Mediatypes}
+import org.orbeon.oxf.util.{ByteSizeUtils, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Mediatypes}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
@@ -295,6 +296,23 @@ trait FormRunnerComponentsCompileTime {
       FormRunnerLogger.warn(s"Theme '$themeName' has no '$propertyName' property mapping, falling back to default '$DefaultTheme' theme")
       propertyNameAndValueOpt(DefaultTheme)._2
     }.orNull
+  }
+
+  //@XPathFunction
+  def styleVariablesCss(app: String, form: String, propertyProfile: String): Option[String] = {
+
+    implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
+    val profileOpt = propertyProfile.trimAllToOpt
+
+    val (valid, invalid) =
+      StyleVariables.fromProperties(app, form, profileOpt)
+        .partition { case (_, value) => StyleVariables.isValidValue(value) }
+
+    invalid.foreach { case (name, _) =>
+      FormRunnerLogger.warn(s"Ignoring property `${StyleVariables.declaredPropertyName(name, app, form, profileOpt)}` for `$app/$form`, as its value is not an allowed CSS value")
+    }
+
+    StyleVariables.toCss(valid)
   }
 
   // Used by components.xsl

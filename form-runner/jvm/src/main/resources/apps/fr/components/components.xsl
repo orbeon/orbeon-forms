@@ -272,6 +272,10 @@
         name="theme-css-uri"
         as="xs:string?"
         select="frf:resolveThemeCssUri($theme, $property-profile-opt)"/>
+    <xsl:variable
+        name="style-variables-css"
+        as="xs:string?"
+        select="frf:styleVariablesCss($app, $form, $property-profile-opt)"/>
 
     <xsl:variable
         name="assets-baseline-updates"
@@ -807,6 +811,11 @@
             <xsl:for-each select="$css-uri">
                 <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
             </xsl:for-each>
+
+            <!-- Theme variables overridden via `oxf.fr.style.variable.*` -->
+            <xsl:if test="exists($style-variables-css)">
+                <xh:style type="text/css"><xsl:value-of select="$style-variables-css"/></xh:style>
+            </xsl:if>
 
             <!-- Handle existing stylesheets -->
             <xsl:for-each select="xh:link[not(@rel = 'icon')] | xh:style">

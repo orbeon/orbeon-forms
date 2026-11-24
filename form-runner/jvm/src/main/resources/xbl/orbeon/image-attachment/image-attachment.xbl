@@ -1378,10 +1378,10 @@
                 "/>
             <xf:var
                 name="lightbox"
-                value="fr:component-param-value('lightbox') = 'true'"/>
+                value="string(fr:component-param-value('lightbox')) = 'true'"/>
             <xf:var
                 name="view-mode"
-                value="if ($multiple and fr:component-param-value('view-mode') = 'carousel') then 'carousel' else 'grid'"/>
+                value="if ($multiple and string(fr:component-param-value('view-mode')) = 'carousel') then 'carousel' else 'grid'"/>
             <xf:var
                 name="carousel-size"
                 value="

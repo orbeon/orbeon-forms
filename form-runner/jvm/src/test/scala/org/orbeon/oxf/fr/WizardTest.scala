@@ -226,6 +226,40 @@ class WizardTest
       }
     }
 
+    it("must not emit XPath formula errors during initialization or navigation in test mode") {
+
+      val (processorService, Some(doc), _) =
+        runFormRunner("tests", "wizard", "test")
+
+      def hasConsoleDataScript: Boolean =
+        doc.getScriptsToRun.exists {
+          case Right(Left(si)) => si.script.shared.body.contains("fr-console-data")
+          case _               => false
+        }
+
+      assert(! hasConsoleDataScript)
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, doc) {
+
+          def resolveControlStaticId(staticId: String) =
+            resolveObject[XFormsInputControl](staticId, container = doc).get.effectiveId
+
+          def doNext() =
+            XFormsAPI.dispatch(name = "fr-next", targetId = Names.ViewComponent)
+
+          setControlValue(resolveControlStaticId("control-11-control"), "Mickey")
+          doNext()
+          assert(! hasConsoleDataScript)
+
+          setControlValue(resolveControlStaticId("control-21-control"), "Minnie")
+          doNext()
+          assert(Wizard.isWizardLastPage)
+          assert(! hasConsoleDataScript)
+        }
+      }
+    }
+
     ignore("must handle section relevance") {
       // TODO: Would be great to have a test for this!
     }

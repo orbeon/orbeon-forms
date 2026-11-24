@@ -220,7 +220,7 @@
                 <xf:bind ref="validate"                               xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
                 <xf:bind ref="toc-position"         type="xs:string"  xxf:default="Wizard:normalizeTocPosition(fr:component-param-value('toc-position'), fr:component-param-value('separate-toc'))"/>
                 <xf:bind ref="separate-toc"         type="xs:boolean" xxf:default="../toc-position/data(.) = 'separate'"/>
-                <xf:bind ref="section-status"       type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
+                <xf:bind ref="section-status"       type="xs:boolean" xxf:default="../separate-toc/data(.) or string(fr:component-param-value('section-status')) = 'true'"/>
                 <xf:bind ref="visit-on-page-change" type="xs:string"  xxf:default="fr:component-param-value('visit-on-page-change')"/>
 
                 <xf:bind ref="current-index"        type="xs:integer" xxf:default="1"/>
@@ -569,7 +569,9 @@
 
                         <xf:var
                             name="fr-wizard-nav-case-index"
-                            value="index-of($fr-wizard-relevant-nav-case-ids, $fr-wizard-current-nav-case-id)"/>
+                            value="
+                                for $case-id in $fr-wizard-current-nav-case-id
+                                return index-of($fr-wizard-relevant-nav-case-ids, $case-id)"/>
 
                         <xf:var
                             name="fr-wizard-top-level-case-index"
@@ -702,17 +704,21 @@
                         <xf:var
                             name="fr-wizard-next-nested-case-id-opt"
                             value="
-                                let $next-nav-case-id := $fr-wizard-next-nav-case-ids[1]
+                                for $next-nav-case-id    in $fr-wizard-next-nav-case-ids[1],
+                                    $next-nav-section-id in $fr-wizard-next-nav-section-id
                                 return
-                                    $next-nav-case-id[
+                                    if (
                                         $fr-wizard-current-top-level-section-id =
                                             $fr-wizard-nav-matching-top-level-section-ids[
                                                 index-of(
                                                     $fr-wizard-nav-section-or-grid-ids,
-                                                    $fr-wizard-next-nav-section-id
+                                                    $next-nav-section-id
                                                 )
                                             ]
-                                    ]
+                                    ) then
+                                        $next-nav-case-id
+                                    else
+                                        ()
                             "/>
 
                         <xf:var
@@ -722,12 +728,8 @@
                                 return
                                     (: Exists and is available :)
                                     $next-top-level-case-id[
-                                        exists(
-                                            index-of(
-                                                xxf:split($fr-wizard-available-top-level-sections),
-                                                $fr-wizard-next-top-level-section-name
-                                            )
-                                        )
+                                        xxf:split($fr-wizard-available-top-level-sections) =
+                                            $fr-wizard-next-top-level-section-name
                                     ]
                             "/>
 

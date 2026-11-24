@@ -1,0 +1,2239 @@
+<resource xml:lang="ar">
+    <override>
+        <label>تجاوز</label>
+    </override>
+    <pages-section>
+        <label>الصفحة الرئيسية وصفحات الملخص والإدارة والاستيراد</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>الإعدادات القياسية</standard-settings>
+        <custom-properties>الخصائص المخصصة</custom-properties>
+    </tabs>
+    <scopes>
+        <header>النطاقات</header>
+        <global>الإعدادات العامة</global>
+        <all-forms>جميع النماذج</all-forms>
+        <add-override>إضافة تجاوز</add-override>
+        <add-short>إضافة</add-short>
+        <add-form-in-app>إضافة تجاوز نموذج</add-form-in-app>
+        <edit-scope>تعديل النطاق</edit-scope>
+        <remove-scope>إزالة التجاوز</remove-scope>
+        <clear-app-overrides>مسح التجاوزات</clear-app-overrides>
+        <dialog-add-title>إضافة تجاوز</dialog-add-title>
+        <dialog-edit-title>تعديل نطاق التجاوز</dialog-edit-title>
+        <level-label>مستوى التجاوز</level-label>
+        <level-app>التطبيق</level-app>
+        <level-app-form>التطبيق والنموذج</level-app-form>
+        <level-global-profile>عام (ملف تعريف)</level-global-profile>
+        <app-label>التطبيق</app-label>
+        <app-hint>اختر تطبيقًا منشورًا أو أدخل اسم تطبيق</app-hint>
+        <form-label>النموذج</form-label>
+        <form-hint>اختر نموذجًا منشورًا أو أدخل اسم نموذج</form-hint>
+        <profiles-label>ملفات التعريف (اختياري)</profiles-label>
+        <profiles-hint>اختر ملفات تعريف موجودة أو أضف أسماء ملفات تعريف مخصصة</profiles-hint>
+        <confirm-add>إضافة</confirm-add>
+        <confirm-save>تطبيق</confirm-save>
+        <cancel>إلغاء</cancel>
+        <error-app-slug>أدخل اسم تطبيق صالحًا (أحرف، أرقام، شرطات، شرطات سفلية)</error-app-slug>
+        <error-form-slug>أدخل اسم نموذج صالحًا (لا يمكن تجاوز orbeon/builder وorbeon/configuration)</error-form-slug>
+        <error-profiles>أدخل معرّفات ملفات تعريف صالحة</error-profiles>
+        <error-duplicate>يوجد تجاوز لهذا النطاق بالفعل</error-duplicate>
+    </scopes>
+    <filter>
+        <label>تصفية الإعدادات</label>
+        <hint>البحث حسب اسم الإعداد أو الوصف أو اسم خاصية oxf.*</hint>
+        <clear>مسح التصفية</clear>
+    </filter>
+    <alerts>
+        <invalid-value>قيمة إعداد غير صالحة</invalid-value>
+        <xpath>تعبير XPath غير صالح</xpath>
+        <non-negative-integer>أدخل عددًا صحيحًا غير سالب (0 أو أكبر)</non-negative-integer>
+        <positive-integer>أدخل عددًا صحيحًا موجبًا (1 أو أكبر)</positive-integer>
+        <optional-integer-or-unlimited>أدخل عددًا صحيحًا (-1 لغير محدود، أو 0 أو أكبر) أو اترك الحقل فارغًا</optional-integer-or-unlimited>
+        <port>أدخل منفذ TCP صالحًا (1–65535) أو اترك الحقل فارغًا</port>
+        <percentage>أدخل نسبة مئوية بين 0% و100%</percentage>
+        <json>صيغة JSON غير صالحة</json>
+        <permissions-json>أكمل جميع أسماء الأدوار المطلوبة أو أصلح صيغة JSON غير الصالحة للأذونات</permissions-json>
+        <landing-cards>أكمل جميع حقول البطاقات المطلوبة</landing-cards>
+        <byte-size>أدخل حجمًا بالبايت أو نسبة من الحد الأقصى للكومة (1–100%)، مثل 15% أو 256m أو 1g أو 0</byte-size>
+        <attachment-size>أدخل حجمًا غير سالب ينتج عنه عدد صحيح من البايتات</attachment-size>
+        <positive-byte-size>أدخل حجمًا موجبًا لا يقل عن 1 بايت</positive-byte-size>
+        <heap-percentage>أدخل نسبة مئوية أكبر من 0% وحتى 100%</heap-percentage>
+        <duration>أدخل مدة زمنية، مثل 30m أو 2h أو 1d أو PT30M أو بالمللي ثانية</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>غير محدود</unlimited>
+        <max-size>الحجم الأقصى</max-size>
+        <heap-percent>نسبة الحد الأقصى للكومة %</heap-percent>
+        <fixed-size>حجم ثابت</fixed-size>
+    </size-modes>
+    <units>
+        <ms>مللي ثانية</ms>
+        <min>دقيقة</min>
+        <chars>حرف</chars>
+    </units>
+    <system-section>
+        <label>عام</label>
+    </system-section>
+    <caches-section>
+        <label>ذاكرات التخزين المؤقت</label>
+        <console-callout-prefix>راقب الاستخدام الحي لذاكرة كومة JVM ومعدلات إصابة ذاكرة التخزين المؤقت ومخازن أقراص SIFS والحالات الثابتة المترجمة في </console-callout-prefix>
+        <console-callout-link>وحدة تحكم الإدارة</console-callout-link>
+        <console-callout-suffix>.</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>شريط التنقل</label>
+    </navbar-section>
+    <appearance-section>
+        <label>المظهر والسمة</label>
+    </appearance-section>
+    <detail-section>
+        <label>صفحة التفاصيل</label>
+    </detail-section>
+    <wizard-section>
+        <label>المعالج</label>
+    </wizard-section>
+    <formulas-section>
+        <label>الصيغ الحسابية</label>
+    </formulas-section>
+    <landing-section>
+        <label>الصفحة الرئيسية</label>
+    </landing-section>
+    <summary-section>
+        <label>صفحة الملخص</label>
+    </summary-section>
+    <admin-section>
+        <label>صفحة الإدارة</label>
+    </admin-section>
+    <import-section>
+        <label>الاستيراد والتصدير</label>
+    </import-section>
+    <pdf-section>
+        <label>إنشاء PDF</label>
+    </pdf-section>
+    <email-section>
+        <label>البريد الإلكتروني</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>تنسيقات الإدخال والإخراج</label>
+    </formats-section>
+    <security-section>
+        <label>المصادقة والأمان</label>
+    </security-section>
+    <resources-section>
+        <label>الموارد</label>
+    </resources-section>
+    <processes-section>
+        <label>العمليات</label>
+        <override-placeholder>تجاوز عملية مدمجة…</override-placeholder>
+        <override-button>تجاوز</override-button>
+        <add-custom>إضافة عملية مخصصة</add-custom>
+        <badge-override>تجاوز</badge-override>
+        <badge-custom>مخصص</badge-custom>
+        <edit>تعديل</edit>
+        <revert>استعادة</revert>
+        <delete>حذف</delete>
+        <empty>لا توجد تجاوزات عمليات أو عمليات مخصصة مكونة لهذا النطاق. تجاوز عملية مدمجة أو أضف عملية مخصصة أعلاه.</empty>
+        <dialog-title-override>تجاوز العملية</dialog-title-override>
+        <dialog-title-add>إضافة عملية مخصصة</dialog-title-add>
+        <dialog-title-edit>تعديل العملية</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>تجاوزات التطبيقات / النماذج</label>
+        <add-override>إضافة تجاوز تطبيق / نموذج</add-override>
+        <app>اسم التطبيق</app>
+        <app-hint>اسم التطبيق أو * لجميع التطبيقات</app-hint>
+        <form>اسم النموذج</form>
+        <form-hint>اسم النموذج أو * لجميع النماذج</form-hint>
+        <profiles>ملفات التعريف</profiles>
+        <profiles-hint>ملفات تعريف خصائص اختيارية مفصولة بمسافات</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>الخصائص المخصصة</label>
+        <name>اسم الخاصية</name>
+        <name-hint>الاسم الكامل للخاصية (بما في ذلك أحرف البدل عند الاقتضاء)</name-hint>
+        <type>النوع</type>
+        <value>القيمة</value>
+        <profiles>ملفات التعريف</profiles>
+        <profiles-hint>ملفات تعريف خصائص اختيارية مفصولة بمسافات</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>اللغة الافتراضية</label>
+        <hint>رمز اللغة الافتراضية &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>اللغات المتاحة (لكل نموذج)</label>
+        <hint>رموز لغات مفصولة بمسافات أو &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>اللغات المتاحة العامة</label>
+        <hint>اللغات المتاحة لصفحات البداية والنماذج والإدارة &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>المنطقة الزمنية الافتراضية</label>
+        <hint>معرّف المنطقة الزمنية وفق معيار IANA، مثل &lt;code&gt;Asia/Riyadh&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>نبض بقاء الجلسة</label>
+        <hint>إبقاء جلسات المستخدمين نشطة طالما الصفحة مفتوحة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>الحد الأقصى للإدخالات</label>
+        <hint>الحد الأقصى لمستندات XForms النشطة المحتفظ بها في كومة JVM قبل ترحيلها إلى المخزن &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>ميزانية البايتات</label>
+        <hint>نسبة الحد الأقصى لكومة JVM، أو حجم بيانات ثابت (مخزن بالبايت)، أو غير محدود &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>الحد الأقصى للخمول</label>
+        <hint>مهلة خمول اختيارية قبل ترحيل المستندات النشطة (مثل &lt;code&gt;30m&lt;/code&gt; أو &lt;code&gt;2h&lt;/code&gt; أو فارغ) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>الحد الأقصى للإدخالات</label>
+        <hint>الحد الأقصى للحالات الثابتة المترجمة لـ XForms المحتفظ بها في كومة JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>ميزانية البايتات</label>
+        <hint>نسبة الحد الأقصى لكومة JVM، أو حجم بيانات ثابت (مخزن بالبايت)، أو غير محدود &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>الحد الأقصى للخمول</label>
+        <hint>مهلة خمول اختيارية قبل نقل الحالات الثابتة إلى المخزن (مثل &lt;code&gt;2h&lt;/code&gt; أو &lt;code&gt;1d&lt;/code&gt; أو فارغ) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>إظهار رابط «الرئيسية» في شريط التنقل</label>
+        <hint>تفعيل رابط «الرئيسية» في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>إظهار محدد اللغة في شريط التنقل</label>
+        <hint>تفعيل محدد اللغة في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>إظهار محدد نظام الألوان في شريط التنقل</label>
+        <hint>تفعيل محدد الوضع الفاتح/الداكن في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>إظهار زر المشاركة في شريط التنقل</label>
+        <hint>تفعيل زر مشاركة الرابط في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>إظهار سجل المراجعات في شريط التنقل</label>
+        <hint>تفعيل أيقونة سجل المراجعات في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>إظهار مرحلة سير العمل في شريط التنقل</label>
+        <hint>عرض مرحلة سير العمل الحالية في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>السمة (لكل نموذج)</label>
+        <hint>السمة المرئية للنماذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>نظام الألوان الافتراضي</label>
+        <hint>نظام الألوان الافتراضي للصفحات &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (فاتح)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>فاتح</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>داكن</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>تلقائي (النظام)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>تخطيط صفحة المتصفح</label>
+        <hint>ما إذا كان النموذج يأخذ عرضًا ثابتًا أم مرنًا &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (عرض ثابت)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>عرض ثابت</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>عرض مرن</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>كثافة العرض</label>
+        <hint>كثافة التباعد في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (مريح)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>مضغوط</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>مريح</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>فسيح</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>ترميز الشبكة</label>
+        <hint>ترميز HTML المستخدم للشبكات &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (شبكة CSS)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>شبكة CSS</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>جدول HTML</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>مظهر التسميات</label>
+        <hint>كيفية عرض تسميات عناصر التحكم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (كامل)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>كامل</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>مختصر (نص نائب)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>مظهر التلميحات</label>
+        <hint>كيفية عرض تلميحات عناصر التحكم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (كامل (سطري))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>كامل (سطري)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>مختصر (نص نائب)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>تلميح منبثق</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>إظهار التلميحات في أوضاع القراءة فقط</label>
+        <hint>عرض تلميحات عناصر التحكم في وضعي العرض وPDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>إظهار التنبيهات في أوضاع القراءة فقط</label>
+        <hint>عرض تنبيهات التحقق من الصحة في وضعي العرض وPDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>إظهار مؤشرات الحقول المطلوبة في أوضاع القراءة فقط</label>
+        <hint>إظهار مؤشرات الحقول المطلوبة في وضعي العرض وPDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>إظهار النصوص التوضيحية في وضع العرض</label>
+        <hint>إظهار عناصر التحكم fr:explanation في وضع العرض &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>معرّف URI للشعار الافتراضي</label>
+        <hint>معرّف URI للشعار الافتراضي &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>معرّف URI لأيقونة الموقع</label>
+        <hint>معرّف URI لأيقونة الصفحة &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>ملفات CSS المخصصة</label>
+        <hint>قائمة مفصولة بمسافات لمسارات ملفات CSS المخصصة &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>ملفات JavaScript المخصصة</label>
+        <hint>قائمة مفصولة بمسافات لمسارات ملفات JS المخصصة &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>إخفاء الشعار</label>
+        <hint>إخفاء الشعار في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>إخفاء الترويسة العلوية</label>
+        <hint>إخفاء ترويسة الصفحة في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>إخفاء تذييل الصفحة</label>
+        <hint>إخفاء تذييل الصفحة في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>إخفاء شريط الأزرار</label>
+        <hint>إخفاء شريط الأزرار السفلي في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>إظهار تلميحات اختصارات لوحة المفاتيح</label>
+        <hint>عرض تلميحات اختصارات لوحة المفاتيح على الأزرار &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>أزرار صفحة التفاصيل</label>
+        <hint>قائمة مفصولة بمسافات للأزرار المعروضة في صفحة التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>أزرار وضع العرض</label>
+        <hint>قائمة مفصولة بمسافات للأزرار المعروضة في صفحة العرض &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>تأخير الحفظ التلقائي (مللي ثانية)</label>
+        <hint>التأخير بالمللي ثانية قبل الحفظ التلقائي؛ القيمة 0 تعطّل الحفظ التلقائي &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>ترحيل البيانات البسيط</label>
+        <hint>إضافة أو إزالة العناصر المفقودة في البيانات تلقائيًا &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (مفعّل)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>مفعّل</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>معطّل</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>إصدار خطأ</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>ترتيب التنقل في الشبكة</label>
+        <hint>ترتيب التنقل بين خلايا الشبكة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (صفوف)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>صفوف</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>أعمدة</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>التركيز المبدئي</label>
+        <hint>وضع التركيز تلقائيًا على أول عنصر تحكم في النموذج عند التحميل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>استخدام التلميحات التلقائية</label>
+        <hint>تفعيل التلميحات التلقائية لعناصر التحكم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>موضع ملخص الأخطاء</label>
+        <hint>مكان إظهار ملخص الأخطاء &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (أسفل)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بلا</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>أعلى</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>أسفل</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>أعلى وأسفل</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>مكوّن التحقق البشري (CAPTCHA)</label>
+        <hint>آلية التحقق البشري في صفحات التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (بلا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بلا</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>نموذج فردي</label>
+        <hint>السماح بمستند بيانات واحد فقط لهذا النموذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>سلوك النموذج الفردي عند وجود مستند</label>
+        <hint>الإجراء عند فتح &lt;code&gt;/new&lt;/code&gt; على نموذج فردي يحتوي على بيانات موجودة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (فتح المستند الموجود)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>فتح المستند الموجود</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>إظهار خطأ</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>الحد الأدنى للأقسام لعرض جدول المحتويات</label>
+        <hint>الحد الأدنى لعدد الأقسام المطلوب لعرض جدول المحتويات؛ -1 للتعطيل، و-2 لغير مستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>موضع جدول المحتويات</label>
+        <hint>موضع جدول المحتويات في صفحة التفاصيل &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (في الأعلى)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>في الأعلى</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>على اليسار</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>مخفي</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>أوضاع عرض جدول المحتويات</label>
+        <hint>الأوضاع التي يظهر فيها جدول المحتويات &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>جديد</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>التعديل</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>العرض</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>مظهر الرسائل</label>
+        <hint>كيفية عرض رسائل الإجراءات &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (إشعار منبثق)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>إشعار منبثق</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>مربع حوار مشروط</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>موضع الإشعارات المنبثقة</label>
+        <hint>موضع ظهور الإشعارات المنبثقة على الشاشة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (أعلى اليمين)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>أعلى اليسار</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>أعلى الوسط</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>أعلى اليمين</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>أسفل اليسار</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>أسفل الوسط</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>أسفل اليمين</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>مدة بقاء الإشعارات المنبثقة (مللي ثانية)</label>
+        <hint>المدة بالمللي ثانية قبل الإخفاء التلقائي للإشعارات المنبثقة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>تفعيل قفل التحرير المتزامن (الإيجار)</label>
+        <hint>تفعيل القفل/الإيجار الحصري للمستند أثناء التحرير &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>مدة الإيجار (دقائق)</label>
+        <hint>المدة الافتراضية للإيجار بالدقائق &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>عتبة تجديد الإيجار (دقائق)</label>
+        <hint>الحد بالدقائق قبل انتهاء الإيجار لتجديده &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>عتبة تنبيه الإيجار (دقائق)</label>
+        <hint>الحد بالدقائق قبل انتهاء الإيجار لتنبيه المستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>مربع حوار التحذير من انتهاء الجلسة</label>
+        <hint>إظهار مربع حوار تحذيري قبل انتهاء جلسة المستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>التحذير عند المغادرة مع وجود تغييرات غير محفوظة</label>
+        <hint>قيمة منطقية أو تعبير XPath للتحكم في تحذير البيانات غير المحفوظة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>التحقق من خيارات عناصر تحكم التحديد</label>
+        <hint>التحقق من أن قيم عناصر تحكم التحديد تقع ضمن مجموعة الخيارات المتاحة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>أقسام قابلة للطي</label>
+        <hint>السماح بطي الأقسام وتوسيعها &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>تحريك طي الأقسام وتوسيعها</label>
+        <hint>إضافة حركة لطي الأقسام وتوسيعها &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>موضع إدراج القسم المتكرر</label>
+        <hint>مكان إدراج التكرارات الجديدة للقسم المتكرر &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (بعد التكرار الحالي)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بعد التكرار الحالي</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>في الأسفل</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>موضع إدراج الشبكة المتكررة</label>
+        <hint>مكان إدراج الصفوف الجديدة للشبكة المتكررة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (بعد الصف الحالي)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بعد الصف الحالي</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>في الأسفل</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>الحجم الأقصى للمرفق لكل ملف</label>
+        <hint>الحجم الأقصى لكل ملف مرفوع، مخزنًا بالبايت &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>الحجم الإجمالي الأقصى للمرفقات لكل عنصر تحكم</label>
+        <hint>الحجم الإجمالي الأقصى للمرفقات لكل عنصر تحكم، مخزنًا بالبايت &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>الحجم الإجمالي الأقصى للمرفقات لكل نموذج</label>
+        <hint>الحجم الإجمالي الأقصى للمرفقات لكل نموذج، مخزنًا بالبايت &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>الحد الأقصى لعدد الملفات لكل عنصر تحكم</label>
+        <hint>الحد الأقصى لعدد الملفات لكل عنصر تحكم مرفقات &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>أنواع وسائط MIME المسموح بها للمرفقات</label>
+        <hint>أنواع MIME مفصولة بمسافات، مثل &lt;code&gt;image/* application/pdf&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>رفض الملفات المرفوعة الفارغة</label>
+        <hint>رفض الملفات المرفوعة التي يبلغ حجمها 0 بايت &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>مظهر أخطاء رفع الملفات</label>
+        <hint>كيفية إظهار أخطاء رفع الملفات &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (مربع حوار مشروط)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>مربع حوار مشروط</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>تنبيه سطري</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>عرض المعالج</label>
+        <hint>عرض الأقسام ذات المستوى الأعلى كصفحة كاملة أو كصفحات معالج منفصلة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (عرض كامل)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>عرض كامل</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>عرض المعالج</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>وضع التحقق من الصحة عند التنقل في المعالج</label>
+        <hint>سلوك التنقل في المعالج عندما تكون البيانات غير صالحة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (حر)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>حر</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>مرن</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>صارم</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>تنقل الأقسام الفرعية في المعالج</label>
+        <hint>تفعيل تنقل المعالج للأقسام والشبكات داخل الأقسام ذات المستوى الأعلى &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>جدول محتويات الأقسام الفرعية في المعالج</label>
+        <hint>كيفية عرض جدول محتويات المعالج للأقسام الفرعية &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (إظهار الأقسام الفرعية للقسم النشط فقط)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>إظهار الأقسام الفرعية للقسم النشط فقط</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>إظهار الأقسام الفرعية لجميع الأقسام</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>عدم إظهار الأقسام الفرعية</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>موضع جدول محتويات المعالج</label>
+        <hint>مكان عرض جدول محتويات المعالج &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (على اليسار)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>على اليسار</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>منفصل</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>مخفي</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>إظهار حالة قسم المعالج دائمًا</label>
+        <hint>إظهار أيقونات حالة الأقسام في جدول محتويات المعالج &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>السماح بمعلمة URL لصفحة المعالج</label>
+        <hint>السماح بتحديد صفحة المعالج الأولية عبر معلمة URL &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>تحديث معلمة URL عند تغيير صفحة المعالج</label>
+        <hint>تحديث معلمة URL في المتصفح عند التبديل بين صفحات المعالج &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>تعليم عناصر التحكم كمُزارة عند تغيير صفحة المعالج</label>
+        <hint>متى يؤدي التبديل بين صفحات المعالج إلى تعليم عناصر التحكم كمُزارة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (دائمًا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>دائمًا</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>عند التنقل للأمام فقط</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>أبدًا</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>تعطيل الحسابات في أوضاع القراءة فقط (المراجعة، PDF)</label>
+        <hint>تعطيل الصيغ الحسابية في وضعي المراجعة وPDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>التبعيات التلقائية للحسابات</label>
+        <hint>تحديد ترتيب التقييم تلقائيًا لصيغ القيمة المحسوبة والقيمة الابتدائية &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>دوال XPath الإضافية المسموح بها</label>
+        <hint>قائمة مفصولة بمسافات لدوال XPath الإضافية المسموح بها في صيغ Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>حجم بطاقة الصفحة الرئيسية</label>
+        <hint>عدد العناصر المعروضة لكل بطاقة في الصفحة الرئيسية &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>بطاقات الصفحة الرئيسية</label>
+        <hint>البطاقات المعروضة في الصفحة الرئيسية &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>حجم صفحة الملخص</label>
+        <hint>عدد الصفوف المعروضة في كل صفحة ضمن صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>أزرار صفحة الملخص</label>
+        <hint>قائمة مفصولة بمسافات للأزرار في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>إظهار عمود تاريخ الإنشاء</label>
+        <hint>إظهار عمود الطابع الزمني للإنشاء في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>إظهار عمود آخر تعديل</label>
+        <hint>إظهار عمود الطابع الزمني لآخر تعديل في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>إظهار عمود مرحلة سير العمل</label>
+        <hint>إظهار عمود مرحلة سير العمل في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>إظهار عمود أُنشئ بواسطة</label>
+        <hint>إظهار عمود منشئ المستند في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>إظهار عمود آخر تعديل بواسطة</label>
+        <hint>إظهار عمود آخر من عدّل المستند في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>إظهار محدد الإصدار في صفحة الملخص</label>
+        <hint>عرض محدد إصدار النموذج في صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>إصدار النموذج لزر «جديد» في صفحة الملخص</label>
+        <hint>إصدار النموذج الذي يُفتح عند النقر على «جديد» من صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (الإصدار المحدد حاليًا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>الإصدار المحدد حاليًا</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>أحدث إصدار منشور</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>فتح خيارات البحث عند تحميل صفحة الملخص</label>
+        <hint>توسيع خيارات البحث المتقدم عند تحميل صفحة الملخص &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>حجم صفحة إدارة النماذج</label>
+        <hint>عدد النماذج لكل صفحة في صفحة إدارة النماذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>روابط جدول إدارة النماذج</label>
+        <hint>الروابط المعروضة لكل نموذج في صفحة إدارة النماذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (ملخص ثم جديد)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>ملخص ثم جديد</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>جديد ثم ملخص</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>ملخص فقط</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>جديد فقط</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>بلا</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>فتح خيارات البحث عند تحميل إدارة النماذج</label>
+        <hint>توسيع خيارات البحث عند تحميل صفحة إدارة النماذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>تكوين الخوادم البعيدة (JSON)</label>
+        <hint>مصفوفة JSON للخوادم البعيدة لنشر النماذج وإدارتها &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>تفعيل صفحة التصدير</label>
+        <hint>تفعيل صفحة تصدير بيانات النماذج &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>السماح باستيراد المستندات غير الصالحة</label>
+        <hint>السماح باستيراد المستندات التي تحتوي على أخطاء في التحقق من الصحة &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>السماح بحذف السجلات الموجودة عند الاستيراد</label>
+        <hint>السماح بخيار حذف البيانات الموجودة أثناء الاستيراد &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>تقييد الاستيراد بأحدث إصدار</label>
+        <hint>السماح بالاستيراد إلى أحدث إصدار من النموذج فقط &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>تنسيقات الاستيراد المسموح بها</label>
+        <hint>تنسيقات استيراد البيانات المسموح بها &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (العناوين)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (النطاقات المسماة)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>بنية النموذج وبياناته بصيغة XML</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>إظهار اسمي التطبيق والنموذج في صفحة الاستيراد</label>
+        <hint>إظهار اسمي التطبيق والنموذج في صفحة الاستيراد &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>أزرار صفحة الاستيراد</label>
+        <hint>قائمة مفصولة بمسافات للأزرار في صفحة الاستيراد &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>اتجاه صفحة PDF</label>
+        <hint>اتجاه الصفحة لملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (عمودي)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>عمودي</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>أفقي</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>حجم صفحة PDF</label>
+        <hint>حجم الصفحة لملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>تعبير اسم ملف PDF</label>
+        <hint>تعبير XPath لأسماء ملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>إمكانية الوصول في PDF (PDF مُوسَّم)</label>
+        <hint>تفعيل إمكانية الوصول لملفات PDF المُوسَّمة &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>وضع التوافق مع PDF/A</label>
+        <hint>التوافق مع معيار الأرشفة PDF/A &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (بلا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بلا</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>وضع ألوان PDF</label>
+        <hint>وضع الألوان عند إنشاء ملفات PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (أبيض وأسود)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>أبيض وأسود</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>ملون</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>أحادي اللون</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>تفعيل الروابط التشعبية في PDF</label>
+        <hint>إنشاء روابط تشعبية نشطة في ملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>تضمين الرمز الشريطي في PDF</label>
+        <hint>عرض الرمز الشريطي للمستند في ملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>تعطيل زر PDF عندما تكون البيانات غير صالحة</label>
+        <hint>تعطيل زر PDF عندما يحتوي النموذج على أخطاء في التحقق من الصحة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>حد المحتوى الطويل لقالب PDF</label>
+        <hint>حد عدد الأحرف الذي تتجاوز عنده حقول قالب PDF إلى ملحق &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>جودة ضغط JPEG في PDF</label>
+        <hint>النسبة المئوية لجودة ضغط JPEG من 0% إلى 100% &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>عائلة خطوط PDF الافتراضية</label>
+        <hint>عائلة الخطوط البديلة لخط Inter في ملفات PDF المُنشأة &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>مسارات خطوط قوالب PDF</label>
+        <hint>مسارات الخطوط المخصصة لقوالب PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>التكوين الافتراضي لترويسة وتذييل PDF (JSON)</label>
+        <hint>تكوين JSON الافتراضي لترويسات وتذييلات صفحات PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>نقل البريد الإلكتروني</label>
+        <hint>آلية إرسال البريد الإلكتروني &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>مضيف SMTP</label>
+        <hint>اسم مضيف خادم SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>منفذ SMTP</label>
+        <hint>منفذ خادم SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>اسم مستخدم SMTP</label>
+        <hint>اسم المستخدم لمصادقة SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>تشفير SMTP</label>
+        <hint>بروتوكول التشفير لـ SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (بلا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>بلا</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>عنوان البريد الإلكتروني للمُرسِل (من)</label>
+        <hint>عنوان البريد الإلكتروني الافتراضي للمُرسِل &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>عنوان البريد الإلكتروني للرد</label>
+        <hint>عنوان البريد الإلكتروني الافتراضي للرد &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>عنوان البريد الإلكتروني للمستلم (إلى)</label>
+        <hint>عنوان البريد الإلكتروني الافتراضي للمستلم الأساسي &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>عنوان البريد الإلكتروني للنسخة الكربونية (CC)</label>
+        <hint>عنوان البريد الإلكتروني الافتراضي لمستلم النسخة الكربونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>عنوان البريد الإلكتروني للنسخة المخفية (BCC)</label>
+        <hint>عنوان البريد الإلكتروني الافتراضي لمستلم النسخة المخفية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>إرفاق ملف PDF بالبريد الإلكتروني</label>
+        <hint>إرفاق ملف PDF المُنشأ برسائل الإشعار الإلكترونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>إرفاق بيانات XML بالبريد الإلكتروني</label>
+        <hint>إرفاق بيانات XML للنموذج برسائل الإشعار الإلكترونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>إرفاق صورة TIFF بالبريد الإلكتروني</label>
+        <hint>إرفاق صورة TIFF المُنشأة برسائل الإشعار الإلكترونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>إرفاق ملف Excel (النطاقات المسماة) بالبريد الإلكتروني</label>
+        <hint>إرفاق ملف Excel المزود بنطاقات مسماة برسائل الإشعار الإلكترونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>إرفاق بنية النموذج وبياناته بصيغة XML بالبريد الإلكتروني</label>
+        <hint>إرفاق تصدير XML لبنية النموذج وبياناته برسائل الإشعار الإلكترونية &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>إرفاق الملفات المرفوعة بالبريد الإلكتروني</label>
+        <hint>تحديد المرفقات المرفوعة من قِبل المستخدم المراد تضمينها في رسائل البريد الإلكتروني &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (جميع المرفقات)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>جميع المرفقات</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>المرفقات المحددة فقط</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>بدون مرفقات</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>إظهار عنصر قائمة «مخطط XML»</label>
+        <hint>إظهار زر مربع حوار «مخطط XML» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>إظهار عنصر قائمة «قوالب PDF»</label>
+        <hint>إظهار زر مربع حوار «قوالب PDF» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>إظهار عنصر قائمة «تحرير المصدر»</label>
+        <hint>إظهار زر مربع حوار «تحرير المصدر» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>إظهار عنصر قائمة «مرحلة سير العمل»</label>
+        <hint>إظهار إعدادات سير العمل في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>إظهار عنصر قائمة «الأذونات»</label>
+        <hint>إظهار زر مربع حوار «الأذونات» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>إظهار عنصر قائمة «إعدادات البريد الإلكتروني»</label>
+        <hint>إظهار زر مربع حوار «إعدادات البريد الإلكتروني» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>إظهار عنصر قائمة «صفحة التأكيد»</label>
+        <hint>إظهار إعدادات صفحة التأكيد في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>إظهار عنصر قائمة «الرسائل المخصصة»</label>
+        <hint>إظهار إعدادات الرسائل المخصصة في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>إظهار عنصر قائمة «العمليات المخصصة»</label>
+        <hint>إظهار إعدادات العمليات المخصصة في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>إظهار خدمات HTTP في الشريط الجانبي</label>
+        <hint>تفعيل خدمات HTTP في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>إظهار خدمات قواعد البيانات في الشريط الجانبي</label>
+        <hint>تفعيل خدمات قواعد البيانات في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>إظهار الإجراءات في الشريط الجانبي</label>
+        <hint>تفعيل محرر الإجراءات في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>إلزامية عنوان النموذج في Form Builder</label>
+        <hint>اشتراط إدخال عنوان غير فارغ للنموذج في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>إلزامية وصف النموذج في Form Builder</label>
+        <hint>اشتراط إدخال وصف غير فارغ للنموذج في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>سلوك الإصدار عند النشر</label>
+        <hint>سلوك إدارة الإصدارات عند نشر نموذج في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (الكتابة فوق إصدار موجود افتراضيًا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>الكتابة فوق إصدار موجود افتراضيًا</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>إنشاء إصدار جديد افتراضيًا</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>فرض إنشاء إصدار جديد</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>السماح برفع شعار النموذج في Form Builder</label>
+        <hint>إظهار عنصر تحكم رفع الشعار في إعدادات النموذج داخل Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>تفعيل خادم MCP لـ Form Builder</label>
+        <hint>تفعيل خادم بروتوكول سياق النموذج (MCP) لـ Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>اشتراط رمز مميز لخادم MCP في Form Builder</label>
+        <hint>اشتراط المصادقة بالرمز المميز لخادم MCP في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>تنسيق إدخال التاريخ</label>
+        <hint>قناع تنسيق إدخال التاريخ، مثل &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; أو &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>تنسيق إدخال الوقت</label>
+        <hint>قناع تنسيق إدخال الوقت &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>تنسيق إخراج التاريخ (XPath)</label>
+        <hint>تعبير XPath لتنسيق إخراج التاريخ &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>تنسيق إخراج التاريخ والوقت (XPath)</label>
+        <hint>تعبير XPath لتنسيق إخراج التاريخ والوقت &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>تنسيق إخراج الوقت (XPath)</label>
+        <hint>تعبير XPath لتنسيق إخراج الوقت &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>تنسيق إخراج الأعداد العشرية (XPath)</label>
+        <hint>تعبير XPath لتنسيق إخراج الأعداد العشرية &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>تنسيق إخراج الأعداد الصحيحة (XPath)</label>
+        <hint>تعبير XPath لتنسيق إخراج الأعداد الصحيحة &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>تفعيل قائمة المستخدم في شريط التنقل</label>
+        <hint>عرض قائمة تسجيل الدخول/الخروج للمستخدم في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (لا)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>معرّف URI لتسجيل الدخول في قائمة المستخدم</label>
+        <hint>قالب URI لتسجيل الدخول في قائمة المستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>معرّف URI لتسجيل الخروج في قائمة المستخدم</label>
+        <hint>قالب URI لتسجيل الخروج في قائمة المستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>معرّف URI للتسجيل في قائمة المستخدم</label>
+        <hint>قالب URI لإنشاء الحساب في قائمة المستخدم &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>أذونات Form Runner</label>
+        <hint>تعريف الأذونات &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>صلاحية رمز الوصول (دقائق)</label>
+        <hint>مدة الصلاحية بالدقائق لرموز الوصول الخارجية &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>صلاحية رمز الحالة (دقائق)</label>
+        <hint>مدة الصلاحية بالدقائق لرموز الحالة &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

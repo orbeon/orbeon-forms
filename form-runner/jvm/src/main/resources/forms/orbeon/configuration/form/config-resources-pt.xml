@@ -1,0 +1,2239 @@
+<resource xml:lang="pt">
+    <override>
+        <label>Redefinir</label>
+    </override>
+    <pages-section>
+        <label>Páginas inicial, sumário, administração e importação</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>Definições padrão</standard-settings>
+        <custom-properties>Propriedades personalizadas</custom-properties>
+    </tabs>
+    <scopes>
+        <header>Âmbitos</header>
+        <global>Definições globais</global>
+        <all-forms>Todos os formulários</all-forms>
+        <add-override>Adicionar redefinição</add-override>
+        <add-short>Adicionar</add-short>
+        <add-form-in-app>Adicionar redefinição de formulário</add-form-in-app>
+        <edit-scope>Editar âmbito</edit-scope>
+        <remove-scope>Remover redefinição</remove-scope>
+        <clear-app-overrides>Limpar redefinições</clear-app-overrides>
+        <dialog-add-title>Adicionar redefinição</dialog-add-title>
+        <dialog-edit-title>Editar âmbito de redefinição</dialog-edit-title>
+        <level-label>Nível de redefinição</level-label>
+        <level-app>Aplicação</level-app>
+        <level-app-form>Aplicação e formulário</level-app-form>
+        <level-global-profile>Global (Perfil)</level-global-profile>
+        <app-label>Aplicação</app-label>
+        <app-hint>Selecione uma aplicação publicada ou introduza um nome de aplicação</app-hint>
+        <form-label>Formulário</form-label>
+        <form-hint>Selecione um formulário publicado ou introduza um nome de formulário</form-hint>
+        <profiles-label>Perfis (opcional)</profiles-label>
+        <profiles-hint>Selecione perfis existentes ou adicione nomes de perfis personalizados</profiles-hint>
+        <confirm-add>Adicionar</confirm-add>
+        <confirm-save>Aplicar</confirm-save>
+        <cancel>Cancelar</cancel>
+        <error-app-slug>Introduza um nome de aplicação válido (letras, algarismos, hífenes e sublinhados)</error-app-slug>
+        <error-form-slug>Introduza um nome de formulário válido (orbeon/builder e orbeon/configuration não podem ser redefinidos)</error-form-slug>
+        <error-profiles>Introduza identificadores de perfil válidos</error-profiles>
+        <error-duplicate>Já existe uma redefinição para este âmbito</error-duplicate>
+    </scopes>
+    <filter>
+        <label>Filtrar definições</label>
+        <hint>Pesquisar por nome de definição, descrição ou nome de propriedade oxf.*</hint>
+        <clear>Limpar filtro</clear>
+    </filter>
+    <alerts>
+        <invalid-value>Valor de definição inválido</invalid-value>
+        <xpath>Expressão XPath inválida</xpath>
+        <non-negative-integer>Introduza um número inteiro não negativo (0 ou superior)</non-negative-integer>
+        <positive-integer>Introduza um número inteiro positivo (1 ou superior)</positive-integer>
+        <optional-integer-or-unlimited>Introduza um número inteiro (-1 para ilimitado, ou 0 ou superior) ou deixe em branco</optional-integer-or-unlimited>
+        <port>Introduza uma porta TCP válida (1–65535) ou deixe em branco</port>
+        <percentage>Introduza uma percentagem entre 0% e 100%</percentage>
+        <json>Sintaxe JSON inválida</json>
+        <permissions-json>Preencha todos os nomes de perfis obrigatórios ou corrija o JSON de permissões inválido</permissions-json>
+        <landing-cards>Preencha todos os campos obrigatórios dos cartões</landing-cards>
+        <byte-size>Introduza um tamanho em bytes ou percentagem de memória máxima (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
+        <attachment-size>Introduza um tamanho não negativo correspondente a um número inteiro de bytes</attachment-size>
+        <positive-byte-size>Introduza um tamanho positivo de pelo menos 1 byte</positive-byte-size>
+        <heap-percentage>Introduza uma percentagem superior a 0% e até 100%</heap-percentage>
+        <duration>Introduza uma duração, ex. 30m, 2h, 1d, PT30M ou milissegundos</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>Ilimitado</unlimited>
+        <max-size>Tamanho máximo</max-size>
+        <heap-percent>% de memória máx.</heap-percent>
+        <fixed-size>Tamanho fixo</fixed-size>
+    </size-modes>
+    <units>
+        <ms>ms</ms>
+        <min>min</min>
+        <chars>car.</chars>
+    </units>
+    <system-section>
+        <label>Geral</label>
+    </system-section>
+    <caches-section>
+        <label>Caches</label>
+        <console-callout-prefix>Monitorize a utilização de memória JVM em tempo real, as taxas de acerto da cache, o armazenamento em disco SIFS e os estados estáticos compilados na </console-callout-prefix>
+        <console-callout-link>Consola de Administração</console-callout-link>
+        <console-callout-suffix>.</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>Barra de navegação</label>
+    </navbar-section>
+    <appearance-section>
+        <label>Aparência e tema</label>
+    </appearance-section>
+    <detail-section>
+        <label>Página de detalhe</label>
+    </detail-section>
+    <wizard-section>
+        <label>Assistente</label>
+    </wizard-section>
+    <formulas-section>
+        <label>Fórmulas</label>
+    </formulas-section>
+    <landing-section>
+        <label>Página inicial</label>
+    </landing-section>
+    <summary-section>
+        <label>Página de sumário</label>
+    </summary-section>
+    <admin-section>
+        <label>Página de administração</label>
+    </admin-section>
+    <import-section>
+        <label>Importação e exportação</label>
+    </import-section>
+    <pdf-section>
+        <label>Geração de PDF</label>
+    </pdf-section>
+    <email-section>
+        <label>Correio eletrónico</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>Formatos de entrada e saída</label>
+    </formats-section>
+    <security-section>
+        <label>Autenticação e segurança</label>
+    </security-section>
+    <resources-section>
+        <label>Recursos</label>
+    </resources-section>
+    <processes-section>
+        <label>Processos</label>
+        <override-placeholder>Redefinir processo integrado…</override-placeholder>
+        <override-button>Redefinir</override-button>
+        <add-custom>Adicionar processo personalizado</add-custom>
+        <badge-override>Redefinição</badge-override>
+        <badge-custom>Personalizado</badge-custom>
+        <edit>Editar</edit>
+        <revert>Reverter</revert>
+        <delete>Apagar</delete>
+        <empty>Não existem redefinições de processos nem processos personalizados configurados para este âmbito. Redefina um processo integrado ou adicione um processo personalizado acima.</empty>
+        <dialog-title-override>Redefinir processo</dialog-title-override>
+        <dialog-title-add>Adicionar processo personalizado</dialog-title-add>
+        <dialog-title-edit>Editar processo</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>Redefinições por aplicação / formulário</label>
+        <add-override>Adicionar redefinição por aplicação / formulário</add-override>
+        <app>Nome da aplicação</app>
+        <app-hint>Nome da aplicação ou * para todas as aplicações</app-hint>
+        <form>Nome do formulário</form>
+        <form-hint>Nome do formulário ou * para todos os formulários</form-hint>
+        <profiles>Perfis</profiles>
+        <profiles-hint>Perfis de propriedades opcionais separados por espaços</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>Propriedades personalizadas</label>
+        <name>Nome da propriedade</name>
+        <name-hint>Nome completo da propriedade (incluindo caracteres universais se aplicável)</name-hint>
+        <type>Tipo</type>
+        <value>Valor</value>
+        <profiles>Perfis</profiles>
+        <profiles-hint>Perfis de propriedades opcionais separados por espaços</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>Idioma predefinido</label>
+        <hint>Código de idioma predefinido &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>Idiomas disponíveis (por formulário)</label>
+        <hint>Códigos de idioma separados por espaços ou &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>Idiomas disponíveis globais</label>
+        <hint>Idiomas disponíveis para as páginas inicial, de formulários e de administração &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>Fuso horário predefinido</label>
+        <hint>Identificador de fuso horário IANA, ex. &lt;code&gt;Europe/Lisbon&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>Manutenção de sessão ativa</label>
+        <hint>Manter as sessões de utilizador ativas enquanto uma página estiver aberta &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>Máx. de entradas</label>
+        <hint>Número máximo de documentos XForms ativos mantidos na memória JVM antes de passivar para o armazenamento &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>Orçamento de memória</label>
+        <hint>Percentagem máxima de memória JVM, tamanho fixo de dados (guardado em bytes) ou ilimitado &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>Inatividade máx.</label>
+        <hint>Tempo limite de inatividade opcional antes de passivar documentos ativos (ex. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; ou em branco) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>Máx. de entradas</label>
+        <hint>Número máximo de estados estáticos XForms compilados mantidos na memória JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>Orçamento de memória</label>
+        <hint>Percentagem máxima de memória JVM, tamanho fixo de dados (guardado em bytes) ou ilimitado &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>Inatividade máx.</label>
+        <hint>Tempo limite de inatividade opcional antes de transferir estados estáticos para o armazenamento (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou em branco) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>Mostrar ligação Início na barra de navegação</label>
+        <hint>Ativar a ligação Início na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>Mostrar seletor de idioma na barra de navegação</label>
+        <hint>Ativar o seletor de idioma na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>Mostrar seletor de esquema de cores na barra de navegação</label>
+        <hint>Ativar o seletor de modo claro/escuro na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>Mostrar botão Partilhar na barra de navegação</label>
+        <hint>Ativar o botão de ligação para partilhar na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>Mostrar histórico de revisões na barra de navegação</label>
+        <hint>Ativar o ícone do histórico de revisões na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>Mostrar etapa do fluxo de trabalho na barra de navegação</label>
+        <hint>Apresentar a etapa atual do fluxo de trabalho na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>Tema (por formulário)</label>
+        <hint>Tema visual para os formulários &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>Esquema de cores predefinido</label>
+        <hint>Esquema de cores predefinido para as páginas &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Claro)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Claro</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>Escuro</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>Automático (Sistema)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>Disposição da página no navegador</label>
+        <hint>Indica se o formulário ocupa largura fixa ou fluida &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Largura fixa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Largura fixa</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>Largura fluida</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>Densidade de visualização</label>
+        <hint>Densidade de espaçamento nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Confortável)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Compacta</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>Confortável</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>Espaçosa</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>Marcação de grelhas</label>
+        <hint>Marcação HTML utilizada para as grelhas &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Grelha CSS)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Grelha CSS</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>Tabela HTML</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>Aparência das etiquetas</label>
+        <hint>Modo de apresentação das etiquetas dos controlos &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Completa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Completa</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Mínima (marcador de posição)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>Aparência das dicas</label>
+        <hint>Modo de apresentação das dicas dos controlos &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Completa (em linha))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Completa (em linha)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Mínima (marcador de posição)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>Dica de ferramenta</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>Mostrar dicas em modos só de leitura</label>
+        <hint>Apresentar as dicas dos controlos nos modos de visualização e PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>Mostrar alertas em modos só de leitura</label>
+        <hint>Apresentar os alertas de validação nos modos de visualização e PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>Mostrar indicadores de obrigatoriedade em modos só de leitura</label>
+        <hint>Mostrar os indicadores de campo obrigatório nos modos de visualização e PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>Mostrar textos explicativos no modo de visualização</label>
+        <hint>Mostrar os controlos fr:explanation no modo de visualização &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>URI do logótipo predefinido</label>
+        <hint>URI do logótipo predefinido &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>URI do ícone da página</label>
+        <hint>URI do ícone de favoritos da página &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>Recursos CSS personalizados</label>
+        <hint>Lista de caminhos CSS personalizados separados por espaços &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>Recursos JavaScript personalizados</label>
+        <hint>Lista de caminhos JavaScript personalizados separados por espaços &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>Ocultar logótipo</label>
+        <hint>Ocultar o logótipo nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>Ocultar cabeçalho</label>
+        <hint>Ocultar o cabeçalho da página nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>Ocultar rodapé</label>
+        <hint>Ocultar o rodapé da página nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>Ocultar barra de botões</label>
+        <hint>Ocultar a barra inferior de botões nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>Mostrar indicações de atalhos de teclado</label>
+        <hint>Apresentar as indicações de atalhos de teclado nos botões &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>Botões da página de detalhe</label>
+        <hint>Lista separada por espaços de botões apresentados na página de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>Botões do modo de visualização</label>
+        <hint>Lista separada por espaços de botões apresentados na página de visualização &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>Atraso de gravação automática (ms)</label>
+        <hint>Atraso em milissegundos antes de guardar automaticamente; 0 desativa a gravação automática &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>Migração simples de dados</label>
+        <hint>Adicionar ou remover automaticamente elementos em falta nos dados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Ativada)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ativada</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>Desativada</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>Gerar um erro</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>Ordem de tabulação da grelha</label>
+        <hint>Ordem de tabulação entre as células da grelha &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Linhas)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Linhas</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>Colunas</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>Foco inicial</label>
+        <hint>Colocar automaticamente o foco no primeiro controlo do formulário ao carregar &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>Usar dicas automáticas</label>
+        <hint>Ativar as dicas automáticas para os controlos &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>Posição do resumo de erros</label>
+        <hint>Local onde apresentar o resumo de erros &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Inferior)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Nenhum</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>Superior</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Inferior</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>Superior e inferior</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>Componente Captcha</label>
+        <hint>Implementação de Captcha nas páginas de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Nenhum)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Nenhum</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>Formulário de instância única</label>
+        <hint>Permitir apenas um documento de dados para este formulário &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>Comportamento de instância única quando existe um documento</label>
+        <hint>Ação ao abrir &lt;code&gt;/new&lt;/code&gt; num formulário de instância única com dados existentes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Abrir documento existente)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Abrir documento existente</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>Mostrar erro</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>Mínimo de secções para a tabela de conteúdos</label>
+        <hint>Número mínimo de secções necessário para apresentar a tabela de conteúdos; -1 para desativar, -2 para não utilizar &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>Posição da tabela de conteúdos</label>
+        <hint>Posição da tabela de conteúdos na página de detalhe &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (No topo)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>No topo</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>À esquerda</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Nenhuma</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>Modos da tabela de conteúdos</label>
+        <hint>Modos em que a tabela de conteúdos é apresentada &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Novo</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Edição</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>Visualização</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>Aparência das mensagens</label>
+        <hint>Modo de apresentação das mensagens de ação &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Notificação flutuante)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Notificação flutuante</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>Caixa de diálogo modal</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>Posição das notificações flutuantes</label>
+        <hint>Posição no ecrã para as notificações flutuantes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Superior direita)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Superior esquerda</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>Superior centro</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>Superior direita</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>Inferior esquerda</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>Inferior centro</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>Inferior direita</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>Tempo de apresentação das notificações flutuantes (ms)</label>
+        <hint>Duração em milissegundos antes do fecho automático das notificações flutuantes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>Ativar reserva de edição concorrente</label>
+        <hint>Ativar o bloqueio/reserva exclusiva do documento durante a edição &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>Duração da reserva (minutos)</label>
+        <hint>Duração predefinida da reserva em minutos &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>Limiar de renovação da reserva (minutos)</label>
+        <hint>Limiar em minutos antes de a reserva expirar para proceder à renovação &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>Limiar de alerta da reserva (minutos)</label>
+        <hint>Limiar em minutos antes de a reserva expirar para alertar o utilizador &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>Caixa de diálogo de aviso de expiração de sessão</label>
+        <hint>Mostrar uma caixa de diálogo de aviso antes de a sessão do utilizador expirar &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>Avisar ao sair com alterações não guardadas</label>
+        <hint>Valor booleano ou expressão XPath que controla o aviso de dados não guardados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>Validar opções dos controlos de seleção</label>
+        <hint>Validar que os valores selecionados pertencem ao conjunto de opções disponível &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>Secções recolhíveis</label>
+        <hint>Permitir recolher e expandir as secções &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>Animar recolha/expansão de secções</label>
+        <hint>Animar a recolha e a expansão das secções &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>Posição de inserção de secções repetidas</label>
+        <hint>Local onde são inseridas as novas iterações de secção repetida &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Após a iteração atual)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Após a iteração atual</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>No fundo</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>Posição de inserção de grelhas repetidas</label>
+        <hint>Local onde são inseridas as novas linhas de grelha repetida &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Após a linha atual)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Após a linha atual</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>No fundo</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>Tamanho máximo de anexo por ficheiro</label>
+        <hint>Tamanho máximo por ficheiro carregado, guardado em bytes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>Tamanho máximo agregado de anexos por controlo</label>
+        <hint>Tamanho máximo total de anexos por controlo, guardado em bytes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>Tamanho máximo agregado de anexos por formulário</label>
+        <hint>Tamanho máximo total de anexos por formulário, guardado em bytes &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>Número máximo de ficheiros por controlo</label>
+        <hint>Número máximo de ficheiros por controlo de anexos &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>Tipos de conteúdo permitidos para anexos</label>
+        <hint>Tipos MIME separados por espaços, ex. &lt;code&gt;image/* application/pdf&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>Rejeitar ficheiros carregados vazios</label>
+        <hint>Rejeitar ficheiros carregados que tenham 0 bytes &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>Aparência de erros de carregamento</label>
+        <hint>Modo de apresentação dos erros de carregamento de ficheiros &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Caixa de diálogo modal)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Caixa de diálogo modal</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>Alerta em linha</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>Vista de assistente</label>
+        <hint>Mostrar as secções de nível superior numa página completa ou em páginas separadas do assistente &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Vista completa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vista completa</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Vista de assistente</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>Modo de validação de navegação do assistente</label>
+        <hint>Comportamento da navegação do assistente quando os dados não são válidos &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Livre)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Livre</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>Permissivo</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>Estrito</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>Navegação de subsecções do assistente</label>
+        <hint>Ativar a navegação do assistente para secções e grelhas dentro de secções de nível superior &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>Tabela de conteúdos de subsecções do assistente</label>
+        <hint>Como a tabela de conteúdos do assistente apresenta as subsecções &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Mostrar subsecções apenas para a secção ativa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Mostrar subsecções apenas para a secção ativa</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>Mostrar subsecções para todas as secções</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Não mostrar subsecções</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>Posição da tabela de conteúdos do assistente</label>
+        <hint>Local onde a tabela de conteúdos do assistente é apresentada &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (À esquerda)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>À esquerda</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Separada</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>Nenhuma</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>Mostrar sempre o estado da secção do assistente</label>
+        <hint>Mostrar ícones de estado da secção na tabela de conteúdos do assistente &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>Permitir parâmetro de URL de página do assistente</label>
+        <hint>Permitir selecionar a página inicial do assistente através de um parâmetro de URL &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>Atualizar parâmetro de URL ao mudar de página no assistente</label>
+        <hint>Atualizar o parâmetro de URL do navegador ao mudar de página no assistente &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>Marcar controlos como visitados ao mudar de página no assistente</label>
+        <hint>Quando a mudança de página no assistente marca os controlos como visitados &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sempre)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sempre</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>Apenas navegação para a frente</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>Nunca</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>Desativar cálculos em modos só de leitura (Revisão, PDF)</label>
+        <hint>Desativar fórmulas de cálculo nos modos de revisão e PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>Dependências automáticas de cálculos</label>
+        <hint>Determinar automaticamente a ordem de avaliação para fórmulas de Valor calculado e Valor inicial &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>Funções XPath adicionais permitidas</label>
+        <hint>Lista separada por espaços de funções XPath adicionais permitidas em fórmulas do Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>Tamanho dos cartões da página inicial</label>
+        <hint>Número de itens apresentados por cartão na página inicial &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>Cartões da página inicial</label>
+        <hint>Cartões apresentados na página inicial &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>Tamanho da página de sumário</label>
+        <hint>Número de linhas apresentadas por página na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>Botões da página de sumário</label>
+        <hint>Lista separada por espaços de botões na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>Mostrar coluna Criado</label>
+        <hint>Mostrar a coluna de data de criação na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>Mostrar coluna Última modificação</label>
+        <hint>Mostrar a coluna de data da última modificação na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>Mostrar coluna Etapa do fluxo de trabalho</label>
+        <hint>Mostrar a coluna de etapa do fluxo de trabalho na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>Mostrar coluna Criado por</label>
+        <hint>Mostrar a coluna Criado por na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>Mostrar coluna Modificado por</label>
+        <hint>Mostrar a coluna Modificado por na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>Mostrar seletor de versão na página de sumário</label>
+        <hint>Apresentar o seletor de versão do formulário na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>Versão do formulário para o botão Novo do sumário</label>
+        <hint>Versão do formulário a abrir ao clicar em Novo na página de sumário &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Versão atualmente selecionada)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Versão atualmente selecionada</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>Última versão publicada</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>Abrir opções de pesquisa ao carregar o sumário</label>
+        <hint>Expandir as opções de pesquisa avançada quando a página de sumário é carregada &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>Tamanho da página de administração de formulários</label>
+        <hint>Número de formulários por página na página de administração de formulários &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>Ligações da tabela de administração de formulários</label>
+        <hint>Ligações apresentadas para cada formulário na página de administração de formulários &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sumário, depois Novo)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sumário, depois Novo</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>Novo, depois Sumário</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>Apenas Sumário</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>Apenas Novo</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Nenhum</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>Abrir opções de pesquisa ao carregar a administração de formulários</label>
+        <hint>Expandir as opções de pesquisa quando a página de administração de formulários é carregada &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>Configuração de servidores remotos (JSON)</label>
+        <hint>Matriz JSON de servidores remotos para publicação e administração de formulários &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>Ativar página de exportação</label>
+        <hint>Ativar a página de exportação de dados de formulários &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>Permitir importar documentos inválidos</label>
+        <hint>Permitir a importação de documentos que contenham erros de validação &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>Permitir apagar registos existentes ao importar</label>
+        <hint>Permitir a opção de apagar dados existentes durante a importação &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>Restringir importação à última versão</label>
+        <hint>Permitir importar apenas para a última versão do formulário &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>Formatos de importação permitidos</label>
+        <hint>Formatos de importação de dados permitidos &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (Cabeçalhos)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (Intervalos com nome)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>Estrutura e dados XML do formulário</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>Mostrar nomes de aplicação e formulário na página de importação</label>
+        <hint>Mostrar os nomes da aplicação e do formulário na página de importação &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>Botões da página de importação</label>
+        <hint>Lista separada por espaços de botões na página de importação &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>Orientação de página PDF</label>
+        <hint>Orientação de página para os PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Retrato)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Retrato</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>Paisagem</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>Tamanho de página PDF</label>
+        <hint>Tamanho de página para os PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>Expressão do nome de ficheiro PDF</label>
+        <hint>Expressão XPath para os nomes de ficheiro PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>Acessibilidade PDF (PDF etiquetado)</label>
+        <hint>Ativar a acessibilidade com PDF etiquetado &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>Modo de conformidade PDF/A</label>
+        <hint>Conformidade com a norma de arquivo PDF/A &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Nenhum)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Nenhum</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>Modo de cor PDF</label>
+        <hint>Modo de cor para a geração de PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Preto e branco)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Preto e branco</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>Cor</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>Monocromático</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>Ativar hiperligações no PDF</label>
+        <hint>Gerar hiperligações ativas nos PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>Incluir código de barras no PDF</label>
+        <hint>Gerar o código de barras do documento nos PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>Desativar botão PDF quando os dados são inválidos</label>
+        <hint>Desativar o botão PDF quando o formulário tiver erros de validação &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>Limiar de conteúdo longo para modelos PDF</label>
+        <hint>Limiar de caracteres acima do qual os campos do modelo PDF passam para um anexo &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>Qualidade de compressão JPEG no PDF</label>
+        <hint>Percentagem de qualidade de compressão JPEG de 0% a 100% &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>Família de tipos de letra PDF predefinida</label>
+        <hint>Família de tipos de letra alternativa para Inter nos PDF gerados &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>Caminhos de tipos de letra para modelos PDF</label>
+        <hint>Caminhos para tipos de letra personalizados de modelos PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>Configuração predefinida de cabeçalho/rodapé PDF (JSON)</label>
+        <hint>Configuração JSON predefinida para cabeçalhos e rodapés PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>Transporte de correio eletrónico</label>
+        <hint>Mecanismo de transporte de correio eletrónico &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>Servidor SMTP</label>
+        <hint>Nome de anfitrião do servidor SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>Porta SMTP</label>
+        <hint>Porta do servidor SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>Nome de utilizador SMTP</label>
+        <hint>Nome de utilizador para autenticação SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>Encriptação SMTP</label>
+        <hint>Protocolo de encriptação para SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Nenhum)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Nenhum</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>Endereço de correio eletrónico do remetente (De)</label>
+        <hint>Endereço de correio eletrónico predefinido do remetente &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>Endereço de correio eletrónico de resposta (Responder para)</label>
+        <hint>Endereço de correio eletrónico de resposta predefinido &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>Endereço de correio eletrónico do destinatário (Para)</label>
+        <hint>Endereço de correio eletrónico predefinido do destinatário &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>Endereço de correio eletrónico em cópia (CC)</label>
+        <hint>Endereço de correio eletrónico em cópia (CC) predefinido &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>Endereço de correio eletrónico em cópia oculta (BCC)</label>
+        <hint>Endereço de correio eletrónico em cópia oculta (BCC) predefinido &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>Anexar PDF ao correio eletrónico</label>
+        <hint>Anexar o PDF gerado às mensagens de correio eletrónico de notificação &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>Anexar dados XML ao correio eletrónico</label>
+        <hint>Anexar os dados XML do formulário às mensagens de correio eletrónico de notificação &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>Anexar TIFF ao correio eletrónico</label>
+        <hint>Anexar a imagem TIFF gerada às mensagens de correio eletrónico de notificação &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>Anexar Excel (intervalos com nome) ao correio eletrónico</label>
+        <hint>Anexar o ficheiro Excel com intervalos com nome às mensagens de correio eletrónico de notificação &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>Anexar estrutura e dados XML do formulário ao correio eletrónico</label>
+        <hint>Anexar a exportação XML da estrutura e dos dados do formulário às mensagens de correio eletrónico de notificação &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>Anexar ficheiros carregados ao correio eletrónico</label>
+        <hint>Que anexos carregados pelo utilizador incluir nas mensagens de correio eletrónico &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Todos os anexos)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Todos os anexos</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Apenas os anexos selecionados</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>Nenhum anexo</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>Mostrar item de menu Esquema XML</label>
+        <hint>Mostrar o botão da caixa de diálogo Esquema XML no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>Mostrar item de menu Modelos PDF</label>
+        <hint>Mostrar o botão da caixa de diálogo Modelos PDF no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>Mostrar item de menu Editar código-fonte</label>
+        <hint>Mostrar o botão da caixa de diálogo Editar código-fonte no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>Mostrar item de menu Etapa do fluxo de trabalho</label>
+        <hint>Mostrar as definições do fluxo de trabalho no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>Mostrar item de menu Permissões</label>
+        <hint>Mostrar o botão da caixa de diálogo Permissões no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>Mostrar item de menu Definições de email</label>
+        <hint>Mostrar o botão da caixa de diálogo Definições de email no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>Mostrar item de menu Página de confirmação</label>
+        <hint>Mostrar as configurações da página de confirmação no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>Mostrar item de menu Mensagens personalizadas</label>
+        <hint>Mostrar as configurações de mensagens personalizadas no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>Mostrar item de menu Processos personalizados</label>
+        <hint>Mostrar as configurações de processos personalizados no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>Mostrar Serviços HTTP na barra lateral</label>
+        <hint>Ativar os serviços HTTP no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>Mostrar Serviços de base de dados na barra lateral</label>
+        <hint>Ativar os serviços de base de dados no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>Mostrar Ações na barra lateral</label>
+        <hint>Ativar o editor de ações no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>Exigir título do formulário no Form Builder</label>
+        <hint>Exigir um título de formulário não vazio no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>Exigir descrição do formulário no Form Builder</label>
+        <hint>Exigir uma descrição de formulário não vazia no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>Comportamento de versão ao publicar</label>
+        <hint>Comportamento do controlo de versões ao publicar um formulário no Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Substituir versão existente por predefinição)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Substituir versão existente por predefinição</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>Criar nova versão por predefinição</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>Forçar a criação de nova versão</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>Permitir carregamento de logótipo do formulário no Form Builder</label>
+        <hint>Mostrar o controlo de carregamento de logótipo nas Configurações do Formulário do Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>Ativar servidor MCP do Form Builder</label>
+        <hint>Ativar o servidor Model Context Protocol (MCP) para o Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>Exigir token para o servidor MCP do Form Builder</label>
+        <hint>Exigir autenticação por token para o servidor MCP do Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Sim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>Formato de entrada de data</label>
+        <hint>Máscara de formato de entrada de data, ex. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; ou &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>Formato de entrada de hora</label>
+        <hint>Máscara de formato de entrada de hora &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>Formato de saída de data (XPath)</label>
+        <hint>Expressão XPath para formatar a saída de data &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>Formato de saída de data e hora (XPath)</label>
+        <hint>Expressão XPath para formatar a saída de data e hora &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>Formato de saída de hora (XPath)</label>
+        <hint>Expressão XPath para formatar a saída de hora &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>Formato de saída decimal (XPath)</label>
+        <hint>Expressão XPath para formatar a saída decimal &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>Formato de saída de inteiros (XPath)</label>
+        <hint>Expressão XPath para formatar a saída de números inteiros &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>Ativar menu de utilizador na barra de navegação</label>
+        <hint>Apresentar o menu de início/fim de sessão do utilizador na barra de navegação &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (Não)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sim</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Não</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>URI de início de sessão do menu de utilizador</label>
+        <hint>Modelo de URI de início de sessão para o menu de utilizador &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>URI de fim de sessão do menu de utilizador</label>
+        <hint>Modelo de URI de fim de sessão para o menu de utilizador &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>URI de registo do menu de utilizador</label>
+        <hint>Modelo de URI de registo para o menu de utilizador &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>Permissões do Form Runner</label>
+        <hint>Definição de permissões &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>Validade do token de acesso (minutos)</label>
+        <hint>Duração de validade em minutos para tokens de acesso externo &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>Validade do token de estado (minutos)</label>
+        <hint>Duração de validade em minutos para tokens de estado &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsSelect1Control, XFormsSelec
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.state.{XFormsDocumentCache, XFormsStaticStateCache}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -181,6 +182,64 @@ class ConfigurationPropertiesTest
       assert(! FormRunnerConfiguration.isValidProcessDefinition("validate then (save"))
       assert(FormRunnerConfiguration.formatProcessDefinition("validate then save") == "validate\nthen save")
       assert(FormRunnerConfiguration.formatProcessDefinition("validate then (save") == "validate then (save")
+    }
+
+    it("must provide complete metadata and resource translations for all 20 Form Runner languages") {
+      val expectedLangs = List(
+        "ar", "ca", "da", "de", "en", "es", "fi", "fr", "hu", "it",
+        "ja", "nl", "no", "pl", "pt", "ru", "sv", "tr", "zh-Hans", "zh-Hant"
+      )
+
+      val formIs = getClass.getResourceAsStream("/forms/orbeon/configuration/form/form.xhtml")
+      assert(formIs ne null)
+      val formDoc = useAndClose(formIs)(IOSupport.readOrbeonDom)
+
+      val metadataElem =
+        formDoc.getRootElement
+          .element("head")
+          .elements("model")
+          .find(_.attributeValue("id") == "fr-form-metadata")
+          .orElse(
+            formDoc.getRootElement
+              .element("head")
+              .elements("model")
+              .flatMap(_.elements("instance"))
+              .find(_.attributeValue("id") == "fr-form-metadata")
+          )
+          .get
+          .element("metadata")
+
+      val titleLangs = metadataElem.elements("title").flatMap(e => Option(e.attributeValue(XMLConstants.XML_LANG_QNAME)).filter(_ => e.getText.trim.nonEmpty)).toSet
+      val descLangs  = metadataElem.elements("description").flatMap(e => Option(e.attributeValue(XMLConstants.XML_LANG_QNAME)).filter(_ => e.getText.trim.nonEmpty)).toSet
+      assert(titleLangs == expectedLangs.toSet)
+      assert(descLangs  == expectedLangs.toSet)
+
+      def collectLeaves(el: org.orbeon.dom.Element, prefix: String = ""): List[(String, String)] =
+        el.elements.toList.flatMap { ch =>
+          val p = s"$prefix/${ch.getName}"
+          if (ch.elements.isEmpty) List(p -> ch.getText) else collectLeaves(ch, p)
+        }
+
+      val enIs = getClass.getResourceAsStream("/forms/orbeon/configuration/form/config-resources-en.xml")
+      assert(enIs ne null)
+      val enRoot   = useAndClose(enIs)(IOSupport.readOrbeonDom).getRootElement
+      val enLeaves = collectLeaves(enRoot)
+      val enPaths  = enLeaves.map(_._1)
+      val enValues = enLeaves.collect { case (p, v) if p.endsWith("/item/value") => v }
+
+      for (lang <- expectedLangs) {
+        val resPath = s"/forms/orbeon/configuration/form/config-resources-$lang.xml"
+        val is      = getClass.getResourceAsStream(resPath)
+        assert(is ne null, s"Missing resource file $resPath")
+        val root    = useAndClose(is)(IOSupport.readOrbeonDom).getRootElement
+        assert(root.attributeValue(XMLConstants.XML_LANG_QNAME) == lang, s"Unexpected xml:lang in $resPath")
+
+        val leaves = collectLeaves(root)
+        assert(leaves.map(_._1) == enPaths, s"Element tree mismatch in $resPath")
+        assert(leaves.collect { case (p, v) if p.endsWith("/item/value") => v } == enValues, s"Item values mismatch in $resPath")
+        for (((p, txt), (_, enTxt)) <- leaves.zip(enLeaves) if ! p.endsWith("/item/value") && enTxt.trim.nonEmpty)
+          assert(txt.trim.nonEmpty, s"Blank translation at $p in $resPath")
+      }
     }
 
     it("must provide a default empty custom property row when none exist and omit it when saving") {
@@ -591,6 +650,10 @@ class ConfigurationPropertiesTest
         // 2. Modify configuration via UI controls / instance and save
         withTestExternalContext { ec =>
           withFormRunnerDocument(processorService, doc) {
+            val loadedResourceLangs =
+              (instance("fr-form-resources").get.rootElement / "resource").map(_.attValue("*:lang")).toSet
+            assert(loadedResourceLangs.size == 20)
+
             val overrideControl       = resolveObject[XFormsSingleNodeControl]("default-language-override-control").get
             val overrideSelectControl = ControlsIterator(overrideControl, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
             val valueControl          = resolveObject[XFormsSingleNodeControl]("default-language-value-control").get

@@ -1,0 +1,2239 @@
+<resource xml:lang="tr">
+    <override>
+        <label>Geçersiz Kıl</label>
+    </override>
+    <pages-section>
+        <label>Başlangıç, Özet, Yönetim ve İçe Aktarma Sayfaları</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>Standart Ayarlar</standard-settings>
+        <custom-properties>Özel Özellikler</custom-properties>
+    </tabs>
+    <scopes>
+        <header>Kapsamlar</header>
+        <global>Genel Ayarlar</global>
+        <all-forms>Tüm formlar</all-forms>
+        <add-override>Geçersiz Kılma Ekle</add-override>
+        <add-short>Ekle</add-short>
+        <add-form-in-app>Form geçersiz kılması ekle</add-form-in-app>
+        <edit-scope>Kapsamı düzenle</edit-scope>
+        <remove-scope>Geçersiz kılmayı kaldır</remove-scope>
+        <clear-app-overrides>Geçersiz kılmaları temizle</clear-app-overrides>
+        <dialog-add-title>Geçersiz Kılma Ekle</dialog-add-title>
+        <dialog-edit-title>Geçersiz Kılma Kapsamını Düzenle</dialog-edit-title>
+        <level-label>Geçersiz Kılma Düzeyi</level-label>
+        <level-app>Uygulama</level-app>
+        <level-app-form>Uygulama ve Form</level-app-form>
+        <level-global-profile>Genel (Profil)</level-global-profile>
+        <app-label>Uygulama</app-label>
+        <app-hint>Yayınlanmış bir uygulama seçin veya bir uygulama adı girin</app-hint>
+        <form-label>Form</form-label>
+        <form-hint>Yayınlanmış bir form seçin veya bir form adı girin</form-hint>
+        <profiles-label>Profiller (İsteğe Bağlı)</profiles-label>
+        <profiles-hint>Mevcut profilleri seçin veya özel profil adları ekleyin</profiles-hint>
+        <confirm-add>Ekle</confirm-add>
+        <confirm-save>Uygula</confirm-save>
+        <cancel>İptal</cancel>
+        <error-app-slug>Geçerli bir uygulama adı girin (harfler, rakamlar, tireler, alt çizgiler)</error-app-slug>
+        <error-form-slug>Geçerli bir form adı girin (orbeon/builder ve orbeon/configuration geçersiz kılınamaz)</error-form-slug>
+        <error-profiles>Geçerli profil tanımlayıcıları girin</error-profiles>
+        <error-duplicate>Bu kapsam için zaten bir geçersiz kılma mevcut</error-duplicate>
+    </scopes>
+    <filter>
+        <label>Ayarları filtrele</label>
+        <hint>Ayar adına, açıklamaya veya oxf.* özellik adına göre ara</hint>
+        <clear>Filtreyi temizle</clear>
+    </filter>
+    <alerts>
+        <invalid-value>Geçersiz ayar değeri</invalid-value>
+        <xpath>Geçersiz XPath ifadesi</xpath>
+        <non-negative-integer>Negatif olmayan bir tam sayı girin (0 veya daha büyük)</non-negative-integer>
+        <positive-integer>Pozitif bir tam sayı girin (1 veya daha büyük)</positive-integer>
+        <optional-integer-or-unlimited>Bir tam sayı girin (sınırsız için -1 veya 0 ya da daha büyük) veya boş bırakın</optional-integer-or-unlimited>
+        <port>Geçerli bir TCP bağlantı noktası (1–65535) girin veya boş bırakın</port>
+        <percentage>%0 ile %100 arasında bir yüzde girin</percentage>
+        <json>Geçersiz JSON sözdizimi</json>
+        <permissions-json>Gerekli tüm rol adlarını tamamlayın veya geçersiz izin JSON verisini düzeltin</permissions-json>
+        <landing-cards>Gerekli tüm kart alanlarını tamamlayın</landing-cards>
+        <byte-size>Bayt cinsinden bir boyut veya maks. yığın yüzdesi (1–100%) girin, örn. 15%, 256m, 1g veya 0</byte-size>
+        <attachment-size>Tam sayı bayt karşılığı veren negatif olmayan bir boyut girin</attachment-size>
+        <positive-byte-size>En az 1 bayt karşılığı veren pozitif bir boyut girin</positive-byte-size>
+        <heap-percentage>%0'dan büyük ve en fazla %100 olan bir yüzde girin</heap-percentage>
+        <duration>Bir süre girin, örn. 30m, 2h, 1d, PT30M veya milisaniye</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>Sınırsız</unlimited>
+        <max-size>Maksimum boyut</max-size>
+        <heap-percent>Maks. yığın %</heap-percent>
+        <fixed-size>Sabit boyut</fixed-size>
+    </size-modes>
+    <units>
+        <ms>ms</ms>
+        <min>dk.</min>
+        <chars>karakter</chars>
+    </units>
+    <system-section>
+        <label>Genel</label>
+    </system-section>
+    <caches-section>
+        <label>Önbellekler</label>
+        <console-callout-prefix>Canlı JVM yığın kullanımını, önbellek isabet oranlarını, SIFS disk depolarını ve derlenmiş statik durumları </console-callout-prefix>
+        <console-callout-link>Yönetim Konsolu</console-callout-link>
+        <console-callout-suffix> üzerinden izleyin.</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>Gezinme Çubuğu</label>
+    </navbar-section>
+    <appearance-section>
+        <label>Görünüm ve Tema</label>
+    </appearance-section>
+    <detail-section>
+        <label>Ayrıntı Sayfası</label>
+    </detail-section>
+    <wizard-section>
+        <label>Sihirbaz</label>
+    </wizard-section>
+    <formulas-section>
+        <label>Formüller</label>
+    </formulas-section>
+    <landing-section>
+        <label>Başlangıç Sayfası</label>
+    </landing-section>
+    <summary-section>
+        <label>Özet Sayfası</label>
+    </summary-section>
+    <admin-section>
+        <label>Yönetim Sayfası</label>
+    </admin-section>
+    <import-section>
+        <label>İçe ve Dışa Aktarma</label>
+    </import-section>
+    <pdf-section>
+        <label>PDF Oluşturma</label>
+    </pdf-section>
+    <email-section>
+        <label>E-posta</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>Giriş ve Çıkış Formatları</label>
+    </formats-section>
+    <security-section>
+        <label>Kimlik Doğrulama ve Güvenlik</label>
+    </security-section>
+    <resources-section>
+        <label>Kaynaklar</label>
+    </resources-section>
+    <processes-section>
+        <label>Süreçler</label>
+        <override-placeholder>Yerleşik süreci geçersiz kıl…</override-placeholder>
+        <override-button>Geçersiz Kıl</override-button>
+        <add-custom>Özel Süreç Ekle</add-custom>
+        <badge-override>Geçersiz Kılma</badge-override>
+        <badge-custom>Özel</badge-custom>
+        <edit>Düzenle</edit>
+        <revert>Geri Al</revert>
+        <delete>Sil</delete>
+        <empty>Bu kapsam için yapılandırılmış süreç geçersiz kılması veya özel süreç yok. Yukarıdan yerleşik bir süreci geçersiz kılın veya özel bir süreç ekleyin.</empty>
+        <dialog-title-override>Süreci Geçersiz Kıl</dialog-title-override>
+        <dialog-title-add>Özel Süreç Ekle</dialog-title-add>
+        <dialog-title-edit>Süreci Düzenle</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>Uygulama / Form Geçersiz Kılmaları</label>
+        <add-override>Uygulama / Form Geçersiz Kılması Ekle</add-override>
+        <app>Uygulama Adı</app>
+        <app-hint>Uygulama adı veya tüm uygulamalar için *</app-hint>
+        <form>Form Adı</form>
+        <form-hint>Form adı veya tüm formlar için *</form-hint>
+        <profiles>Profiller</profiles>
+        <profiles-hint>Boşlukla ayrılmış isteğe bağlı özellik profilleri</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>Özel Özellikler</label>
+        <name>Özellik Adı</name>
+        <name-hint>Tam özellik adı (varsa joker karakterler dahil)</name-hint>
+        <type>Tür</type>
+        <value>Değer</value>
+        <profiles>Profiller</profiles>
+        <profiles-hint>Boşlukla ayrılmış isteğe bağlı özellik profilleri</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>Varsayılan Dil</label>
+        <hint>Varsayılan dil kodu &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>Kullanılabilir Diller (Form Başına)</label>
+        <hint>Boşlukla ayrılmış dil kodları veya &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>Genel Kullanılabilir Diller</label>
+        <hint>Başlangıç, Formlar ve Yönetim sayfaları için kullanılabilir diller &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>Varsayılan Saat Dilimi</label>
+        <hint>IANA saat dilimi tanımlayıcısı, örn. &lt;code&gt;Europe/Istanbul&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>Oturum Canlılık Sinyali</label>
+        <hint>Sayfa açıkken kullanıcı oturumlarını etkin tut &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>Maks. Giriş Sayısı</label>
+        <hint>Depoya pasifleştirilmeden önce JVM yığınında tutulan maksimum canlı XForms belgesi sayısı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>Bayt Bütçesi</label>
+        <hint>Maks. JVM yığın yüzdesi, sabit veri boyutu (bayt olarak saklanır) veya sınırsız &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>Maks. Boşta Kalma Süresi</label>
+        <hint>Canlı belgeler pasifleştirilmeden önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>Maks. Giriş Sayısı</label>
+        <hint>JVM yığınında tutulan maksimum derlenmiş XForms statik durumu sayısı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>Bayt Bütçesi</label>
+        <hint>Maks. JVM yığın yüzdesi, sabit veri boyutu (bayt olarak saklanır) veya sınırsız &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>Maks. Boşta Kalma Süresi</label>
+        <hint>Statik durumlar depoya aktarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>Gezinme Çubuğunda Ana Sayfa Bağlantısını Göster</label>
+        <hint>Gezinme çubuğunda Ana Sayfa bağlantısını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>Gezinme Çubuğunda Dil Seçiciyi Göster</label>
+        <hint>Gezinme çubuğunda dil seçiciyi etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>Gezinme Çubuğunda Renk Düzeni Seçiciyi Göster</label>
+        <hint>Gezinme çubuğunda açık/koyu mod seçiciyi etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>Gezinme Çubuğunda Paylaş Düğmesini Göster</label>
+        <hint>Gezinme çubuğunda bağlantı paylaşma düğmesini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>Gezinme Çubuğunda Revizyon Geçmişini Göster</label>
+        <hint>Gezinme çubuğunda revizyon geçmişi simgesini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>Gezinme Çubuğunda İş Akışı Aşamasını Göster</label>
+        <hint>Gezinme çubuğunda geçerli iş akışı aşamasını görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>Tema (Form Başına)</label>
+        <hint>Formlar için görsel tema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>Varsayılan Renk Düzeni</label>
+        <hint>Sayfalar için varsayılan renk düzeni &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Açık)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Açık</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>Koyu</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>Otomatik (Sistem)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>Tarayıcı Sayfa Düzeni</label>
+        <hint>Formun sabit mi yoksa esnek genişlikte mi görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Sabit genişlik)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sabit genişlik</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>Esnek genişlik</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>Görünüm Yoğunluğu</label>
+        <hint>Ayrıntı sayfalarındaki boşluk yoğunluğu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Rahat)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sıkışık</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>Rahat</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>Geniş</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>Izgara İşaretlemesi</label>
+        <hint>Izgaralar için kullanılan HTML işaretlemesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (CSS Izgarası)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>CSS Izgarası</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>HTML Tablosu</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>Etiket Görünümü</label>
+        <hint>Kontrol etiketlerinin nasıl görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal (Yer Tutucu)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>İpucu Görünümü</label>
+        <hint>Kontrol ipuçlarının nasıl görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam (Satır İçi))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam (Satır İçi)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal (Yer Tutucu)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>Araç İpucu</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>Salt Okunur Modlarda İpuçlarını Göster</label>
+        <hint>Görüntüleme ve PDF modlarında kontrol ipuçlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>Salt Okunur Modlarda Uyarıları Göster</label>
+        <hint>Görüntüleme ve PDF modlarında doğrulama uyarılarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>Salt Okunur Modlarda Zorunlu Alan Göstergelerini Göster</label>
+        <hint>Görüntüleme ve PDF modlarında zorunlu alan göstergelerini göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>Görüntüleme Modunda Açıklamaları Göster</label>
+        <hint>Görüntüleme modunda fr:explanation kontrollerini göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>Varsayılan Logo URI'si</label>
+        <hint>Varsayılan logonun URI adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>Site Simgesi URI'si</label>
+        <hint>Sayfa simgesinin URI adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>Özel CSS Dosyaları</label>
+        <hint>Boşlukla ayrılmış özel CSS dosya yolları listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>Özel JavaScript Dosyaları</label>
+        <hint>Boşlukla ayrılmış özel JS dosya yolları listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>Logoyu Gizle</label>
+        <hint>Ayrıntı sayfalarında logoyu gizle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>Üst Bilgiyi Gizle</label>
+        <hint>Ayrıntı sayfalarında sayfa üst bilgisini gizle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>Alt Bilgiyi Gizle</label>
+        <hint>Ayrıntı sayfalarında sayfa alt bilgisini gizle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>Düğme Çubuğunu Gizle</label>
+        <hint>Ayrıntı sayfalarında alt düğme çubuğunu gizle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>Klavye Kısayolu İpuçlarını Göster</label>
+        <hint>Düğmelerde klavye kısayolu ipuçlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>Ayrıntı Sayfası Düğmeleri</label>
+        <hint>Ayrıntı sayfasında gösterilen, boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>Görüntüleme Modu Düğmeleri</label>
+        <hint>Görüntüleme sayfasında gösterilen, boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>Otomatik Kaydetme Gecikmesi (ms)</label>
+        <hint>Otomatik kaydetme öncesinde milisaniye cinsinden gecikme; 0 otomatik kaydetmeyi devre dışı bırakır &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>Basit Veri Taşıma</label>
+        <hint>Verilerdeki eksik öğeleri otomatik olarak ekle/kaldır &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Etkin)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Etkin</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>Devre Dışı</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>Hata ver</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>Izgara Sekme Sırası</label>
+        <hint>Izgara hücreleri arasında sekme geçiş sırası &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Satırlar)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Satırlar</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>Sütunlar</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>Başlangıç Odağı</label>
+        <hint>Sayfa yüklendiğinde ilk form kontrolüne otomatik olarak odaklan &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>Otomatik İpuçlarını Kullan</label>
+        <hint>Kontroller için otomatik ipuçlarını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>Hata Özeti Konumu</label>
+        <hint>Hata özetinin nerede gösterileceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Alt)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Yok</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>Üst</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Alt</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>Üst ve Alt</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>CAPTCHA Bileşeni</label>
+        <hint>Ayrıntı sayfalarındaki CAPTCHA uygulaması &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Yok)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Yok</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>Tekil Form</label>
+        <hint>Bu form için yalnızca tek bir form veri belgesine izin ver &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>Belge Mevcut Olduğunda Tekil Form Davranışı</label>
+        <hint>Mevcut verisi olan tekil bir formda &lt;code&gt;/new&lt;/code&gt; açıldığında yapılacak işlem &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Mevcut Belgeyi Aç)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Mevcut Belgeyi Aç</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>Hata Göster</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>İçindekiler İçin Minimum Bölüm Sayısı</label>
+        <hint>İçindekiler tablosunu göstermek için gereken minimum bölüm sayısı; devre dışı bırakmak için -1, kullanılmıyorsa -2 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>İçindekiler Konumu</label>
+        <hint>Ayrıntı sayfasındaki içindekiler tablosunun konumu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Üstte)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Üstte</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Solda</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Gizli</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>İçindekiler Görünüm Modları</label>
+        <hint>İçindekiler tablosunun gösterildiği modlar &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Yeni</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Düzenleme</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>Görüntüleme</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>Mesaj Görünümü</label>
+        <hint>İşlem mesajlarının nasıl görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Anlık Bildirim)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Anlık Bildirim</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>Kalıcı İletişim Kutusu</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>Anlık Bildirim Konumu</label>
+        <hint>Anlık bildirim mesajlarının ekrandaki konumu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Sağ Üst)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sol Üst</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>Üst Orta</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>Sağ Üst</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>Sol Alt</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>Alt Orta</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>Sağ Alt</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>Anlık Bildirim Süresi (ms)</label>
+        <hint>Anlık bildirim mesajlarının otomatik kapanmadan önceki milisaniye cinsinden süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>Eşzamanlı Düzenleme Kiralamasını Etkinleştir</label>
+        <hint>Düzenleme sırasında özel belge kilidini/kiralamasını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>Kiralama Süresi (Dakika)</label>
+        <hint>Dakika cinsinden varsayılan kiralama süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>Kiralama Yenileme Eşiği (Dakika)</label>
+        <hint>Kiralama süresi dolmadan önce yenileme yapılacak dakika eşiği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>Kiralama Uyarı Eşiği (Dakika)</label>
+        <hint>Kiralama süresi dolmadan önce kullanıcıyı uyaracak dakika eşiği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>Oturum Süresi Dolma Uyarı İletişim Kutusu</label>
+        <hint>Kullanıcı oturumu sona ermeden önce uyarı iletişim kutusu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>Kaydedilmemiş Değişikliklerle Ayrılırken Uyar</label>
+        <hint>Kaydedilmemiş veri uyarısını denetleyen mantıksal değer veya XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>Seçim Kontrolü Seçeneklerini Doğrula</label>
+        <hint>Seçim kontrolü değerlerinin mevcut öğe kümesinde yer aldığını doğrula &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>Daraltılabilir Bölümler</label>
+        <hint>Bölümlerin daraltılıp genişletilmesine izin ver &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>Bölüm Daraltma/Genişletme Animasyonu</label>
+        <hint>Bölüm daraltma ve genişletme işlemini canlandır &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>Tekrarlanan Bölüm Ekleme Konumu</label>
+        <hint>Yeni tekrarlanan bölüm yinelemelerinin nereye ekleneceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Geçerli Yinelemeden Sonra)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Geçerli Yinelemeden Sonra</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>En Alta</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>Tekrarlanan Izgara Ekleme Konumu</label>
+        <hint>Yeni tekrarlanan ızgara satırlarının nereye ekleneceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Geçerli Satırdan Sonra)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Geçerli Satırdan Sonra</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>En Alta</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>Dosya Başına Maks. Ek Boyutu</label>
+        <hint>Yüklenen dosya başına bayt olarak saklanan maksimum boyut &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>Kontrol Başına Maks. Toplam Ek Boyutu</label>
+        <hint>Kontrol başına bayt olarak saklanan maksimum toplam ek boyutu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>Form Başına Maks. Toplam Ek Boyutu</label>
+        <hint>Form başına bayt olarak saklanan maksimum toplam ek boyutu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>Kontrol Başına Maksimum Dosya Sayısı</label>
+        <hint>Ek kontrolü başına maksimum dosya sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>İzin Verilen Ek MIME Türleri</label>
+        <hint>Boşlukla ayrılmış MIME türleri, örn. &lt;code&gt;image/* application/pdf&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>Boş Yüklenen Dosyaları Reddet</label>
+        <hint>Boyutu 0 bayt olan yüklenen dosyaları reddet &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>Yükleme Hatası Görünümü</label>
+        <hint>Dosya yükleme hatalarının nasıl gösterileceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Kalıcı İletişim Kutusu)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kalıcı İletişim Kutusu</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>Satır İçi Uyarı</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>Sihirbaz Görünümü</label>
+        <hint>Üst düzey bölümleri tek bir tam sayfa olarak veya ayrı sihirbaz sayfaları olarak göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam Görünüm)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam Görünüm</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Sihirbaz Görünümü</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>Sihirbaz Gezinme Doğrulama Modu</label>
+        <hint>Veriler geçerli olmadığında sihirbaz gezinmesinin nasıl davranacağı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Serbest)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Serbest</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>Esnek</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>Katı</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>Sihirbaz Alt Bölümleri Gezinmesi</label>
+        <hint>Üst düzey bölümler içindeki alt bölümler ve ızgaralar için sihirbaz gezinmesini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>Sihirbaz Alt Bölümleri İçindekiler Tablosu</label>
+        <hint>Sihirbaz içindekiler tablosunun alt bölümleri nasıl göstereceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Alt bölümleri yalnızca etkin bölüm için göster)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Alt bölümleri yalnızca etkin bölüm için göster</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>Alt bölümleri tüm bölümler için göster</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Alt bölümleri gösterme</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>Sihirbaz İçindekiler Konumu</label>
+        <hint>Sihirbaz içindekiler tablosunun nerede görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Solda)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Solda</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Ayrı</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>Gizli</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>Sihirbaz Bölüm Durumunu Her Zaman Göster</label>
+        <hint>Sihirbaz içindekiler tablosunda bölüm durumu simgelerini göster &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>Sihirbaz Sayfası URL Parametresine İzin Ver</label>
+        <hint>Başlangıç sihirbaz sayfasının URL parametresiyle seçilmesine izin ver &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>Sihirbaz Sayfası Değiştiğinde URL Parametresini Güncelle</label>
+        <hint>Sihirbaz sayfaları arasında geçiş yapılırken tarayıcı URL parametresini güncelle &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>Sihirbaz Sayfası Değiştiğinde Kontrolleri Ziyaret Edildi Olarak İşaretle</label>
+        <hint>Sihirbaz sayfaları değiştirilirken kontrollerin ne zaman ziyaret edildi olarak işaretleneceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Her Zaman)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Her Zaman</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>Yalnızca İleri Gezinmede</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>Hiçbir Zaman</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>Salt Okunur Modlarda (İnceleme, PDF) Hesaplamaları Devre Dışı Bırak</label>
+        <hint>İnceleme ve PDF modlarında hesaplama formüllerini devre dışı bırak &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>Otomatik Hesaplama Bağımlılıkları</label>
+        <hint>Hesaplanan Değer ve Başlangıç Değeri formülleri için değerlendirme sırasını otomatik olarak belirle &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>İzin Verilen Ek XPath Fonksiyonları</label>
+        <hint>Form Builder formüllerinde izin verilen ek XPath fonksiyonlarının boşlukla ayrılmış listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>Başlangıç Sayfası Kart Boyutu</label>
+        <hint>Başlangıç sayfasında kart başına gösterilen öğe sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>Başlangıç Sayfası Kartları</label>
+        <hint>Başlangıç sayfasında görüntülenen kartlar &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>Özet Sayfası Boyutu</label>
+        <hint>Özet sayfasında sayfa başına görüntülenen satır sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>Özet Sayfası Düğmeleri</label>
+        <hint>Özet sayfasındaki boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>Oluşturulma Tarihi Sütununu Göster</label>
+        <hint>Özet sayfasında oluşturulma zaman damgası sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>Son Değiştirilme Sütununu Göster</label>
+        <hint>Özet sayfasında son değiştirilme zaman damgası sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>İş Akışı Aşaması Sütununu Göster</label>
+        <hint>Özet sayfasında iş akışı aşaması sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>Oluşturan Sütununu Göster</label>
+        <hint>Özet sayfasında Oluşturan sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>Son Değiştiren Sütununu Göster</label>
+        <hint>Özet sayfasında Son Değiştiren sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>Özet Sayfasında Sürüm Seçiciyi Göster</label>
+        <hint>Özet sayfasında form sürümü seçiciyi görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>Özet Sayfası Yeni Düğmesi Form Sürümü</label>
+        <hint>Özet sayfasından Yeni düğmesine tıklandığında hangi form sürümünün açılacağı &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Seçili Olan Sürüm)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Seçili Olan Sürüm</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>Yayınlanan En Son Sürüm</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>Özet Yüklendiğinde Arama Seçeneklerini Aç</label>
+        <hint>Özet sayfası yüklendiğinde gelişmiş arama seçeneklerini genişlet &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>Form Yönetimi Sayfa Boyutu</label>
+        <hint>Form Yönetimi sayfasında sayfa başına gösterilen form sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>Form Yönetimi Tablo Bağlantıları</label>
+        <hint>Form Yönetimi sayfasında her form için gösterilen bağlantılar &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Önce Özet, sonra Yeni)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Önce Özet, sonra Yeni</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>Önce Yeni, sonra Özet</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>Yalnızca Özet</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>Yalnızca Yeni</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Yok</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>Form Yönetimi Yüklendiğinde Arama Seçeneklerini Aç</label>
+        <hint>Form Yönetimi sayfası yüklendiğinde arama seçeneklerini genişlet &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>Uzak Sunucu Yapılandırması (JSON)</label>
+        <hint>Form yayınlama ve yönetimi için uzak sunucuların JSON dizisi &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>Dışa Aktarma Sayfasını Etkinleştir</label>
+        <hint>Form verilerini dışa aktarma sayfasını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>Geçersiz Belgelerin İçe Aktarılmasına İzin Ver</label>
+        <hint>Doğrulama hataları içeren belgelerin içe aktarılmasına izin ver &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>İçe Aktarma Sırasında Mevcut Kayıtları Silmeye İzin Ver</label>
+        <hint>İçe aktarma sırasında mevcut verileri silme seçeneğine izin ver &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>İçe Aktarmayı En Son Sürümle Sınırla</label>
+        <hint>Yalnızca en son form sürümüne içe aktarmaya izin ver &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>İzin Verilen İçe Aktarma Formatları</label>
+        <hint>İzin verilen veri içe aktarma formatları &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (Başlıklar)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (Adlandırılmış Aralıklar)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>XML Form Yapısı ve Verileri</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>İçe Aktarma Sayfasında Uygulama/Form Adlarını Göster</label>
+        <hint>İçe aktarma sayfasında uygulama ve form adlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>İçe Aktarma Sayfası Düğmeleri</label>
+        <hint>İçe aktarma sayfasındaki boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>PDF Sayfa Yönü</label>
+        <hint>Oluşturulan PDF'ler için sayfa yönü &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Dikey)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Dikey</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>Yatay</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>PDF Sayfa Boyutu</label>
+        <hint>Oluşturulan PDF'ler için sayfa boyutu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>PDF Dosya Adı İfadesi</label>
+        <hint>Oluşturulan PDF dosya adları için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>PDF Erişilebilirliği (Etiketli PDF)</label>
+        <hint>Etiketli PDF erişilebilirliğini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>PDF/A Uyumluluk Modu</label>
+        <hint>PDF/A arşivleme standardı uyumluluğu &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Yok)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Yok</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>PDF Renk Modu</label>
+        <hint>PDF oluşturma için renk modu &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Siyah Beyaz)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Siyah Beyaz</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>Renkli</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>Tek Renkli (Monokrom)</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>PDF'te Köprüleri Etkinleştir</label>
+        <hint>Oluşturulan PDF'lerde etkin köprüler oluştur &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>PDF'e Barkod Ekle</label>
+        <hint>Oluşturulan PDF'lerde belge barkodunu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>Veriler Geçersiz Olduğunda PDF Düğmesini Devre Dışı Bırak</label>
+        <hint>Formda doğrulama hataları olduğunda PDF düğmesini devre dışı bırak &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>PDF Şablonu Uzun İçerik Eşiği</label>
+        <hint>PDF şablonu alanlarının ek sayfaya taşacağı karakter sınırı &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>PDF JPEG Sıkıştırma Kalitesi</label>
+        <hint>%0 ile %100 arasında JPEG sıkıştırma kalitesi yüzdesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>Varsayılan PDF Yazı Tipi Ailesi</label>
+        <hint>Oluşturulan PDF'lerde Inter için yedek yazı tipi ailesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>PDF Şablonu Yazı Tipi Yolları</label>
+        <hint>PDF şablonları için özel yazı tipi yolları &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>PDF Üst Bilgi/Alt Bilgi Varsayılan Yapılandırması (JSON)</label>
+        <hint>PDF üst bilgileri ve alt bilgileri için varsayılan JSON yapılandırması &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>E-posta İletimi</label>
+        <hint>E-posta gönderim mekanizması &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>SMTP Sunucusu</label>
+        <hint>SMTP sunucusu ana bilgisayar adı &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>SMTP Bağlantı Noktası</label>
+        <hint>SMTP sunucusu bağlantı noktası &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>SMTP Kullanıcı Adı</label>
+        <hint>SMTP kimlik doğrulaması için kullanıcı adı &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>SMTP Şifrelemesi</label>
+        <hint>SMTP için şifreleme protokolü &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Yok)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Yok</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>Gönderen E-posta Adresi (Kimden)</label>
+        <hint>Varsayılan gönderen e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>Yanıt E-posta Adresi</label>
+        <hint>Varsayılan yanıt e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>Alıcı E-posta Adresi (Kime)</label>
+        <hint>Varsayılan alıcı e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>Bilgi (CC) E-posta Adresi</label>
+        <hint>Varsayılan bilgi (CC) alıcı e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>Gizli Bilgi (BCC) E-posta Adresi</label>
+        <hint>Varsayılan gizli bilgi (BCC) alıcı e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>E-postaya PDF Ekle</label>
+        <hint>Oluşturulan PDF'i bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>E-postaya XML Verisi Ekle</label>
+        <hint>Form XML verilerini bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>E-postaya TIFF Ekle</label>
+        <hint>Oluşturulan TIFF görüntüsünü bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>E-postaya Excel (Adlandırılmış Aralıklar) Ekle</label>
+        <hint>Adlandırılmış aralıklar içeren Excel dosyasını bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>E-postaya XML Form Yapısı ve Verilerini Ekle</label>
+        <hint>Form yapısı ve verilerinin XML dışa aktarımını bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>E-postaya Yüklenen Dosyaları Ekle</label>
+        <hint>Kullanıcı tarafından yüklenen hangi eklerin e-postalara dahil edileceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tüm Ekler)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tüm Ekler</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Yalnızca Seçili Ekler</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>Ek Yok</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>XML Şeması Menü Öğesini Göster</label>
+        <hint>Form Builder'da XML Şeması iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>PDF Şablonları Menü Öğesini Göster</label>
+        <hint>Form Builder'da PDF Şablonları iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>Kaynağı Düzenle Menü Öğesini Göster</label>
+        <hint>Form Builder'da Kaynağı Düzenle iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>İş Akışı Aşaması Menü Öğesini Göster</label>
+        <hint>Form Builder'da İş Akışı ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>İzinler Menü Öğesini Göster</label>
+        <hint>Form Builder'da İzinler iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>E-posta Ayarları Menü Öğesini Göster</label>
+        <hint>Form Builder'da E-posta Ayarları iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>Onay Sayfası Menü Öğesini Göster</label>
+        <hint>Form Builder'da Onay Sayfası ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>Özel Mesajlar Menü Öğesini Göster</label>
+        <hint>Form Builder'da Özel Mesajlar ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>Özel Süreçler Menü Öğesini Göster</label>
+        <hint>Form Builder'da Özel Süreçler ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>Kenar Çubuğunda HTTP Servislerini Göster</label>
+        <hint>Form Builder'da HTTP Servislerini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>Kenar Çubuğunda Veritabanı Servislerini Göster</label>
+        <hint>Form Builder'da Veritabanı Servislerini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>Kenar Çubuğunda Eylemleri Göster</label>
+        <hint>Form Builder'da Eylemler düzenleyicisini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>Form Builder'da Form Başlığını Zorunlu Kıl</label>
+        <hint>Form Builder'da boş olmayan bir form başlığı zorunlu kıl &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>Form Builder'da Form Açıklamasını Zorunlu Kıl</label>
+        <hint>Form Builder'da boş olmayan bir form açıklaması zorunlu kıl &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>Yayınlama Sürüm Davranışı</label>
+        <hint>Form Builder'da bir form yayınlanırken sürüm yönetiminin nasıl davranacağı &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Mevcut Sürümün Üzerine Yazmayı Varsayılan Yap)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Mevcut Sürümün Üzerine Yazmayı Varsayılan Yap</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>Yeni Sürüm Oluşturmayı Varsayılan Yap</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>Yeni Sürüm Oluşturmayı Zorunlu Kıl</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>Form Builder'da Form Logosu Yüklemeye İzin Ver</label>
+        <hint>Form Builder Form Ayarları içinde logo yükleme kontrolünü göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>Form Builder MCP Sunucusunu Etkinleştir</label>
+        <hint>Form Builder için Model Bağlam Protokolü (MCP) sunucusunu etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>Form Builder MCP Sunucusu İçin Belirteç Zorunlu Kıl</label>
+        <hint>Form Builder MCP sunucusu için belirteç tabanlı kimlik doğrulamayı zorunlu kıl &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>Tarih Giriş Formatı</label>
+        <hint>Tarih giriş formatı maskesi, örn. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; veya &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>Saat Giriş Formatı</label>
+        <hint>Saat giriş formatı maskesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>Tarih Çıkış Formatı (XPath)</label>
+        <hint>Tarih çıktısını biçimlendirmek için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>Tarih-Saat Çıkış Formatı (XPath)</label>
+        <hint>Tarih ve saat çıktısını biçimlendirmek için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>Saat Çıkış Formatı (XPath)</label>
+        <hint>Saat çıktısını biçimlendirmek için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>Ondalık Sayı Çıkış Formatı (XPath)</label>
+        <hint>Ondalık sayı çıktısını biçimlendirmek için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>Tam Sayı Çıkış Formatı (XPath)</label>
+        <hint>Tam sayı çıktısını biçimlendirmek için XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>Gezinme Çubuğunda Kullanıcı Menüsünü Etkinleştir</label>
+        <hint>Gezinme çubuğunda oturum açma/kapatma kullanıcı menüsünü görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>Kullanıcı Menüsü Oturum Açma URI'si</label>
+        <hint>Kullanıcı menüsü için oturum açma URI şablonu &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>Kullanıcı Menüsü Oturum Kapatma URI'si</label>
+        <hint>Kullanıcı menüsü için oturum kapatma URI şablonu &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>Kullanıcı Menüsü Kayıt URI'si</label>
+        <hint>Kullanıcı menüsü için kayıt URI şablonu &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>Form Runner İzinleri</label>
+        <hint>İzin tanımı &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>Erişim Belirteci Geçerlilik Süresi (Dakika)</label>
+        <hint>Harici erişim belirteçleri için dakika cinsinden geçerlilik süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>Durum Belirteci Geçerlilik Süresi (Dakika)</label>
+        <hint>Durum belirteçleri için dakika cinsinden geçerlilik süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

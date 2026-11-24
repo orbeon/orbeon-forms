@@ -1,0 +1,2239 @@
+<resource xml:lang="ru">
+    <override>
+        <label>Переопределить</label>
+    </override>
+    <pages-section>
+        <label>Начальная страница, общая информация, администрирование и импорт</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>Стандартные параметры</standard-settings>
+        <custom-properties>Пользовательские свойства</custom-properties>
+    </tabs>
+    <scopes>
+        <header>Области действия</header>
+        <global>Глобальные параметры</global>
+        <all-forms>Все формы</all-forms>
+        <add-override>Добавить переопределение</add-override>
+        <add-short>Добавить</add-short>
+        <add-form-in-app>Добавить переопределение формы</add-form-in-app>
+        <edit-scope>Изменить область действия</edit-scope>
+        <remove-scope>Удалить переопределение</remove-scope>
+        <clear-app-overrides>Очистить переопределения</clear-app-overrides>
+        <dialog-add-title>Добавить переопределение</dialog-add-title>
+        <dialog-edit-title>Изменение области переопределения</dialog-edit-title>
+        <level-label>Уровень переопределения</level-label>
+        <level-app>Приложение</level-app>
+        <level-app-form>Приложение и форма</level-app-form>
+        <level-global-profile>Глобальный (профиль)</level-global-profile>
+        <app-label>Приложение</app-label>
+        <app-hint>Выберите опубликованное приложение или введите имя приложения</app-hint>
+        <form-label>Форма</form-label>
+        <form-hint>Выберите опубликованную форму или введите имя формы</form-hint>
+        <profiles-label>Профили (необязательно)</profiles-label>
+        <profiles-hint>Выберите существующие профили или добавьте собственные имена профилей</profiles-hint>
+        <confirm-add>Добавить</confirm-add>
+        <confirm-save>Применить</confirm-save>
+        <cancel>Отменить</cancel>
+        <error-app-slug>Введите допустимое имя приложения (буквы, цифры, дефисы, знаки подчёркивания)</error-app-slug>
+        <error-form-slug>Введите допустимое имя формы (orbeon/builder и orbeon/configuration нельзя переопределить)</error-form-slug>
+        <error-profiles>Введите допустимые идентификаторы профилей</error-profiles>
+        <error-duplicate>Переопределение для этой области действия уже существует</error-duplicate>
+    </scopes>
+    <filter>
+        <label>Фильтр параметров</label>
+        <hint>Поиск по названию параметра, описанию или имени свойства oxf.*</hint>
+        <clear>Очистить фильтр</clear>
+    </filter>
+    <alerts>
+        <invalid-value>Недопустимое значение параметра</invalid-value>
+        <xpath>Недопустимое выражение XPath</xpath>
+        <non-negative-integer>Введите неотрицательное целое число (0 или больше)</non-negative-integer>
+        <positive-integer>Введите положительное целое число (1 или больше)</positive-integer>
+        <optional-integer-or-unlimited>Введите целое число (-1 — без ограничений, либо 0 или больше) или оставьте поле пустым</optional-integer-or-unlimited>
+        <port>Введите допустимый порт TCP (1–65535) или оставьте поле пустым</port>
+        <percentage>Введите процент в диапазоне от 0% до 100%</percentage>
+        <json>Недопустимый синтаксис JSON</json>
+        <permissions-json>Заполните все обязательные имена ролей или исправьте ошибки в JSON настройки прав</permissions-json>
+        <landing-cards>Заполните все обязательные поля карточек</landing-cards>
+        <byte-size>Введите размер в байтах или процент от макс. кучи (1–100%), например 15%, 256m, 1g или 0</byte-size>
+        <attachment-size>Введите неотрицательный размер, соответствующий целому числу байт</attachment-size>
+        <positive-byte-size>Введите положительный размер не менее 1 байта</positive-byte-size>
+        <heap-percentage>Введите процент строго больше 0% и не более 100%</heap-percentage>
+        <duration>Введите длительность, например 30m, 2h, 1d, PT30M или значение в миллисекундах</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>Без ограничений</unlimited>
+        <max-size>Максимальный размер</max-size>
+        <heap-percent>% от макс. кучи</heap-percent>
+        <fixed-size>Фиксированный размер</fixed-size>
+    </size-modes>
+    <units>
+        <ms>мс</ms>
+        <min>мин</min>
+        <chars>симв.</chars>
+    </units>
+    <system-section>
+        <label>Общие</label>
+    </system-section>
+    <caches-section>
+        <label>Кэши</label>
+        <console-callout-prefix>Отслеживайте текущее использование кучи JVM, эффективность кэшей, дисковые хранилища SIFS и скомпилированные статические состояния в разделе </console-callout-prefix>
+        <console-callout-link>Консоль администрирования</console-callout-link>
+        <console-callout-suffix>.</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>Панель навигации</label>
+    </navbar-section>
+    <appearance-section>
+        <label>Внешний вид и тема</label>
+    </appearance-section>
+    <detail-section>
+        <label>Страница формы</label>
+    </detail-section>
+    <wizard-section>
+        <label>Мастер</label>
+    </wizard-section>
+    <formulas-section>
+        <label>Формулы</label>
+    </formulas-section>
+    <landing-section>
+        <label>Начальная страница</label>
+    </landing-section>
+    <summary-section>
+        <label>Страница общей информации</label>
+    </summary-section>
+    <admin-section>
+        <label>Страница администрирования</label>
+    </admin-section>
+    <import-section>
+        <label>Импорт и экспорт</label>
+    </import-section>
+    <pdf-section>
+        <label>Генерация PDF</label>
+    </pdf-section>
+    <email-section>
+        <label>Электронная почта</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>Форматы ввода и вывода</label>
+    </formats-section>
+    <security-section>
+        <label>Аутентификация и безопасность</label>
+    </security-section>
+    <resources-section>
+        <label>Ресурсы</label>
+    </resources-section>
+    <processes-section>
+        <label>Процессы</label>
+        <override-placeholder>Переопределить встроенный процесс…</override-placeholder>
+        <override-button>Переопределить</override-button>
+        <add-custom>Добавить пользовательский процесс</add-custom>
+        <badge-override>Переопределение</badge-override>
+        <badge-custom>Пользовательский</badge-custom>
+        <edit>Править</edit>
+        <revert>Сбросить</revert>
+        <delete>Удалить</delete>
+        <empty>Для этой области действия не настроены переопределения процессов или пользовательские процессы. Переопределите встроенный процесс или добавьте пользовательский процесс выше.</empty>
+        <dialog-title-override>Переопределение процесса</dialog-title-override>
+        <dialog-title-add>Добавить пользовательский процесс</dialog-title-add>
+        <dialog-title-edit>Редактирование процесса</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>Переопределения для приложений / форм</label>
+        <add-override>Добавить переопределение для приложения / формы</add-override>
+        <app>Имя приложения</app>
+        <app-hint>Имя приложения или * для всех приложений</app-hint>
+        <form>Имя формы</form>
+        <form-hint>Имя формы или * для всех форм</form-hint>
+        <profiles>Профили</profiles>
+        <profiles-hint>Необязательные профили свойств, разделённые пробелами</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>Пользовательские свойства</label>
+        <name>Имя свойства</name>
+        <name-hint>Полное имя свойства (включая подстановочные знаки, если применимо)</name-hint>
+        <type>Тип</type>
+        <value>Значение</value>
+        <profiles>Профили</profiles>
+        <profiles-hint>Необязательные профили свойств, разделённые пробелами</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>Язык по умолчанию</label>
+        <hint>Код языка по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>Доступные языки (для формы)</label>
+        <hint>Разделённые пробелами коды языков или &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>Глобальные доступные языки</label>
+        <hint>Доступные языки для начальной страницы, страниц форм и администрирования &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>Часовой пояс по умолчанию</label>
+        <hint>Идентификатор часового пояса IANA, например &lt;code&gt;Europe/Moscow&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>Поддержание активности сеанса</label>
+        <hint>Поддерживать активность пользовательских сеансов, пока страница открыта &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>Макс. число записей</label>
+        <hint>Максимальное число активных документов XForms в куче JVM до пассивации в хранилище &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>Лимит памяти в байтах</label>
+        <hint>Макс. процент кучи JVM, фиксированный размер данных (в байтах) или без ограничений &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>Макс. время простоя</label>
+        <hint>Необязательный тайм-аут простоя перед пассивацией активных документов (например, &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>Макс. число записей</label>
+        <hint>Максимальное число скомпилированных статических состояний XForms в куче JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>Лимит памяти в байтах</label>
+        <hint>Макс. процент кучи JVM, фиксированный размер данных (в байтах) или без ограничений &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>Макс. время простоя</label>
+        <hint>Необязательный тайм-аут простоя перед выгрузкой статических состояний в хранилище (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>Показывать ссылку «На главную» на панели навигации</label>
+        <hint>Включить ссылку «На главную» на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>Показывать выбор языка на панели навигации</label>
+        <hint>Включить переключатель языка на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>Показывать выбор цветовой схемы на панели навигации</label>
+        <hint>Включить переключатель светлого/тёмного режима на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>Показывать кнопку «Поделиться» на панели навигации</label>
+        <hint>Включить кнопку обмена ссылкой на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>Показывать историю изменений на панели навигации</label>
+        <hint>Включить значок истории изменений на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>Показывать стадию рабочего процесса на панели навигации</label>
+        <hint>Отображать текущую стадию рабочего процесса на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>Тема (для формы)</label>
+        <hint>Визуальная тема для форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>Цветовая схема по умолчанию</label>
+        <hint>Цветовая схема страниц по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Светлая)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Светлая</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>Тёмная</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>Автоматически (системная)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>Макет страницы в браузере</label>
+        <hint>Фиксированная или резиновая ширина формы в браузере &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Фиксированная ширина)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Фиксированная ширина</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>Резиновая ширина</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>Плотность отображения</label>
+        <hint>Плотность отступов на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Обычная)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Компактная</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>Обычная</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>Просторная</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>Разметка сетки</label>
+        <hint>HTML-разметка, используемая для сеток &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (CSS-сетка)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>CSS-сетка</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>HTML-таблица</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>Отображение меток</label>
+        <hint>Способ отображения меток элементов управления &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полное)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полное</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Минимальное (заполнитель)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>Отображение подсказок</label>
+        <hint>Способ отображения подсказок элементов управления &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полное (встроенное))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полное (встроенное)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Минимальное (заполнитель)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>Всплывающая подсказка</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>Показывать подсказки в режимах только для чтения</label>
+        <hint>Отображать подсказки элементов управления в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>Показывать предупреждения в режимах только для чтения</label>
+        <hint>Отображать предупреждения проверки в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>Показывать индикаторы обязательности в режимах только для чтения</label>
+        <hint>Показывать индикаторы обязательных полей в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>Показывать пояснения в режиме просмотра</label>
+        <hint>Показывать элементы управления fr:explanation в режиме просмотра &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>URI логотипа по умолчанию</label>
+        <hint>URI логотипа по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>URI значка сайта</label>
+        <hint>URI значка страницы &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>Пользовательские ресурсы CSS</label>
+        <hint>Разделённый пробелами список путей к пользовательским файлам CSS &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>Пользовательские ресурсы JavaScript</label>
+        <hint>Разделённый пробелами список путей к пользовательским скриптам JS &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>Скрыть логотип</label>
+        <hint>Скрывать логотип на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>Скрыть верхний колонтитул</label>
+        <hint>Скрывать шапку страницы на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>Скрыть нижний колонтитул</label>
+        <hint>Скрывать подвал страницы на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>Скрыть панель кнопок</label>
+        <hint>Скрывать нижнюю панель кнопок на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>Показывать подсказки сочетаний клавиш</label>
+        <hint>Отображать подсказки сочетаний клавиш на кнопках &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>Кнопки страницы формы</label>
+        <hint>Разделённый пробелами список кнопок, отображаемых на странице формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>Кнопки режима просмотра</label>
+        <hint>Разделённый пробелами список кнопок на странице просмотра &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>Задержка автосохранения (мс)</label>
+        <hint>Задержка в миллисекундах перед автосохранением; 0 отключает автосохранение &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>Простая миграция данных</label>
+        <hint>Автоматически добавлять и удалять отсутствующие элементы в данных &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Включена)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Включена</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>Отключена</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>Вызывать ошибку</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>Порядок табуляции в сетке</label>
+        <hint>Порядок табуляции между ячейками сетки &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (По строкам)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>По строкам</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>По столбцам</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>Начальный фокус</label>
+        <hint>Автоматически устанавливать фокус на первый элемент управления при загрузке &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>Использовать автоматические подсказки</label>
+        <hint>Включить автоматические подсказки для элементов управления &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>Положение сводки ошибок</label>
+        <hint>Где отображать сводку ошибок &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Снизу)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>Сверху</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Снизу</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>Сверху и снизу</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>Компонент защитного кода (Captcha)</label>
+        <hint>Реализация защитного кода на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>Форма-одиночка</label>
+        <hint>Разрешить только один документ данных для этой формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>Поведение формы-одиночки при наличии документа</label>
+        <hint>Действие при открытии &lt;code&gt;/new&lt;/code&gt; для формы-одиночки с существующими данными &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Открыть существующий документ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Открыть существующий документ</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>Показать ошибку</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>Минимальное число разделов для оглавления</label>
+        <hint>Минимальное число разделов для показа оглавления; -1 — отключить, -2 — не используется &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>Положение оглавления</label>
+        <hint>Положение оглавления на странице формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Сверху)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Сверху</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Слева</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Скрыто</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>Режимы отображения оглавления</label>
+        <hint>Режимы, в которых отображается оглавление &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Создание</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Редактирование</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>Просмотр</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>Отображение сообщений</label>
+        <hint>Способ отображения сообщений о действиях &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Всплывающее уведомление)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Всплывающее уведомление</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>Модальное окно</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>Положение всплывающих уведомлений</label>
+        <hint>Положение всплывающих уведомлений на экране &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Сверху справа)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Сверху слева</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>Сверху по центру</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>Сверху справа</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>Снизу слева</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>Снизу по центру</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>Снизу справа</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>Задержка всплывающих уведомлений (мс)</label>
+        <hint>Время в миллисекундах до автоматического скрытия всплывающих уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>Включить блокировку при совместном редактировании</label>
+        <hint>Включить монопольную блокировку документа при редактировании &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>Длительность блокировки (минуты)</label>
+        <hint>Длительность блокировки по умолчанию в минутах &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>Порог продления блокировки (минуты)</label>
+        <hint>Время в минутах до истечения блокировки для её продления &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>Порог предупреждения о блокировке (минуты)</label>
+        <hint>Время в минутах до истечения блокировки для оповещения пользователя &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>Окно предупреждения об истечении сеанса</label>
+        <hint>Показывать диалоговое окно с предупреждением перед истечением сеанса пользователя &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>Предупреждать при уходе с несохранёнными изменениями</label>
+        <hint>Логическое значение или выражение XPath, управляющее предупреждением о несохранённых данных &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>Проверять допустимость вариантов в элементах выбора</label>
+        <hint>Проверять, что значения элементов выбора входят в набор доступных вариантов &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>Сворачиваемые разделы</label>
+        <hint>Разрешить сворачивание и разворачивание разделов &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>Анимация сворачивания и разворачивания разделов</label>
+        <hint>Анимировать сворачивание и разворачивание разделов &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>Позиция вставки повторяющегося раздела</label>
+        <hint>Куда вставляются новые повторения раздела &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (После текущего повторения)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>После текущего повторения</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>В конец</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>Позиция вставки в повторяющейся сетке</label>
+        <hint>Куда вставляются новые строки повторяющейся сетки &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (После текущей строки)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>После текущей строки</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>В конец</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>Макс. размер вложения на файл</label>
+        <hint>Максимальный размер одного загружаемого файла в байтах &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>Макс. суммарный размер вложений на элемент управления</label>
+        <hint>Максимальный общий размер вложений на элемент управления в байтах &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>Макс. суммарный размер вложений на форму</label>
+        <hint>Максимальный общий размер вложений на форму в байтах &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>Максимальное количество файлов на элемент управления</label>
+        <hint>Максимальное количество файлов на элемент управления вложениями &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>Разрешённые MIME-типы вложений</label>
+        <hint>Разделённые пробелами MIME-типы, например &lt;code&gt;image/* application/pdf&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>Отклонять пустые загружаемые файлы</label>
+        <hint>Отклонять загружаемые файлы размером 0 байт &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>Отображение ошибок загрузки файлов</label>
+        <hint>Способ отображения ошибок загрузки файлов &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Модальное окно)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Модальное окно</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>Встроенное предупреждение</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>Режим мастера</label>
+        <hint>Показывать разделы верхнего уровня на одной странице или как отдельные страницы мастера &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полный вид)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полный вид</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Режим мастера</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>Режим проверки при навигации в мастере</label>
+        <hint>Поведение навигации мастера при наличии недопустимых данных &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Свободный)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Свободный</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>Мягкий</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>Строгий</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>Навигация по подразделам мастера</label>
+        <hint>Включить навигацию мастера для подразделов и сеток внутри разделов верхнего уровня &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>Оглавление подразделов мастера</label>
+        <hint>Способ отображения подразделов в оглавлении мастера &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Показывать подразделы только для активного раздела)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Показывать подразделы только для активного раздела</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>Показывать подразделы для всех разделов</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Не показывать подразделы</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>Положение оглавления мастера</label>
+        <hint>Где отображается оглавление мастера &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Слева)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Слева</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Отдельно</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>Скрыто</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>Всегда показывать состояние разделов мастера</label>
+        <hint>Показывать значки состояния разделов в оглавлении мастера &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>Разрешить параметр URL страницы мастера</label>
+        <hint>Разрешить выбор начальной страницы мастера через параметр URL &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>Обновлять параметр URL при смене страницы мастера</label>
+        <hint>Обновлять параметр URL в браузере при переключении страниц мастера &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>Отмечать элементы как просмотренные при смене страницы мастера</label>
+        <hint>Когда отмечать элементы управления как просмотренные при смене страниц мастера &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Всегда)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Всегда</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>Только при переходе вперёд</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>Никогда</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>Отключить вычисления в режимах только для чтения (просмотр, PDF)</label>
+        <hint>Отключить формулы вычисления в режимах проверки и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>Автоматические зависимости вычислений</label>
+        <hint>Автоматически определять порядок вычисления формул вычисляемого и начального значений &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>Разрешённые дополнительные функции XPath</label>
+        <hint>Разделённый пробелами список дополнительных функций XPath, разрешённых в формулах Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>Размер карточки на начальной странице</label>
+        <hint>Количество элементов на карточке на начальной странице &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>Карточки начальной страницы</label>
+        <hint>Карточки, отображаемые на начальной странице &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>Размер страницы общей информации</label>
+        <hint>Количество строк на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>Кнопки страницы общей информации</label>
+        <hint>Разделённый пробелами список кнопок на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>Показывать столбец «Дата создания»</label>
+        <hint>Показывать столбец даты и времени создания на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>Показывать столбец «Дата изменения»</label>
+        <hint>Показывать столбец даты и времени последнего изменения на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>Показывать столбец «Стадия рабочего процесса»</label>
+        <hint>Показывать столбец стадии рабочего процесса на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>Показывать столбец «Создано»</label>
+        <hint>Показывать столбец автора создания на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>Показывать столбец «Кем изменено»</label>
+        <hint>Показывать столбец автора последнего изменения на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>Показывать выбор версии на странице общей информации</label>
+        <hint>Отображать переключатель версии формы на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>Версия формы для кнопки «Создать» на странице общей информации</label>
+        <hint>Какую версию формы открывать при нажатии «Создать» на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Текущая выбранная версия)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Текущая выбранная версия</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>Последняя опубликованная версия</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>Открывать параметры поиска при загрузке общей информации</label>
+        <hint>Разворачивать расширенные параметры поиска при загрузке страницы общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>Размер страницы администрирования форм</label>
+        <hint>Количество форм на странице администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>Ссылки таблицы администрирования форм</label>
+        <hint>Ссылки, отображаемые для каждой формы на странице администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Общая информация, затем Создать)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Общая информация, затем Создать</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>Создать, затем Общая информация</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>Только Общая информация</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>Только Создать</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>Открывать параметры поиска при загрузке администрирования форм</label>
+        <hint>Разворачивать параметры поиска при загрузке страницы администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>Конфигурация удалённых серверов (JSON)</label>
+        <hint>Массив JSON удалённых серверов для публикации и администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>Включить страницу экспорта</label>
+        <hint>Включить страницу экспорта данных форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>Разрешить импорт некорректных документов</label>
+        <hint>Разрешить импорт документов, содержащих ошибки проверки &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>Разрешить удаление существующих записей при импорте</label>
+        <hint>Разрешить параметр удаления существующих данных во время импорта &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>Ограничить импорт последней версией</label>
+        <hint>Разрешить импорт только в последнюю версию формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>Разрешённые форматы импорта</label>
+        <hint>Разрешённые форматы импорта данных &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (заголовки)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (именованные диапазоны)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>Структура и данные формы XML</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>Показывать имена приложения и формы на странице импорта</label>
+        <hint>Показывать имена приложения и формы на странице импорта &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>Кнопки страницы импорта</label>
+        <hint>Разделённый пробелами список кнопок на странице импорта &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>Ориентация страницы PDF</label>
+        <hint>Ориентация страниц для создаваемых файлов PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Книжная)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Книжная</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>Альбомная</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>Размер страницы PDF</label>
+        <hint>Размер страниц для создаваемых файлов PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>Выражение имени файла PDF</label>
+        <hint>Выражение XPath для имён создаваемых файлов PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>Специальные возможности PDF (размеченный PDF)</label>
+        <hint>Включить специальные возможности размеченного PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>Режим соответствия PDF/A</label>
+        <hint>Соответствие архивному стандарту PDF/A &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>Цветовой режим PDF</label>
+        <hint>Цветовой режим при формировании PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Чёрно-белый)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Чёрно-белый</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>Цветной</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>Монохромный</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>Включить гиперссылки в PDF</label>
+        <hint>Формировать активные гиперссылки в создаваемых файлах PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>Включать штрихкод в PDF</label>
+        <hint>Отображать штрихкод документа в создаваемых файлах PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>Отключать кнопку PDF при недопустимых данных</label>
+        <hint>Отключать кнопку PDF, если форма содержит ошибки проверки &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>Порог длинного содержимого для шаблона PDF</label>
+        <hint>Предел числа символов, при превышении которого поля шаблона PDF переносятся в приложение &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>Качество сжатия JPEG в PDF</label>
+        <hint>Процент качества сжатия JPEG от 0% до 100% &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>Семейство шрифтов PDF по умолчанию</label>
+        <hint>Резервное семейство шрифтов для Inter в создаваемых файлах PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>Пути к шрифтам шаблонов PDF</label>
+        <hint>Пути к пользовательским шрифтам для шаблонов PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>Конфигурация колонтитулов PDF по умолчанию (JSON)</label>
+        <hint>Конфигурация JSON по умолчанию для верхних и нижних колонтитулов PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>Транспорт электронной почты</label>
+        <hint>Механизм отправки электронной почты &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>Хост SMTP</label>
+        <hint>Имя хоста сервера SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>Порт SMTP</label>
+        <hint>Порт сервера SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>Имя пользователя SMTP</label>
+        <hint>Имя пользователя для аутентификации SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>Шифрование SMTP</label>
+        <hint>Протокол шифрования для SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>Адрес электронной почты отправителя (От)</label>
+        <hint>Адрес электронной почты отправителя по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>Адрес электронной почты для ответа</label>
+        <hint>Адрес электронной почты для ответа по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>Адрес электронной почты получателя (Кому)</label>
+        <hint>Адрес электронной почты основного получателя по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>Адрес электронной почты копии (Копия)</label>
+        <hint>Адрес электронной почты получателя копии по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>Адрес электронной почты скрытой копии (Скрытая копия)</label>
+        <hint>Адрес электронной почты получателя скрытой копии по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>Прикреплять PDF к письму</label>
+        <hint>Прикреплять созданный файл PDF к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>Прикреплять данные XML к письму</label>
+        <hint>Прикреплять XML-данные формы к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>Прикреплять TIFF к письму</label>
+        <hint>Прикреплять созданное изображение TIFF к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>Прикреплять Excel (именованные диапазоны) к письму</label>
+        <hint>Прикреплять файл Excel с именованными диапазонами к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>Прикреплять структуру и данные формы XML к письму</label>
+        <hint>Прикреплять XML-экспорт структуры и данных формы к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>Прикреплять загруженные файлы к письму</label>
+        <hint>Какие загруженные пользователем вложения включать в письма &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Все вложения)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Все вложения</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Только выбранные вложения</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>Без вложений</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>Показывать пункт меню «Схема XML»</label>
+        <hint>Показывать кнопку диалога «Схема XML» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>Показывать пункт меню «Шаблоны PDF»</label>
+        <hint>Показывать кнопку диалога «Шаблоны PDF» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>Показывать пункт меню «Редактировать исходный код»</label>
+        <hint>Показывать кнопку редактирования исходного кода в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>Показывать пункт меню «Стадия рабочего процесса»</label>
+        <hint>Показывать параметры рабочего процесса в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>Показывать пункт меню «Настройка прав»</label>
+        <hint>Показывать кнопку диалога «Настройка прав» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>Показывать пункт меню «Параметры электронной почты»</label>
+        <hint>Показывать кнопку диалога параметров электронной почты в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>Показывать пункт меню «Страница подтверждения»</label>
+        <hint>Показывать параметры страницы подтверждения в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>Показывать пункт меню «Пользовательские сообщения»</label>
+        <hint>Показывать параметры пользовательских сообщений в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>Показывать пункт меню «Пользовательские процессы»</label>
+        <hint>Показывать параметры пользовательских процессов в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>Показывать HTTP-сервисы на боковой панели</label>
+        <hint>Включить HTTP-сервисы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>Показывать сервисы СУБД на боковой панели</label>
+        <hint>Включить сервисы баз данных в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>Показывать действия на боковой панели</label>
+        <hint>Включить редактор действий в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>Требовать заголовок формы в Form Builder</label>
+        <hint>Требовать непустой заголовок формы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>Требовать описание формы в Form Builder</label>
+        <hint>Требовать непустое описание формы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>Поведение версий при публикации</label>
+        <hint>Управление версиями при публикации формы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (По умолчанию перезаписывать существующую версию)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>По умолчанию перезаписывать существующую версию</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>По умолчанию создавать новую версию</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>Принудительно создавать новую версию</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>Разрешить загрузку логотипа формы в Form Builder</label>
+        <hint>Показывать элемент загрузки логотипа в настройках формы Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>Включить сервер MCP Form Builder</label>
+        <hint>Включить сервер протокола контекста модели (MCP) для Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>Требовать токен для сервера MCP Form Builder</label>
+        <hint>Требовать аутентификацию по токену для сервера MCP Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>Формат ввода даты</label>
+        <hint>Маска формата ввода даты, например &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; или &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>Формат ввода времени</label>
+        <hint>Маска формата ввода времени &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>Формат вывода даты (XPath)</label>
+        <hint>Выражение XPath для форматирования вывода даты &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>Формат вывода даты и времени (XPath)</label>
+        <hint>Выражение XPath для форматирования вывода даты и времени &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>Формат вывода времени (XPath)</label>
+        <hint>Выражение XPath для форматирования вывода времени &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>Формат вывода десятичных чисел (XPath)</label>
+        <hint>Выражение XPath для форматирования вывода десятичных чисел &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>Формат вывода целых чисел (XPath)</label>
+        <hint>Выражение XPath для форматирования вывода целых чисел &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>Включить меню пользователя на панели навигации</label>
+        <hint>Отображать меню входа и выхода пользователя на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>URI входа в меню пользователя</label>
+        <hint>Шаблон URI входа для меню пользователя &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>URI выхода в меню пользователя</label>
+        <hint>Шаблон URI выхода для меню пользователя &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>URI регистрации в меню пользователя</label>
+        <hint>Шаблон URI регистрации для меню пользователя &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>Настройка прав Form Runner</label>
+        <hint>Определение прав доступа &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>Срок действия токена доступа (минуты)</label>
+        <hint>Срок действия в минутах для внешних токенов доступа &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>Срок действия токена состояния (минуты)</label>
+        <hint>Срок действия в минутах для токенов состояния &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

@@ -1,0 +1,2239 @@
+<resource xml:lang="no">
+    <override>
+        <label>Overstyr</label>
+    </override>
+    <pages-section>
+        <label>Landings-, oppsummerings-, administrasjons- og importsider</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>Standardinnstillinger</standard-settings>
+        <custom-properties>Tilpassede egenskaper</custom-properties>
+    </tabs>
+    <scopes>
+        <header>Omfang</header>
+        <global>Globale innstillinger</global>
+        <all-forms>Alle skjema</all-forms>
+        <add-override>Legg til overstyring</add-override>
+        <add-short>Legg til</add-short>
+        <add-form-in-app>Legg til skjemaoverstyring</add-form-in-app>
+        <edit-scope>Rediger omfang</edit-scope>
+        <remove-scope>Fjern overstyring</remove-scope>
+        <clear-app-overrides>Tøm overstyringer</clear-app-overrides>
+        <dialog-add-title>Legg til overstyring</dialog-add-title>
+        <dialog-edit-title>Rediger omfang for overstyring</dialog-edit-title>
+        <level-label>Overstyringsnivå</level-label>
+        <level-app>Applikasjon</level-app>
+        <level-app-form>Applikasjon og skjema</level-app-form>
+        <level-global-profile>Global (profil)</level-global-profile>
+        <app-label>Applikasjon</app-label>
+        <app-hint>Velg en publisert applikasjon eller skriv inn et applikasjonsnavn</app-hint>
+        <form-label>Skjema</form-label>
+        <form-hint>Velg et publisert skjema eller skriv inn et skjemanavn</form-hint>
+        <profiles-label>Profiler (valgfritt)</profiles-label>
+        <profiles-hint>Velg eksisterende profiler eller legg til tilpassede profilnavn</profiles-hint>
+        <confirm-add>Legg til</confirm-add>
+        <confirm-save>Bruk</confirm-save>
+        <cancel>Avbryt</cancel>
+        <error-app-slug>Skriv inn et gyldig applikasjonsnavn (bokstaver, sifre, bindestreker, understreker)</error-app-slug>
+        <error-form-slug>Skriv inn et gyldig skjemanavn (orbeon/builder og orbeon/configuration kan ikke overstyres)</error-form-slug>
+        <error-profiles>Skriv inn gyldige profil-ID-er</error-profiles>
+        <error-duplicate>En overstyring for dette omfanget finnes allerede</error-duplicate>
+    </scopes>
+    <filter>
+        <label>Filtrer innstillinger</label>
+        <hint>Søk etter innstillingsnavn, beskrivelse eller oxf.*-egenskapsnavn</hint>
+        <clear>Tøm filter</clear>
+    </filter>
+    <alerts>
+        <invalid-value>Ugyldig innstillingsverdi</invalid-value>
+        <xpath>Ugyldig XPath-uttrykk</xpath>
+        <non-negative-integer>Skriv inn et ikke-negativt heltall (0 eller større)</non-negative-integer>
+        <positive-integer>Skriv inn et positivt heltall (1 eller større)</positive-integer>
+        <optional-integer-or-unlimited>Skriv inn et heltall (-1 for ubegrenset, eller 0 eller større), eller la feltet stå tomt</optional-integer-or-unlimited>
+        <port>Skriv inn en gyldig TCP-port (1–65535), eller la feltet stå tomt</port>
+        <percentage>Skriv inn en prosentandel mellom 0 % og 100 %</percentage>
+        <json>Ugyldig JSON-syntaks</json>
+        <permissions-json>Fyll ut alle påkrevde rollenavn eller rett ugyldig JSON for tillatelser</permissions-json>
+        <landing-cards>Fyll ut alle påkrevde kortfelter</landing-cards>
+        <byte-size>Skriv inn en størrelse i byte eller prosentandel av maks. heap (1–100 %), f.eks. 15%, 256m, 1g eller 0</byte-size>
+        <attachment-size>Skriv inn en ikke-negativ størrelse som gir et helt antall byte</attachment-size>
+        <positive-byte-size>Skriv inn en positiv størrelse på minst 1 byte</positive-byte-size>
+        <heap-percentage>Skriv inn en prosentandel større enn 0 % og opptil 100 %</heap-percentage>
+        <duration>Skriv inn en varighet, f.eks. 30m, 2h, 1d, PT30M eller millisekunder</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>Ubegrenset</unlimited>
+        <max-size>Maksimal størrelse</max-size>
+        <heap-percent>Maks. heap-%</heap-percent>
+        <fixed-size>Fast størrelse</fixed-size>
+    </size-modes>
+    <units>
+        <ms>ms</ms>
+        <min>min</min>
+        <chars>tegn</chars>
+    </units>
+    <system-section>
+        <label>Generelt</label>
+    </system-section>
+    <caches-section>
+        <label>Hurtigbuffere</label>
+        <console-callout-prefix>Overvåk gjeldende JVM-heapbruk, hurtigbuffertreffrater, SIFS-disklagre og kompilerte statiske tilstander i </console-callout-prefix>
+        <console-callout-link>Administrasjonskonsoll</console-callout-link>
+        <console-callout-suffix>.</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>Navigasjonslinje</label>
+    </navbar-section>
+    <appearance-section>
+        <label>Utseende og tema</label>
+    </appearance-section>
+    <detail-section>
+        <label>Detaljside</label>
+    </detail-section>
+    <wizard-section>
+        <label>Veiviser</label>
+    </wizard-section>
+    <formulas-section>
+        <label>Formler</label>
+    </formulas-section>
+    <landing-section>
+        <label>Landingsside</label>
+    </landing-section>
+    <summary-section>
+        <label>Oppsummeringsside</label>
+    </summary-section>
+    <admin-section>
+        <label>Administrasjonsside</label>
+    </admin-section>
+    <import-section>
+        <label>Import og eksport</label>
+    </import-section>
+    <pdf-section>
+        <label>PDF-generering</label>
+    </pdf-section>
+    <email-section>
+        <label>E-post</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>Inndata- og utdataformater</label>
+    </formats-section>
+    <security-section>
+        <label>Autentisering og sikkerhet</label>
+    </security-section>
+    <resources-section>
+        <label>Ressurser</label>
+    </resources-section>
+    <processes-section>
+        <label>Prosesser</label>
+        <override-placeholder>Overstyr innebygd prosess…</override-placeholder>
+        <override-button>Overstyr</override-button>
+        <add-custom>Legg til tilpasset prosess</add-custom>
+        <badge-override>Overstyring</badge-override>
+        <badge-custom>Tilpasset</badge-custom>
+        <edit>Rediger</edit>
+        <revert>Tilbakestill</revert>
+        <delete>Slett</delete>
+        <empty>Ingen prosessoverstyringer eller tilpassede prosesser er konfigurert for dette omfanget. Overstyr en innebygd prosess eller legg til en tilpasset prosess ovenfor.</empty>
+        <dialog-title-override>Overstyr prosess</dialog-title-override>
+        <dialog-title-add>Legg til tilpasset prosess</dialog-title-add>
+        <dialog-title-edit>Rediger prosess</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>Overstyringer for applikasjon / skjema</label>
+        <add-override>Legg til overstyring for applikasjon / skjema</add-override>
+        <app>Applikasjonsnavn</app>
+        <app-hint>Applikasjonsnavn eller * for alle applikasjoner</app-hint>
+        <form>Skjemanavn</form>
+        <form-hint>Skjemanavn eller * for alle skjema</form-hint>
+        <profiles>Profiler</profiles>
+        <profiles-hint>Valgfrie mellomromsatskilte egenskapsprofiler</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>Tilpassede egenskaper</label>
+        <name>Egenskapsnavn</name>
+        <name-hint>Fullt egenskapsnavn (inkludert jokertegn hvis aktuelt)</name-hint>
+        <type>Type</type>
+        <value>Verdi</value>
+        <profiles>Profiler</profiles>
+        <profiles-hint>Valgfrie mellomromsatskilte egenskapsprofiler</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>Standardspråk</label>
+        <hint>Standardspråkkode &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>Tilgjengelige språk (per skjema)</label>
+        <hint>Mellomromsatskilte språkkoder eller &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>Globalt tilgjengelige språk</label>
+        <hint>Tilgjengelige språk for start-, skjema- og administrasjonssider &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>Standardtidssone</label>
+        <hint>IANA-tidssone-ID, f.eks. &lt;code&gt;Europe/Oslo&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>Vedlikehold av økt</label>
+        <hint>Hold brukerøkter aktive mens en side er åpen &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>Maks. oppføringer</label>
+        <hint>Maksimalt antall aktive XForms-dokumenter i JVM-heap før passivering til lager &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>Bytebudsjett</label>
+        <hint>Maks. prosentandel av JVM-heap, fast datastørrelse (lagret i byte) eller ubegrenset &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>Maks. inaktivitet</label>
+        <hint>Valgfri tidsgrense for inaktivitet før passivering av aktive dokumenter (f.eks. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>Maks. oppføringer</label>
+        <hint>Maksimalt antall kompilerte statiske XForms-tilstander i JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>Bytebudsjett</label>
+        <hint>Maks. prosentandel av JVM-heap, fast datastørrelse (lagret i byte) eller ubegrenset &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>Maks. inaktivitet</label>
+        <hint>Valgfri tidsgrense for inaktivitet før statiske tilstander flyttes til lager (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>Vis Hjem-lenke på navigasjonslinjen</label>
+        <hint>Aktiver Hjem-lenken på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>Vis språkvelger på navigasjonslinjen</label>
+        <hint>Aktiver språkvelgeren på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>Vis fargemodusvelger på navigasjonslinjen</label>
+        <hint>Aktiver velgeren for lys/mørk modus på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>Vis Del-knapp på navigasjonslinjen</label>
+        <hint>Aktiver knappen for deling av lenke på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>Vis revisjonshistorikk på navigasjonslinjen</label>
+        <hint>Aktiver ikonet for revisjonshistorikk på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>Vis arbeidsflytstadium på navigasjonslinjen</label>
+        <hint>Vis gjeldende arbeidsflytstadium på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>Tema (per skjema)</label>
+        <hint>Visuelt tema for skjemaer &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>Standard fargemodus</label>
+        <hint>Standard fargemodus for sider &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Lys)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Lys</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>Mørk</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>Automatisk (System)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>Sideoppsett i nettleser</label>
+        <hint>Om skjemaet bruker fast eller flytende bredde &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fast bredde)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fast bredde</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>Flytende bredde</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>Visningstetthet</label>
+        <hint>Avstandstetthet på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Komfortabel)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kompakt</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>Komfortabel</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>Romslig</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>Rutenettoppmerking</label>
+        <hint>HTML-oppmerking brukt for rutenett &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (CSS-rutenett)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>CSS-rutenett</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>HTML-tabell</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>Utseende for etiketter</label>
+        <hint>Hvordan kontrolletiketter vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fullstendig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fullstendig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal (Plassholder)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>Utseende for hint</label>
+        <hint>Hvordan kontrollhint vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fullstendig (innebygd))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fullstendig (innebygd)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal (Plassholder)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>Verktøytips</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>Vis hint i skrivebeskyttede moduser</label>
+        <hint>Vis kontrollhint i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>Vis varsler i skrivebeskyttede moduser</label>
+        <hint>Vis valideringsvarsler i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>Vis indikatorer for påkrevde felt i skrivebeskyttede moduser</label>
+        <hint>Vis indikatorer for påkrevde felt i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>Vis forklaringer i visningsmodus</label>
+        <hint>Vis kontroller av typen fr:explanation i visningsmodus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>Standardlogo-URI</label>
+        <hint>URI for standardlogoen &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>Favikon-URI</label>
+        <hint>URI for sidens favikon &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>Tilpassede CSS-ressurser</label>
+        <hint>Mellomromsatskilt liste over tilpassede CSS-baner &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>Tilpassede JavaScript-ressurser</label>
+        <hint>Mellomromsatskilt liste over tilpassede JS-baner &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>Skjul logo</label>
+        <hint>Skjul logoen på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>Skjul topptekst</label>
+        <hint>Skjul sidens topptekst på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>Skjul bunntekst</label>
+        <hint>Skjul sidens bunntekst på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>Skjul knapperad</label>
+        <hint>Skjul den nederste knapperaden på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>Vis hurtigtasthint på knapper</label>
+        <hint>Vis hurtigtasthint på knapper &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>Knapper på detaljside</label>
+        <hint>Mellomromsatskilt liste over knapper som vises på detaljsiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>Knapper i visningsmodus</label>
+        <hint>Mellomromsatskilt liste over knapper som vises på visningssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>Forsinkelse før automatisk lagring (ms)</label>
+        <hint>Forsinkelse i millisekunder før automatisk lagring; 0 deaktiverer automatisk lagring &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>Enkel datamigrering</label>
+        <hint>Legg til / fjern manglende elementer i data automatisk &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Aktivert)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Aktivert</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>Deaktivert</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>Utløs en feil</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>Tabulatorrekkefølge i rutenett</label>
+        <hint>Tabulatorrekkefølge mellom celler i rutenett &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Rader)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Rader</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>Kolonner</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>Startfokus</label>
+        <hint>Sett automatisk fokus på første skjemakontroll ved innlasting &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>Bruk automatiske hint</label>
+        <hint>Aktiver automatiske hint for kontroller &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>Plassering av feiloversikt</label>
+        <hint>Hvor feiloversikten skal vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nederst)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>Øverst</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Nederst</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>Begge</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>Captcha-komponent</label>
+        <hint>Captcha-implementering på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ingen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>Enkeltskjema</label>
+        <hint>Tillat kun ett skjemadatadokument for dette skjemaet &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>Atferd for enkeltskjema når dokument finnes</label>
+        <hint>Handling ved åpning av &lt;code&gt;/new&lt;/code&gt; på et enkeltskjema med eksisterende data &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Åpne eksisterende dokument)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Åpne eksisterende dokument</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>Vis feil</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>Minimum antall seksjoner for innholdsfortegnelse</label>
+        <hint>Minimum antall seksjoner som kreves for å vise innholdsfortegnelsen; -1 for å deaktivere, -2 for ubrukt &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>Plassering av innholdsfortegnelse</label>
+        <hint>Plassering av innholdsfortegnelsen på detaljsiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Øverst)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Øverst</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>Til venstre</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>Moduser for innholdsfortegnelse</label>
+        <hint>Moduser der innholdsfortegnelsen vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Ny</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Redigering</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>Visning</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>Utseende for meldinger</label>
+        <hint>Hvordan handlingsmeldinger vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Hurtigmelding)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Hurtigmelding</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>Modal dialogboks</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>Plassering av hurtigmeldinger</label>
+        <hint>Skjermplassering for hurtigmeldinger &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Øverst til høyre)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Øverst til venstre</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>Øverst i midten</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>Øverst til høyre</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>Nederst til venstre</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>Nederst i midten</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>Nederst til høyre</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>Visningstid for hurtigmeldinger (ms)</label>
+        <hint>Varighet i millisekunder før hurtigmeldinger lukkes automatisk &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>Aktiver låsing ved samtidig redigering</label>
+        <hint>Aktiver eksklusiv dokumentlås ved redigering &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>Låsvarighet (minutter)</label>
+        <hint>Standard varighet for dokumentlås i minutter &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>Terskel for fornyelse av lås (minutter)</label>
+        <hint>Terskel i minutter før låsen utløper for fornyelse &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>Terskel for utløpsvarsel for lås (minutter)</label>
+        <hint>Terskel i minutter før låsen utløper for å varsle brukeren &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>Varseldialog ved øktutløp</label>
+        <hint>Vis varseldialog før brukerøkten utløper &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>Varsle når siden forlates med ulagrede endringer</label>
+        <hint>Boolsk verdi eller XPath-uttrykk som styrer varsel om ulagrede data &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>Valider valg i valgkontroller</label>
+        <hint>Valider at verdier i valgkontroller finnes i det tilgjengelige utvalget &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>Sammenleggbare seksjoner</label>
+        <hint>Tillat at seksjoner skjules og utvides &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>Animer sammenslåing/utvidelse av seksjoner</label>
+        <hint>Animer sammenslåing og utvidelse av seksjoner &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>Innsettingsposisjon for gjentatte seksjoner</label>
+        <hint>Hvor nye forekomster av gjentatte seksjoner settes inn &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Etter gjeldende forekomst)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Etter gjeldende forekomst</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>Nederst</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>Innsettingsposisjon for gjentatte rutenett</label>
+        <hint>Hvor nye rader i gjentatte rutenett settes inn &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Etter gjeldende rad)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Etter gjeldende rad</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>Nederst</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>Maks. vedleggsstørrelse per fil</label>
+        <hint>Maksimal størrelse per opplastet fil, lagret i byte &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>Maks. samlet vedleggsstørrelse per kontroll</label>
+        <hint>Maksimal samlet vedleggsstørrelse per kontroll, lagret i byte &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>Maks. samlet vedleggsstørrelse per skjema</label>
+        <hint>Maksimal samlet vedleggsstørrelse per skjema, lagret i byte &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>Maksimalt antall filer per kontroll</label>
+        <hint>Maksimalt antall filer per vedleggskontroll &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>Tillatte medietyper for vedlegg</label>
+        <hint>Mellomromsatskilte MIME-typer, f.eks. &lt;code&gt;image/* application/pdf&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>Avvis tomme opplastede filer</label>
+        <hint>Avvis opplastede filer som har 0 byte &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>Utseende for opplastingsfeil</label>
+        <hint>Hvordan filopplastingsfeil vises &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Modal dialogboks)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Modal dialogboks</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>Innebygd varsel</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>Veiviservisning</label>
+        <hint>Vis toppnivåseksjoner som en hel side eller separate veivisersider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Full visning)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Full visning</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Veiviservisning</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>Valideringsmodus for veivisernavigasjon</label>
+        <hint>Hvordan veivisernavigasjon oppfører seg når data ikke er gyldige &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fri)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fri</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>Lempelig</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>Streng</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>Navigasjon i underseksjoner i veiviser</label>
+        <hint>Aktiver veivisernavigasjon for seksjoner og rutenett under toppnivåseksjoner &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>Innholdsfortegnelse for underseksjoner i veiviser</label>
+        <hint>Hvordan veiviserens innholdsfortegnelse viser underseksjoner &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Vis kun underseksjoner for den aktive seksjonen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vis kun underseksjoner for den aktive seksjonen</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>Vis underseksjoner for alle seksjoner</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Ikke vis underseksjoner</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>Plassering av innholdsfortegnelse i veiviser</label>
+        <hint>Hvor veiviserens innholdsfortegnelse vises &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Til venstre)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Til venstre</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>Separat</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>Vis alltid seksjonsstatus i veiviser</label>
+        <hint>Vis ikoner for seksjonsstatus i veiviserens innholdsfortegnelse &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>Tillat URL-parameter for veiviserside</label>
+        <hint>Tillat valg av første veiviserside via URL-parameter &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>Oppdater URL-parameter ved sidebytte i veiviser</label>
+        <hint>Oppdater nettleserens URL-parameter ved bytte mellom veivisersider &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>Merk kontroller som besøkt ved sidebytte i veiviser</label>
+        <hint>Når bytte mellom veivisersider markerer kontroller som besøkt &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Alltid)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Alltid</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>Kun ved navigasjon fremover</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>Aldri</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>Deaktiver beregninger i skrivebeskyttede moduser (gjennomgang, PDF)</label>
+        <hint>Deaktiver beregningsformler i gjennomgangs- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>Automatiske beregningsavhengigheter</label>
+        <hint>Bestem evalueringsrekkefølge automatisk for formlene Beregnet verdi og Startverdi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>Tillatte ekstra XPath-funksjoner</label>
+        <hint>Mellomromsatskilt liste over ekstra XPath-funksjoner tillatt i Form Builder-formler &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>Kortstørrelse på landingsside</label>
+        <hint>Antall elementer som vises per kort på landingssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>Kort på landingsside</label>
+        <hint>Kort som vises på landingssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>Sidestørrelse på oppsummeringsside</label>
+        <hint>Antall rader som vises per side på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>Knapper på oppsummeringsside</label>
+        <hint>Mellomromsatskilt liste over knapper på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>Vis kolonnen Opprettet</label>
+        <hint>Vis kolonne med opprettelsestidspunkt på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>Vis kolonnen Sist endret</label>
+        <hint>Vis kolonne med siste endringstidspunkt på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>Vis kolonnen Arbeidsflytstadium</label>
+        <hint>Vis kolonne for arbeidsflytstadium på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>Vis kolonnen Opprettet av</label>
+        <hint>Vis kolonnen Opprettet av på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>Vis kolonnen Sist endret av</label>
+        <hint>Vis kolonnen Sist endret av på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>Vis versjonsvelger på oppsummeringsside</label>
+        <hint>Vis skjemaversjonsvelger på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>Skjemaversjon for Ny-knappen på oppsummeringsside</label>
+        <hint>Hvilken skjemaversjon som åpnes når man klikker på Ny fra oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Gjeldende valgt versjon)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Gjeldende valgt versjon</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>Siste publiserte versjon</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>Åpne søkealternativer ved innlasting av oppsummeringsside</label>
+        <hint>Utvid avanserte søkealternativer når oppsummeringssiden lastes inn &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>Sidestørrelse for skjemaadministrasjon</label>
+        <hint>Antall skjema per side på siden Skjemaadministrasjon &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>Tabellenker i skjemaadministrasjon</label>
+        <hint>Lenker som vises for hvert skjema på siden Skjemaadministrasjon &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Oppsummering, deretter Ny)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Oppsummering, deretter Ny</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>Ny, deretter Oppsummering</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>Kun Oppsummering</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>Kun Ny</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>Åpne søkealternativer ved innlasting av skjemaadministrasjon</label>
+        <hint>Utvid søkealternativer når siden Skjemaadministrasjon lastes inn &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>Konfigurasjon av eksterne servere (JSON)</label>
+        <hint>JSON-matrise med eksterne servere for publisering og administrasjon av skjema &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>Aktiver eksportside</label>
+        <hint>Aktiver siden for eksport av skjemadata &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>Tillat import av ugyldige dokumenter</label>
+        <hint>Tillat import av dokumenter som inneholder valideringsfeil &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>Tillat sletting av eksisterende oppføringer ved import</label>
+        <hint>Tillat alternativet for å slette eksisterende data under import &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>Begrens import til siste versjon</label>
+        <hint>Tillat kun import til den siste skjemaversjonen &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>Tillatte importformater</label>
+        <hint>Tillatte formater for dataimport &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (Overskrifter)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (Navngitte områder)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>XML-skjemastruktur og -data</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>Vis applikasjons-/skjemanavn på importside</label>
+        <hint>Vis applikasjons- og skjemanavn på importsiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>Knapper på importside</label>
+        <hint>Mellomromsatskilt liste over knapper på importsiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>PDF-sideorientering</label>
+        <hint>Sideorientering for genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Stående)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Stående</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>Liggende</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>PDF-sidestørrelse</label>
+        <hint>Sidestørrelse for genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>Uttrykk for PDF-filnavn</label>
+        <hint>XPath-uttrykk for navn på genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>PDF-tilgjengelighet (merket PDF)</label>
+        <hint>Aktiver tilgjengelighet med merket PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>PDF/A-samsvarsmodus</label>
+        <hint>Samsvar med PDF/A-arkiveringsstandarden &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ingen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>PDF-fargemodus</label>
+        <hint>Fargemodus for PDF-gjengivelse &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Svart-hvitt)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Svart-hvitt</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>Farge</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>Monokrom</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>Aktiver hyperlenker i PDF</label>
+        <hint>Gjengi aktive hyperlenker i genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>Inkluder strekkode i PDF</label>
+        <hint>Gjengi dokumentstrekkode i genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>Deaktiver PDF-knapp når data er ugyldige</label>
+        <hint>Deaktiver PDF-knappen når skjemaet har valideringsfeil &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>Terskel for langt innhold i PDF-mal</label>
+        <hint>Tegngrense der felt i PDF-maler flyttes over i et vedlegg &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>JPEG-komprimeringskvalitet i PDF</label>
+        <hint>JPEG-komprimeringskvalitet i prosent fra 0 % til 100 % &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>Standard skriftfamilie i PDF</label>
+        <hint>Reserveskriftfamilie for Inter i genererte PDF-filer &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>Skriftbaner for PDF-maler</label>
+        <hint>Baner til tilpassede skrifttyper for PDF-maler &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>Standardkonfigurasjon for PDF-topptekst/-bunntekst (JSON)</label>
+        <hint>Standard JSON-konfigurasjon for topptekster og bunntekster i PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>E-posttransport</label>
+        <hint>Mekanisme for e-posttransport &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>SMTP-vert</label>
+        <hint>Vertsnavn for SMTP-server &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>SMTP-port</label>
+        <hint>Port for SMTP-server &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>SMTP-brukernavn</label>
+        <hint>Brukernavn for SMTP-autentisering &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>SMTP-kryptering</label>
+        <hint>Krypteringsprotokoll for SMTP &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ingen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ingen</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>Avsenders e-postadresse (Fra)</label>
+        <hint>Standard e-postadresse for avsender &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>Svar-til-e-postadresse</label>
+        <hint>Standard e-postadresse for svar &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>Mottakers e-postadresse (Til)</label>
+        <hint>Standard e-postadresse for mottaker &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>CC-e-postadresse</label>
+        <hint>Standard e-postadresse for kopi (CC) &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>BCC-e-postadresse</label>
+        <hint>Standard e-postadresse for blindkopi (BCC) &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>Legg ved PDF i e-post</label>
+        <hint>Legg ved generert PDF i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>Legg ved XML-data i e-post</label>
+        <hint>Legg ved skjemaets XML-data i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>Legg ved TIFF i e-post</label>
+        <hint>Legg ved generert TIFF-bilde i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>Legg ved Excel (Navngitte områder) i e-post</label>
+        <hint>Legg ved Excel-fil med navngitte områder i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>Legg ved XML-skjemastruktur og -data i e-post</label>
+        <hint>Legg ved XML-eksport av skjemastruktur og -data i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>Legg ved opplastede filer i e-post</label>
+        <hint>Hvilke brukeropplastede vedlegg som skal inkluderes i e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Alle vedlegg)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Alle vedlegg</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>Kun valgte vedlegg</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>Ingen vedlegg</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>Vis menyelementet XML-skjema</label>
+        <hint>Vis knappen for dialogboksen XML-skjema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>Vis menyelementet PDF-maler</label>
+        <hint>Vis knappen for dialogboksen PDF-maler i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>Vis menyelementet Rediger kildekode</label>
+        <hint>Vis knappen for dialogboksen Rediger kildekode i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>Vis menyelementet Arbeidsflytstadium</label>
+        <hint>Vis innstillinger for arbeidsflyt i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>Vis menyelementet Tillatelser</label>
+        <hint>Vis knappen for dialogboksen Tillatelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>Vis menyelementet E-postinnstillinger</label>
+        <hint>Vis knappen for dialogboksen E-postinnstillinger i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>Vis menyelementet Bekreftelsesside</label>
+        <hint>Vis innstillinger for bekreftelsesside i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>Vis menyelementet Tilpassede meldinger</label>
+        <hint>Vis innstillinger for tilpassede meldinger i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>Vis menyelementet Tilpassede prosesser</label>
+        <hint>Vis innstillinger for tilpassede prosesser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>Vis HTTP-tjenester i sidefeltet</label>
+        <hint>Aktiver HTTP-tjenester i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>Vis databasetjenester i sidefeltet</label>
+        <hint>Aktiver databasetjenester i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>Vis handlinger i sidefeltet</label>
+        <hint>Aktiver handlingsredigering i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>Krev skjematittel i Form Builder</label>
+        <hint>Krev en ikke-tom skjematittel i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>Krev skjemabeskrivelse i Form Builder</label>
+        <hint>Krev en ikke-tom skjemabeskrivelse i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>Versjonsatferd ved publisering</label>
+        <hint>Hvordan versjonshåndtering fungerer ved publisering av et skjema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Overskriv eksisterende versjon som standard)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Overskriv eksisterende versjon som standard</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>Opprett ny versjon som standard</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>Tving opprettelse av ny versjon</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>Tillat opplasting av skjemalogo i Form Builder</label>
+        <hint>Vis kontroll for logoopplasting i Skjemainnstillinger i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>Aktiver MCP-server for Form Builder</label>
+        <hint>Aktiver Model Context Protocol (MCP)-serveren for Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>Krev tilgangspollett for Form Builder MCP-server</label>
+        <hint>Krev autentisering med tilgangspollett for Form Builder MCP-serveren &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>Datoinndataformat</label>
+        <hint>Maske for datoinndataformat, f.eks. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; eller &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>Tidsinndataformat</label>
+        <hint>Maske for tidsinndataformat &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>Datoutdataformat (XPath)</label>
+        <hint>XPath-uttrykk for formatering av datovisning &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>Dato- og tidsutdataformat (XPath)</label>
+        <hint>XPath-uttrykk for formatering av dato- og tidsvisning &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>Tidsutdataformat (XPath)</label>
+        <hint>XPath-uttrykk for formatering av tidsvisning &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>Desimalutdataformat (XPath)</label>
+        <hint>XPath-uttrykk for formatering av desimaltall &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>Heltallsutdataformat (XPath)</label>
+        <hint>XPath-uttrykk for formatering av heltall &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>Aktiver brukermeny på navigasjonslinjen</label>
+        <hint>Vis brukermenyen for innlogging/utlogging på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>Innloggings-URI for brukermeny</label>
+        <hint>Innloggings-URI-mal for brukermenyen &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>Utloggings-URI for brukermeny</label>
+        <hint>Utloggings-URI-mal for brukermenyen &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>Registrerings-URI for brukermeny</label>
+        <hint>Registrerings-URI-mal for brukermenyen &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>Tillatelser for Form Runner</label>
+        <hint>Definisjon av tillatelser &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>Gyldighet for tilgangspollett (minutter)</label>
+        <hint>Gyldighetstid i minutter for eksterne tilgangspolletter &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>Gyldighet for tilstandspollett (minutter)</label>
+        <hint>Gyldighetstid i minutter for tilstandspolletter &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

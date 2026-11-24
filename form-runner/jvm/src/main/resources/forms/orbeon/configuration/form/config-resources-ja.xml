@@ -1,0 +1,2239 @@
+<resource xml:lang="ja">
+    <override>
+        <label>オーバーライド</label>
+    </override>
+    <pages-section>
+        <label>ランディング、一覧、管理、インポートページ</label>
+    </pages-section>
+    <tabs>
+        <standard-settings>標準設定</standard-settings>
+        <custom-properties>カスタムプロパティ</custom-properties>
+    </tabs>
+    <scopes>
+        <header>スコープ</header>
+        <global>グローバル設定</global>
+        <all-forms>すべてのフォーム</all-forms>
+        <add-override>オーバーライドを追加</add-override>
+        <add-short>追加</add-short>
+        <add-form-in-app>フォームのオーバーライドを追加</add-form-in-app>
+        <edit-scope>スコープを編集</edit-scope>
+        <remove-scope>オーバーライドを削除</remove-scope>
+        <clear-app-overrides>オーバーライドをクリア</clear-app-overrides>
+        <dialog-add-title>オーバーライドを追加</dialog-add-title>
+        <dialog-edit-title>オーバーライドスコープを編集</dialog-edit-title>
+        <level-label>オーバーライドレベル</level-label>
+        <level-app>アプリケーション</level-app>
+        <level-app-form>アプリケーションとフォーム</level-app-form>
+        <level-global-profile>グローバル (プロファイル)</level-global-profile>
+        <app-label>アプリケーション</app-label>
+        <app-hint>公開済みのアプリケーションを選択するか、アプリケーション名を入力してください</app-hint>
+        <form-label>フォーム</form-label>
+        <form-hint>公開済みのフォームを選択するか、フォーム名を入力してください</form-hint>
+        <profiles-label>プロファイル (任意)</profiles-label>
+        <profiles-hint>既存のプロファイルを選択するか、カスタムプロファイル名を追加してください</profiles-hint>
+        <confirm-add>追加</confirm-add>
+        <confirm-save>適用</confirm-save>
+        <cancel>キャンセル</cancel>
+        <error-app-slug>有効なアプリケーション名を入力してください（英字、数字、ハイフン、アンダースコア）</error-app-slug>
+        <error-form-slug>有効なフォーム名を入力してください（orbeon/builder および orbeon/configuration はオーバーライドできません）</error-form-slug>
+        <error-profiles>有効なプロファイル識別子を入力してください</error-profiles>
+        <error-duplicate>このスコープのオーバーライドはすでに存在します</error-duplicate>
+    </scopes>
+    <filter>
+        <label>設定を絞り込む</label>
+        <hint>設定名、説明、または oxf.* プロパティ名で検索</hint>
+        <clear>フィルターをクリア</clear>
+    </filter>
+    <alerts>
+        <invalid-value>設定値が無効です</invalid-value>
+        <xpath>XPath式が無効です</xpath>
+        <non-negative-integer>0以上の整数を入力してください</non-negative-integer>
+        <positive-integer>1以上の正の整数を入力してください</positive-integer>
+        <optional-integer-or-unlimited>整数（無制限の場合は -1、または 0 以上）を入力するか、空欄のままにしてください</optional-integer-or-unlimited>
+        <port>有効なTCPポート（1–65535）を入力するか、空欄のままにしてください</port>
+        <percentage>0% から 100% の間のパーセンテージを入力してください</percentage>
+        <json>JSON構文が無効です</json>
+        <permissions-json>必須のロール名をすべて入力するか、無効な権限JSONを修正してください</permissions-json>
+        <landing-cards>カードの必須フィールドをすべて入力してください</landing-cards>
+        <byte-size>バイトサイズまたは最大ヒープに対する割合（1–100%）を入力してください（例: 15%、256m、1g、または 0）</byte-size>
+        <attachment-size>整数のバイト数となる0以上のサイズを入力してください</attachment-size>
+        <positive-byte-size>1バイト以上となる正のサイズを入力してください</positive-byte-size>
+        <heap-percentage>0% より大きく 100% 以下のパーセンテージを入力してください</heap-percentage>
+        <duration>期間を入力してください（例: 30m、2h、1d、PT30M、またはミリ秒）</duration>
+    </alerts>
+    <size-modes>
+        <unlimited>無制限</unlimited>
+        <max-size>最大サイズ</max-size>
+        <heap-percent>最大ヒープ %</heap-percent>
+        <fixed-size>固定サイズ</fixed-size>
+    </size-modes>
+    <units>
+        <ms>ミリ秒</ms>
+        <min>分</min>
+        <chars>文字</chars>
+    </units>
+    <system-section>
+        <label>全般</label>
+    </system-section>
+    <caches-section>
+        <label>キャッシュ</label>
+        <console-callout-prefix>ライブJVMヒープ使用量、キャッシュヒット率、SIFSディスクストア、およびコンパイル済み静的状態は、</console-callout-prefix>
+        <console-callout-link>管理コンソール</console-callout-link>
+        <console-callout-suffix>で確認できます。</console-callout-suffix>
+    </caches-section>
+    <navbar-section>
+        <label>ナビゲーションバー</label>
+    </navbar-section>
+    <appearance-section>
+        <label>外観とテーマ</label>
+    </appearance-section>
+    <detail-section>
+        <label>詳細ページ</label>
+    </detail-section>
+    <wizard-section>
+        <label>ウィザード</label>
+    </wizard-section>
+    <formulas-section>
+        <label>計算式</label>
+    </formulas-section>
+    <landing-section>
+        <label>ランディングページ</label>
+    </landing-section>
+    <summary-section>
+        <label>一覧ページ</label>
+    </summary-section>
+    <admin-section>
+        <label>管理ページ</label>
+    </admin-section>
+    <import-section>
+        <label>インポートとエクスポート</label>
+    </import-section>
+    <pdf-section>
+        <label>PDF生成</label>
+    </pdf-section>
+    <email-section>
+        <label>メール</label>
+    </email-section>
+    <form-builder-section>
+        <label>Form Builder</label>
+    </form-builder-section>
+    <formats-section>
+        <label>入出力フォーマット</label>
+    </formats-section>
+    <security-section>
+        <label>認証とセキュリティ</label>
+    </security-section>
+    <resources-section>
+        <label>リソース</label>
+    </resources-section>
+    <processes-section>
+        <label>プロセス</label>
+        <override-placeholder>組み込みプロセスをオーバーライド…</override-placeholder>
+        <override-button>オーバーライド</override-button>
+        <add-custom>カスタムプロセスを追加</add-custom>
+        <badge-override>オーバーライド</badge-override>
+        <badge-custom>カスタム</badge-custom>
+        <edit>編集</edit>
+        <revert>元に戻す</revert>
+        <delete>削除</delete>
+        <empty>このスコープにはプロセスのオーバーライドやカスタムプロセスは設定されていません。上から組み込みプロセスをオーバーライドするか、カスタムプロセスを追加してください。</empty>
+        <dialog-title-override>プロセスをオーバーライド</dialog-title-override>
+        <dialog-title-add>カスタムプロセスを追加</dialog-title-add>
+        <dialog-title-edit>プロセスを編集</dialog-title-edit>
+    </processes-section>
+    <app-form-overrides-section>
+        <label>アプリケーション / フォームのオーバーライド</label>
+        <add-override>アプリケーション / フォームのオーバーライドを追加</add-override>
+        <app>アプリケーション名</app>
+        <app-hint>アプリケーション名、またはすべてのアプリケーションを表す *</app-hint>
+        <form>フォーム名</form>
+        <form-hint>フォーム名、またはすべてのフォームを表す *</form-hint>
+        <profiles>プロファイル</profiles>
+        <profiles-hint>スペース区切りのプロパティプロファイル（任意）</profiles-hint>
+    </app-form-overrides-section>
+    <custom-properties-section>
+        <label>カスタムプロパティ</label>
+        <name>プロパティ名</name>
+        <name-hint>完全なプロパティ名（該当する場合はワイルドカードを含む）</name-hint>
+        <type>データ型</type>
+        <value>値</value>
+        <profiles>プロファイル</profiles>
+        <profiles-hint>スペース区切りのプロパティプロファイル（任意）</profiles-hint>
+    </custom-properties-section>
+    <default-language>
+        <label>デフォルト言語</label>
+        <hint>デフォルトの言語コード &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
+    </default-language>
+    <available-languages>
+        <label>利用可能な言語 (フォームごと)</label>
+        <hint>スペース区切りの言語コードまたは &lt;code&gt;*&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages.*.*&lt;/code&gt;</hint>
+    </available-languages>
+    <global-available-languages>
+        <label>グローバルで利用可能な言語</label>
+        <hint>ランディング、フォーム一覧、管理ページで使用可能な言語 &lt;code class="fr-config-prop-name"&gt;oxf.fr.available-languages&lt;/code&gt;</hint>
+    </global-available-languages>
+    <default-timezone>
+        <label>デフォルトタイムゾーン</label>
+        <hint>IANAタイムゾーン識別子（例: &lt;code&gt;Asia/Tokyo&lt;/code&gt;） &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-timezone&lt;/code&gt;</hint>
+    </default-timezone>
+    <session-heartbeat>
+        <label>セッションハートビート</label>
+        <hint>ページが開いている間ユーザーセッションを維持する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-heartbeat&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </session-heartbeat>
+    <cache-documents-size>
+        <label>最大エントリ数</label>
+        <hint>ストアへ退避するまでにJVMヒープ内に保持するライブXFormsドキュメントの最大数 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
+    </cache-documents-size>
+    <cache-documents-max-size-bytes>
+        <label>メモリ上限</label>
+        <hint>最大JVMヒープに対する割合、固定データサイズ（バイト単位で保存）、または無制限 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
+    </cache-documents-max-size-bytes>
+    <cache-documents-max-idle>
+        <label>最大アイドル時間</label>
+        <hint>ライブドキュメントを退避するまでのアイドルタイムアウト（任意、例: &lt;code&gt;30m&lt;/code&gt;、&lt;code&gt;2h&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
+    </cache-documents-max-idle>
+    <cache-static-state-size>
+        <label>最大エントリ数</label>
+        <hint>JVMヒープ内に保持するコンパイル済みXForms静的状態の最大数 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
+    </cache-static-state-size>
+    <cache-static-state-max-size-bytes>
+        <label>メモリ上限</label>
+        <hint>最大JVMヒープに対する割合、固定データサイズ（バイト単位で保存）、または無制限 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
+    </cache-static-state-max-size-bytes>
+    <cache-static-state-max-idle>
+        <label>最大アイドル時間</label>
+        <hint>静的状態をストアへ退避するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
+    </cache-static-state-max-idle>
+    <navbar-home-link>
+        <label>ナビゲーションバーにホームリンクを表示</label>
+        <hint>ナビゲーションバーのホームリンクを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-home-link>
+    <navbar-language-selector>
+        <label>ナビゲーションバーに言語セレクターを表示</label>
+        <hint>ナビゲーションバーの言語セレクターを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-language-selector>
+    <navbar-color-scheme-selector>
+        <label>ナビゲーションバーにカラースキームセレクターを表示</label>
+        <hint>ナビゲーションバーのライト/ダークモード切り替えを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-color-scheme-selector>
+    <navbar-share-button>
+        <label>ナビゲーションバーに共有ボタンを表示</label>
+        <hint>ナビゲーションバーの共有リンクボタンを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-share-button>
+    <navbar-revision-history>
+        <label>ナビゲーションバーに変更履歴を表示</label>
+        <hint>ナビゲーションバーの変更履歴アイコンを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-revision-history>
+    <navbar-workflow-stage>
+        <label>ナビゲーションバーにワークフローステージを表示</label>
+        <hint>ナビゲーションバーに現在のワークフローステージを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-workflow-stage>
+    <style-theme>
+        <label>テーマ（フォームごと）</label>
+        <hint>フォームのビジュアルテーマ &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </style-theme>
+    <color-scheme>
+        <label>デフォルトのカラースキーム</label>
+        <hint>ページのデフォルトのカラースキーム &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (ライト)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>ライト</label>
+            <value>light</value>
+        </item>
+        <item>
+            <label>ダーク</label>
+            <value>dark</value>
+        </item>
+        <item>
+            <label>自動 (システム)</label>
+            <value>auto</value>
+        </item>
+    </color-scheme>
+    <html-page-layout>
+        <label>ブラウザページレイアウト</label>
+        <hint>フォームを固定幅または可変幅のどちらで表示するか &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.html-page-layout.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (固定幅)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>固定幅</label>
+            <value>fixed</value>
+        </item>
+        <item>
+            <label>可変幅</label>
+            <value>fluid</value>
+        </item>
+    </html-page-layout>
+    <detail-density>
+        <label>表示密度</label>
+        <hint>詳細ページの間隔の密度 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.density.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (標準)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>コンパクト</label>
+            <value>compact</value>
+        </item>
+        <item>
+            <label>標準</label>
+            <value>comfortable</value>
+        </item>
+        <item>
+            <label>広め</label>
+            <value>roomy</value>
+        </item>
+    </detail-density>
+    <grid-markup>
+        <label>グリッドマークアップ</label>
+        <hint>グリッドに使用するHTMLマークアップ &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.markup.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (CSSグリッド)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>CSSグリッド</label>
+            <value>css-grid</value>
+        </item>
+        <item>
+            <label>HTMLテーブル</label>
+            <value>html-table</value>
+        </item>
+    </grid-markup>
+    <label-appearance>
+        <label>ラベルの外観</label>
+        <hint>コントロールラベルの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.label.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (通常)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>通常</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>最小 (プレースホルダー)</label>
+            <value>minimal</value>
+        </item>
+    </label-appearance>
+    <hint-appearance>
+        <label>ヒントの外観</label>
+        <hint>コントロールヒントの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (通常 (インライン))</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>通常 (インライン)</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>最小 (プレースホルダー)</label>
+            <value>minimal</value>
+        </item>
+        <item>
+            <label>ツールチップ</label>
+            <value>tooltip</value>
+        </item>
+    </hint-appearance>
+    <static-readonly-hint>
+        <label>読み取り専用モードでヒントを表示</label>
+        <hint>表示モードおよびPDFモードでコントロールのヒントを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </static-readonly-hint>
+    <static-readonly-alert>
+        <label>読み取り専用モードでアラートを表示</label>
+        <hint>表示モードおよびPDFモードで検証アラートを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </static-readonly-alert>
+    <static-readonly-required>
+        <label>読み取り専用モードで必須マークを表示</label>
+        <hint>表示モードおよびPDFモードで必須フィールドのマークを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </static-readonly-required>
+    <view-show-explanation>
+        <label>表示モードで説明テキストを表示</label>
+        <hint>表示モードで fr:explanation コントロールを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </view-show-explanation>
+    <default-logo-uri>
+        <label>デフォルトロゴURI</label>
+        <hint>デフォルトロゴのURI &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-logo.uri.*.*&lt;/code&gt;</hint>
+    </default-logo-uri>
+    <favicon-uri>
+        <label>ファビコンURI</label>
+        <hint>ページファビコンのURI &lt;code class="fr-config-prop-name"&gt;oxf.fr.favicon.uri.*.*&lt;/code&gt;</hint>
+    </favicon-uri>
+    <custom-css-uri>
+        <label>カスタムCSSアセット</label>
+        <hint>スペース区切りのカスタムCSSパスのリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.css.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-css-uri>
+    <custom-js-uri>
+        <label>カスタムJavaScriptアセット</label>
+        <hint>スペース区切りのカスタムJSパスのリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.js.custom.uri.*.*&lt;/code&gt;</hint>
+    </custom-js-uri>
+    <hide-logo>
+        <label>ロゴを非表示</label>
+        <hint>詳細ページでロゴを非表示にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-logo.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </hide-logo>
+    <hide-header>
+        <label>ヘッダーを非表示</label>
+        <hint>詳細ページでページヘッダーを非表示にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-header.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </hide-header>
+    <hide-footer>
+        <label>フッターを非表示</label>
+        <hint>詳細ページでページフッターを非表示にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-footer.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </hide-footer>
+    <hide-buttons-bar>
+        <label>ボタンバーを非表示</label>
+        <hint>詳細ページで下部のボタンバーを非表示にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hide-buttons-bar.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </hide-buttons-bar>
+    <keyboard-shortcuts-show-hints>
+        <label>キーボードショートカットのヒントを表示</label>
+        <hint>ボタンにキーボードショートカットのヒントを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.keyboard-shortcuts.show-hints.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </keyboard-shortcuts-show-hints>
+    <detail-buttons>
+        <label>詳細ページのボタン</label>
+        <hint>詳細ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
+    </detail-buttons>
+    <detail-buttons-view>
+        <label>表示モードのボタン</label>
+        <hint>表示ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
+    </detail-buttons-view>
+    <autosave-delay>
+        <label>自動保存の遅延 (ミリ秒)</label>
+        <hint>自動保存までのミリ秒単位の遅延時間（0で自動保存を無効化） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+    </autosave-delay>
+    <data-migration>
+        <label>簡易データ移行</label>
+        <hint>データ内の不足している要素を自動的に追加/削除する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.data-migration.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (有効)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>有効</label>
+            <value>enabled</value>
+        </item>
+        <item>
+            <label>無効</label>
+            <value>disabled</value>
+        </item>
+        <item>
+            <label>エラーを発生させる</label>
+            <value>error</value>
+        </item>
+    </data-migration>
+    <grid-tab-order>
+        <label>グリッドのタブ移動順序</label>
+        <hint>グリッドセル間のTabキー移動順序 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.tab-order.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (行)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>行</label>
+            <value>rows</value>
+        </item>
+        <item>
+            <label>列</label>
+            <value>columns</value>
+        </item>
+    </grid-tab-order>
+    <initial-focus>
+        <label>初期フォーカス</label>
+        <hint>読み込み時に最初のフォームコントロールに自動的にフォーカスする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.initial-focus.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </initial-focus>
+    <automatic-hints>
+        <label>自動ヒントを使用</label>
+        <hint>コントロールの自動ヒントを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.hint.automatic.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </automatic-hints>
+    <error-summary>
+        <label>エラー概要の位置</label>
+        <hint>エラー概要を表示する位置 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.error-summary.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (下部)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>上部</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>下部</label>
+            <value>bottom</value>
+        </item>
+        <item>
+            <label>上下両方</label>
+            <value>both</value>
+        </item>
+    </error-summary>
+    <captcha-component>
+        <label>CAPTCHAコンポーネント</label>
+        <hint>詳細ページで使用するCAPTCHA実装 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (なし)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value></value>
+        </item>
+        <item>
+            <label>reCAPTCHA v2</label>
+            <value>reCAPTCHA2</value>
+        </item>
+        <item>
+            <label>SimpleCaptcha</label>
+            <value>SimpleCaptcha</value>
+        </item>
+    </captcha-component>
+    <singleton-enabled>
+        <label>シングルトンフォーム</label>
+        <hint>このフォームに対して1つのフォームデータドキュメントのみを許可する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </singleton-enabled>
+    <singleton-if-one-exists>
+        <label>既存ドキュメントがある場合のシングルトンの動作</label>
+        <hint>既存データがあるシングルトンフォームで &lt;code&gt;/new&lt;/code&gt; を開いたときの動作 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.if-one-exists.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (既存のドキュメントを開く)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>既存のドキュメントを開く</label>
+            <value>open</value>
+        </item>
+        <item>
+            <label>エラーを表示</label>
+            <value>error</value>
+        </item>
+    </singleton-if-one-exists>
+    <toc-min-sections>
+        <label>目次を表示する最小セクション数</label>
+        <hint>目次を表示するために必要な最小セクション数（-1で無効、-2で未使用） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+    </toc-min-sections>
+    <toc-position>
+        <label>目次の位置</label>
+        <hint>詳細ページの目次の表示位置 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (上部)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>上部</label>
+            <value>top</value>
+        </item>
+        <item>
+            <label>左側</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value>none</value>
+        </item>
+    </toc-position>
+    <toc-modes>
+        <label>目次を表示するモード</label>
+        <hint>目次を表示するモード &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>新規</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>編集</label>
+            <value>edit</value>
+        </item>
+        <item>
+            <label>表示</label>
+            <value>view</value>
+        </item>
+        <item>
+            <label>PDF</label>
+            <value>pdf</value>
+        </item>
+    </toc-modes>
+    <messages-appearance>
+        <label>メッセージの外観</label>
+        <hint>アクションメッセージの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (トースト)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>トースト</label>
+            <value>toast</value>
+        </item>
+        <item>
+            <label>モーダルダイアログ</label>
+            <value>dialog</value>
+        </item>
+    </messages-appearance>
+    <messages-position>
+        <label>トーストメッセージの位置</label>
+        <hint>トーストメッセージの画面上の表示位置 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (右上)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>左上</label>
+            <value>top-left</value>
+        </item>
+        <item>
+            <label>上部中央</label>
+            <value>top-center</value>
+        </item>
+        <item>
+            <label>右上</label>
+            <value>top-right</value>
+        </item>
+        <item>
+            <label>左下</label>
+            <value>bottom-left</value>
+        </item>
+        <item>
+            <label>下部中央</label>
+            <value>bottom-center</value>
+        </item>
+        <item>
+            <label>右下</label>
+            <value>bottom-right</value>
+        </item>
+    </messages-position>
+    <messages-delay>
+        <label>トーストメッセージの表示時間 (ミリ秒)</label>
+        <hint>トーストメッセージが自動的に閉じるまでのミリ秒単位の時間 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.delay.*.*&lt;/code&gt;</hint>
+    </messages-delay>
+    <lease-enabled>
+        <label>同時編集リースを有効化</label>
+        <hint>編集時の排他的なドキュメントロック/リースを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </lease-enabled>
+    <lease-duration>
+        <label>リース期間 (分)</label>
+        <hint>デフォルトのリース期間（分単位） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.duration.*.*.*&lt;/code&gt;</hint>
+    </lease-duration>
+    <lease-renew-threshold>
+        <label>リース更新しきい値 (分)</label>
+        <hint>リースを更新する期限切れ前のしきい値（分単位） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.renew-threshold.*.*&lt;/code&gt;</hint>
+    </lease-renew-threshold>
+    <lease-alert-threshold>
+        <label>リース警告しきい値 (分)</label>
+        <hint>ユーザーに警告を表示するリース期限切れ前のしきい値（分単位） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.lease.alert-threshold.*.*&lt;/code&gt;</hint>
+    </lease-alert-threshold>
+    <session-expiration-dialog-enabled>
+        <label>セッション期限切れ警告ダイアログ</label>
+        <hint>ユーザーセッションが期限切れになる前に警告ダイアログを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.session-expiration-dialog.enabled.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </session-expiration-dialog-enabled>
+    <warn-when-data-unsafe>
+        <label>未保存の変更がある状態で離れる際に警告</label>
+        <hint>未保存データの警告を制御するブール値またはXPath式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
+    </warn-when-data-unsafe>
+    <validate-selection-controls-choices>
+        <label>選択コントロールの選択肢を検証</label>
+        <hint>選択コントロールの値が利用可能な選択肢リストに含まれていることを検証する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.validate-selection-controls-choices.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </validate-selection-controls-choices>
+    <section-collapsible>
+        <label>折りたたみ可能なセクション</label>
+        <hint>セクションの折りたたみと展開を許可する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.collapsible.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </section-collapsible>
+    <section-animate>
+        <label>セクションの折りたたみ/展開アニメーション</label>
+        <hint>セクションの折りたたみと展開をアニメーション表示する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.animate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </section-animate>
+    <section-insert>
+        <label>繰り返しセクションの挿入位置</label>
+        <hint>新しい繰り返しセクションの項目を挿入する位置 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (現在の繰り返しの後)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>現在の繰り返しの後</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>末尾</label>
+            <value>bottom</value>
+        </item>
+    </section-insert>
+    <grid-insert>
+        <label>繰り返しグリッドの挿入位置</label>
+        <hint>新しい繰り返しグリッドの行を挿入する位置 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.insert.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (現在の行の後)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>現在の行の後</label>
+            <value>index</value>
+        </item>
+        <item>
+            <label>末尾</label>
+            <value>bottom</value>
+        </item>
+    </grid-insert>
+    <attachment-max-size-per-file>
+        <label>ファイルごとの添付ファイル最大サイズ</label>
+        <hint>アップロードされる1ファイルあたりの最大サイズ（バイト単位で保存） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-per-file.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-per-file>
+    <attachment-max-size-aggregate-per-control>
+        <label>コントロールごとの添付ファイル合計最大サイズ</label>
+        <hint>コントロールごとの添付ファイルの合計最大サイズ（バイト単位で保存） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-control>
+    <attachment-max-size-aggregate-per-form>
+        <label>フォームごとの添付ファイル合計最大サイズ</label>
+        <hint>フォームごとの添付ファイルの合計最大サイズ（バイト単位で保存） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*&lt;/code&gt;</hint>
+    </attachment-max-size-aggregate-per-form>
+    <attachment-max-files-per-control>
+        <label>コントロールごとの最大ファイル数</label>
+        <hint>添付ファイルコントロールごとの最大ファイル数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.max-files-per-control.*.*&lt;/code&gt;</hint>
+    </attachment-max-files-per-control>
+    <attachment-mediatypes>
+        <label>許可する添付ファイルのメディアタイプ</label>
+        <hint>スペース区切りのMIMEタイプ（例: &lt;code&gt;image/* application/pdf&lt;/code&gt;） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.attachment.mediatypes.*.*&lt;/code&gt;</hint>
+    </attachment-mediatypes>
+    <upload-reject-empty-files>
+        <label>空のアップロードファイルを拒否</label>
+        <hint>サイズが0バイトのアップロードファイルを拒否する &lt;code class="fr-config-prop-name"&gt;oxf.fr.upload.reject-empty-files&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </upload-reject-empty-files>
+    <attachment-upload-error-appearance>
+        <label>アップロードエラーの外観</label>
+        <hint>ファイルアップロードエラーの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (モーダルダイアログ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>モーダルダイアログ</label>
+            <value>dialog</value>
+        </item>
+        <item>
+            <label>インラインアラート</label>
+            <value>inline</value>
+        </item>
+    </attachment-upload-error-appearance>
+    <wizard-view>
+        <label>ウィザード表示</label>
+        <hint>トップレベルセクションを1ページ全体で表示するか、個別のウィザードページとして表示するか &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (全体表示)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>全体表示</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>ウィザード表示</label>
+            <value>wizard</value>
+        </item>
+    </wizard-view>
+    <wizard-mode>
+        <label>ウィザード移動の検証モード</label>
+        <hint>データが無効な場合のウィザードページ移動の動作 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.validate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (自由)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>自由</label>
+            <value>free</value>
+        </item>
+        <item>
+            <label>ゆるめ</label>
+            <value>lax</value>
+        </item>
+        <item>
+            <label>厳密</label>
+            <value>strict</value>
+        </item>
+    </wizard-mode>
+    <wizard-subsections-nav>
+        <label>ウィザードのサブセクション移動</label>
+        <hint>トップレベルセクション内のセクションやグリッドでのウィザード移動を有効にする &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-nav.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </wizard-subsections-nav>
+    <wizard-subsections-toc>
+        <label>ウィザードのサブセクション目次</label>
+        <hint>ウィザードの目次でのサブセクションの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.subsections-toc.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (アクティブなセクションのみサブセクションを表示)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>アクティブなセクションのみサブセクションを表示</label>
+            <value>active</value>
+        </item>
+        <item>
+            <label>すべてのセクションのサブセクションを表示</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>サブセクションを表示しない</label>
+            <value>none</value>
+        </item>
+    </wizard-subsections-toc>
+    <wizard-toc-position>
+        <label>ウィザードの目次の位置</label>
+        <hint>ウィザードの目次を表示する位置 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.toc.position.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (左側)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>左側</label>
+            <value>left</value>
+        </item>
+        <item>
+            <label>別ページ</label>
+            <value>separate</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value>none</value>
+        </item>
+    </wizard-toc-position>
+    <wizard-section-status>
+        <label>ウィザードのセクション状態を常に表示</label>
+        <hint>ウィザードの目次にセクション状態のアイコンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.section-status.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </wizard-section-status>
+    <wizard-allow-url-param>
+        <label>ウィザードページのURLパラメーターを許可</label>
+        <hint>URLパラメーターによる初期ウィザードページの選択を許可する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.allow-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </wizard-allow-url-param>
+    <wizard-update-url-param>
+        <label>ウィザードページ切り替え時にURLパラメーターを更新</label>
+        <hint>ウィザードページを切り替えたときにブラウザのURLパラメーターを更新する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.update-url-param.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </wizard-update-url-param>
+    <wizard-visit-on-page-change>
+        <label>ウィザードページ切り替え時にコントロールを訪問済みに設定</label>
+        <hint>ウィザードページ切り替え時にコントロールを訪問済みにするタイミング &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.wizard.visit-on-page-change.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (常に)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>常に</label>
+            <value>always</value>
+        </item>
+        <item>
+            <label>次へ移動するときのみ</label>
+            <value>forward</value>
+        </item>
+        <item>
+            <label>しない</label>
+            <value>never</value>
+        </item>
+    </wizard-visit-on-page-change>
+    <readonly-disable-calculate>
+        <label>読み取り専用モード（確認、PDF）で計算を無効化</label>
+        <hint>確認モードおよびPDFモードで計算式を無効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.readonly.disable-calculate.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </readonly-disable-calculate>
+    <analysis-calculate>
+        <label>自動計算の依存関係</label>
+        <hint>計算値および初期値の計算式の評価順序を自動的に決定する &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </analysis-calculate>
+    <formula-allowed-functions>
+        <label>許可する追加XPath関数</label>
+        <hint>Form Builder の計算式で許可する追加XPath関数のスペース区切りリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.formula.allowed-functions.*.*&lt;/code&gt;</hint>
+    </formula-allowed-functions>
+    <landing-page-size>
+        <label>ランディングページのカード表示件数</label>
+        <hint>ランディングページの各カードに表示する項目数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.page-size&lt;/code&gt;</hint>
+    </landing-page-size>
+    <landing-cards>
+        <label>ランディングページのカード</label>
+        <hint>ランディングページに表示するカード &lt;code class="fr-config-prop-name"&gt;oxf.fr.landing.cards&lt;/code&gt;</hint>
+    </landing-cards>
+    <summary-page-size>
+        <label>一覧ページの表示件数</label>
+        <hint>一覧ページで1ページあたりに表示する行数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.page-size.*.*&lt;/code&gt;</hint>
+    </summary-page-size>
+    <summary-buttons>
+        <label>一覧ページのボタン</label>
+        <hint>一覧ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
+    </summary-buttons>
+    <summary-show-created>
+        <label>作成日列を表示</label>
+        <hint>一覧ページに作成日時の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-created>
+    <summary-show-last-modified>
+        <label>更新日列を表示</label>
+        <hint>一覧ページに最終更新日時の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified>
+    <summary-show-workflow-stage>
+        <label>ワークフローステージ列を表示</label>
+        <hint>一覧ページにワークフローステージの列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-workflow-stage>
+    <summary-show-created-by>
+        <label>作成者列を表示</label>
+        <hint>一覧ページに作成者の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-created-by>
+    <summary-show-last-modified-by>
+        <label>更新者列を表示</label>
+        <hint>一覧ページに更新者の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-last-modified-by>
+    <summary-show-version-selector>
+        <label>一覧ページにバージョンセレクターを表示</label>
+        <hint>一覧ページにフォームバージョンセレクターを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-version-selector.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-version-selector>
+    <summary-new-form-version>
+        <label>一覧ページの新規ボタンのフォームバージョン</label>
+        <hint>一覧ページから「新規」をクリックしたときに開くフォームバージョン &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.new.form-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (現在選択されているバージョン)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>現在選択されているバージョン</label>
+            <value>current</value>
+        </item>
+        <item>
+            <label>最新の公開バージョン</label>
+            <value>latest</value>
+        </item>
+    </summary-new-form-version>
+    <summary-search-options-opened-on-load>
+        <label>一覧ページ読み込み時に検索オプションを展開</label>
+        <hint>一覧ページの読み込み時に詳細検索オプションを展開する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.search-options-opened-on-load.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-search-options-opened-on-load>
+    <home-page-size>
+        <label>フォーム管理ページの表示件数</label>
+        <hint>フォーム管理ページで1ページあたりに表示するフォーム数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
+    </home-page-size>
+    <home-table-link-to>
+        <label>フォーム管理テーブルのリンク</label>
+        <hint>フォーム管理ページで各フォームに表示するリンク &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (一覧、次に新規)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>一覧、次に新規</label>
+            <value>summary new</value>
+        </item>
+        <item>
+            <label>新規、次に一覧</label>
+            <value>new summary</value>
+        </item>
+        <item>
+            <label>一覧のみ</label>
+            <value>summary</value>
+        </item>
+        <item>
+            <label>新規のみ</label>
+            <value>new</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value></value>
+        </item>
+    </home-table-link-to>
+    <home-search-options-opened-on-load>
+        <label>フォーム管理ページ読み込み時に検索オプションを展開</label>
+        <hint>フォーム管理ページの読み込み時に検索オプションを展開する &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.search-options-opened-on-load&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </home-search-options-opened-on-load>
+    <home-remote-servers>
+        <label>リモートサーバー設定 (JSON)</label>
+        <hint>フォームの公開/管理用リモートサーバーのJSON配列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
+    </home-remote-servers>
+    <export-page-enable>
+        <label>エクスポートページを有効化</label>
+        <hint>フォームデータのエクスポートページを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </export-page-enable>
+    <import-allow-invalid-documents>
+        <label>無効なドキュメントのインポートを許可</label>
+        <hint>検証エラーを含むドキュメントのインポートを許可する &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-invalid-documents.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </import-allow-invalid-documents>
+    <import-allow-delete-existing-records>
+        <label>インポート時に既存レコードの削除を許可</label>
+        <hint>インポート中に既存データを削除するオプションを許可する &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allow-delete-existing-records.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </import-allow-delete-existing-records>
+    <import-restrict-to-latest-version>
+        <label>インポートを最新バージョンに制限</label>
+        <hint>最新のフォームバージョンへのインポートのみを許可する &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.restrict-to-latest-version.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </import-restrict-to-latest-version>
+    <import-allowed-formats>
+        <label>許可するインポート形式</label>
+        <hint>許可されるデータインポート形式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Excel (見出し)</label>
+            <value>excel-headings</value>
+        </item>
+        <item>
+            <label>Excel (名前付き範囲)</label>
+            <value>excel-named-ranges</value>
+        </item>
+        <item>
+            <label>XMLフォーム構造とデータ</label>
+            <value>xml-form-structure-and-data</value>
+        </item>
+    </import-allowed-formats>
+    <import-show-app-form-names>
+        <label>インポートページにアプリ/フォーム名を表示</label>
+        <hint>インポートページにアプリケーション名とフォーム名を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.show-app-form-names.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </import-show-app-form-names>
+    <import-buttons>
+        <label>インポートページのボタン</label>
+        <hint>インポートページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.buttons.*.*&lt;/code&gt;</hint>
+    </import-buttons>
+    <rendered-page-orientation>
+        <label>PDFページの向き</label>
+        <hint>生成されるPDFのページの向き &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-orientation.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (縦)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>縦</label>
+            <value>portrait</value>
+        </item>
+        <item>
+            <label>横</label>
+            <value>landscape</value>
+        </item>
+    </rendered-page-orientation>
+    <rendered-page-size>
+        <label>PDF用紙サイズ</label>
+        <hint>生成されるPDFの用紙サイズ &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.rendered-page-size.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (Letter)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Letter</label>
+            <value>letter</value>
+        </item>
+        <item>
+            <label>A4</label>
+            <value>a4</value>
+        </item>
+        <item>
+            <label>Legal</label>
+            <value>legal</value>
+        </item>
+    </rendered-page-size>
+    <pdf-filename>
+        <label>PDFファイル名式</label>
+        <hint>生成されるPDFのファイル名を指定するXPath式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.filename.*.*&lt;/code&gt;</hint>
+    </pdf-filename>
+    <pdf-accessibility>
+        <label>PDFアクセシビリティ (タグ付きPDF)</label>
+        <hint>タグ付きPDFのアクセシビリティを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.accessibility&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </pdf-accessibility>
+    <pdf-a>
+        <label>PDF/A準拠モード</label>
+        <hint>PDF/Aアーカイブ標準への準拠モード &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.pdf/a&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (なし)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value>none</value>
+        </item>
+        <item>
+            <label>PDF/A-1a</label>
+            <value>1a</value>
+        </item>
+        <item>
+            <label>PDF/A-1b</label>
+            <value>1b</value>
+        </item>
+        <item>
+            <label>PDF/A-2a</label>
+            <value>2a</value>
+        </item>
+        <item>
+            <label>PDF/A-2b</label>
+            <value>2b</value>
+        </item>
+        <item>
+            <label>PDF/A-2u</label>
+            <value>2u</value>
+        </item>
+        <item>
+            <label>PDF/A-3a</label>
+            <value>3a</value>
+        </item>
+        <item>
+            <label>PDF/A-3b</label>
+            <value>3b</value>
+        </item>
+        <item>
+            <label>PDF/A-3u</label>
+            <value>3u</value>
+        </item>
+    </pdf-a>
+    <pdf-color-mode>
+        <label>PDFカラーモード</label>
+        <hint>PDFレンダリングのカラーモード &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.color-mode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (白黒)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>白黒</label>
+            <value>black-and-white</value>
+        </item>
+        <item>
+            <label>カラー</label>
+            <value>color</value>
+        </item>
+        <item>
+            <label>モノクロ</label>
+            <value>monochrome</value>
+        </item>
+    </pdf-color-mode>
+    <pdf-hyperlinks>
+        <label>PDF内のハイパーリンクを有効化</label>
+        <hint>生成されるPDF内で有効なハイパーリンクをレンダリングする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.hyperlinks.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </pdf-hyperlinks>
+    <pdf-barcode>
+        <label>PDFにバーコードを含める</label>
+        <hint>生成されるPDFにドキュメントバーコードをレンダリングする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.barcode.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </pdf-barcode>
+    <pdf-disable-if-invalid>
+        <label>データが無効な場合にPDFボタンを無効化</label>
+        <hint>フォームに検証エラーがある場合にPDFボタンを無効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.disable-if-invalid.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </pdf-disable-if-invalid>
+    <pdf-long-content-threshold>
+        <label>PDFテンプレートの長文しきい値</label>
+        <hint>PDFテンプレートフィールドが別紙（付録）へ折り返される文字数のしきい値 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.long-content-threshold.*.*&lt;/code&gt;</hint>
+    </pdf-long-content-threshold>
+    <pdf-jpeg-compression>
+        <label>PDF JPEG圧縮品質</label>
+        <hint>0% から 100% までのJPEG圧縮品質パーセンテージ &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+    </pdf-jpeg-compression>
+    <pdf-font-family>
+        <label>デフォルトのPDFフォントファミリー</label>
+        <hint>生成されるPDFでの Inter の代替フォントファミリー &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.font.family.inter&lt;/code&gt;</hint>
+    </pdf-font-family>
+    <pdf-template-font-paths>
+        <label>PDFテンプレートのフォントパス</label>
+        <hint>PDFテンプレート用のカスタムフォントへのパス &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.template.font.paths&lt;/code&gt;</hint>
+    </pdf-template-font-paths>
+    <pdf-header-footer-default>
+        <label>PDFヘッダー/フッターのデフォルト設定 (JSON)</label>
+        <hint>PDFのヘッダーおよびフッターのデフォルトJSON設定 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.pdf.header-footer.default.*.*&lt;/code&gt;</hint>
+    </pdf-header-footer-default>
+    <email-transport>
+        <label>メール送信方式</label>
+        <hint>メール送信メカニズム &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.transport.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (SMTP)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>SMTP</label>
+            <value>smtp</value>
+        </item>
+        <item>
+            <label>SendGrid</label>
+            <value>sendgrid</value>
+        </item>
+    </email-transport>
+    <email-smtp-host>
+        <label>SMTPホスト</label>
+        <hint>SMTPサーバーのホスト名 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.host.*.*&lt;/code&gt;</hint>
+    </email-smtp-host>
+    <email-smtp-port>
+        <label>SMTPポート</label>
+        <hint>SMTPサーバーのポート番号 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.port.*.*&lt;/code&gt;</hint>
+    </email-smtp-port>
+    <email-smtp-username>
+        <label>SMTPユーザー名</label>
+        <hint>SMTP認証用のユーザー名 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.username.*.*&lt;/code&gt;</hint>
+    </email-smtp-username>
+    <email-smtp-encryption>
+        <label>SMTP暗号化</label>
+        <hint>SMTPの暗号化プロトコル &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.smtp.encryption.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (なし)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>なし</label>
+            <value></value>
+        </item>
+        <item>
+            <label>TLS (STARTTLS)</label>
+            <value>tls</value>
+        </item>
+        <item>
+            <label>SSL</label>
+            <value>ssl</value>
+        </item>
+    </email-smtp-encryption>
+    <email-from>
+        <label>送信者メールアドレス</label>
+        <hint>デフォルトの送信者メールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.from.*.*&lt;/code&gt;</hint>
+    </email-from>
+    <email-reply-to>
+        <label>返信先メールアドレス</label>
+        <hint>デフォルトの返信先メールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.reply-to.*.*&lt;/code&gt;</hint>
+    </email-reply-to>
+    <email-to>
+        <label>宛先メールアドレス</label>
+        <hint>デフォルトの宛先メールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.to.*.*&lt;/code&gt;</hint>
+    </email-to>
+    <email-cc>
+        <label>CCメールアドレス</label>
+        <hint>デフォルトのCCメールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.cc.*.*&lt;/code&gt;</hint>
+    </email-cc>
+    <email-bcc>
+        <label>BCCメールアドレス</label>
+        <hint>デフォルトのBCCメールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
+    </email-bcc>
+    <email-attach-pdf>
+        <label>メールにPDFを添付</label>
+        <hint>通知メールに生成されたPDFを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </email-attach-pdf>
+    <email-attach-xml>
+        <label>メールにXMLデータを添付</label>
+        <hint>通知メールにフォームのXMLデータを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml>
+    <email-attach-tiff>
+        <label>メールにTIFFを添付</label>
+        <hint>通知メールに生成されたTIFF画像を添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </email-attach-tiff>
+    <email-attach-excel>
+        <label>メールにExcel (名前付き範囲) を添付</label>
+        <hint>通知メールに名前付き範囲付きのExcelファイルを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </email-attach-excel>
+    <email-attach-xml-export>
+        <label>メールにXMLフォーム構造とデータを添付</label>
+        <hint>通知メールにフォーム構造とデータのXMLエクスポートを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </email-attach-xml-export>
+    <email-attach-files>
+        <label>アップロードされたファイルをメールに添付</label>
+        <hint>ユーザーがアップロードしたどの添付ファイルをメールに含めるか &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-files.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (すべての添付ファイル)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>すべての添付ファイル</label>
+            <value>all</value>
+        </item>
+        <item>
+            <label>選択された添付ファイルのみ</label>
+            <value>selected</value>
+        </item>
+        <item>
+            <label>添付ファイルなし</label>
+            <value>none</value>
+        </item>
+    </email-attach-files>
+    <fb-menu-schema>
+        <label>XMLスキーマメニュー項目を表示</label>
+        <hint>Form Builder にXMLスキーマダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-schema>
+    <fb-menu-pdf>
+        <label>PDFテンプレートメニュー項目を表示</label>
+        <hint>Form Builder にPDFテンプレートダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-pdf>
+    <fb-menu-edit-source>
+        <label>ソースを編集メニュー項目を表示</label>
+        <hint>Form Builder にソースを編集ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-edit-source>
+    <fb-menu-workflow>
+        <label>ワークフローステージメニュー項目を表示</label>
+        <hint>Form Builder にワークフロー設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-workflow>
+    <fb-menu-permissions>
+        <label>権限メニュー項目を表示</label>
+        <hint>Form Builder に権限ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions>
+    <fb-menu-email>
+        <label>メール設定メニュー項目を表示</label>
+        <hint>Form Builder にメール設定ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-email>
+    <fb-menu-confirmation>
+        <label>確認ページメニュー項目を表示</label>
+        <hint>Form Builder に確認ページ設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-confirmation>
+    <fb-menu-messages>
+        <label>カスタムメッセージメニュー項目を表示</label>
+        <hint>Form Builder にカスタムメッセージ設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-messages>
+    <fb-menu-processes>
+        <label>カスタムプロセスメニュー項目を表示</label>
+        <hint>Form Builder にカスタムプロセス設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-processes>
+    <fb-menu-services-http>
+        <label>サイドバーにHTTPサービスを表示</label>
+        <hint>Form Builder でHTTPサービスを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-http>
+    <fb-menu-services-database>
+        <label>サイドバーにデータベースサービスを表示</label>
+        <hint>Form Builder でデータベースサービスを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-services-database>
+    <fb-menu-actions>
+        <label>サイドバーにアクションを表示</label>
+        <hint>Form Builder でアクションエディターを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-actions>
+    <fb-form-title-required>
+        <label>Form Builder でフォームタイトルを必須化</label>
+        <hint>Form Builder で空でないフォームタイトルを必須にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-title.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-form-title-required>
+    <fb-form-description-required>
+        <label>Form Builder でフォーム説明を必須化</label>
+        <hint>Form Builder で空でないフォーム説明を必須にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.form-description.required.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-form-description-required>
+    <fb-publish-version>
+        <label>公開バージョンの動作</label>
+        <hint>Form Builder でフォームを公開するときのバージョン管理の動作 &lt;code class="fr-config-prop-name"&gt;oxf.fb.publish.version&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (デフォルトで既存バージョンを上書き)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>デフォルトで既存バージョンを上書き</label>
+            <value>default-to-select</value>
+        </item>
+        <item>
+            <label>デフォルトで新しいバージョンを作成</label>
+            <value>default-to-new</value>
+        </item>
+        <item>
+            <label>常に新しいバージョンを作成</label>
+            <value>force-new</value>
+        </item>
+    </fb-publish-version>
+    <fb-metadata-logo>
+        <label>Form Builder でフォームロゴのアップロードを許可</label>
+        <hint>Form Builder のフォーム設定にロゴアップロードコントロールを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.metadata.logo&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-metadata-logo>
+    <fb-mcp-enable>
+        <label>Form Builder MCPサーバーを有効化</label>
+        <hint>Form Builder の Model Context Protocol (MCP) サーバーを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-enable>
+    <fb-mcp-token-enable>
+        <label>Form Builder MCPサーバーにトークンを要求</label>
+        <hint>Form Builder MCPサーバーにトークン認証を要求する &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-mcp-token-enable>
+    <format-input-date>
+        <label>日付入力フォーマット</label>
+        <hint>日付入力フォーマットマスク（例: &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; または &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt;） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
+    </format-input-date>
+    <format-input-time>
+        <label>時刻入力フォーマット</label>
+        <hint>時刻入力フォーマットマスク &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.time&lt;/code&gt;</hint>
+    </format-input-time>
+    <format-output-date>
+        <label>日付出力フォーマット (XPath)</label>
+        <hint>日付出力の書式設定用XPath式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.date&lt;/code&gt;</hint>
+    </format-output-date>
+    <format-output-datetime>
+        <label>日時出力フォーマット (XPath)</label>
+        <hint>日時出力の書式設定用XPath式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.dateTime&lt;/code&gt;</hint>
+    </format-output-datetime>
+    <format-output-time>
+        <label>時刻出力フォーマット (XPath)</label>
+        <hint>時刻出力の書式設定用XPath式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.time&lt;/code&gt;</hint>
+    </format-output-time>
+    <format-output-decimal>
+        <label>小数出力フォーマット (XPath)</label>
+        <hint>小数出力の書式設定用XPath式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.decimal&lt;/code&gt;</hint>
+    </format-output-decimal>
+    <format-output-integer>
+        <label>整数出力フォーマット (XPath)</label>
+        <hint>整数出力の書式設定用XPath式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.output.integer&lt;/code&gt;</hint>
+    </format-output-integer>
+    <auth-user-menu-enable>
+        <label>ナビゲーションバーのユーザーメニューを有効化</label>
+        <hint>ナビゲーションバーにログイン/ログアウトのユーザーメニューを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </auth-user-menu-enable>
+    <auth-user-menu-uri-login>
+        <label>ユーザーメニューのログインURI</label>
+        <hint>ユーザーメニュー用のログインURIテンプレート &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.login&lt;/code&gt;</hint>
+    </auth-user-menu-uri-login>
+    <auth-user-menu-uri-logout>
+        <label>ユーザーメニューのログアウトURI</label>
+        <hint>ユーザーメニュー用のログアウトURIテンプレート &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.logout&lt;/code&gt;</hint>
+    </auth-user-menu-uri-logout>
+    <auth-user-menu-uri-register>
+        <label>ユーザーメニューの登録URI</label>
+        <hint>ユーザーメニュー用の登録URIテンプレート &lt;code class="fr-config-prop-name"&gt;oxf.fr.authentication.user-menu.uri.register&lt;/code&gt;</hint>
+    </auth-user-menu-uri-register>
+    <permissions>
+        <label>Form Runner の権限</label>
+        <hint>権限の定義 &lt;code class="fr-config-prop-name"&gt;oxf.fr.permissions.*.*&lt;/code&gt;</hint>
+    </permissions>
+    <access-token-validity>
+        <label>アクセストークンの有効期間 (分)</label>
+        <hint>外部アクセストークンの分単位の有効期間 &lt;code class="fr-config-prop-name"&gt;oxf.fr.access-token.validity.*.*&lt;/code&gt;</hint>
+    </access-token-validity>
+    <state-token-validity>
+        <label>状態トークンの有効期間 (分)</label>
+        <hint>状態トークンの分単位の有効期間 &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
+    </state-token-validity>
+</resource>

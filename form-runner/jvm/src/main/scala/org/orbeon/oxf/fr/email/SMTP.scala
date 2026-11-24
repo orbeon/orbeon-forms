@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr.email
 
-import cats.implicits.catsSyntaxOptionId
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import jakarta.activation.{DataHandler, DataSource}
@@ -39,15 +38,18 @@ import scala.util.Try
 
 case object SMTP {
 
+  val DefaultPort = 25
+
   case class ServerConfig(
-    host                     : String,
-    port                     : Int,
-    encryptionWithCredentials: EncryptionWithCredentials,
-    heloNameOpt              : Option[String]  = None,
-    connectionTimeoutMsOpt   : Option[Int]     = None,
-    timeoutMsOpt             : Option[Int]     = None,
-    writeTimeoutMsOpt        : Option[Int]     = None,
-    quitWaitOpt              : Option[Boolean] = None
+    host                  : String,
+    port                  : Int,
+    encryptionOpt         : Option[Encryption]  = None,
+    credentialsOpt        : Option[Credentials] = None,
+    heloNameOpt           : Option[String]      = None,
+    connectionTimeoutMsOpt: Option[Int]         = None,
+    timeoutMsOpt          : Option[Int]         = None,
+    writeTimeoutMsOpt     : Option[Int]         = None,
+    quitWaitOpt           : Option[Boolean]     = None
   ) {
 
     def newSession: Session = {
@@ -67,20 +69,18 @@ case object SMTP {
 
       heloNameOpt.foreach(v => properties.setProperty("mail.smtp.localhost", v))
 
-      encryptionWithCredentials match {
-        case EncryptionWithCredentials.SSL(_) =>
+      encryptionOpt.foreach {
+        case Encryption.SSL =>
           // "SSL" / Implicit TLS
           // Use mail.smtp.ssl.enable instead of mail.smtp.socketFactory.* (legacy)
           properties.setProperty("mail.smtp.ssl.enable" , "true")
 
-        case EncryptionWithCredentials.TLS(_) =>
+        case Encryption.TLS =>
           // "TLS" / STARTTLS (i.e. opportunistic TLS upgrade)
           properties.setProperty("mail.smtp.starttls.enable", "true")
-
-        case EncryptionWithCredentials.NoEncryption(_) =>
       }
 
-      encryptionWithCredentials.credentialsOpt match {
+      credentialsOpt match {
         case Some(credentials) =>
           properties.setProperty("mail.smtp.auth", "true")
 
@@ -113,67 +113,42 @@ case object SMTP {
       val host           = testHostOpt.orElse(prop("host")).getOrElse(throw new OXFException("Could not find SMTP host in properties"))
       val portOpt        = intProp("port")
       val usernameOpt    = prop("username")
-      val encryption     = prop("encryption").getOrElse("")
+      val encryptionOpt  = prop("encryption").map { v =>
+        Encryption.withNameOption(v).getOrElse(throw new OXFException(s"Invalid value `$v` for SMTP property `encryption`"))
+      }
       val credentialsOpt = usernameOpt.map(SMTP.Credentials(_, prop("credentials").getOrElse("")))
 
-      def credentials: Credentials =
-        credentialsOpt.getOrElse(throw new OXFException(s"Credentials are required when using ${encryption.toUpperCase}"))
-
-      val encryptionWithCredentials = encryption match {
-        case ""    => EncryptionWithCredentials.NoEncryption(credentialsOpt)
-        case "tls" => EncryptionWithCredentials.TLS(credentials)
-        case "ssl" => EncryptionWithCredentials.SSL(credentials)
-      }
-
       ServerConfig(
-        host                      = host,
-        port                      = portOpt.getOrElse(encryptionWithCredentials.defaultPort),
-        encryptionWithCredentials = encryptionWithCredentials,
-        heloNameOpt               = prop("helo-name"),
-        connectionTimeoutMsOpt    = intProp("connection-timeout"),
-        timeoutMsOpt              = intProp("timeout"),
-        writeTimeoutMsOpt         = intProp("write-timeout"),
-        quitWaitOpt               = booleanProp("quit-wait")
+        host                   = host,
+        port                   = portOpt.getOrElse(encryptionOpt.fold(DefaultPort)(_.defaultPort)),
+        encryptionOpt          = encryptionOpt,
+        credentialsOpt         = credentialsOpt,
+        heloNameOpt            = prop("helo-name"),
+        connectionTimeoutMsOpt = intProp("connection-timeout"),
+        timeoutMsOpt           = intProp("timeout"),
+        writeTimeoutMsOpt      = intProp("write-timeout"),
+        quitWaitOpt            = booleanProp("quit-wait")
       )
     }
   }
 
-  sealed trait Encryption extends EnumEntry with Hyphencase
+  sealed trait Encryption extends EnumEntry with Hyphencase {
+    def defaultPort: Int
+  }
 
   object Encryption extends Enum[Encryption] {
-    case object SSL extends Encryption
-    case object TLS extends Encryption
+    case object SSL extends Encryption {
+      override val defaultPort: Int = 465
+    }
+
+    case object TLS extends Encryption {
+      override val defaultPort: Int = 587
+    }
 
     override def values: immutable.IndexedSeq[Encryption] = super.findValues
   }
 
   case class Credentials(username: String, password: String)
-
-  // Enforce optional or mandatory credentials via type
-  sealed trait EncryptionWithCredentials {
-    def defaultPort   : Int
-    def encryptionOpt : Option[Encryption]
-    def credentialsOpt: Option[Credentials]
-  }
-
-  object EncryptionWithCredentials {
-    case class NoEncryption(credentialsOpt: Option[Credentials]) extends EncryptionWithCredentials {
-      override val defaultPort  : Int                = 25
-      override val encryptionOpt: Option[Encryption] = None
-    }
-
-    case class SSL(credentials: Credentials) extends EncryptionWithCredentials {
-      override val defaultPort   : Int                 = 465
-      override val encryptionOpt : Option[Encryption]  = Encryption.SSL.some
-      override val credentialsOpt: Option[Credentials] = credentials.some
-    }
-
-    case class TLS(credentials: Credentials) extends EncryptionWithCredentials {
-      override val defaultPort   : Int                 = 587
-      override val encryptionOpt : Option[Encryption]  = Encryption.TLS.some
-      override val credentialsOpt: Option[Credentials] = credentials.some
-    }
-  }
 
   def send(serverConfig: ServerConfig, emailContent: EmailContent): Try[Unit] = {
 

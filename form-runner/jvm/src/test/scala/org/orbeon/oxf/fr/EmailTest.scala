@@ -13,28 +13,35 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.data.NonEmptyList
 import com.icegreen.greenmail.util.{GreenMail, ServerSetup}
 import jakarta.mail.Message
 import jakarta.mail.internet.InternetAddress
 import org.orbeon.io.IOUtils
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.email.*
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.properties.{CombinedPropertyStore, PropertyLoader, PropertySet, SimplePropertyStore}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.orbeon.xforms.XFormsNames
 import org.scalatest.funspec.AnyFunSpecLike
 
-import java.net.{ServerSocket, URI}
+import java.net.{ServerSocket, Socket, URI}
 import java.nio.charset.StandardCharsets
+import java.security.cert.X509Certificate
+import javax.net.ssl.{SSLContext, SSLEngine, TrustManager, X509ExtendedTrustManager}
 
 class EmailTest
   extends DocumentTestBase
@@ -341,10 +348,15 @@ class EmailTest
     password : String
   )
 
-  private def withEmailServer[T](f: TestMailConfig => T): T = {
+  private def withEmailServer[T](
+    protocol    : String  = ServerSetup.PROTOCOL_SMTP,
+    registerUser: Boolean = true
+  )(
+    f           : TestMailConfig => T
+  ): T = {
     val socket      = new ServerSocket(0)
     val freePort    = try socket.getLocalPort finally socket.close()
-    val serverSetup = new ServerSetup(freePort, "localhost", ServerSetup.PROTOCOL_SMTP)
+    val serverSetup = new ServerSetup(freePort, "localhost", protocol)
     val greenMail   = new GreenMail(serverSetup)
 
     val testMailConfig = TestMailConfig(
@@ -355,7 +367,8 @@ class EmailTest
       password  = "password"
     )
 
-    greenMail.setUser(testMailConfig.username, testMailConfig.password)
+    if (registerUser)
+      greenMail.setUser(testMailConfig.username, testMailConfig.password)
 
     greenMail.start()
 
@@ -366,14 +379,15 @@ class EmailTest
 
     describe("with a simple text message content") {
 
-      withEmailServer { testMailConfig =>
+      withEmailServer() { testMailConfig =>
 
         val smtpCredentials = SMTP.Credentials(testMailConfig.username, testMailConfig.password)
 
         val smtpConfig = SMTP.ServerConfig(
-          host                      = testMailConfig.host,
-          port                      = testMailConfig.port,
-          encryptionWithCredentials = SMTP.EncryptionWithCredentials.TLS(smtpCredentials)
+          host           = testMailConfig.host,
+          port           = testMailConfig.port,
+          encryptionOpt  = Some(SMTP.Encryption.TLS),
+          credentialsOpt = Some(smtpCredentials)
         )
 
         val emailContent = EmailContent(
@@ -463,6 +477,153 @@ class EmailTest
         assert(attachment.contentType == "application/xml")
         val content = IOUtils.readStreamAsStringAndClose(attachment.contentFactory().stream, Some(StandardCharsets.UTF_8.name))
         assert(content == "<license/>")
+      }
+    }
+  }
+  private def withTestProperties[T](properties: (String, String)*)(thunk: => T): T =
+    withTestExternalContext { ec =>
+      val combinedStore =
+        CombinedPropertyStore.combine(
+          NonEmptyList.of(
+            Some(PropertyLoader.getPropertyStore(None)),
+            Some(
+              SimplePropertyStore(
+                PropertySet.forTests(
+                  properties.map { case (name, value) => PropertyParams(Map.empty, name, XS_STRING_QNAME, value) }
+                ),
+                Map.empty
+              )
+            )
+          )
+        ).get
+
+      ec.getRequest.getAttributesMap.put(PropertyLoader.RequestPropertiesAttributeName, combinedStore)
+      thunk
+    }
+
+  private def withTrustAllSslContext[T](thunk: => T): T = {
+    val previousSslContext = SSLContext.getDefault
+    val trustAllManager    = new X509ExtendedTrustManager {
+      override def getAcceptedIssuers: Array[X509Certificate]                                                   = Array.empty
+      override def checkClientTrusted(chain: Array[X509Certificate], authType: String): Unit                    = ()
+      override def checkServerTrusted(chain: Array[X509Certificate], authType: String): Unit                    = ()
+      override def checkClientTrusted(chain: Array[X509Certificate], authType: String, socket: Socket): Unit    = ()
+      override def checkServerTrusted(chain: Array[X509Certificate], authType: String, socket: Socket): Unit    = ()
+      override def checkClientTrusted(chain: Array[X509Certificate], authType: String, engine: SSLEngine): Unit = ()
+      override def checkServerTrusted(chain: Array[X509Certificate], authType: String, engine: SSLEngine): Unit = ()
+    }
+    val sslContext = SSLContext.getInstance("TLS")
+    sslContext.init(null, Array[TrustManager](trustAllManager), null)
+    SSLContext.setDefault(sslContext)
+    try thunk finally SSLContext.setDefault(previousSslContext)
+  }
+
+  describe("#8129: SMTP with TLS or SSL without credentials") {
+
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams(AppForm("acme", "order"), "email")
+
+    it("must build ServerConfig and Session from properties with or without credentials") {
+      List(
+        (""   , None                     , 25 , null  , null  ),
+        ("tls", Some(SMTP.Encryption.TLS), 587, "true", null  ),
+        ("ssl", Some(SMTP.Encryption.SSL), 465, null  , "true")
+      ).foreach { case (encryptionProp, expectedEncryptionOpt, expectedDefaultPort, expectedStartTls, expectedSsl) =>
+        withTestProperties(
+          "oxf.fr.email.smtp.host.acme.order"       -> "smtp-relay.example.org",
+          "oxf.fr.email.smtp.encryption.acme.order" -> encryptionProp,
+          "oxf.fr.email.smtp.username.acme.order"   -> ""
+        ) {
+          val config       = SMTP.ServerConfig.fromProperties()
+          val sessionProps = config.newSession.getProperties
+
+          assert(config.host == "smtp-relay.example.org")
+          assert(config.port == expectedDefaultPort)
+          assert(config.encryptionOpt == expectedEncryptionOpt)
+          assert(config.credentialsOpt.isEmpty)
+          assert(sessionProps.getProperty("mail.smtp.starttls.enable") == expectedStartTls)
+          assert(sessionProps.getProperty("mail.smtp.ssl.enable") == expectedSsl)
+          assert(sessionProps.getProperty("mail.smtp.auth") == null)
+        }
+
+        withTestProperties(
+          "oxf.fr.email.smtp.host.acme.order"        -> "smtp-relay.example.org",
+          "oxf.fr.email.smtp.encryption.acme.order"  -> encryptionProp,
+          "oxf.fr.email.smtp.username.acme.order"    -> "jdoe",
+          "oxf.fr.email.smtp.credentials.acme.order" -> "secret"
+        ) {
+          val config       = SMTP.ServerConfig.fromProperties()
+          val sessionProps = config.newSession.getProperties
+
+          assert(config.encryptionOpt == expectedEncryptionOpt)
+          assert(config.credentialsOpt.contains(SMTP.Credentials("jdoe", "secret")))
+          assert(sessionProps.getProperty("mail.smtp.starttls.enable") == expectedStartTls)
+          assert(sessionProps.getProperty("mail.smtp.ssl.enable") == expectedSsl)
+          assert(sessionProps.getProperty("mail.smtp.auth") == "true")
+        }
+      }
+
+      withTestProperties(
+        "oxf.fr.email.smtp.host.acme.order"       -> "smtp-relay.example.org",
+        "oxf.fr.email.smtp.encryption.acme.order" -> "invalid"
+      ) {
+        val thrown = intercept[OXFException](SMTP.ServerConfig.fromProperties())
+        assert(thrown.getMessage.contains("Invalid value `invalid` for SMTP property `encryption`"))
+      }
+    }
+
+    it("must send email via EmailTransport using TLS without credentials") {
+      withEmailServer(protocol = ServerSetup.PROTOCOL_SMTP, registerUser = false) { testMailConfig =>
+        withTestProperties(
+          "oxf.fr.email.smtp.host.acme.order"       -> testMailConfig.host,
+          "oxf.fr.email.smtp.port.acme.order"       -> testMailConfig.port.toString,
+          "oxf.fr.email.smtp.encryption.acme.order" -> "tls",
+          "oxf.fr.email.smtp.username.acme.order"   -> ""
+        ) {
+          val emailContent = EmailContent(
+            headers        = List(HeaderName.From -> "from@localhost", HeaderName.To -> "to@localhost"),
+            subject        = "TLS without credentials",
+            messageContent = MessageContent("TLS body", html = false),
+            attachments    = Nil
+          )
+
+          EmailTransport.send(emailContent).get
+
+          assert(testMailConfig.greenMail.getReceivedMessages.length == 1)
+          val mail = testMailConfig.greenMail.getReceivedMessages.head
+          assert(mail.getFrom.map(_.toString).mkString == "from@localhost")
+          assert(mail.getRecipients(Message.RecipientType.TO).map(_.toString).mkString == "to@localhost")
+          assert(mail.getSubject == "TLS without credentials")
+          assert(List(mail.getContent).collect { case s: String => s } == List("TLS body"))
+        }
+      }
+    }
+
+    it("must send email via EmailTransport using SSL without credentials") {
+      withTrustAllSslContext {
+        withEmailServer(protocol = ServerSetup.PROTOCOL_SMTPS, registerUser = false) { testMailConfig =>
+          withTestProperties(
+            "oxf.fr.email.smtp.host.acme.order"       -> testMailConfig.host,
+            "oxf.fr.email.smtp.port.acme.order"       -> testMailConfig.port.toString,
+            "oxf.fr.email.smtp.encryption.acme.order" -> "ssl",
+            "oxf.fr.email.smtp.username.acme.order"   -> ""
+          ) {
+            val emailContent = EmailContent(
+              headers        = List(HeaderName.From -> "from@localhost", HeaderName.To -> "to@localhost"),
+              subject        = "SSL without credentials",
+              messageContent = MessageContent("SSL body", html = false),
+              attachments    = Nil
+            )
+
+            EmailTransport.send(emailContent).get
+
+            assert(testMailConfig.greenMail.getReceivedMessages.length == 1)
+            val mail = testMailConfig.greenMail.getReceivedMessages.head
+            assert(mail.getFrom.map(_.toString).mkString == "from@localhost")
+            assert(mail.getRecipients(Message.RecipientType.TO).map(_.toString).mkString == "to@localhost")
+            assert(mail.getSubject == "SSL without credentials")
+            assert(List(mail.getContent).collect { case s: String => s } == List("SSL body"))
+          }
+        }
       }
     }
   }

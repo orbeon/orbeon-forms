@@ -41,6 +41,22 @@ class ThemeVariablesUsageTest extends AnyFunSpec {
   // Set at run time by JavaScript, not by a theme, so a fallback is the real default
   private val RuntimeVariables = Set("--orbeon-card-columns")
 
+  // Documented as stable for the `oxf.fr.style.variable.*` properties: names can be added, not removed or renamed
+  private val StableVariables = List(
+    "accent-color",
+    "base-color",
+    "base-font-family",
+    "base-font-size",
+    "page-background-color",
+    "form-background-color",
+    "base-border-color",
+    "control-border-color",
+    "control-border-radius",
+    "button-border-radius",
+    "error-color",
+    "link-color"
+  )
+
   private val VariableUse         = """var\(\s*(--orbeon-[a-z0-9-]+)\s*(,)?""".r
   private val VariableDeclaration = """(?m)^\s*(--orbeon-[a-z0-9-]+)\s*:""".r
 
@@ -101,6 +117,12 @@ class ThemeVariablesUsageTest extends AnyFunSpec {
         uses.collect { case (file, name, true) if ! RuntimeVariables(name) => s"${repoRoot.toPath.relativize(file.toPath)}: $name" }
       assert(withFallback.isEmpty, s"\nfallback values found, declare the variable in both themes instead:\n${withFallback.mkString("\n")}")
     }
+
+    for (theme <- BuiltInThemes)
+      it(s"must declare the stable variables in the $theme theme") {
+        val missing = StableVariables.filterNot(name => declaredByTheme(theme)(s"--orbeon-$name"))
+        assert(missing.isEmpty, s"\nstable variables not declared by the $theme theme:\n${missing.mkString("\n")}")
+      }
 
     for (theme <- BuiltInThemes)
       it(s"must only read variables declared by the $theme theme") {

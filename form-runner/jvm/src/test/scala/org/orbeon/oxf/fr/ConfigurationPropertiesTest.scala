@@ -100,6 +100,89 @@ class ConfigurationPropertiesTest
       assert(roundTripPropsDoc.getRootElement.elements("property").isEmpty)
     }
 
+    it("must round-trip detail process overrides and custom processes across scopes and exclude non-detail / dotted / internal processes") {
+      val inputXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:string" name="oxf.fr.detail.process.save-final.*.*" value="require-valid then save"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.my-custom.*.*" value="validate then save"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.save-final.acme.*" value="save(draft = 'false')"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.submit.acme.order" value="validate then send(uri = 'https://example.org')"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.save-final.*.*" profiles="mobile" value="save"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.custom-mobile.acme.order" profiles="mobile" value="email"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.after-controls.foreground.new.*.*" value="log(message = 'loaded')"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.save.orbeon.builder" value="save"/>
+          |    <property as="xs:string" name="oxf.fr.detail.process.save-final.orbeon.configuration" value="save"/>
+          |    <property as="xs:string" name="oxf.fr.summary.process.delete.*.*" value="delete"/>
+          |</properties>""".stripMargin
+
+      val inputDoc  = IOSupport.readOrbeonDom(inputXml)
+      val configDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputDoc)
+      val root      = configDoc.getRootElement
+
+      // Global processes
+      val globalProcs = root.element("processes").elements("process").map(e => e.attributeValue("name") -> e.getText).toMap
+      assert(globalProcs == Map(
+        "save-final" -> "require-valid then save",
+        "my-custom"  -> "validate then save"
+      ))
+
+      // Scoped processes (including profiles)
+      val overrides = root.element("app-form-overrides").elements("override").toList
+      def procsFor(app: String, form: String, profiles: String): Map[String, String] =
+        overrides
+          .find(o => o.attributeValue("app") == app && o.attributeValue("form") == form && o.attributeValue("profiles") == profiles)
+          .map(_.element("processes").elements("process").map(e => e.attributeValue("name") -> e.getText).toMap)
+          .getOrElse(Map.empty)
+
+      assert(procsFor("*", "*", "mobile")         == Map("save-final" -> "save"))
+      assert(procsFor("acme", "*", "")            == Map("save-final" -> "save(draft = 'false')"))
+      assert(procsFor("acme", "order", "")        == Map("submit" -> "validate then send(uri = 'https://example.org')"))
+      assert(procsFor("acme", "order", "mobile")  == Map("custom-mobile" -> "email"))
+
+      // Excluded properties remain in custom-properties
+      val customNames = root.element("custom-properties").elements("property").map(_.attributeValue("name")).toSet
+      assert(customNames == Set(
+        "oxf.fr.detail.process.after-controls.foreground.new.*.*",
+        "oxf.fr.detail.process.save.orbeon.builder",
+        "oxf.fr.detail.process.save-final.orbeon.configuration",
+        "oxf.fr.summary.process.delete.*.*"
+      ))
+
+      // Round-trip back to <properties>
+      val outDoc   = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val outProps = outDoc.getRootElement.elements("property").map { p =>
+        (
+          p.attributeValue("name"),
+          Option(p.attributeValue("profiles")).getOrElse(""),
+          Option(p.attributeValue("value")).getOrElse(p.getText)
+        )
+      }.toSet
+
+      assert(outProps == Set(
+        ("oxf.fr.detail.process.save-final.*.*", "", "require-valid then save"),
+        ("oxf.fr.detail.process.my-custom.*.*", "", "validate then save"),
+        ("oxf.fr.detail.process.save-final.*.*", "mobile", "save"),
+        ("oxf.fr.detail.process.save-final.acme.*", "", "save(draft = 'false')"),
+        ("oxf.fr.detail.process.submit.acme.order", "", "validate then send(uri = 'https://example.org')"),
+        ("oxf.fr.detail.process.custom-mobile.acme.order", "mobile", "email"),
+        ("oxf.fr.detail.process.after-controls.foreground.new.*.*", "", "log(message = 'loaded')"),
+        ("oxf.fr.detail.process.save.orbeon.builder", "", "save"),
+        ("oxf.fr.detail.process.save-final.orbeon.configuration", "", "save"),
+        ("oxf.fr.summary.process.delete.*.*", "", "delete")
+      ))
+
+      // Built-in detail process helpers
+      val builtins = FormRunnerConfiguration.builtinDetailProcessNames().toSet
+      assert(builtins.contains("save-final"))
+      assert(builtins.contains("require-uploads"))
+      assert(builtins.contains("submit"))
+      assert(FormRunnerConfiguration.defaultDetailProcessDefinition("save-final", "*", "*").nonEmpty)
+      assert(FormRunnerConfiguration.isValidProcessDefinition("validate then save"))
+      assert(! FormRunnerConfiguration.isValidProcessDefinition("validate then (save"))
+      assert(FormRunnerConfiguration.formatProcessDefinition("validate then save") == "validate\nthen save")
+      assert(FormRunnerConfiguration.formatProcessDefinition("validate then (save") == "validate then (save")
+    }
+
     it("must round-trip global curated properties, app/form overrides, and custom properties") {
       val inputPropsXml =
         """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:saxon="http://saxon.sf.net/">

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.builder
+package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
@@ -32,14 +32,15 @@ object ProcessEditorDnD {
   private val IndentStepPx       = 20.0
   private val ClusterGapPx       = 10.0
   private val ClusterSpreadStep  = 7.0
-  private val GrabHandleSelector = ".fb-dialog-process-editor .fb-process-iteration.fb-process-can-move .fb-process-grab"
+  private val GrabHandleSelector = ".fr-process-steps-list .fr-process-iteration.fr-process-can-move .fr-process-grab"
   private val ContainerStepTypes = Set("group", "condition", "else")
 
   private case class DragContext(
-    dialogEl       : html.Element,
-    listEl         : html.Element,
-    processIndex   : String,
-    sourceRowIndex : Int
+    editorEl           : html.Element,
+    overlayContainerEl : html.Element,
+    listEl             : html.Element,
+    processIndex       : String,
+    sourceRowIndex     : Int
   )
 
   private case class ProcessRow(
@@ -95,9 +96,9 @@ object ProcessEditorDnD {
         if (event.button == 0 && activePointerId.isEmpty) {
           for {
             handleEl     <- event.targetOpt.flatMap(_.closestOpt(GrabHandleSelector))
-            rowEl        <- handleEl.closestOpt(".fb-process-iteration")
-            listEl       <- rowEl.closestOpt(".fb-process-steps-list")
-            dialogEl     <- listEl.closestOpt(".xforms-dialog.fb-dialog-process-editor")
+            rowEl        <- handleEl.closestOpt(".fr-process-iteration")
+            listEl       <- rowEl.closestOpt(".fr-process-steps-list")
+            editorEl     <- listEl.closestOpt(".xbl-fr-dialog-process-editor, .xbl-fr-process-editor")
             processIndex <- listEl.attValueOpt("data-orbeon-process-index").flatMap(_.trimAllToOpt)
             allRows       = rowsInList(listEl)
             draggedRow   <- allRows.find(_.el == rowEl)
@@ -105,9 +106,11 @@ object ProcessEditorDnD {
           } {
             event.preventDefault()
 
+            val overlayContainerEl = listEl.closestOpt(".xforms-dialog").getOrElse(editorEl)
+
             activePointerId   = Some(event.pointerId)
             capturedHandleOpt = Some(handleEl)
-            dragContextOpt    = Some(DragContext(dialogEl, listEl, processIndex, draggedRow.rowIndex))
+            dragContextOpt    = Some(DragContext(editorEl, overlayContainerEl, listEl, processIndex, draggedRow.rowIndex))
             startClientX      = event.clientX
             startClientY      = event.clientY
             lastClientX       = event.clientX
@@ -134,7 +137,7 @@ object ProcessEditorDnD {
   private def rowsInList(listEl: html.Element): List[ProcessRow] = {
     val rawElems =
       listEl
-        .querySelectorAllT(".fb-process-iteration")
+        .querySelectorAllT(".fr-process-iteration")
         .iterator
         .filter(_.isVisible)
         .toList
@@ -145,8 +148,8 @@ object ProcessEditorDnD {
     rawElems.flatMap { el =>
       for {
         rowIndex  <- el.attValueOpt("data-orbeon-row-index").flatMap(_.toIntOption)
-        mainEl    <- el.querySelectorOpt(".fb-process-row-main")
-        contentEl <- mainEl.querySelectorOpt(".fb-process-row-content")
+        mainEl    <- el.querySelectorOpt(".fr-process-row-main")
+        contentEl <- mainEl.querySelectorOpt(".fr-process-row-content")
       } yield {
         val stepType = el.attValueOpt("data-orbeon-step-type").flatMap(_.trimAllToOpt).getOrElse("action")
         val level    = el.attValueOpt("data-orbeon-level").flatMap(_.toIntOption).getOrElse(0)
@@ -292,7 +295,7 @@ object ProcessEditorDnD {
                 } else {
                   lastRow
                     .mainEl
-                    .querySelectorOpt(s".fb-process-box-slice[data-orbeon-body-level='$targetLevel']")
+                    .querySelectorOpt(s".fr-process-box-slice[data-orbeon-body-level='$targetLevel']")
                     .map(_.getBoundingClientRect().bottom)
                     .getOrElse(lastRow.mainEl.getBoundingClientRect().bottom)
                 }
@@ -363,7 +366,7 @@ object ProcessEditorDnD {
       case "condition" =>
         val condOpt =
           row.el
-            .querySelectorOpt(".fb-process-condition-input input")
+            .querySelectorOpt(".fr-process-condition-input input")
             .collect { case inp: html.Input => inp.value }
             .flatMap(_.trimAllToOpt)
             .map { s =>
@@ -375,7 +378,7 @@ object ProcessEditorDnD {
       case _ =>
         val actionLabel =
           row.el
-            .querySelectorOpt(".fb-process-action-select1 select")
+            .querySelectorOpt(".fr-process-action-select1 select")
             .collect {
               case sel: html.Select if sel.selectedIndex >= 0 && sel.selectedIndex < sel.options.length =>
                 sel.options(sel.selectedIndex).text
@@ -396,10 +399,10 @@ object ProcessEditorDnD {
     val subtreeRows = allRows.filter(r => isDescendantOrSelf(r.rowIndex, draggedRow.rowIndex, rowByIndex))
 
     subtreeRows.flatMap { r =>
-      val buttonsOpt  = r.el.querySelectorOpt(".fb-process-row-buttons")
+      val buttonsOpt  = r.el.querySelectorOpt(".fr-process-row-buttons")
       val innerSlices =
         r.mainEl
-          .childrenT(".fb-process-box-slice")
+          .childrenT(".fr-process-box-slice")
           .filter(_.attValueOpt("data-orbeon-box-depth").flatMap(_.toIntOption).exists(_ >= draggedRow.level))
       r.contentEl :: buttonsOpt.toList ++ innerSlices
     }
@@ -414,28 +417,28 @@ object ProcessEditorDnD {
           cleanupDrag()
         } else {
           _isDragging = true
-          orbeonRootEl.classList.add("fb-dragging-container")
+          orbeonRootEl.classList.add("fr-process-dragging")
 
           dimmedElements = collectSubtreeDimmedElements(draggedRow, allRows)
-          dimmedElements.foreach(_.classList.add("fb-dnd-source"))
+          dimmedElements.foreach(_.classList.add("fr-process-dnd-source"))
 
           val (iconClass, labelText) = stepGhostLabel(draggedRow)
 
           val ghostEl        = dom.document.createDivElement
-          ghostEl.className  = "fb-container-dnd-ghost"
+          ghostEl.className  = "fr-process-dnd-ghost"
           val iconEl         = dom.document.createElementT("i")
           iconEl.className   = s"fa fa-fw $iconClass"
           val textEl         = dom.document.createElementT("span")
           textEl.textContent = labelText
           ghostEl.appendChild(iconEl)
           ghostEl.appendChild(textEl)
-          ctx.dialogEl.appendChild(ghostEl)
+          ctx.overlayContainerEl.appendChild(ghostEl)
           ghostElOpt = Some(ghostEl)
 
           val indicatorEl       = dom.document.createDivElement
-          indicatorEl.className = "fb-container-drop-indicator fb-process-drop-indicator"
+          indicatorEl.className = "fr-process-drop-indicator"
           indicatorEl.hide()
-          ctx.dialogEl.appendChild(indicatorEl)
+          ctx.overlayContainerEl.appendChild(indicatorEl)
           indicatorElOpt = Some(indicatorEl)
         }
 
@@ -452,9 +455,9 @@ object ProcessEditorDnD {
 
     activeDropTargetOpt = dropTargets.minByOption(t => Math.abs(clientY - t.anchorY))
 
-    highlightedRowOpt.foreach(_.classList.remove("fb-process-dnd-drop-into"))
+    highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
     highlightedRowOpt = activeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoOpt).map(_.el)
-    highlightedRowOpt.foreach(_.classList.add("fb-process-dnd-drop-into"))
+    highlightedRowOpt.foreach(_.classList.add("fr-process-dnd-drop-into"))
 
     indicatorElOpt.foreach { indicatorEl =>
       activeDropTargetOpt match {
@@ -463,7 +466,7 @@ object ProcessEditorDnD {
           indicatorEl.style.left  = s"${target.left}px"
           indicatorEl.style.top   = s"${target.boundaryY - 1.5}px"
           indicatorEl.style.width = s"${target.width}px"
-          indicatorEl.classList.toggle("fb-container-drop-indicator-noop", target.isOriginalPosition)
+          indicatorEl.classList.toggle("fr-process-drop-indicator-noop", target.isOriginalPosition)
         case None =>
           indicatorEl.hide()
       }
@@ -473,7 +476,7 @@ object ProcessEditorDnD {
   private def findScrollContainerOpt(ctx: DragContext): Option[html.Element] =
     ctx.listEl
       .ancestorOrSelfElem(includeSelf = false)
-      .takeWhile(el => (el ne ctx.dialogEl.parentElement) && (el ne dom.document.body))
+      .takeWhile(el => (el ne ctx.overlayContainerEl.parentElement) && (el ne dom.document.body))
       .find(el => el.scrollHeight > el.clientHeight + 1)
 
   private def updateAutoScroll(clientY: Double): Unit =
@@ -578,19 +581,14 @@ object ProcessEditorDnD {
           target <- targetOpt
           if ! target.isOriginalPosition
         } {
-          val targetId =
-            ctx.dialogEl
-              .closestOpt(".xbl-fb-dialog-process-editor")
-              .map(_.id)
-              .filter(_.nonEmpty)
-              .getOrElse(ctx.dialogEl.id.stripSuffix("≡dialog"))
+          val targetId = ctx.editorEl.id
 
           val intoIndex  = target.intoOpt.map(_.rowIndex.toString).getOrElse("")
           val afterIndex = target.afterRowIndexOpt.map(_.toString).getOrElse("")
 
           AjaxClient.fireEvent(
             AjaxEvent(
-              eventName  = "fb-move-process-step",
+              eventName  = "fr-move-process-step",
               targetId   = targetId,
               properties = Map[String, js.Any](
                 "process-index" -> ctx.processIndex,
@@ -636,9 +634,9 @@ object ProcessEditorDnD {
 
     _isDragging = false
 
-    orbeonRootEl.classList.remove("fb-dragging-container")
-    dimmedElements.foreach(_.classList.remove("fb-dnd-source"))
-    highlightedRowOpt.foreach(_.classList.remove("fb-process-dnd-drop-into"))
+    orbeonRootEl.classList.remove("fr-process-dragging")
+    dimmedElements.foreach(_.classList.remove("fr-process-dnd-source"))
+    highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
 
     ghostElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
     indicatorElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))

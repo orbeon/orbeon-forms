@@ -18,12 +18,11 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.XMLNames.*
-import org.orbeon.oxf.fb.process.{ProcessParams, ProcessUI}
-import org.orbeon.oxf.fb.process.ProcessParams.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.permission.*
-import org.orbeon.oxf.fr.process.{ProcessInterpreter, ProcessParser}
+import org.orbeon.oxf.fr.process.{ProcessEditorParams, ProcessEditorUI, ProcessInterpreter, ProcessParser}
+import org.orbeon.oxf.fr.process.ProcessEditorParams.*
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, ExprNode, GroupNode}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, Names, NodeInfoCell, SchemaOps}
 import org.orbeon.oxf.util.CoreUtils.*
@@ -909,7 +908,7 @@ object FormDefinitionValidator {
 
       for ((procElem, procName, rootGroup) <- parsedProcesses) {
         val processXPathNamespaces =
-          NamespaceMapping(procElem.namespaceMappings.toMap ++ ProcessUI.ProcessNamespaceMapping)
+          NamespaceMapping(procElem.namespaceMappings.toMap ++ ProcessEditorUI.ProcessNamespaceMapping)
         val processAvtNamespaces =
           NamespaceMapping(procElem.namespaceMappings.toMap ++ ProcessInterpreter.StandardNamespaceMapping.mapping)
         val procLocation = s"process:$procName"

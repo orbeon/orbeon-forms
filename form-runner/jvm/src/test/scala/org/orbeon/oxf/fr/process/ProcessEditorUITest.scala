@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fb.process
+package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -19,20 +19,20 @@ import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 
-class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with AnyFunSpecLike {
+class ProcessEditorUITest extends DocumentTestBase with ResourceManagerSupport with AnyFunSpecLike {
 
   describe("ProcessUI XML conversion") {
 
     it("should round-trip simple actions") {
       val processStr = "validate then save"
-      val xml = ProcessUI.processStringToXml(processStr)
-      val serialized = ProcessUI.xmlToProcessString(xml)
+      val xml = ProcessEditorUI.processStringToXml(processStr)
+      val serialized = ProcessEditorUI.xmlToProcessString(xml)
       assert(serialized == processStr)
     }
 
     it("should round-trip actions with combinators and parameters") {
       val processStr = """validate then save recover error-message("error")"""
-      val xml = ProcessUI.processStringToXml(processStr)
+      val xml = ProcessEditorUI.processStringToXml(processStr)
       val steps = (xml child "step").toList
       assert(steps.size == 3)
       assert((steps(0) attValue "name") == "validate")
@@ -41,13 +41,13 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
       assert((steps(2) attValue "name") == "error-message")
       assert((steps(2) attValue "combinator") == "recover")
 
-      val serialized = ProcessUI.xmlToProcessString(xml)
+      val serialized = ProcessEditorUI.xmlToProcessString(xml)
       assert(serialized == processStr)
     }
 
     it("should round-trip groups") {
       val processStr = "validate then (save recover error-message)"
-      val xml = ProcessUI.processStringToXml(processStr)
+      val xml = ProcessEditorUI.processStringToXml(processStr)
       val steps = (xml child "step").toList
       assert(steps.size == 2)
       assert((steps(0) attValue "name") == "validate")
@@ -59,38 +59,38 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
       assert((groupChildren(1) attValue "name") == "error-message")
       assert((groupChildren(1) attValue "combinator") == "recover")
 
-      val serialized = ProcessUI.xmlToProcessString(xml)
+      val serialized = ProcessEditorUI.xmlToProcessString(xml)
       assert(serialized == processStr)
     }
 
     it("should round-trip conditions with `then` and `else`") {
       val processStr = """if ("$valid = true()") then save else error-message"""
-      val xml = ProcessUI.processStringToXml(processStr)
+      val xml = ProcessEditorUI.processStringToXml(processStr)
       val steps = (xml child "step").toList
       assert(steps.size == 1)
       assert((steps.head attValue "type") == "condition")
       assert((steps.head attValue "condition") == "$valid = true()")
 
-      val serialized = ProcessUI.xmlToProcessString(xml)
+      val serialized = ProcessEditorUI.xmlToProcessString(xml)
       assert(serialized == processStr)
     }
 
     it("should round-trip conditions with multiple steps in branches") {
       val processStr = """if ("$valid = true()") then (save then success-message("saved")) else error-message"""
-      val xml = ProcessUI.processStringToXml(processStr)
-      val serialized = ProcessUI.xmlToProcessString(xml)
+      val xml = ProcessEditorUI.processStringToXml(processStr)
+      val serialized = ProcessEditorUI.xmlToProcessString(xml)
       assert(serialized == processStr)
     }
 
     it("should deserialize and serialize `<processes>` metadata") {
-      val xmlConfig = ProcessUI.xmlStringToMutableNodeInfoRootElem(
+      val xmlConfig = ProcessEditorUI.xmlStringToMutableNodeInfoRootElem(
         """<processes>
           |  <process name="save">validate then save</process>
           |  <process name="review">if ("true()") then review else edit</process>
           |</processes>""".stripMargin
       )
 
-      val deserialized = ProcessUI.deserializeProcesses(xmlConfig)
+      val deserialized = ProcessEditorUI.deserializeProcesses(xmlConfig)
       val procList = (deserialized child "process").toList
       assert(procList.size == 2)
       assert((procList(0) attValue "name") == "save")
@@ -98,7 +98,7 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
       assert((procList(1) attValue "name") == "review")
       assert((procList(1) child "step").toList.size == 1)
 
-      val serialized = ProcessUI.serializeProcesses(deserialized)
+      val serialized = ProcessEditorUI.serializeProcesses(deserialized)
       val resProcList = (serialized child "process").toList
       assert(resProcList.size == 2)
       assert((resProcList(0) attValue "name") == "save")
@@ -108,25 +108,37 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
     }
 
     it("should generate templates") {
-      val actionXml = ProcessUI.newActionTemplateXml("validate", "then")
+      val actionXml = ProcessEditorUI.newActionTemplateXml("validate", "then")
       assert((actionXml attValue "type") == "action")
       assert((actionXml attValue "name") == "validate")
       assert((actionXml attValue "combinator") == "then")
       assert((actionXml child "param").nonEmpty)
 
-      val groupXml = ProcessUI.newGroupTemplateXml("recover")
+      val groupXml = ProcessEditorUI.newGroupTemplateXml("recover")
       assert((groupXml attValue "type") == "group")
       assert((groupXml attValue "combinator") == "recover")
 
-      val condXml = ProcessUI.newConditionTemplateXml("then")
+      val condXml = ProcessEditorUI.newConditionTemplateXml("then")
       assert((condXml attValue "type") == "condition")
       assert((condXml attValue "condition") == "true()")
 
-      val elseXml = ProcessUI.newElseTemplateXml()
-      assert(elseXml.localname == "else")
-      assert((elseXml child "step").nonEmpty)
+      val blankActionXml = ProcessEditorUI.newActionTemplateXml("", "then")
+      assert((blankActionXml attValue "type") == "action")
+      assert((blankActionXml attValue "name") == "")
+      assert((blankActionXml child "param").isEmpty)
 
-      val actionsXml = ProcessUI.availableActionsXml()
+      val elseXml = ProcessEditorUI.newElseTemplateXml()
+      assert(elseXml.localname == "else")
+      val elseSteps = (elseXml child "step").toList
+      assert(elseSteps.size == 1)
+      assert((elseSteps.head attValue "name") == "")
+
+      val emptyProcXml = ProcessEditorUI.processStringToXml("")
+      val emptySteps = (emptyProcXml child "step").toList
+      assert(emptySteps.size == 1)
+      assert((emptySteps.head attValue "name") == "")
+
+      val actionsXml = ProcessEditorUI.availableActionsXml()
       assert(actionsXml.localname == "actions")
       assert((actionsXml child "action").nonEmpty)
     }
@@ -134,46 +146,46 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
     describe("Indented process serialization") {
 
       it("should indent simple action sequences") {
-        val xml = ProcessUI.processStringToXml("""validate then save recover error-message("error")""")
+        val xml = ProcessEditorUI.processStringToXml("""validate then save recover error-message("error")""")
         val expected =
           """validate
             |then save
             |recover error-message("error")""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
-        assert(ProcessUI.xmlToIndentedProcessString(xml) == expected)
+        assert(ProcessEditorUI.xmlToIndentedProcessString(xml) == expected)
       }
 
       it("should not add newlines to a single action") {
-        val xml = ProcessUI.processStringToXml("save")
-        assert(ProcessUI.xmlToProcessString(xml, indent = true) == "save")
+        val xml = ProcessEditorUI.processStringToXml("save")
+        assert(ProcessEditorUI.xmlToProcessString(xml, indent = true) == "save")
       }
 
       it("should indent groups") {
-        val xml = ProcessUI.processStringToXml("validate then (save recover error-message)")
+        val xml = ProcessEditorUI.processStringToXml("validate then (save recover error-message)")
         val expected =
           """validate
             |then (
             |    save
             |    recover error-message
             |)""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
       it("should indent conditions with single-step branches") {
-        val xml = ProcessUI.processStringToXml("""if ("$valid = true()") then save else error-message""")
+        val xml = ProcessEditorUI.processStringToXml("""if ("$valid = true()") then save else error-message""")
         val expected =
           """if ("$valid = true()") then
             |    save
             |else
             |    error-message""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
       it("should indent conditions with multiple steps in branches") {
-        val xml = ProcessUI.processStringToXml("""if ("$valid = true()") then (save then success-message("saved")) else (error-message recover log)""")
+        val xml = ProcessEditorUI.processStringToXml("""if ("$valid = true()") then (save then success-message("saved")) else (error-message recover log)""")
         val expected =
           """if ("$valid = true()") then (
             |    save
@@ -183,23 +195,23 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
             |    error-message
             |    recover log
             |)""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
       it("should indent condition without else branch") {
-        val xml = ProcessUI.processStringToXml("""if ("$valid = true()") then (save then success-message("saved"))""")
+        val xml = ProcessEditorUI.processStringToXml("""if ("$valid = true()") then (save then success-message("saved"))""")
         val expected =
           """if ("$valid = true()") then (
             |    save
             |    then success-message("saved")
             |)""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
       it("should indent nested groups and conditions") {
-        val xml = ProcessUI.processStringToXml(
+        val xml = ProcessEditorUI.processStringToXml(
           """(validate then if ("$valid = true()") then (save then success-message("saved")) else error-message then navigate)"""
         )
         val expected =
@@ -213,12 +225,12 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
             |        error-message
             |    then navigate
             |)""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
       it("should indent chained conditions (else if)") {
-        val xml = ProcessUI.processStringToXml("""if ("$c1") then save else if ("$c2") then edit else review""")
+        val xml = ProcessEditorUI.processStringToXml("""if ("$c1") then save else if ("$c2") then edit else review""")
         val expected =
           """if ("$c1") then
             |    save
@@ -226,7 +238,7 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
             |    edit
             |else
             |    review""".stripMargin
-        val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+        val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
         assert(indented == expected)
       }
 
@@ -241,8 +253,8 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
           """if ("$c1") then save else if ("$c2") then edit else review"""
         )
         for (proc <- testProcesses) {
-          val xml = ProcessUI.processStringToXml(proc)
-          val indented = ProcessUI.xmlToProcessString(xml, indent = true)
+          val xml = ProcessEditorUI.processStringToXml(proc)
+          val indented = ProcessEditorUI.xmlToProcessString(xml, indent = true)
           val originalParsed = org.orbeon.oxf.fr.process.ProcessParser.parse(proc)
           val indentedParsed = org.orbeon.oxf.fr.process.ProcessParser.parse(indented)
           assert(indentedParsed == originalParsed)
@@ -253,58 +265,71 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
     describe("ProcessParams metadata and dialog validation helpers (#7871)") {
 
       it("should resolve unnamed default parameters matching runtime semantics") {
-        assert(ProcessParams.resolveUnnamedParamName("validate", "warning")              == "level")
-        assert(ProcessParams.resolveUnnamedParamName("success-message", "save-success")  == "resource")
-        assert(ProcessParams.resolveUnnamedParamName("error-message", "database-error")  == "resource")
-        assert(ProcessParams.resolveUnnamedParamName("confirm", "confirm-msg")           == "resource")
-        assert(ProcessParams.resolveUnnamedParamName("navigate", "/fr/orbeon/builder")   == "uri")
-        assert(ProcessParams.resolveUnnamedParamName("navigate", "https://orbeon.com")   == "uri")
-        assert(ProcessParams.resolveUnnamedParamName("navigate", "oxf.fr.detail.close")  == "property")
-        assert(ProcessParams.resolveUnnamedParamName("send", "oxf.fr.detail.send")       == "property")
-        assert(ProcessParams.resolveUnnamedParamName("process", "my-proc")               == "name")
-        assert(ProcessParams.resolveUnnamedParamName("rollback", "in-memory-form-data")  == "changes")
-        assert(ProcessParams.resolveUnnamedParamName("save", "true")                     == "")
+        assert(ProcessEditorParams.resolveUnnamedParamName("validate", "warning")              == "level")
+        assert(ProcessEditorParams.resolveUnnamedParamName("success-message", "save-success")  == "resource")
+        assert(ProcessEditorParams.resolveUnnamedParamName("error-message", "database-error")  == "resource")
+        assert(ProcessEditorParams.resolveUnnamedParamName("confirm", "confirm-msg")           == "resource")
+        assert(ProcessEditorParams.resolveUnnamedParamName("navigate", "/fr/orbeon/builder")   == "uri")
+        assert(ProcessEditorParams.resolveUnnamedParamName("navigate", "https://orbeon.com")   == "uri")
+        assert(ProcessEditorParams.resolveUnnamedParamName("navigate", "oxf.fr.detail.close")  == "property")
+        assert(ProcessEditorParams.resolveUnnamedParamName("send", "oxf.fr.detail.send")       == "property")
+        assert(ProcessEditorParams.resolveUnnamedParamName("process", "my-proc")               == "name")
+        assert(ProcessEditorParams.resolveUnnamedParamName("rollback", "in-memory-form-data")  == "changes")
+        assert(ProcessEditorParams.resolveUnnamedParamName("save", "true")                     == "")
       }
 
       it("should emit only Required and Common parameters by default and support singleParamTemplateXml") {
         // `save` has only Advanced parameters -> none inserted by default
-        assert((ProcessUI.actionParamsXml("save") child "param").isEmpty)
+        assert((ProcessEditorUI.actionParamsXml("save") child "param").isEmpty)
 
         // `result-dialog` takes no parameters
-        assert((ProcessUI.actionParamsXml("result-dialog") child "param").isEmpty)
+        assert((ProcessEditorUI.actionParamsXml("result-dialog") child "param").isEmpty)
 
         // `send` shows `uri` and `method` by default
-        val sendDefaultNames = (ProcessUI.actionParamsXml("send") child "param").map(_ attValue "name").toList
+        val sendDefaultNames = (ProcessEditorUI.actionParamsXml("send") child "param").map(_ attValue "name").toList
         assert(sendDefaultNames == List("uri", "method"))
 
         // `control-setvalue` shows `control-name` and `value` by default
-        val setvalDefaultNames = (ProcessUI.actionParamsXml("control-setvalue") child "param").map(_ attValue "name").toList
+        val setvalDefaultNames = (ProcessEditorUI.actionParamsXml("control-setvalue") child "param").map(_ attValue "name").toList
         assert(setvalDefaultNames == List("control-name", "value"))
 
-        // `sleep` defaults to `1000ms` (with required duration unit)
-        val sleepParams = (ProcessUI.actionParamsXml("sleep") child "param").toList
+        // `sleep` defaults to `1000` with `@unit="ms"` for `fr:quantity`
+        val sleepParams = (ProcessEditorUI.actionParamsXml("sleep") child "param").toList
         assert(sleepParams.map(_ attValue "name") == List("duration"))
-        assert(sleepParams.head.stringValue == "1000ms")
+        assert(sleepParams.head.stringValue == "1000")
+        assert((sleepParams.head attValue "unit") == "ms")
+
+        // `sleep` duration deserializes into amount + `@unit` and serializes back to `<amount><unit>`
+        val sleepXml = ProcessEditorUI.processStringToXml("""sleep(duration = "5s") then sleep(duration = "{$delay}")""")
+        val sleepSteps = (sleepXml child "step").toList
+        val staticDur  = (sleepSteps(0) child "param").head
+        assert(staticDur.stringValue == "5")
+        assert((staticDur attValue "unit") == "s")
+        assert((staticDur attValue "avt-mode") == "false")
+        val avtDur = (sleepSteps(1) child "param").head
+        assert(avtDur.stringValue == "{$delay}")
+        assert((avtDur attValue "avt-mode") == "true")
+        assert(ProcessEditorUI.xmlToProcessString(sleepXml) == """sleep(duration = "5s") then sleep(duration = "{$delay}")""")
 
         // Adding an Advanced parameter vs a custom parameter
-        val draftParam = ProcessUI.singleParamTemplateXml("save", "draft")
+        val draftParam = ProcessEditorUI.singleParamTemplateXml("save", "draft")
         assert((draftParam attValue "name") == "draft")
         assert((draftParam attValue "custom") == "false")
         assert(draftParam.stringValue == "true")
 
-        val customParam = ProcessUI.singleParamTemplateXml("xf:dispatch", ProcessUI.CustomParamSentinel)
+        val customParam = ProcessEditorUI.singleParamTemplateXml("xf:dispatch", ProcessEditorUI.CustomParamSentinel)
         assert((customParam attValue "name") == "")
         assert((customParam attValue "custom") == "true")
       }
 
       it("should detect AVT mode on deserialization and switch to named syntax when an unnamed param becomes an AVT") {
-        val xml = ProcessUI.processStringToXml("""save(draft = "{$is-draft}") then validate("warning") then xf:dispatch(name = "my-event", my-prop = "{$val}")""")
+        val xml = ProcessEditorUI.processStringToXml("""save(draft = "{$is-draft}") then validate("warning") then xf:dispatch(name = "my-event", my-prop = "{$val}")""")
         val steps = (xml child "step").toList
 
         val saveDraft = (steps(0) child "param").head
         assert((saveDraft attValue "name") == "draft")
         assert((saveDraft attValue "avt-mode") == "true")
-        assert(ProcessUI.defaultValueWhenLeavingAvtMode("save", "draft", "{$is-draft}") == "true")
+        assert(ProcessEditorUI.defaultValueWhenLeavingAvtMode("save", "draft", "{$is-draft}") == "true")
 
         val validateLevel = (steps(1) child "param").head
         assert((validateLevel attValue "name") == "level")
@@ -313,7 +338,7 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
 
         // Mutating an unnamed param to an AVT must serialize as a named param so runtime evaluates the AVT
         org.orbeon.oxf.xforms.action.XFormsAPI.setvalue(Seq(validateLevel), "{$dyn-level}")
-        val reserialized = ProcessUI.xmlToProcessString(xml)
+        val reserialized = ProcessEditorUI.xmlToProcessString(xml)
         assert(reserialized.contains("""validate(level = "{$dyn-level}")"""))
 
         // Custom param on `xf:dispatch`
@@ -321,40 +346,40 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
         assert(dispatchParams.size == 2)
         assert((dispatchParams(1) attValue "name") == "my-prop")
         assert((dispatchParams(1) attValue "custom") == "true")
-        assert(ProcessUI.paramValueMode(dispatchParams(1)) == "avt")
-        assert(ProcessUI.isCustomParamNameValid(dispatchParams(1)))
+        assert(ProcessEditorUI.paramValueMode(dispatchParams(1)) == "avt")
+        assert(ProcessEditorUI.isCustomParamNameValid(dispatchParams(1)))
       }
 
       it("should validate parameter static values, custom parameter names, and step-level rules") {
-        val config = ProcessUI.xmlStringToMutableNodeInfoRootElem(
+        val config = ProcessEditorUI.xmlStringToMutableNodeInfoRootElem(
           """<processes>
             |  <process name="p1">validate(level = "") then send(method = "POST") then control-setvalue(control-name = "c1", value = "1", at = "all", section-name = "s1")</process>
             |  <process name="p2">save(draft = "true")</process>
             |</processes>""".stripMargin
         )
-        val deserialized = ProcessUI.deserializeProcesses(config)
-        val emptyContext = ProcessUI.xmlStringToMutableNodeInfoRootElem("<form-context/>")
+        val deserialized = ProcessEditorUI.deserializeProcesses(config)
+        val emptyContext = ProcessEditorUI.xmlStringToMutableNodeInfoRootElem("<form-context/>")
 
         val p1Steps = ((deserialized child "process").head child "step").toList
 
         // 1. `validate(level = "")`: `level` param itself is invalid, step is not double-flagged
         val levelParam = (p1Steps(0) child "param").head
-        assert(! ProcessUI.isParamValueValid(levelParam, emptyContext))
-        assert(ProcessUI.isActionStepValid(p1Steps(0), emptyContext))
+        assert(! ProcessEditorUI.isParamValueValid(levelParam, emptyContext))
+        assert(ProcessEditorUI.isActionStepValid(p1Steps(0), emptyContext))
 
         // 2. `send(method = "POST")`: neither `uri` nor `property` is present -> step-level error
-        assert(! ProcessUI.isActionStepValid(p1Steps(1), emptyContext))
+        assert(! ProcessEditorUI.isActionStepValid(p1Steps(1), emptyContext))
 
         // 3. `control-setvalue` with both `at` and `section-name` -> mutually exclusive step-level error
-        assert(! ProcessUI.isActionStepValid(p1Steps(2), emptyContext))
+        assert(! ProcessEditorUI.isActionStepValid(p1Steps(2), emptyContext))
 
         // 4. `serializeProcesses` must not leak namespace declarations onto `<processes>`
-        val serialized = ProcessUI.serializeProcesses(deserialized)
+        val serialized = ProcessEditorUI.serializeProcesses(deserialized)
         val serializedStr = TransformerUtils.tinyTreeToString(serialized)
         assert(! serializedStr.contains("xmlns:"))
 
         // 5. `availableActionsXml` exposes the three UI action categories plus built-in `<sub-process>` entries
-        val actionsDoc = ProcessUI.availableActionsXml()
+        val actionsDoc = ProcessEditorUI.availableActionsXml()
         val categories = (actionsDoc child "action").flatMap(_.attValueOpt("category")).toSet
         assert(categories == Set("form-runner", "flow-control", "xforms"))
         assert((actionsDoc child "action").exists(a => (a attValue "name") == "process" && (a attValue "category") == "flow-control"))
@@ -363,24 +388,45 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
       }
 
       it("should normalize bare sub-process calls into `process` steps and validate process names") {
-        val xml = ProcessUI.processStringToXml("""require-uploads then my-helper then process("other") then process(name = "{$dyn}")""")
+        val xml = ProcessEditorUI.processStringToXml("""require-uploads then my-helper then process("other") then process(name = "{$dyn}")""")
         val steps = (xml child "step").toList
         assert(steps.size == 4)
         assert(steps.forall(s => (s attValue "name") == "process"))
         assert(steps.map(s => (s child "param").head.stringValue) == List("require-uploads", "my-helper", "other", "{$dyn}"))
         assert(((steps(3) child "param").head attValue "avt-mode") == "true")
 
-        val serialized = ProcessUI.xmlToProcessString(xml)
+        val serialized = ProcessEditorUI.xmlToProcessString(xml)
         assert(serialized == """process(name = "require-uploads") then process(name = "my-helper") then process("other") then process(name = "{$dyn}")""")
 
         // Process name syntax matches `ProcessParser.Name` (minus `:`)
-        assert(ProcessParams.ProcessNameRegex.matches("save-final"))
-        assert(ProcessParams.ProcessNameRegex.matches("_helper_2"))
-        assert(ProcessParams.ProcessNameRegex.matches("-custom"))
-        assert(! ProcessParams.ProcessNameRegex.matches("my.process"))
-        assert(! ProcessParams.ProcessNameRegex.matches("2026-submit"))
-        assert(! ProcessParams.ProcessNameRegex.matches("xf:custom"))
-        assert(! ProcessParams.ProcessNameRegex.matches("bad name"))
+        assert(ProcessEditorParams.ProcessNameRegex.matches("save-final"))
+        assert(ProcessEditorParams.ProcessNameRegex.matches("_helper_2"))
+        assert(ProcessEditorParams.ProcessNameRegex.matches("-custom"))
+        assert(! ProcessEditorParams.ProcessNameRegex.matches("my.process"))
+        assert(! ProcessEditorParams.ProcessNameRegex.matches("2026-submit"))
+        assert(! ProcessEditorParams.ProcessNameRegex.matches("xf:custom"))
+        assert(! ProcessEditorParams.ProcessNameRegex.matches("bad name"))
+      }
+
+      it("should syntax-highlight process definitions into safe HTML spans") {
+        val html = ProcessSyntaxHighlighter.highlightToHtml(
+          """if ("$a < 1 & $b") then
+            |    sleep(duration = "1000ms")
+            |else
+            |    xf:dispatch(name = 'my-ev')""".stripMargin
+        )
+        assert(html.contains("""<span class="fr-proc-tok-keyword">if</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-string">"$a &lt; 1 &amp; $b"</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-keyword">then</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-action">sleep</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-param">duration</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-string">"1000ms"</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-keyword">else</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-action">xf:dispatch</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-param">name</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-string">'my-ev'</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-punct">(</span>"""))
+        assert(html.contains("""<span class="fr-proc-tok-punct">=</span>"""))
       }
     }
   }

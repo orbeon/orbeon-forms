@@ -83,7 +83,9 @@
                 gap: 18px;
             }
             .orbeon .fr-config-scope-sidebar {
-                width: 320px;
+                width: fit-content;
+                min-width: 216px;
+                max-width: 360px;
                 flex-shrink: 0;
                 background-color: var(--orbeon-tab-bar-background-color);
                 border: 1px solid var(--orbeon-tab-border-color);
@@ -135,9 +137,9 @@
                 position: relative;
                 display: flex;
                 align-items: center;
-                gap: 2px;
+                gap: 4px;
                 min-height: 34px;
-                padding-inline-end: 4px;
+                padding-inline-end: 6px;
                 border-radius: 6px;
                 border: 1px solid transparent;
                 box-sizing: border-box;
@@ -209,7 +211,7 @@
                 pointer-events: none;
             }
             .orbeon .fr-config-scope-select {
-                flex: 1;
+                flex: 1 1 auto;
                 min-width: 0;
                 display: block;
             }
@@ -219,6 +221,7 @@
                 align-items: center;
                 gap: 6px;
                 width: 100%;
+                min-width: 0;
                 padding: 5px 6px;
                 box-sizing: border-box;
                 text-align: left;
@@ -226,6 +229,13 @@
                 color: var(--orbeon-tab-inactive-color);
                 font-size: 13px;
                 font-weight: 500;
+            }
+            .orbeon .fr-config-scope-select a::after,
+            .orbeon .fr-config-scope-select button.btn-link::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: 0;
             }
             .orbeon .fr-config-scope-row:hover .fr-config-scope-select a,
             .orbeon .fr-config-scope-row:hover .fr-config-scope-select button.btn-link {
@@ -274,6 +284,10 @@
                 align-items: center;
                 gap: 4px;
                 flex-shrink: 0;
+                pointer-events: none;
+            }
+            .orbeon .fr-config-scope-badges:not(:has(&gt; :not(.xforms-hidden))) {
+                display: none;
             }
             .orbeon .fr-config-scope-error-dot {
                 display: inline-flex;
@@ -283,23 +297,34 @@
                 font-size: 12px;
             }
             .orbeon .fr-config-scope-actions {
-                display: none;
+                position: relative;
+                z-index: 1;
+                margin-inline-start: auto;
+                display: inline-flex;
                 align-items: center;
                 gap: 1px;
                 flex-shrink: 0;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+            }
+            .orbeon .fr-config-scope-actions + .fr-config-scope-badges {
+                margin-inline-start: 2px;
             }
             .orbeon .fr-config-scope-row:hover .fr-config-scope-actions,
             .orbeon .fr-config-scope-row:focus-within .fr-config-scope-actions,
             .orbeon .fr-config-scope-row.fr-config-scope-active .fr-config-scope-actions {
-                display: inline-flex;
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
             }
             .orbeon .fr-config-scope-icon-btn a,
             .orbeon .fr-config-scope-icon-btn button.btn-link {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 22px;
-                height: 22px;
+                width: 20px;
+                height: 20px;
                 padding: 0;
                 border-radius: 4px;
                 color: var(--orbeon-hint-color);
@@ -338,6 +363,8 @@
                 }
                 .orbeon .fr-config-scope-sidebar {
                     width: 100%;
+                    min-width: 0;
+                    max-width: none;
                 }
                 .orbeon .fr-config-category-tabs {
                     width: 100%;
@@ -555,6 +582,107 @@
                 color: inherit;
                 opacity: 0.85;
             }
+            /* Processes Tab */
+            .orbeon .fr-config-processes-toolbar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px;
+                margin-bottom: 16px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: 6px;
+            }
+            .orbeon .fr-config-processes-override-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .orbeon .fr-config-processes-override-select {
+                margin-bottom: 0;
+            }
+            .orbeon .fr-config-processes-override-select &gt; .xforms-label {
+                display: none;
+            }
+            .orbeon .fr-config-processes-override-select select {
+                width: auto;
+                min-width: 220px;
+                margin-bottom: 0;
+            }
+            .orbeon .fr-config-processes-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .orbeon .fr-config-process-card {
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: 6px;
+                padding: 12px 14px;
+                background-color: var(--orbeon-form-background-color);
+            }
+            .orbeon .fr-config-process-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 8px;
+            }
+            .orbeon .fr-config-process-card-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+            }
+            .orbeon .fr-config-process-name {
+                font-family: var(--orbeon-code-font-family);
+                font-weight: 600;
+                font-size: 13px;
+                color: var(--orbeon-base-color);
+            }
+            .orbeon .fr-config-process-kind-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 1px 7px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 600;
+                border: 1px solid var(--orbeon-base-border-color);
+                background-color: var(--orbeon-control-read-only-background-color);
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-process-kind-badge.fr-config-process-kind-override {
+                border-color: var(--orbeon-accent-color);
+                color: var(--orbeon-accent-color);
+                background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+            }
+            .orbeon .fr-config-process-card-actions {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                flex-shrink: 0;
+            }
+            .orbeon .fr-config-process-code {
+                display: block;
+                padding: 8px 10px;
+                border-radius: 4px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                font-family: var(--orbeon-code-font-family);
+                font-size: 12px;
+                color: var(--orbeon-code-color);
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+            .orbeon .fr-config-processes-empty {
+                padding: 20px 16px;
+                text-align: center;
+                color: var(--orbeon-hint-color);
+                border: 1px dashed var(--orbeon-base-border-color);
+                border-radius: 6px;
+            }
             /* Unified Cross-Category View When Filtering */
             .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs {
                 display: none;
@@ -662,6 +790,10 @@
                         <profiles/>
                         <show-errors>false</show-errors>
                     </scope-dialog>
+                    <process-editor>
+                        <override-selection/>
+                        <editing-name/>
+                    </process-editor>
                 </ui>
             </xf:instance>
 
@@ -789,6 +921,18 @@
                         ref="@profiles"
                         xxf:whitespace="trim"
                         constraint="xxf:is-blank() or (every $p in xxf:split(.) satisfies $p castable as xs:NMTOKEN)"/>
+                </xf:bind>
+
+                <xf:bind ref="processes/process | app-form-overrides/override/processes/process">
+                    <xf:bind
+                        ref="@name"
+                        required="true()"
+                        xxf:whitespace="trim"
+                        constraint="matches(., '^[A-Za-z_\-][A-Za-z0-9_\-]*$')"/>
+                    <xf:bind
+                        ref="."
+                        required="true()"
+                        constraint="frf:isValidProcessDefinition(string(.))"/>
                 </xf:bind>
 
                 <xf:bind ref="custom-properties/property">
@@ -985,6 +1129,21 @@
                         <resources-section>
                             <label>Resources</label>
                         </resources-section>
+                        <processes-section>
+                            <label>Processes</label>
+                            <override-placeholder>Override built-in process…</override-placeholder>
+                            <override-button>Override</override-button>
+                            <add-custom>Add Custom Process</add-custom>
+                            <badge-override>Override</badge-override>
+                            <badge-custom>Custom</badge-custom>
+                            <edit>Edit</edit>
+                            <revert>Revert</revert>
+                            <delete>Delete</delete>
+                            <empty>No process overrides or custom processes configured for this scope. Override a built-in process or add a custom process above.</empty>
+                            <dialog-title-override>Override Process</dialog-title-override>
+                            <dialog-title-add>Add Custom Process</dialog-title-add>
+                            <dialog-title-edit>Edit Process</dialog-title-edit>
+                        </processes-section>
                         <app-form-overrides-section>
                             <label>Application / Form Overrides</label>
                             <add-override>Add Application / Form Override</add-override>
@@ -3208,6 +3367,21 @@
                         <resources-section>
                             <label>Ressources</label>
                         </resources-section>
+                        <processes-section>
+                            <label>Processus</label>
+                            <override-placeholder>Surcharger un processus intégré…</override-placeholder>
+                            <override-button>Surcharger</override-button>
+                            <add-custom>Ajouter un processus personnalisé</add-custom>
+                            <badge-override>Surcharge</badge-override>
+                            <badge-custom>Personnalisé</badge-custom>
+                            <edit>Modifier</edit>
+                            <revert>Réinitialiser</revert>
+                            <delete>Supprimer</delete>
+                            <empty>Aucune surcharge de processus ni aucun processus personnalisé configuré pour cette portée. Surchargez un processus intégré ou ajoutez un processus personnalisé ci-dessus.</empty>
+                            <dialog-title-override>Surcharger le processus</dialog-title-override>
+                            <dialog-title-add>Ajouter un processus personnalisé</dialog-title-add>
+                            <dialog-title-edit>Modifier le processus</dialog-title-edit>
+                        </processes-section>
                         <app-form-overrides-section>
                             <label>Surcharges par application / formulaire</label>
                             <add-override>Ajouter une surcharge application / formulaire</add-override>
@@ -5350,11 +5524,13 @@
                                 let $c :=
                                     count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
                                     count(instance('fr-configuration-instance')/resources/message) +
+                                    count(instance('fr-configuration-instance')/processes/process) +
                                     count(instance('fr-configuration-instance')/app-form-overrides/override/curated/*/*[
                                         string(@override) = 'true' and
                                         (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')
                                     ]) +
-                                    count(instance('fr-configuration-instance')/app-form-overrides/override[xxf:is-blank(@profiles)]/resources/message)
+                                    count(instance('fr-configuration-instance')/app-form-overrides/override[xxf:is-blank(@profiles)]/resources/message) +
+                                    count(instance('fr-configuration-instance')/app-form-overrides/override/processes/process)
                                 return concat(
                                     $form-resources/tabs/standard-settings,
                                     if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
@@ -5445,7 +5621,8 @@
                                             name="global-override-count"
                                             value="
                                                 count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
-                                                count(instance('fr-configuration-instance')/resources/message)
+                                                count(instance('fr-configuration-instance')/resources/message) +
+                                                count(instance('fr-configuration-instance')/processes/process)
                                             "/>
                                         <xf:var
                                             name="global-has-error"
@@ -5453,7 +5630,8 @@
                                                 not($is-global-scope) and
                                                 exists((
                                                     instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']/@value |
-                                                    instance('fr-configuration-instance')/resources/message/(@xml:lang | @name)
+                                                    instance('fr-configuration-instance')/resources/message/(@xml:lang | @name) |
+                                                    instance('fr-configuration-instance')/processes/process/(. | @name)
                                                 )[not(xxf:valid(.))])
                                             "/>
                                         <xh:div class="fr-config-scope-row fr-config-scope-global {'fr-config-scope-active'[$is-global-scope]}">
@@ -5462,14 +5640,6 @@
                                                     <xh:i class="fa fa-fw fa-globe fr-config-scope-icon" aria-hidden="true"/>
                                                     <xh:span class="fr-config-scope-name">
                                                         <xf:output ref="$form-resources/scopes/global"/>
-                                                    </xh:span>
-                                                    <xh:span class="fr-config-scope-badges">
-                                                        <xh:span class="fr-config-scope-error-dot {'xforms-hidden'[not($global-has-error)]}">
-                                                            <xh:i class="fa fa-circle-exclamation" aria-hidden="true"/>
-                                                        </xh:span>
-                                                        <xh:span class="badge fr-config-tab-badge {'xforms-hidden'[$global-override-count le 0]}">
-                                                            <xf:output value="$global-override-count"/>
-                                                        </xh:span>
                                                     </xh:span>
                                                 </xf:label>
                                                 <xf:action event="DOMActivate">
@@ -5480,6 +5650,14 @@
                                                     <xf:dispatch name="fr-ensure-visible-tab" targetid="fr-configuration-categories-tabs"/>
                                                 </xf:action>
                                             </xf:trigger>
+                                            <xh:span class="fr-config-scope-badges">
+                                                <xh:span class="fr-config-scope-error-dot {'xforms-hidden'[not($global-has-error)]}">
+                                                    <xh:i class="fa fa-circle-exclamation" aria-hidden="true"/>
+                                                </xh:span>
+                                                <xh:span class="badge fr-config-tab-badge {'xforms-hidden'[$global-override-count le 0]}">
+                                                    <xf:output value="$global-override-count"/>
+                                                </xh:span>
+                                            </xh:span>
                                         </xh:div>
 
                                         <!-- Indented Application & Form Override Nodes -->
@@ -5525,7 +5703,8 @@
                                                 name="row-override-count"
                                                 value="
                                                     count(curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]) +
-                                                    count(resources/message[xxf:is-blank($ov/@profiles)])
+                                                    count(resources/message[xxf:is-blank($ov/@profiles)]) +
+                                                    count(processes/process)
                                                 "/>
                                             <xf:var
                                                 name="row-has-error"
@@ -5533,7 +5712,8 @@
                                                     not($is-selected) and
                                                     exists((
                                                         curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]/@value |
-                                                        resources/message[xxf:is-blank($ov/@profiles)]/(@xml:lang | @name)
+                                                        resources/message[xxf:is-blank($ov/@profiles)]/(@xml:lang | @name) |
+                                                        processes/process/(. | @name)
                                                     )[not(xxf:valid(.))])
                                                 "/>
 
@@ -5560,14 +5740,6 @@
                                                         <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($ov/@profiles)]}">
                                                             <xf:output value="@profiles"/>
                                                         </xh:span>
-                                                        <xh:span class="fr-config-scope-badges">
-                                                            <xh:span class="fr-config-scope-error-dot {'xforms-hidden'[not($row-has-error)]}">
-                                                                <xh:i class="fa fa-circle-exclamation" aria-hidden="true"/>
-                                                            </xh:span>
-                                                            <xh:span class="badge fr-config-tab-badge {'xforms-hidden'[$row-override-count le 0]}">
-                                                                <xf:output value="$row-override-count"/>
-                                                            </xh:span>
-                                                        </xh:span>
                                                     </xf:label>
                                                     <xf:action event="DOMActivate">
                                                         <xf:setvalue ref="instance('fr-configuration-ui-instance')/selected-scope" value="$ov-id"/>
@@ -5582,7 +5754,7 @@
                                                     <xf:trigger
                                                         id="add-form-in-app-button"
                                                         appearance="minimal"
-                                                        ref=".[@app != '*' and @form = '*']"
+                                                        ref=".[@app != '*' and @form = '*' and xxf:is-blank(@profiles)]"
                                                         class="fr-config-scope-icon-btn">
                                                         <xf:label>
                                                             <xh:i class="fa fa-plus" aria-hidden="true"/>
@@ -5648,6 +5820,7 @@
                                                                     <xf:setvalue if="exists(quantity/@unit)" ref="quantity/@unit" value="'MB'"/>
                                                                 </xf:action>
                                                                 <xf:delete ref="$ov/resources/message"/>
+                                                                <xf:delete ref="$ov/processes/process"/>
                                                             </xf:action>
                                                             <xf:action if="not($has-child-scopes)">
                                                                 <xf:var
@@ -5671,6 +5844,15 @@
                                                             </xf:action>
                                                         </xf:action>
                                                     </xf:trigger>
+                                                </xh:span>
+
+                                                <xh:span class="fr-config-scope-badges">
+                                                    <xh:span class="fr-config-scope-error-dot {'xforms-hidden'[not($row-has-error)]}">
+                                                        <xh:i class="fa fa-circle-exclamation" aria-hidden="true"/>
+                                                    </xh:span>
+                                                    <xh:span class="badge fr-config-tab-badge {'xforms-hidden'[$row-override-count le 0]}">
+                                                        <xf:output value="$row-override-count"/>
+                                                    </xh:span>
                                                 </xh:span>
                                             </xh:div>
                                         </xf:repeat>
@@ -8760,6 +8942,196 @@
                                     languages-ref="('*', xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code/string())"
                                     items-ref="$resource-override-items"/>
                             </fr:tab>
+
+                            <!-- Processes -->
+                            <fr:tab id="processes-tab">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count($active-scope/processes/process)
+                                        return concat(
+                                            $form-resources/processes-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xf:var
+                                    name="builtin-process-names"
+                                    value="frf:builtinDetailProcessNames()"/>
+                                <xf:var
+                                    name="available-builtin-processes"
+                                    value="$builtin-process-names[not(. = $active-scope/processes/process/@name)]"/>
+                                <xf:var
+                                    name="active-app"
+                                    value="if ($is-global-scope) then '*' else string($active-override/@app)"/>
+                                <xf:var
+                                    name="active-form"
+                                    value="if ($is-global-scope) then '*' else string($active-override/@form)"/>
+                                <xf:var
+                                    name="known-custom-process-names"
+                                    value="
+                                        distinct-values((
+                                            $active-scope/processes/process/@name,
+                                            instance('fr-configuration-instance')/processes/process/@name
+                                        )[xxf:non-blank()])"/>
+
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/processes-section/label"/>
+                                    </xh:h3>
+                                    <xh:span class="fr-config-scope-context-pill">
+                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
+                                        <xf:output value="$active-scope-display"/>
+                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
+                                            <xf:output value="$active-scope-profiles"/>
+                                        </xh:span>
+                                    </xh:span>
+                                </xh:div>
+
+                                <!-- Toolbar: Override Built-in Process + Add Custom Process -->
+                                <xh:div class="fr-config-processes-toolbar">
+                                    <xh:div class="fr-config-processes-override-group">
+                                        <xf:select1
+                                            id="override-builtin-process-select"
+                                            ref="instance('fr-configuration-ui-instance')/process-editor/override-selection"
+                                            class="fr-config-processes-override-select">
+                                            <xf:label ref="$form-resources/processes-section/override-placeholder"/>
+                                            <xf:item>
+                                                <xf:label ref="$form-resources/processes-section/override-placeholder"/>
+                                                <xf:value/>
+                                            </xf:item>
+                                            <xf:itemset ref="$available-builtin-processes">
+                                                <xf:label value="."/>
+                                                <xf:value value="."/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <xf:trigger
+                                            id="override-builtin-process-button"
+                                            ref="instance('fr-configuration-ui-instance')/process-editor/override-selection[xxf:non-blank()]">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-code-branch" aria-hidden="true"/>
+                                                <xf:output value="concat(' ', $form-resources/processes-section/override-button)"/>
+                                            </xf:label>
+                                            <xf:action event="DOMActivate">
+                                                <xf:var name="chosen" value="string(instance('fr-configuration-ui-instance')/process-editor/override-selection)"/>
+                                                <xf:var
+                                                    name="inherited-def"
+                                                    value="
+                                                        (
+                                                            if (not($is-global-scope) and $active-form != '*') then
+                                                                instance('fr-configuration-instance')/app-form-overrides/override[@app = $active-app and @form = '*' and xxf:is-blank(@profiles)]/processes/process[@name = $chosen]/string()
+                                                            else (),
+                                                            if (not($is-global-scope)) then
+                                                                instance('fr-configuration-instance')/processes/process[@name = $chosen]/string()
+                                                            else (),
+                                                            frf:defaultDetailProcessDefinition($chosen, $active-app, $active-form)
+                                                        )[xxf:non-blank()][1]"/>
+                                                <xf:var
+                                                    name="config-elem"
+                                                    value="xf:element('processes', xf:element('process', (xf:attribute('name', $chosen), ($inherited-def, '')[1])))"/>
+                                                <xf:var
+                                                    name="ctx-elem"
+                                                    value="xf:element('form-context', xf:element('processes', for $n in $known-custom-process-names return xf:element('item', xf:attribute('value', $n))))"/>
+                                                <xf:setvalue ref="instance('fr-configuration-ui-instance')/process-editor/editing-name" value="$chosen"/>
+                                                <xf:setvalue ref="instance('fr-configuration-ui-instance')/process-editor/override-selection" value="''"/>
+                                                <xf:dispatch name="fr-show-dialog" targetid="fr-config-process-editor-dialog">
+                                                    <xf:property name="config"         value="$config-elem"/>
+                                                    <xf:property name="form-context"   value="$ctx-elem"/>
+                                                    <xf:property name="mode"           value="'single'"/>
+                                                    <xf:property name="name-readonly"  value="'true'"/>
+                                                    <xf:property name="existing-names" value="string-join($active-scope/processes/process/@name[. != $chosen], ' ')"/>
+                                                    <xf:property name="title"          value="concat($form-resources/processes-section/dialog-title-override, ': ', $chosen)"/>
+                                                </xf:dispatch>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </xh:div>
+
+                                    <xf:trigger id="add-custom-process-button" appearance="xxf:primary">
+                                        <xf:label>
+                                            <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                            <xf:output value="concat(' ', $form-resources/processes-section/add-custom)"/>
+                                        </xf:label>
+                                        <xf:action event="DOMActivate">
+                                            <xf:var
+                                                name="config-elem"
+                                                value="xf:element('processes', xf:element('process', (xf:attribute('name', ''), '')))"/>
+                                            <xf:var
+                                                name="ctx-elem"
+                                                value="xf:element('form-context', xf:element('processes', for $n in $known-custom-process-names return xf:element('item', xf:attribute('value', $n))))"/>
+                                            <xf:setvalue ref="instance('fr-configuration-ui-instance')/process-editor/editing-name" value="''"/>
+                                            <xf:dispatch name="fr-show-dialog" targetid="fr-config-process-editor-dialog">
+                                                <xf:property name="config"         value="$config-elem"/>
+                                                <xf:property name="form-context"   value="$ctx-elem"/>
+                                                <xf:property name="mode"           value="'single'"/>
+                                                <xf:property name="name-readonly"  value="'false'"/>
+                                                <xf:property name="existing-names" value="string-join($active-scope/processes/process/@name, ' ')"/>
+                                                <xf:property name="title"          value="$form-resources/processes-section/dialog-title-add"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </xh:div>
+
+                                <!-- Configured Processes List -->
+                                <xf:group ref=".[exists($active-scope/processes/process)]">
+                                    <xh:div class="fr-config-processes-list">
+                                        <xf:repeat id="configured-processes-repeat" ref="$active-scope/processes/process">
+                                            <xf:var name="proc"       value="."/>
+                                            <xf:var name="proc-name"  value="string(@name)"/>
+                                            <xf:var name="is-builtin" value="$proc-name = $builtin-process-names"/>
+                                            <xh:div class="fr-config-process-card">
+                                                <xh:div class="fr-config-process-card-header">
+                                                    <xh:div class="fr-config-process-card-title">
+                                                        <xh:span class="fr-config-process-name">
+                                                            <xf:output value="$proc-name"/>
+                                                        </xh:span>
+                                                        <xh:span class="fr-config-process-kind-badge {'fr-config-process-kind-override'[$is-builtin]}">
+                                                            <xf:output value="if ($is-builtin) then $form-resources/processes-section/badge-override else $form-resources/processes-section/badge-custom"/>
+                                                        </xh:span>
+                                                    </xh:div>
+                                                    <xh:div class="fr-config-process-card-actions">
+                                                        <xf:trigger id="edit-configured-process-button" appearance="xxf:mini">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-pen" aria-hidden="true"/>
+                                                                <xf:output value="concat(' ', $form-resources/processes-section/edit)"/>
+                                                            </xf:label>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:var
+                                                                    name="config-elem"
+                                                                    value="xf:element('processes', xf:element('process', (xf:attribute('name', $proc-name), string($proc))))"/>
+                                                                <xf:var
+                                                                    name="ctx-elem"
+                                                                    value="xf:element('form-context', xf:element('processes', for $n in $known-custom-process-names return xf:element('item', xf:attribute('value', $n))))"/>
+                                                                <xf:setvalue ref="instance('fr-configuration-ui-instance')/process-editor/editing-name" value="$proc-name"/>
+                                                                <xf:dispatch name="fr-show-dialog" targetid="fr-config-process-editor-dialog">
+                                                                    <xf:property name="config"         value="$config-elem"/>
+                                                                    <xf:property name="form-context"   value="$ctx-elem"/>
+                                                                    <xf:property name="mode"           value="'single'"/>
+                                                                    <xf:property name="name-readonly"  value="if ($is-builtin) then 'true' else 'false'"/>
+                                                                    <xf:property name="existing-names" value="string-join($active-scope/processes/process/@name[. != $proc-name], ' ')"/>
+                                                                    <xf:property name="title"          value="concat($form-resources/processes-section/dialog-title-edit, ': ', $proc-name)"/>
+                                                                </xf:dispatch>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger id="delete-configured-process-button" appearance="xxf:mini xxf:danger">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw {if ($is-builtin) then 'fa-rotate-left' else 'fa-trash'}" aria-hidden="true"/>
+                                                                <xf:output value="concat(' ', if ($is-builtin) then $form-resources/processes-section/revert else $form-resources/processes-section/delete)"/>
+                                                            </xf:label>
+                                                            <xf:delete event="DOMActivate" ref="$proc"/>
+                                                        </xf:trigger>
+                                                    </xh:div>
+                                                </xh:div>
+                                                <xh:code class="fr-config-process-code"><xf:output mediatype="text/html" value="frf:formatProcessDefinitionHtml(string(.))"/></xh:code>
+                                            </xh:div>
+                                        </xf:repeat>
+                                    </xh:div>
+                                </xf:group>
+
+                                <!-- Empty state -->
+                                <xf:group ref=".[empty($active-scope/processes/process)]">
+                                    <xh:div class="fr-config-processes-empty">
+                                        <xf:output ref="$form-resources/processes-section/empty"/>
+                                    </xh:div>
+                                </xf:group>
+                            </fr:tab>
                                 </fr:tabbable>
                             </xh:div>
 
@@ -8771,11 +9143,13 @@
                                         (
                                             instance('fr-configuration-instance')[not($is-global-scope)]/(
                                                 curated/*/*[string(@override) = 'true']/@value |
-                                                resources/message/(@xml:lang | @name)
+                                                resources/message/(@xml:lang | @name) |
+                                                processes/process/(. | @name)
                                             ),
                                             instance('fr-configuration-instance')/app-form-overrides/override[@id != $selected-scope-id]/(
                                                 curated/*/*[string(@override) = 'true' and (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')]/@value |
-                                                resources/message[xxf:is-blank(ancestor::override/@profiles)]/(@xml:lang | @name)
+                                                resources/message[xxf:is-blank(ancestor::override/@profiles)]/(@xml:lang | @name) |
+                                                processes/process/(. | @name)
                                             )
                                         )">
                                     <xf:output id="unselected-scope-value-validator" ref=".">
@@ -8792,6 +9166,8 @@
                                                     $prop-label :=
                                                         if (exists(parent::message)) then
                                                             $form-resources/resources-section/label
+                                                        else if (exists(self::process | parent::process)) then
+                                                            $form-resources/processes-section/label
                                                         else
                                                             ($form-resources/*[name() = local-name(current()/..)]/label, local-name(..))[1]
                                                 return concat($scope-label, ' — ', $prop-label)
@@ -8868,6 +9244,41 @@
                     </fr:tab>
 
                 </fr:tabbable>
+
+                <!-- Reusable Form Runner Process Editor Dialog (single-process mode) -->
+                <fr:dialog-process-editor id="fr-config-process-editor-dialog">
+                    <xf:action event="fr-update">
+                        <xf:var name="updated-proc" value="event('config')/process[1]"/>
+                        <xf:action if="exists($updated-proc)">
+                            <xf:var name="sel-id"      value="string(instance('fr-configuration-ui-instance')/selected-scope)"/>
+                            <xf:var name="scope-node"  value="(instance('fr-configuration-instance')/app-form-overrides/override[@id = $sel-id], instance('fr-configuration-instance'))[1]"/>
+                            <xf:var name="prev-name"   value="string(instance('fr-configuration-ui-instance')/process-editor/editing-name)"/>
+                            <xf:var name="new-name"    value="string($updated-proc/@name)"/>
+                            <xf:var name="new-body"    value="string($updated-proc)"/>
+                            <xf:insert
+                                if="empty($scope-node/processes)"
+                                context="$scope-node"
+                                ref="*"
+                                origin="xf:element('processes')"/>
+                            <xf:var
+                                name="existing-proc"
+                                value="
+                                    if (xxf:non-blank($prev-name)) then
+                                        $scope-node/processes/process[@name = $prev-name][1]
+                                    else
+                                        $scope-node/processes/process[@name = $new-name][1]"/>
+                            <xf:action if="exists($existing-proc)">
+                                <xf:setvalue ref="$existing-proc/@name" value="$new-name"/>
+                                <xf:setvalue ref="$existing-proc"       value="$new-body"/>
+                            </xf:action>
+                            <xf:insert
+                                if="empty($existing-proc)"
+                                context="$scope-node/processes"
+                                ref="process"
+                                origin="xf:element('process', (xf:attribute('name', $new-name), $new-body))"/>
+                        </xf:action>
+                    </xf:action>
+                </fr:dialog-process-editor>
 
                 <!-- Add / Edit Application or Form Override Modal Dialog -->
                 <xxf:dialog
@@ -8966,7 +9377,8 @@
                                 exists($existing-match) and
                                 $eff-profiles = '' and
                                 empty($existing-match/curated/*/*[string(@override) = 'true']) and
-                                empty($existing-match/resources/message)
+                                empty($existing-match/resources/message) and
+                                empty($existing-match/processes/process)
                             "/>
                         <xf:var
                             name="duplicate-error"
@@ -9096,7 +9508,8 @@
                                             exists($cur-existing-match) and
                                             $cur-profiles = '' and
                                             empty($cur-existing-match/curated/*/*[string(@override) = 'true']) and
-                                            empty($cur-existing-match/resources/message)
+                                            empty($cur-existing-match/resources/message) and
+                                            empty($cur-existing-match/processes/process)
                                         "/>
                                     <xf:var name="cur-duplicate-error" value="exists($cur-existing-match) and not($cur-existing-is-empty-parent)"/>
                                     <xf:var name="cur-dialog-valid" value="$cur-app-valid and $cur-form-valid and $cur-profiles-valid and not($cur-duplicate-error)"/>

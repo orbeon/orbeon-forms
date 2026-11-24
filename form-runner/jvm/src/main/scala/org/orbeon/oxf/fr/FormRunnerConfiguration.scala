@@ -17,6 +17,7 @@ import org.orbeon.dom.{Document, Element, Namespace}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.fr.persistence.PersistencePropertyProvider
+import org.orbeon.oxf.fr.process.{ProcessEditorParams, ProcessEditorUI, ProcessParser}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -135,6 +136,32 @@ trait FormRunnerConfiguration {
     val editorDoc = StaticXPath.tinyTreeToOrbeonDom(editorNode)
     LandingCardsConfigXml.toJsonString(editorDoc)
   }
+
+  //@XPathFunction
+  def builtinDetailProcessNames(): Array[String] =
+    BuiltinDetailProcessNames
+
+  //@XPathFunction
+  def defaultDetailProcessDefinition(name: String, app: String, form: String): String =
+    name.trimAllToOpt.flatMap { trimmedName =>
+      val effApp  = app.trimAllToOpt.getOrElse("*")
+      val effForm = form.trimAllToOpt.getOrElse("*")
+      Properties.instance.getPropertySet
+        .getStringOrURIAsStringOpt(s"$DetailProcessPropertyPrefix$trimmedName.$effApp.$effForm")
+        .orElse(Properties.instance.getPropertySet.getStringOrURIAsStringOpt(s"$DetailProcessPropertyPrefix$trimmedName.*.*"))
+    }.getOrElse("")
+
+  //@XPathFunction
+  def isValidProcessDefinition(source: String): Boolean =
+    source.trimAllToOpt.exists(s => Try(ProcessParser.parse(s)).isSuccess)
+
+  //@XPathFunction
+  def formatProcessDefinition(source: String): String =
+    ProcessEditorUI.formatProcessString(source)
+
+  //@XPathFunction
+  def formatProcessDefinitionHtml(source: String): String =
+    ProcessEditorUI.formatProcessStringToHtml(source)
 }
 
 object FormRunnerConfiguration extends FormRunnerConfiguration {
@@ -179,8 +206,34 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     name: String
   )
 
-  private val ResourcePropertyPrefix = "oxf.fr.resource."
-  private val HtmlSuffix             = "html"
+  private val ResourcePropertyPrefix      = "oxf.fr.resource."
+  private val DetailProcessPropertyPrefix = "oxf.fr.detail.process."
+  private val HtmlSuffix                  = "html"
+
+  private val BuiltinDetailButtonProcessNames: List[String] = List(
+    "save",
+    "validate",
+    "send",
+    "email",
+    "edit",
+    "review",
+    "new",
+    "collapse-all",
+    "expand-all",
+    "new-to-edit",
+    "wizard-prev",
+    "wizard-next",
+    "search-first",
+    "search-prev",
+    "search-next",
+    "search-last"
+  )
+
+  val BuiltinDetailProcessNames: Array[String] =
+    (ProcessEditorParams.BuiltinSubProcesses.filterNot(_.deprecated).map(_.name) ++ BuiltinDetailButtonProcessNames)
+      .distinct
+      .sorted
+      .toArray
 
   val Categories: List[String] =
     List(
@@ -1761,9 +1814,11 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     val globalCuratedValues  = mutable.Map.empty[String, String]
     val globalResourceValues = mutable.LinkedHashMap.empty[ResourceOverrideKey, String]
     val globalResourceHtml   = mutable.Map.empty[ResourceOverrideKey, Boolean]
+    val globalProcesses      = mutable.LinkedHashMap.empty[String, String]
     val appFormOverrides     = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
     val appFormResources     = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[ResourceOverrideKey, String]]
     val appFormResourceHtml  = mutable.Map.empty[OverrideScope, mutable.Map[ResourceOverrideKey, Boolean]]
+    val appFormProcesses     = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[String, String]]
     val customProperties     = mutable.ListBuffer.empty[CustomProperty]
     val customNamespaces     = mutable.LinkedHashMap.empty[String, String]
 
@@ -1830,6 +1885,46 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         false
       }
 
+    def tryMatchProcessProperty(
+      name         : String,
+      asType       : String,
+      value        : String,
+      profiles     : String,
+      processorName: String
+    ): Boolean =
+      if (processorName.isEmpty && asType == "xs:string" && name.startsWith(DetailProcessPropertyPrefix)) {
+        val suffix = name.substring(DetailProcessPropertyPrefix.length)
+        suffix.splitTo[List](".") match {
+          case List(procName, app, form)
+            if ProcessEditorParams.ProcessNameRegex.matches(procName) &&
+               app.nonEmpty && form.nonEmpty &&
+               AppForm(app, form) != AppForm.FormBuilder &&
+               AppForm(app, form) != AppForm.FormConfiguration =>
+            if (app == "*" && form == "*" && profiles.isEmpty) {
+              if (! globalProcesses.contains(procName)) {
+                globalProcesses.put(procName, value)
+                true
+              } else {
+                false
+              }
+            } else {
+              val scope = OverrideScope(app, form, profiles)
+              appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
+              val procMap = appFormProcesses.getOrElseUpdate(scope, mutable.LinkedHashMap.empty)
+              if (! procMap.contains(procName)) {
+                procMap.put(procName, value)
+                true
+              } else {
+                false
+              }
+            }
+          case _ =>
+            false
+        }
+      } else {
+        false
+      }
+
     rootOpt.foreach { root =>
       collectNamespaces(root)
 
@@ -1842,7 +1937,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         val profiles      = propElem.attributeValueOpt("profiles").orElse(propElem.attributeValueOpt("profile")).map(_.splitTo[List]().mkString(" ")).getOrElse("")
         val processorName = propElem.attributeValueOpt("processor-name").flatMap(_.trimAllToOpt).getOrElse("")
 
-        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName)) {
+        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName) && ! tryMatchProcessProperty(name, asType, value, profiles, processorName)) {
           val matchedGlobal =
             if (profiles.isEmpty && processorName.isEmpty)
               CuratedByGlobalName.get(name).filter(c => c.xsType == asType && ! globalCuratedValues.contains(c.key))
@@ -1906,9 +2001,10 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     for ((prefix, uri) <- allConfigNamespaces)
       configRoot.add(Namespace(prefix, uri))
 
-    // 1. Global curated properties & global resource overrides
+    // 1. Global curated properties, resource overrides & processes
     appendCuratedBlock(configRoot, globalCuratedValues, appFormOnly = false)
     appendResourcesBlock(configRoot, globalResourceValues, globalResourceHtml)
+    appendProcessesBlock(configRoot, globalProcesses)
 
     // 2. Application / Form / Profile overrides
     val overridesElem = configRoot.addElement("app-form-overrides")
@@ -1923,6 +2019,10 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         overrideElem,
         appFormResources.getOrElse(scope, Map.empty),
         appFormResourceHtml.getOrElse(scope, Map.empty)
+      )
+      appendProcessesBlock(
+        overrideElem,
+        appFormProcesses.getOrElse(scope, Map.empty)
       )
     }
 
@@ -1954,6 +2054,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     templateOverride.addAttribute("profiles", "")
     appendCuratedBlock(templateOverride, Map.empty, appFormOnly = true)
     appendResourcesBlock(templateOverride, Map.empty, Map.empty)
+    appendProcessesBlock(templateOverride, Map.empty)
 
     val templateProp = templatesElem.addElement("property")
     templateProp.addAttribute("name", "")
@@ -2123,6 +2224,18 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     }
   }
 
+  private def appendProcessesBlock(
+    parent   : Element,
+    processes: scala.collection.Map[String, String]
+  ): Unit = {
+    val processesElem = parent.addElement("processes")
+    for ((name, v) <- processes) {
+      val procElem = processesElem.addElement("process")
+      procElem.addAttribute("name", name)
+      procElem.setText(v)
+    }
+  }
+
   def normalizeOverridesDom(configDoc: Document): Unit =
     for {
       configRoot    <- Option(configDoc.getRootElement)
@@ -2166,6 +2279,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           parentElem.addAttribute("profiles", "")
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
+          appendProcessesBlock(parentElem, Map.empty)
           seenScopes += parentScope
           keptElems  += parentElem
         }
@@ -2190,6 +2304,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           parentElem.addAttribute("profiles", "")
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
+          appendProcessesBlock(parentElem, Map.empty)
           seenScopes += parentScope
           keptElems  += parentElem
         }
@@ -2312,8 +2427,23 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           )
       }
 
+    def appendProcessProperties(processesElemOpt: Option[Element], app: String, form: String, profiles: String = ""): Unit =
+      for {
+        processesElem <- processesElemOpt.toList
+        procElem      <- processesElem.elements("process")
+        procName      <- procElem.attributeValueOpt("name").flatMap(_.trimAllToOpt)
+      } {
+        val value = procElem.getText
+        appendProperty(
+          name     = s"$DetailProcessPropertyPrefix$procName.$app.$form",
+          xsType   = "xs:string",
+          value    = value,
+          profiles = profiles
+        )
+      }
+
     configRootOpt.foreach { configRoot =>
-      // 1. Global curated properties & global resource overrides
+      // 1. Global curated properties, resource overrides & processes
       for {
         curatedElem <- Option(configRoot.element("curated")).toList
         c           <- CuratedProperties
@@ -2327,6 +2457,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       )
 
       appendResourceProperties(Option(configRoot.element("resources")), "*", "*")
+      appendProcessProperties(Option(configRoot.element("processes")), "*", "*")
 
       // 2. Application / Form / Profile overrides
       for {
@@ -2352,6 +2483,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
         if (profiles.isEmpty)
           appendResourceProperties(Option(overrideElem.element("resources")), app, form)
+        appendProcessProperties(Option(overrideElem.element("processes")), app, form, profiles)
       }
 
       // 3. Custom properties

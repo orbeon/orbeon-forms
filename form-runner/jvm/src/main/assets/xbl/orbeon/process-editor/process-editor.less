@@ -1,0 +1,830 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    .fr-proc-tok-keyword {
+        color: var(--orbeon-syntax-keyword-color);
+        font-weight: 600;
+    }
+
+    .fr-proc-tok-action {
+        color: var(--orbeon-syntax-function-color);
+    }
+
+    .fr-proc-tok-param {
+        color: var(--orbeon-syntax-parameter-color);
+    }
+
+    .fr-proc-tok-string {
+        color: var(--orbeon-syntax-string-color);
+    }
+
+    .fr-proc-tok-punct {
+        color: var(--orbeon-syntax-punctuation-color);
+    }
+
+    &.fr-process-dragging {
+        cursor: grabbing !important;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .fr-process-dnd-source {
+        opacity: 0.35;
+    }
+
+    .fr-process-dnd-ghost {
+        position: fixed;
+        z-index: 10000;
+        pointer-events: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 500;
+        color: var(--orbeon-base-color);
+        background-color: var(--orbeon-tab-background-color);
+        border: 1px solid var(--orbeon-focus-border-color);
+        border-radius: 9999px;
+        box-shadow: 0 4px 12px color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
+        white-space: nowrap;
+    }
+
+    .fr-process-drop-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background-color: var(--orbeon-focus-border-color);
+        border-radius: 9999px;
+        pointer-events: none;
+        z-index: 9999;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: -3px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--orbeon-focus-border-color);
+            box-shadow: 0 0 0 2px var(--orbeon-form-background-color);
+        }
+
+        &.fr-process-drop-indicator-noop {
+            opacity: 0.35;
+        }
+    }
+
+    .fr-dialog-process-editor {
+        width: 1130px;
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 40px);
+
+        &[open] {
+            display: flex;
+            flex-direction: column;
+        }
+
+        > .xxforms-dialog-head {
+            flex-shrink: 0;
+        }
+
+        > .xxforms-dialog-body {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .fr-process-editor-body {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1 1 auto;
+        }
+
+        .fr-dialog-buttons {
+            flex-shrink: 0;
+        }
+
+        &:has(.fr-process-editor-single) {
+            width: 920px;
+
+            .xbl-fr-tabbable > .tabs-left {
+                display: flex;
+                flex-direction: column;
+                grid-template-columns: minmax(0, 1fr);
+
+                > .nav-tabs {
+                    display: none;
+                }
+
+                > .tab-content {
+                    width: 100%;
+                    margin: 0;
+                    border: none;
+                    padding: 0;
+                    background: transparent;
+
+                    > .tab-pane {
+                        padding: 0;
+                    }
+                }
+            }
+        }
+
+        .xbl-fr-grid .fr-grid:not(.fr-grid-css) .fr-grid-body .fr-grid-td {
+            position: static;
+        }
+
+        .xbl-fr-tabbable {
+            min-height: 0;
+            flex: 1 1 auto;
+            display: flex;
+
+            & > .tabs-left {
+                min-height: 0;
+                min-width: 0;
+                flex-grow: 1;
+                grid-template-rows: minmax(0, 1fr);
+
+                > .nav-tabs {
+                    max-height: 100%;
+                    box-sizing: border-box;
+                    overflow-y: auto;
+                }
+
+                > .tab-content {
+                    min-height: 0;
+                    overflow-y: auto;
+                }
+            }
+        }
+    }
+
+    .xbl-fr-process-editor,
+    .fr-dialog-process-editor {
+
+        .fr-process-tab-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fr-process-name-inline {
+            margin-bottom: 10px;
+
+            .fr-process-name-input {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                column-gap: 8px;
+                row-gap: 4px;
+
+                > .xforms-label {
+                    margin: 0;
+                    font-weight: 600;
+                    white-space: nowrap;
+                }
+
+                > input.xforms-input-input {
+                    flex: 1 1 200px;
+                    max-width: 340px;
+                    margin: 0;
+                }
+
+                > .xforms-alert {
+                    flex-basis: 100%;
+                    margin-top: 2px;
+                }
+            }
+        }
+
+        .fr-process-mode-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+            padding: 3px;
+            gap: 2px;
+            background-color: var(--orbeon-tab-bar-background-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+
+            .fr-process-mode-tab {
+                flex: 1 1 0;
+                min-width: 0;
+
+                button {
+                    display: block;
+                    width: 100%;
+                    text-align: center;
+                    padding: 5px 12px;
+                    line-height: 20px;
+                    font-weight: 500;
+                    border: none;
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    color: var(--orbeon-tab-inactive-color);
+                    background-color: transparent;
+                    text-decoration: none;
+                    cursor: pointer;
+                    transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+
+                    &:hover {
+                        background-color: transparent;
+                        color: var(--orbeon-tab-inactive-hover-color);
+                        text-decoration: none;
+                    }
+                }
+
+                &.fr-process-mode-active button,
+                &.fr-process-mode-active button:hover {
+                    background-color: var(--orbeon-tab-background-color);
+                    color: var(--orbeon-base-color);
+                    border: none;
+                    box-shadow: 0 1px 2px color-mix(in oklab, var(--orbeon-base-color) 8%, transparent), 0 0 0 1px color-mix(in oklab, var(--orbeon-base-color) 4%, transparent);
+                    cursor: default;
+                }
+            }
+        }
+
+        .fr-process-editor-panel {
+            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            background-color: var(--orbeon-tab-background-color);
+            padding: var(--orbeon-tab-padding);
+        }
+
+        .fr-process-mode-switch {
+            display: block;
+        }
+
+        .fr-process-steps-container {
+            margin: 0;
+        }
+
+        .fr-process-steps-list {
+            display: block;
+            width: 100%;
+
+            .fr-process-iteration {
+                display: flex;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                .fr-process-row-main {
+                    position: relative;
+                    flex-grow: 1;
+                    min-width: 0;
+                    align-self: stretch;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                }
+
+                .fr-process-box-slice {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: var(--fr-box-inset);
+                    right: var(--fr-box-inset);
+                    background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+                    pointer-events: none;
+
+                    &.fr-process-box-start {
+                        top: 2px;
+                        border-top-left-radius: var(--orbeon-body-decorations-border-radius);
+                        border-top-right-radius: var(--orbeon-body-decorations-border-radius);
+                    }
+
+                    &.fr-process-box-end {
+                        bottom: calc(2px + var(--fr-outer-closing) * 6px);
+                        border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
+                        border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
+                    }
+                }
+
+                .fr-process-row-content {
+                    position: relative;
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr);
+                    column-gap: 6px;
+                    row-gap: 4px;
+                    align-items: start;
+                    margin-left: calc(var(--fr-indent-level) * 20px);
+                    margin-right: calc(var(--fr-indent-level) * 20px);
+                    padding: 2px 6px calc(2px + var(--fr-extra-closing) * 6px) 6px;
+
+                    &.fr-process-has-combinator {
+                        grid-template-columns: min-content minmax(0, 1fr);
+
+                        .fr-process-row-content-params {
+                            grid-column: 2 / 3;
+                        }
+                    }
+                }
+
+                &.fr-process-row-opening-box {
+                    > .fr-process-row-main > .fr-process-row-content {
+                        padding-top: 6px;
+                    }
+
+                    > .fr-process-row-buttons {
+                        margin-top: 6px;
+                    }
+                }
+
+                &.fr-process-row-closing-box > .fr-process-row-main > .fr-process-row-content {
+                    padding-bottom: calc(6px + var(--fr-extra-closing) * 6px);
+                }
+
+                .fr-process-row-content-params {
+                    grid-column: 1 / 2;
+                    margin-left: 4px;
+                    padding: 2px 0 2px 10px;
+                    border-left: 2px solid color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
+                }
+
+                .fr-process-row-switch {
+                    align-self: center;
+                    min-width: 0;
+                }
+
+                .fr-process-action-bar {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    gap: 6px;
+                }
+
+                .fr-process-keyword-with-condition {
+                    display: flex;
+                    column-gap: 6px;
+                    align-items: flex-start;
+
+                    .fr-process-keyword {
+                        flex-grow: 0;
+                        margin-top: 5px;
+                    }
+
+                    .fr-process-condition-control {
+                        flex-grow: 1;
+                        min-width: 0;
+                    }
+
+                    .fr-process-condition-input {
+                        input.xforms-input-input {
+                            width: 100%;
+                            box-sizing: border-box;
+                            font-family: monospace;
+                        }
+                    }
+                }
+
+                .fr-process-row-buttons {
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                    display: grid;
+                    grid-template-columns: 22px 26px 26px 26px 26px 44px;
+                    align-items: center;
+                    justify-items: center;
+                    width: 170px;
+                    min-height: 34px;
+                    margin-top: 2px;
+                    margin-bottom: 2px;
+
+                    .fr-process-grab          { grid-column: 1; }
+                    .fr-process-btn-remove    { grid-column: 2; }
+                    .fr-process-btn-add       { grid-column: 3; }
+                    .fr-process-btn-group     { grid-column: 4; }
+                    .fr-process-btn-ungroup   { grid-column: 5; }
+                    .fr-process-btn-condition { grid-column: 6; }
+                    .fr-process-btn-else      { grid-column: 6; }
+                }
+
+                // DnD
+                &.fr-process-dnd-drop-into > .fr-process-row-main > .fr-process-row-content {
+                    outline: 1px dashed var(--orbeon-focus-border-color);
+                    outline-offset: -1px;
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+                }
+
+                .fr-process-grab {
+                    display: inline-block;
+                    visibility: hidden;
+                }
+
+                &.fr-process-can-move .fr-process-grab {
+                    visibility: visible;
+                    cursor: grab;
+                    opacity: 0.5;
+                    touch-action: none;
+                    -webkit-user-select: none;
+                    user-select: none;
+                }
+
+                &.fr-process-can-move:hover .fr-process-grab {
+                    opacity: 0.8;
+                }
+            }
+
+            // Control labels inside step rows are used only by error-summary, not shown inline
+            .xforms-control > .xforms-label,
+            .xforms-control > fieldset > legend.xforms-label,
+            .xbl-component > .xforms-label {
+                display: none;
+            }
+
+            .xforms-visited.xforms-invalid {
+                input.xforms-input-input,
+                > select {
+                    border-color: var(--orbeon-error-color);
+                }
+            }
+
+            .fr-process-combinator-select1 {
+                align-self: start;
+
+                select {
+                    width: auto;
+                    display: inline-block;
+                }
+
+                &.fr-process-combinator-placeholder {
+                    visibility: hidden;
+                    pointer-events: none;
+                }
+            }
+
+            .fr-process-action-select1 select {
+                width: auto;
+            }
+
+            .fr-process-add-param {
+                select {
+                    width: auto;
+                    font-size: 12px;
+                    padding-top: 3px;
+                    padding-bottom: 3px;
+                    color: var(--orbeon-link-color);
+                    border-style: dashed;
+                }
+            }
+
+            .fr-process-param-row {
+                display: grid;
+                grid-template-columns: 150px minmax(0, 1fr) auto;
+                column-gap: 8px;
+                align-items: start;
+                padding: 2px 0;
+
+                .fr-process-param-name {
+                    min-width: 0;
+                    padding-top: 5px;
+                    line-height: 20px;
+
+                    &:has(.fr-process-custom-name-input:not(.xforms-disabled)) {
+                        padding-top: 0;
+                    }
+
+                    .fr-process-param-label {
+                        display: block;
+                        font-family: monospace;
+                        font-size: 12px;
+                        color: var(--orbeon-base-color);
+                        opacity: 0.85;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+
+                        &.fr-process-param-required::after {
+                            content: " *";
+                            color: var(--orbeon-error-color);
+                            font-weight: bold;
+                        }
+                    }
+
+                    .fr-process-custom-name-input input.xforms-input-input {
+                        width: 100%;
+                        box-sizing: border-box;
+                        font-family: monospace;
+                        font-size: 12px;
+                    }
+                }
+
+                .fr-process-param-control {
+                    min-width: 0;
+
+                    .fr-process-param-input {
+                        display: block;
+                        width: 100%;
+
+                        input.xforms-input-input {
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+
+                        &.fr-process-code-input input.xforms-input-input {
+                            font-family: monospace;
+                        }
+                    }
+
+                    .fr-process-param-select1 {
+                        display: inline-block;
+                        max-width: 100%;
+
+                        select {
+                            width: auto;
+                            min-width: 150px;
+                            max-width: 100%;
+                        }
+                    }
+
+                    .fr-process-param-quantity {
+                        display: block;
+                        max-width: 240px;
+                    }
+
+                    .fr-process-param-tokens {
+                        display: block;
+
+                        fieldset {
+                            margin: 0;
+                            padding: 0;
+                        }
+
+                        .xforms-items {
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: wrap;
+                            justify-content: flex-start;
+                            gap: 4px 12px;
+                            align-items: center;
+                            padding: 4px 2px;
+
+                            > span {
+                                display: inline-flex;
+                                width: auto;
+                                margin: 0;
+                            }
+
+                            label.checkbox {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 4px;
+                                margin: 0;
+                                padding: 0;
+                                font-family: monospace;
+                                font-size: 12px;
+                                white-space: nowrap;
+                                cursor: pointer;
+
+                                input[type="checkbox"] {
+                                    margin: 0;
+                                    cursor: pointer;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .fr-process-param-actions {
+                    display: flex;
+                    align-items: center;
+                    min-height: 30px;
+                    white-space: nowrap;
+                }
+            }
+
+            .fr-process-avt-toggle {
+                .fr-process-avt-badge {
+                    display: inline-block;
+                    padding: 1px 5px;
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    font-family: monospace;
+                    font-size: 11px;
+                    font-weight: 600;
+                    line-height: 16px;
+                    color: var(--orbeon-hint-color);
+                    background-color: var(--orbeon-control-background-color);
+                }
+
+                &.fr-process-avt-active .fr-process-avt-badge {
+                    color: var(--orbeon-accent-color);
+                    border-color: var(--orbeon-accent-color);
+                    background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+                }
+            }
+
+            .fr-process-keyword {
+                display: inline-block;
+                padding: 2px 8px;
+                border: 1px solid transparent;
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                font-weight: 600;
+                font-family: monospace;
+                font-size: 12px;
+                line-height: 18px;
+
+                &.fr-process-keyword-if {
+                    color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 78%, var(--orbeon-base-color));
+                    border-color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 40%, transparent);
+                    background-color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 14%, transparent);
+                }
+
+                &.fr-process-keyword-else {
+                    color: color-mix(in oklab, var(--orbeon-alert-warning-background-color) 80%, var(--orbeon-base-color));
+                    border-color: color-mix(in oklab, var(--orbeon-alert-warning-background-color) 42%, transparent);
+                    background-color: color-mix(in oklab, var(--orbeon-alert-warning-background-color) 14%, transparent);
+                }
+
+                &.fr-process-keyword-group {
+                    color: var(--orbeon-accent-color);
+                    border-color: color-mix(in oklab, var(--orbeon-accent-color) 35%, transparent);
+                    background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+                }
+            }
+
+            .fr-process-btn {
+                padding: 2px 4px;
+
+                i {
+                    font-size: 14px;
+                }
+
+                .fr-process-btn-badge {
+                    display: inline-block;
+                    padding: 1px 5px;
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    font-family: monospace;
+                    font-size: 11px;
+                    font-weight: 600;
+                    line-height: 16px;
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-control-background-color);
+                    white-space: nowrap;
+                }
+
+                &.fr-process-btn-active .fr-process-btn-badge {
+                    color: var(--orbeon-accent-color);
+                    border-color: var(--orbeon-accent-color);
+                    background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+                }
+            }
+        }
+
+        .fr-process-empty-steps {
+            padding: 15px;
+            text-align: center;
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px dashed var(--orbeon-control-border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .fr-process-text-editor {
+            .fr-process-text-wrapper {
+                position: relative;
+                display: block;
+                width: 100%;
+                background-color: var(--orbeon-control-background-color);
+                border-radius: var(--orbeon-control-border-radius);
+
+                > .fr-process-text-backdrop {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                    pointer-events: none;
+                    z-index: 1;
+                    box-sizing: border-box;
+
+                    .fr-process-text-highlights {
+                        box-sizing: border-box;
+                        border: none !important;
+                        margin: 0;
+                        width: 100%;
+                        color: var(--orbeon-base-color);
+                        font-family: monospace;
+                        font-size: 13px;
+                        line-height: 1.5;
+                        white-space: pre-wrap;
+                        word-wrap: break-word;
+                        overflow-wrap: break-word;
+                    }
+                }
+
+                .fr-process-text-textarea {
+                    display: block;
+                    width: 100%;
+
+                    > .xforms-label {
+                        display: none;
+                    }
+
+                    textarea {
+                        position: relative;
+                        z-index: 2;
+                        display: block;
+                        width: 100%;
+                        min-height: 220px;
+                        margin: 0;
+                        padding: 10px 36px 10px 12px;
+                        box-sizing: border-box;
+                        background: transparent !important;
+                        color: transparent !important;
+                        caret-color: var(--orbeon-base-color);
+                        font-family: monospace;
+                        font-size: 13px;
+                        line-height: 1.5;
+                        resize: vertical;
+
+                        &::selection {
+                            background-color: color-mix(in oklab, var(--orbeon-accent-color) 25%, transparent);
+                            color: transparent;
+                        }
+                    }
+
+                    &.xforms-visited.xforms-invalid textarea {
+                        border-color: var(--orbeon-error-color);
+                    }
+                }
+
+                > .fr-process-text-buttons {
+                    position: absolute;
+                    top: 6px;
+                    right: 8px;
+                    z-index: 3;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    button {
+                        width: 22px;
+                        height: 22px;
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 1px solid var(--orbeon-control-border-color);
+                        border-radius: var(--orbeon-add-on-border-radius);
+                        background-color: var(--orbeon-control-background-color);
+                        color: var(--orbeon-hint-color);
+                        cursor: pointer;
+                        opacity: 0.45;
+                        font-size: 11px;
+                        line-height: 1;
+                        text-decoration: none;
+                        transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+                        &:hover,
+                        &:focus {
+                            opacity: 1;
+                            color: var(--orbeon-base-color);
+                            border-color: var(--orbeon-focus-border-color);
+                            outline: none;
+                            text-decoration: none;
+                        }
+
+                        &.fr-process-copy-success {
+                            color: var(--orbeon-button-success-background-color);
+                            border-color: var(--orbeon-button-success-background-color);
+                            opacity: 1;
+                        }
+                    }
+                }
+
+                &:hover > .fr-process-text-buttons button,
+                &:focus-within > .fr-process-text-buttons button {
+                    opacity: 0.85;
+                }
+            }
+        }
+
+        .fr-process-delete-container {
+            margin-top: 15px;
+        }
+    }
+}

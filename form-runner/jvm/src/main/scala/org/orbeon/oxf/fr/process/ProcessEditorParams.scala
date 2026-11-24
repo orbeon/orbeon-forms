@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fb.process
+package org.orbeon.oxf.fr.process
 
 import enumeratum.EnumEntry.{Hyphencase, Lowercase}
 import enumeratum.*
@@ -27,7 +27,7 @@ import scala.concurrent.duration.Duration
 import scala.util.Try
 
 
-object ProcessParams {
+object ProcessEditorParams {
 
   sealed trait ParamTier extends EnumEntry with Lowercase
   object ParamTier extends Enum[ParamTier] {
@@ -90,7 +90,8 @@ object ProcessParams {
       override val hasConstrainedWidget = true
     }
     case object DurationInput extends ParamControlKind {
-      val entryName = "duration"
+      val entryName                   = "duration"
+      override val hasConstrainedWidget = true
     }
     case object RepeatAtInput extends ParamControlKind {
       val entryName = "repeat-at"
@@ -766,6 +767,32 @@ object ProcessParams {
     }
   }
 
+  private val DurationLiteralRegex = """^(\d+)\s*([A-Za-z]+)$""".r
+
+  private val NormalizedDurationUnit: Map[String, String] = Map(
+    "ms"           -> "ms",
+    "millis"       -> "ms",
+    "millisecond"  -> "ms",
+    "milliseconds" -> "ms",
+    "s"            -> "s",
+    "sec"          -> "s",
+    "second"       -> "s",
+    "seconds"      -> "s",
+    "min"          -> "min",
+    "minute"       -> "min",
+    "minutes"      -> "min",
+    "h"            -> "h",
+    "hr"           -> "h",
+    "hour"         -> "h",
+    "hours"        -> "h"
+  )
+
+  def splitDurationLiteral(value: String): Option[(String, String)] =
+    value.trimAllToOpt.collect {
+      case DurationLiteralRegex(amount, unit) =>
+        NormalizedDurationUnit.get(unit.toLowerCase).map(normUnit => (amount, normUnit))
+    }.flatten
+
   def isValidDurationLiteral(value: String): Boolean =
     value.trimAllToOpt.exists { trimmed =>
       Try(Duration(SubmissionUtils.normalizeDurationString(trimmed))).isSuccess
@@ -977,6 +1004,8 @@ object ProcessParams {
               rawValue.splitTo[List]().exists(t => ! choices.contains(t))
             case DetailModeSelect =>
               rawValue.nonAllBlank && ! DetailModeSelect.choices.contains(rawValue) && ! DisallowedChangeModes(rawValue)
+            case DurationInput =>
+              rawValue.nonAllBlank && splitDurationLiteral(rawValue).isEmpty
             case _ =>
               false
           }

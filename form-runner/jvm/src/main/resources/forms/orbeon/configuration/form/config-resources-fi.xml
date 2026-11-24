@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Tyhjennä piilotetut arvot</label>
+        <hint>Tyhjennä piilotettujen kenttien, ruudukoiden ja osioiden arvot välittömästi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Säilytä arvot)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Säilytä arvot</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Tyhjennä arvot</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automaattiset laskentariippuvuudet</label>
         <hint>Määritä automaattisesti arviointijärjestys Laskettu arvo- ja Alkuarvo-kaavoille &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

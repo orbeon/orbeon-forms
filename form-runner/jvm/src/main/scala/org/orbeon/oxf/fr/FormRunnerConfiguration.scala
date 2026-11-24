@@ -1067,6 +1067,15 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "false"
     ),
     CuratedPropertyDef(
+      key          = "nonrelevant",
+      category     = "formulas",
+      baseName     = "oxf.fr.detail.nonrelevant",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = "keep"
+    ),
+    CuratedPropertyDef(
       key          = "analysis-calculate",
       category     = "formulas",
       baseName     = "oxf.xforms.analysis.calculate",

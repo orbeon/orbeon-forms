@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Tøm skjulte verdier</label>
+        <hint>Tøm umiddelbart verdiene til skjulte kontroller, rutenett og seksjoner &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Behold verdier)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Behold verdier</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Tøm verdier</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatiske beregningsavhengigheter</label>
         <hint>Bestem evalueringsrekkefølge automatisk for formlene Beregnet verdi og Startverdi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

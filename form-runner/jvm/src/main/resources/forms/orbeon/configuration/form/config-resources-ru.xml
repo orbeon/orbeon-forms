@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Очищать скрытые значения</label>
+        <hint>Немедленно очищать значения скрытых элементов управления, таблиц и секций &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Сохранять значения)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Сохранять значения</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Очищать значения</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Автоматические зависимости вычислений</label>
         <hint>Автоматически определять порядок вычисления формул вычисляемого и начального значений &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

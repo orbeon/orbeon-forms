@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Ryd skjulte værdier</label>
+        <hint>Ryd straks værdier for skjulte kontroller, gitre og sektioner &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Behold værdier)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Behold værdier</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Ryd værdier</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatiske beregningsafhængigheder</label>
         <hint>Bestem automatisk evalueringsrækkefølgen for formlerne Beregnet værdi og Startværdi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

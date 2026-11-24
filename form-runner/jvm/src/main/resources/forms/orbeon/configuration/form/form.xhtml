@@ -3298,6 +3298,21 @@
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="12">
+                                        <xf:select1 id="nonrelevant-value-control" appearance="minimal" ref="nonrelevant/@selection" class="fr-config-select1">
+                                            <xf:label ref="$form-resources/nonrelevant/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/nonrelevant/hint else replace($form-resources/nonrelevant/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:itemset ref="$form-resources/nonrelevant/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="3" w="12">
                                         <xf:select1 id="analysis-calculate-value-control" appearance="minimal" ref="analysis-calculate/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/analysis-calculate/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/analysis-calculate/hint else replace($form-resources/analysis-calculate/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3312,7 +3327,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="3" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="4" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="formula-allowed-functions-override-control" ref="formula-allowed-functions/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">

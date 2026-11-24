@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>مسح القيم المخفية</label>
+        <hint>مسح قيم عناصر التحكم والشبكات والأقسام المخفية فورًا &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (الاحتفاظ بالقيم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>الاحتفاظ بالقيم</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>مسح القيم</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>التبعيات التلقائية للحسابات</label>
         <hint>تحديد ترتيب التقييم تلقائيًا لصيغ القيمة المحسوبة والقيمة الابتدائية &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

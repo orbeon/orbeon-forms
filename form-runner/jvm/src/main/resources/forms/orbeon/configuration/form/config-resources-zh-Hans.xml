@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>清除隐藏值</label>
+        <hint>立即清除隐藏控件、网格和节的值 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (保留值)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>保留值</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>清除值</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>自动计算依赖关系</label>
         <hint>自动确定计算值和初始值公式的求值顺序 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

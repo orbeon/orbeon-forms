@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Wyczyść ukryte wartości</label>
+        <hint>Natychmiast wyczyść wartości ukrytych kontrolek, siatek i sekcji &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Domyślnie (Zachowaj wartości)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Zachowaj wartości</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Wyczyść wartości</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatyczne zależności obliczeń</label>
         <hint>Automatycznie określaj kolejność wyliczania formuł Wartość obliczana i Wartość początkowa &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

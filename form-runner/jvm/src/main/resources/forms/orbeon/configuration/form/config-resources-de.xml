@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Ausgeblendete Werte löschen</label>
+        <hint>Werte von ausgeblendeten Steuerelementen, Rastern und Abschnitten sofort löschen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Werte beibehalten)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Werte beibehalten</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Werte löschen</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatische Berechnungsabhängigkeiten</label>
         <hint>Auswertungsreihenfolge für Formeln vom Typ „Berechneter Wert“ und „Initialer Wert“ automatisch ermitteln &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

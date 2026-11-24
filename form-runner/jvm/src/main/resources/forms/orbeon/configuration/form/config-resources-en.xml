@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Clear Hidden Values</label>
+        <hint>Immediately clear values of hidden controls, grids, and sections &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Default (Keep values)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Keep values</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Clear values</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatic Calculations Dependencies</label>
         <hint>Automatically determine evaluation order for Calculated Value and Initial Value formulas &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

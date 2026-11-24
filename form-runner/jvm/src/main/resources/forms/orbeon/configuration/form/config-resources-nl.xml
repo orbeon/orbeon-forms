@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Verborgen waarden wissen</label>
+        <hint>Waarden van verborgen velden, rasters en secties onmiddellijk wissen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Waarden behouden)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Waarden behouden</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Waarden wissen</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatische berekeningsafhankelijkheden</label>
         <hint>Evaluatievolgorde voor formules Berekende waarde en Initiële waarde automatisch bepalen &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

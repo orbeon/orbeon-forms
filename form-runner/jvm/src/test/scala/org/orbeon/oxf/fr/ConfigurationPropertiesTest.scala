@@ -97,6 +97,11 @@ class ConfigurationPropertiesTest
       assert(importElem.attributeValue("override") == "false")
       assert(importElem.attributeValue("value") == "false")
 
+      val nonRelevantElem = curatedElem.element("formulas").element("nonrelevant")
+      assert(nonRelevantElem.attributeValue("override") == "false")
+      assert(nonRelevantElem.attributeValue("value") == "keep")
+      assert(nonRelevantElem.attributeValue("name") == "oxf.fr.detail.nonrelevant.*.*")
+
       val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
       assert(roundTripPropsDoc.getRootElement.elements("property").isEmpty)
     }

@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Rensa dolda värden</label>
+        <hint>Rensa omedelbart värden för dolda kontroller, rutnät och sektioner &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Behåll värden)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Behåll värden</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Rensa värden</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatiska beräkningsberoenden</label>
         <hint>Fastställ automatiskt utvärderingsordning för formlerna Beräknat värde och Startvärde &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Rejtett értékek törlése</label>
+        <hint>A rejtett vezérlők, rácsok és szakaszok értékeinek azonnali törlése &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Értékek megtartása)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Értékek megtartása</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Értékek törlése</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Automatikus számítási függőségek</label>
         <hint>Kiértékelési sorrend automatikus meghatározása a Számított érték és Kezdeti érték képletekhez &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

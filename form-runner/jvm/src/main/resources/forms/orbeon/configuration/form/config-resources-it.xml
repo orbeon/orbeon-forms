@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Cancella valori nascosti</label>
+        <hint>Cancella immediatamente i valori di controlli, griglie e sezioni nascosti &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinito (Mantieni valori)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Mantieni valori</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Cancella valori</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Dipendenze dei calcoli automatici</label>
         <hint>Determina automaticamente l'ordine di valutazione per le formule Valore calcolato e Valore iniziale &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

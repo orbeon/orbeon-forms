@@ -1220,6 +1220,22 @@
             <value>false</value>
         </item>
     </readonly-disable-calculate>
+    <nonrelevant>
+        <label>Gizli Değerleri Temizle</label>
+        <hint>Gizli denetimlerin, ızgaraların ve bölümlerin değerlerini hemen temizle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.nonrelevant.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Değerleri koru)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Değerleri koru</label>
+            <value>keep</value>
+        </item>
+        <item>
+            <label>Değerleri temizle</label>
+            <value>empty</value>
+        </item>
+    </nonrelevant>
     <analysis-calculate>
         <label>Otomatik Hesaplama Bağımlılıkları</label>
         <hint>Hesaplanan Değer ve Başlangıç Değeri formülleri için değerlendirme sırasını otomatik olarak belirle &lt;code class="fr-config-prop-name"&gt;oxf.xforms.analysis.calculate&lt;/code&gt;</hint>

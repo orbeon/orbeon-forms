@@ -58,14 +58,25 @@ object StyleVariables {
     hasBalancedParentheses
   }
 
+  case class ThemeVariables(all: Set[String], hasLightLayer: Boolean)
+
   private val CssCommentRE          = """(?s)/\*.*?\*/""".r
   private val VariableDeclarationRE = """--orbeon-([a-z][a-z0-9-]*)\s*:""".r
+  private val LightLayerRE          = """@layer\s+orbeon-theme\s*\{""".r
 
-  def themeVariables(css: String): Set[String] =
+  def themeVariables(css: String): ThemeVariables = {
+
     // Names without their `--orbeon-` prefix
-    VariableDeclarationRE.findAllMatchIn(CssCommentRE.replaceAllIn(css, "")).map(_.group(1)).toSet
 
-  def themeVariablesForPath(path: String): Option[Set[String]] = {
+    val withoutComments = CssCommentRE.replaceAllIn(css, "")
+
+    ThemeVariables(
+      all           = VariableDeclarationRE.findAllMatchIn(withoutComments).map(_.group(1)).toSet,
+      hasLightLayer = LightLayerRE.findFirstIn(withoutComments).isDefined
+    )
+  }
+
+  def themeVariablesForPath(path: String): Option[ThemeVariables] = {
     // `None` if the path isn't that of a resource, as for a theme served by another site
     val resourceManager = ResourceManagerWrapper.instance
     path.trimAllToOpt.filter(resourceManager.exists).map { p =>
@@ -137,9 +148,10 @@ object StyleVariables {
   val LayerOrder = "@layer orbeon-theme, orbeon-properties, orbeon-theme-variants, orbeon-properties-variants;"
 
   def toCss(
-    light : List[(String, String)],
-    dark  : List[(String, String)],
-    print : List[(String, String)]
+    light         : List[(String, String)],
+    dark          : List[(String, String)],
+    print         : List[(String, String)],
+    hasLightLayer : Boolean
   ): Option[String] = {
 
     def declarations(variables: List[(String, String)]): String =
@@ -149,8 +161,12 @@ object StyleVariables {
     def darkSelectors(colorSchemeClass: String): String =
       s".orbeon.$colorSchemeClass, .orbeon .$colorSchemeClass, .orbeon:has(.$colorSchemeClass)"
 
+    // A theme without layers, as one copied from an earlier version, would win over any layered value
     def inLayer(layer: String, blocks: List[String]): List[String] =
-      blocks.nonEmpty.list(s"@layer $layer { ${blocks.mkString(" ")} }")
+      if (hasLightLayer)
+        blocks.nonEmpty.list(s"@layer $layer { ${blocks.mkString(" ")} }")
+      else
+        blocks
 
     val lightBlocks =
       light.nonEmpty.list(s".orbeon ${declarations(light)}")
@@ -163,6 +179,6 @@ object StyleVariables {
     val blocks =
       inLayer("orbeon-properties", lightBlocks) ::: inLayer("orbeon-properties-variants", variantBlocks)
 
-    blocks.nonEmpty.option((LayerOrder :: blocks).mkString(" "))
+    blocks.nonEmpty.option((hasLightLayer.list(LayerOrder) ::: blocks).mkString(" "))
   }
 }

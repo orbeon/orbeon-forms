@@ -329,12 +329,13 @@ trait FormRunnerComponentsCompileTime {
       themeVariables  <- themeVariablesOpt.toList
       (name, variant) <-
         StyleVariables.unknownVariables(
-          themeVariables = themeVariables,
+          themeVariables = themeVariables.all,
           variables      = List(None -> light, Some(StyleVariables.DarkVariant) -> dark, Some(StyleVariables.PrintVariant) -> print)
         )
     } FormRunnerLogger.warn(s"Property `${StyleVariables.declaredPropertyName(name, app, form, profileOpt, variant)}` for `$app/$form` overrides `--orbeon-$name`, which the theme `$themeCssUri` doesn't declare")
 
-    StyleVariables.toCss(light, dark, print)
+    // If the CSS of the theme can't be read, the light values are not in a layer, so they keep their effect
+    StyleVariables.toCss(light, dark, print, hasLightLayer = themeVariablesOpt.exists(_.hasLightLayer))
   }
 
   // Used by components.xsl

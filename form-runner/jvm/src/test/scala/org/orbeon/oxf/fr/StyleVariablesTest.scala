@@ -45,9 +45,12 @@ class StyleVariablesTest
   private def layeredCss(lightDeclarations: Option[String], variantBlocks: String*): String =
     (
       StyleVariables.LayerOrder ::
-      lightDeclarations.toList.map(declarations => s"@layer orbeon-properties { .orbeon { $declarations } }") :::
+      lightDeclarations.toList.map(declarations => s"@layer orbeon-properties { ${unlayeredLightCss(declarations)} }") :::
       variantBlocks.nonEmpty.list(s"@layer orbeon-properties-variants { ${variantBlocks.mkString(" ")} }")
     ).mkString(" ")
+
+  private def unlayeredLightCss(declarations: String): String =
+    s".orbeon { $declarations }"
 
   private def topLevelBlocks(css: String): List[(String, String)] = {
     // Header and content of the top-level rules and at-rules of a stylesheet without comments
@@ -267,13 +270,27 @@ class StyleVariablesTest
           |}
           |.after { --orbeon-after-print: 0; }""".stripMargin
 
-      assert(StyleVariables.themeVariables(css) == Set("accent-color", "base-font-size", "dark-only", "page-background-color", "after-print"))
+      assert(
+        StyleVariables.themeVariables(css) ==
+          StyleVariables.ThemeVariables(
+            all           = Set("accent-color", "base-font-size", "dark-only", "page-background-color", "after-print"),
+            hasLightLayer = false
+          )
+      )
+    }
+
+    it("must find whether the CSS of a theme puts its light values in the `orbeon-theme` layer") {
+      assert(  StyleVariables.themeVariables("@layer orbeon-theme {\n  .orbeon { --orbeon-accent-color: #333; }\n}").hasLightLayer)
+      assert(  StyleVariables.themeVariables("@layer orbeon-theme{.orbeon{--orbeon-accent-color:#333}}").hasLightLayer)
+      assert(! StyleVariables.themeVariables(".orbeon { --orbeon-accent-color: #333; }").hasLightLayer)
+      assert(! StyleVariables.themeVariables("/* @layer orbeon-theme { */ .orbeon { --orbeon-accent-color: #333; }").hasLightLayer)
+      assert(! StyleVariables.themeVariables("@layer orbeon-themes { .orbeon { --orbeon-accent-color: #333; } }").hasLightLayer)
     }
 
     it("must read the variables of a theme from its CSS resource, and nothing if the CSS can't be read") {
       assert(
         StyleVariables.themeVariablesForPath("/forms/issue/7641/theme.css") ==
-          Set("accent-color", "base-font-size").some
+          StyleVariables.ThemeVariables(all = Set("accent-color", "base-font-size"), hasLightLayer = false).some
       )
       assert(StyleVariables.themeVariablesForPath("/forms/issue/7641/theme.css") == StyleVariables.themeVariablesForPath(" /forms/issue/7641/theme.css "))
       assert(StyleVariables.themeVariablesForPath("/forms/issue/7641/missing.css").isEmpty)
@@ -305,31 +322,40 @@ class StyleVariablesTest
 
     it("must read the variables of the built-in themes") {
       for (theme <- List("2025", "2026"))
-        assert(StyleVariables.themeVariablesForPath(s"/apps/fr/themes/$theme/theme.css").exists(_("accent-color")), theme)
+        assert(StyleVariables.themeVariablesForPath(s"/apps/fr/themes/$theme/theme.css").exists(t => t.all("accent-color") && t.hasLightLayer), theme)
     }
 
     it("must produce CSS without a media query for the light values, and nothing without variables") {
       assert(
-        StyleVariables.toCss(List("accent-color" -> "#333333", "base-font-size" -> "15px"), Nil, Nil) ==
+        StyleVariables.toCss(List("accent-color" -> "#333333", "base-font-size" -> "15px"), Nil, Nil, hasLightLayer = true) ==
           layeredCss("--orbeon-accent-color: #333333; --orbeon-base-font-size: 15px;".some).some
       )
-      assert(StyleVariables.toCss(Nil, Nil, Nil).isEmpty)
+      assert(StyleVariables.toCss(Nil, Nil, Nil, hasLightLayer = true).isEmpty)
+    }
+
+    // A custom theme copied from the `theme.less` of an earlier version has no layer, and would win over the layer
+    it("must produce the light values outside of any layer for a theme which doesn't put its light values in a layer") {
+      assert(
+        StyleVariables.toCss(List("accent-color" -> "#333333"), List("accent-color" -> "#cccccc"), List("base-font-size" -> "14px"), hasLightLayer = false) ==
+          (unlayeredLightCss("--orbeon-accent-color: #333333;") + " " + darkCss("--orbeon-accent-color: #cccccc;") + " " + printCss("--orbeon-base-font-size: 14px;")).some
+      )
+      assert(StyleVariables.toCss(Nil, Nil, Nil, hasLightLayer = false).isEmpty)
     }
 
     it("must produce screen-only CSS for the dark values, after the light values") {
       assert(
-        StyleVariables.toCss(List("accent-color" -> "#333333"), List("accent-color" -> "#cccccc", "base-color" -> "#dddddd"), Nil) ==
+        StyleVariables.toCss(List("accent-color" -> "#333333"), List("accent-color" -> "#cccccc", "base-color" -> "#dddddd"), Nil, hasLightLayer = true) ==
           layeredCss("--orbeon-accent-color: #333333;".some, darkCss("--orbeon-accent-color: #cccccc; --orbeon-base-color: #dddddd;")).some
       )
-      assert(StyleVariables.toCss(Nil, List("accent-color" -> "#cccccc"), Nil) == layeredCss(None, darkCss("--orbeon-accent-color: #cccccc;")).some)
+      assert(StyleVariables.toCss(Nil, List("accent-color" -> "#cccccc"), Nil, hasLightLayer = true) == layeredCss(None, darkCss("--orbeon-accent-color: #cccccc;")).some)
     }
 
     it("must produce print-only CSS for the print values, after the light and dark values") {
       assert(
-        StyleVariables.toCss(List("accent-color" -> "#333333"), List("accent-color" -> "#cccccc"), List("base-font-size" -> "14px")) ==
+        StyleVariables.toCss(List("accent-color" -> "#333333"), List("accent-color" -> "#cccccc"), List("base-font-size" -> "14px"), hasLightLayer = true) ==
           layeredCss("--orbeon-accent-color: #333333;".some, darkCss("--orbeon-accent-color: #cccccc;"), printCss("--orbeon-base-font-size: 14px;")).some
       )
-      assert(StyleVariables.toCss(Nil, Nil, List("base-font-size" -> "14px")) == layeredCss(None, printCss("--orbeon-base-font-size: 14px;")).some)
+      assert(StyleVariables.toCss(Nil, Nil, List("base-font-size" -> "14px"), hasLightLayer = true) == layeredCss(None, printCss("--orbeon-base-font-size: 14px;")).some)
     }
 
     // The dark values must apply exactly when the dark blocks of the themes apply
@@ -345,7 +371,7 @@ class StyleVariablesTest
           } yield
             media -> selector.replaceAll("""\s+""", " ")
 
-        val generated = StyleVariables.toCss(Nil, List("accent-color" -> "#cccccc"), Nil).get
+        val generated = StyleVariables.toCss(Nil, List("accent-color" -> "#cccccc"), Nil, hasLightLayer = true).get
 
         assert(darkRules(generated, "@layer orbeon-properties-variants").size == 2)
         assert(darkRules(generated, "@layer orbeon-properties-variants") == darkRules(themeCss(theme), "@layer orbeon-theme-variants").distinct)
@@ -384,6 +410,20 @@ class StyleVariablesTest
       assert(
         styleVariablesStylesheets("7641", "view", variableProperty("accent-color", "*.*", "#aaaaaa", variant = "dark".some)) ==
           List(layeredCss(None, darkCss("--orbeon-accent-color: #aaaaaa;")))
+      )
+    }
+
+    it("must produce the light values outside of any layer with a custom theme which doesn't put its light values in a layer") {
+      assert(
+        styleVariablesStylesheets(
+          "7641",
+          "edit",
+          stringProperty("oxf.fr.style.theme.issue.7641",          "custom7641"),
+          stringProperty("oxf.fr.style.themes.custom7641.css-uri", "/forms/issue/7641/theme.css"),
+          variableProperty("accent-color",   "issue.7641", "#333333"),
+          variableProperty("base-font-size", "issue.7641", "12px", variant = "print".some)
+        ) ==
+          List(unlayeredLightCss("--orbeon-accent-color: #333333;") + " " + printCss("--orbeon-base-font-size: 12px;"))
       )
     }
   }

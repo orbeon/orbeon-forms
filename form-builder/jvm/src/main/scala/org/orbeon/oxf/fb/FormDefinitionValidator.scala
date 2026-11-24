@@ -276,7 +276,6 @@ object FormDefinitionValidator {
     XFItemsetTest
 
   private val FormResourceRefRegex = """\$form-resources/([A-Za-z0-9_\-.]+)/""".r
-  private val ProcessNameRegex     = """^[a-zA-Z0-9_\-\.]+$""".r
 
   // Safe context wrapper over a form definition root element
   private class SafeFormDocContext(val formDefinitionRootElem: NodeInfo) extends FormRunnerDocContext {
@@ -887,10 +886,7 @@ object FormDefinitionValidator {
             .filter(formProcessNames)
             .toSet
         case ActionNode(actionName, _) =>
-          val isSubProcessRef =
-            ! ActionDefsByName.contains(actionName) ||
-              ActionDefsByName.get(actionName).exists(_.category == ActionCategory.SubProcess)
-          if (isSubProcessRef && formProcessNames(actionName)) Set(actionName) else Set.empty
+          if (! ActionDefsByName.contains(actionName) && formProcessNames(actionName)) Set(actionName) else Set.empty
       }
 
       val callGraph: Map[String, Set[String]] =

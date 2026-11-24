@@ -75,7 +75,10 @@ object ProcessUI {
          | allows-custom-params="${a.allowsCustomParams}"
          | deprecated="${a.deprecated}">$paramsXml</action>""".stripMargin.replace('\n', ' ')
     }.mkString
-    xmlStringToMutableNodeInfoRootElem(s"""<actions>$itemsXml</actions>""")
+    val subProcessesXml = BuiltinSubProcesses.map { sp =>
+      s"""<sub-process name="${sp.name.escapeXmlForAttribute}" deprecated="${sp.deprecated}"/>"""
+    }.mkString
+    xmlStringToMutableNodeInfoRootElem(s"""<actions>$itemsXml$subProcessesXml</actions>""")
   }
 
   /*@XPathFunction*/
@@ -417,6 +420,12 @@ object ProcessUI {
 
   // AST ExprNode to XML String
   def exprNodeToXmlString(expr: ExprNode, combinator: String): String = expr match {
+    case ActionNode(name, params) if ! ActionDefsByName.contains(name) && params.isEmpty =>
+      // Normalize bare sub-process calls (e.g. `require-uploads` or `my-helper`) into `process(name = "...")`
+      // so the editor presents a single unified "Call Process" UI.
+      val paramXml = s"""<param name="name" avt-mode="false" custom="false">${name.escapeXmlMinimal}</param>"""
+      s"""<step type="action" combinator="${combinator.escapeXmlForAttribute}" name="process" _add-param="">$paramXml</step>"""
+
     case ActionNode(name, params) =>
       val actionDefOpt = ActionDefsByName.get(name)
       val canonicalIndex: Map[String, Int] =

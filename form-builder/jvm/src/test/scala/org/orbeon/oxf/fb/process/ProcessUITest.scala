@@ -353,10 +353,34 @@ class ProcessUITest extends DocumentTestBase with ResourceManagerSupport with An
         val serializedStr = TransformerUtils.tinyTreeToString(serialized)
         assert(! serializedStr.contains("xmlns:"))
 
-        // 5. `availableActionsXml` exposes all four UI categories matching XBL/resource keys
+        // 5. `availableActionsXml` exposes the three UI action categories plus built-in `<sub-process>` entries
         val actionsDoc = ProcessUI.availableActionsXml()
         val categories = (actionsDoc child "action").flatMap(_.attValueOpt("category")).toSet
-        assert(categories == Set("form-runner", "sub-process", "flow-control", "xforms"))
+        assert(categories == Set("form-runner", "flow-control", "xforms"))
+        assert((actionsDoc child "action").exists(a => (a attValue "name") == "process" && (a attValue "category") == "flow-control"))
+        assert(! (actionsDoc child "action").exists(a => (a attValue "name") == "require-uploads"))
+        assert((actionsDoc child "sub-process").exists(sp => (sp attValue "name") == "require-uploads" && (sp attValue "deprecated") == "false"))
+      }
+
+      it("should normalize bare sub-process calls into `process` steps and validate process names") {
+        val xml = ProcessUI.processStringToXml("""require-uploads then my-helper then process("other") then process(name = "{$dyn}")""")
+        val steps = (xml child "step").toList
+        assert(steps.size == 4)
+        assert(steps.forall(s => (s attValue "name") == "process"))
+        assert(steps.map(s => (s child "param").head.stringValue) == List("require-uploads", "my-helper", "other", "{$dyn}"))
+        assert(((steps(3) child "param").head attValue "avt-mode") == "true")
+
+        val serialized = ProcessUI.xmlToProcessString(xml)
+        assert(serialized == """process(name = "require-uploads") then process(name = "my-helper") then process("other") then process(name = "{$dyn}")""")
+
+        // Process name syntax matches `ProcessParser.Name` (minus `:`)
+        assert(ProcessParams.ProcessNameRegex.matches("save-final"))
+        assert(ProcessParams.ProcessNameRegex.matches("_helper_2"))
+        assert(ProcessParams.ProcessNameRegex.matches("-custom"))
+        assert(! ProcessParams.ProcessNameRegex.matches("my.process"))
+        assert(! ProcessParams.ProcessNameRegex.matches("2026-submit"))
+        assert(! ProcessParams.ProcessNameRegex.matches("xf:custom"))
+        assert(! ProcessParams.ProcessNameRegex.matches("bad name"))
       }
     }
   }

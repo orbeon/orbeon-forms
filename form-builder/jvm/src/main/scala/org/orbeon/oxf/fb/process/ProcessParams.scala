@@ -52,7 +52,6 @@ object ProcessParams {
     val values: immutable.IndexedSeq[ActionCategory] = findValues
 
     case object FormRunner  extends ActionCategory
-    case object SubProcess  extends ActionCategory
     case object FlowControl extends ActionCategory
     case object XForms      extends ActionCategory {
       override val entryName: String = "xforms"
@@ -419,53 +418,16 @@ object ProcessParams {
     ActionDef("review",                 "Go to Review"),
     ActionDef("edit",                   "Go to Edit"),
 
-    // --- Sub-process actions ---
+    // --- Process flow control actions ---
     ActionDef(
       name        = "process",
       label       = "Call Process",
-      category    = SubProcess,
+      category    = FlowControl,
       unnamedRule = FixedParam("name"),
       params      = List(
         ActionParamDef("name", Required, Avt, ProcessNameSelect, initialValue = "")
       )
     ),
-    ActionDef("require-uploads",  "Sub-process: Require Uploads",  category = SubProcess),
-    ActionDef("require-valid",    "Sub-process: Require Valid",    category = SubProcess),
-    ActionDef("validate-all",     "Sub-process: Validate All",     category = SubProcess),
-    ActionDef("review-messages",  "Sub-process: Review Messages",  category = SubProcess),
-    ActionDef("save-final",       "Sub-process: Save Final",       category = SubProcess),
-    ActionDef("save-progress",    "Sub-process: Save Progress",    category = SubProcess),
-    ActionDef("save-overwrite",   "Sub-process: Save Overwrite",   category = SubProcess),
-    ActionDef("save-import",      "Sub-process: Save Import",      category = SubProcess),
-    ActionDef("autosave",         "Sub-process: Autosave",         category = SubProcess),
-    ActionDef("clear",            "Sub-process: Clear Data",       category = SubProcess),
-    ActionDef("reset-form-data",  "Sub-process: Reset Form Data",  category = SubProcess),
-    ActionDef("close",            "Sub-process: Close",            category = SubProcess),
-    ActionDef("summary",          "Sub-process: Summary Page",     category = SubProcess),
-    ActionDef("home",             "Sub-process: Home",             category = SubProcess),
-    ActionDef("form-runner-home", "Sub-process: Form Runner Home", category = SubProcess),
-    ActionDef("orbeon-home",      "Sub-process: Orbeon Home",      category = SubProcess),
-    ActionDef("submit",           "Sub-process: Submit",           category = SubProcess),
-    ActionDef("workflow-send",    "Sub-process: Workflow Send",    category = SubProcess),
-    ActionDef("pdf",              "Sub-process: Open PDF",         category = SubProcess),
-    ActionDef("tiff",             "Sub-process: Open TIFF",        category = SubProcess),
-    ActionDef("excel-export",     "Sub-process: Export Excel",     category = SubProcess),
-    ActionDef("xml-export",       "Sub-process: Export XML",       category = SubProcess),
-    ActionDef("reupload",         "Sub-process: Re-upload",        category = SubProcess),
-    ActionDef("wizard-toc",       "Sub-process: Wizard TOC",       category = SubProcess),
-
-    // Additional internal/deprecated built-in sub-processes (preserved when encountered)
-    ActionDef("save-draft",                 "Sub-process: Save Draft",                 category = SubProcess, deprecated = true),
-    ActionDef("lease-view",                 "Sub-process: Lease View",                 category = SubProcess, deprecated = true),
-    ActionDef("workflow-review",            "Sub-process: Workflow Review",            category = SubProcess, deprecated = true),
-    ActionDef("workflow-edit",              "Sub-process: Workflow Edit",              category = SubProcess, deprecated = true),
-    ActionDef("validation-dialog-review",   "Sub-process: Validation Dialog Review",   category = SubProcess, deprecated = true),
-    ActionDef("validation-dialog-continue", "Sub-process: Validation Dialog Continue", category = SubProcess, deprecated = true),
-    ActionDef("action-service-error",       "Sub-process: Service Error",              category = SubProcess, deprecated = true),
-    ActionDef("action-action-error",        "Sub-process: Action Error",               category = SubProcess, deprecated = true),
-    ActionDef("before-publish",             "Sub-process: Before Publish",             category = SubProcess, deprecated = true),
-
-    // --- Process flow control actions ---
     ActionDef("continue-with-success", "Continue with Success", category = FlowControl),
     ActionDef("continue-with-failure", "Continue with Failure", category = FlowControl),
     ActionDef(
@@ -597,19 +559,62 @@ object ProcessParams {
     )
   )
 
+  case class BuiltinSubProcessDef(
+    name       : String,
+    deprecated : Boolean = false
+  )
+
+  val BuiltinSubProcesses: List[BuiltinSubProcessDef] = List(
+    BuiltinSubProcessDef("require-uploads"),
+    BuiltinSubProcessDef("require-valid"),
+    BuiltinSubProcessDef("validate-all"),
+    BuiltinSubProcessDef("review-messages"),
+    BuiltinSubProcessDef("save-final"),
+    BuiltinSubProcessDef("save-progress"),
+    BuiltinSubProcessDef("save-overwrite"),
+    BuiltinSubProcessDef("save-import"),
+    BuiltinSubProcessDef("autosave"),
+    BuiltinSubProcessDef("clear"),
+    BuiltinSubProcessDef("reset-form-data"),
+    BuiltinSubProcessDef("close"),
+    BuiltinSubProcessDef("summary"),
+    BuiltinSubProcessDef("home"),
+    BuiltinSubProcessDef("form-runner-home"),
+    BuiltinSubProcessDef("orbeon-home"),
+    BuiltinSubProcessDef("submit"),
+    BuiltinSubProcessDef("workflow-send"),
+    BuiltinSubProcessDef("pdf"),
+    BuiltinSubProcessDef("tiff"),
+    BuiltinSubProcessDef("excel-export"),
+    BuiltinSubProcessDef("xml-export"),
+    BuiltinSubProcessDef("reupload"),
+    BuiltinSubProcessDef("wizard-toc"),
+    // Additional internal/deprecated built-in sub-processes (preserved when encountered)
+    BuiltinSubProcessDef("save-draft",                 deprecated = true),
+    BuiltinSubProcessDef("lease-view",                 deprecated = true),
+    BuiltinSubProcessDef("workflow-review",            deprecated = true),
+    BuiltinSubProcessDef("workflow-edit",              deprecated = true),
+    BuiltinSubProcessDef("validation-dialog-review",   deprecated = true),
+    BuiltinSubProcessDef("validation-dialog-continue", deprecated = true),
+    BuiltinSubProcessDef("action-service-error",       deprecated = true),
+    BuiltinSubProcessDef("action-action-error",        deprecated = true),
+    BuiltinSubProcessDef("before-publish",             deprecated = true)
+  )
+
   val ActionDefsByName: Map[String, ActionDef] =
     ActionDefinitions.map(a => a.name -> a).toMap
 
   val BuiltinSubProcessNames: Set[String] =
-    ActionDefinitions.filter(_.category == SubProcess).map(_.name).toSet - "process"
+    BuiltinSubProcesses.map(_.name).toSet
 
   private val DisallowedChangeModes: Set[String] =
     Set("pdf") ++
       FormRunnerDetailMode.SecondaryModes.map(_.publicName) ++
       FormRunnerDetailMode.SupportedNonDetailModes
 
-  private val CustomModeNameRegex = """^[A-Za-z_][A-Za-z0-9\-_:]*$""".r
-  private val ParamNameRegex      = """^[A-Za-z_\-][A-Za-z0-9_\-:]*$""".r
+  val ProcessNameRegex             = """^[A-Za-z_\-][A-Za-z0-9_\-]*$""".r
+  private val CustomModeNameRegex  = """^[A-Za-z_][A-Za-z0-9\-_:]*$""".r
+  private val ParamNameRegex       = """^[A-Za-z_\-][A-Za-z0-9_\-:]*$""".r
 
   def resolveUnnamedParamName(actionName: String, paramValue: String): String =
     ActionDefsByName.get(actionName).map(_.unnamedRule) match {
@@ -914,12 +919,6 @@ object ProcessParams {
         }
 
       case Some(actionDef) =>
-        val selfCallErrors =
-          if (actionDef.category == SubProcess && actionName != "process" && enclosingProcess.contains(actionName))
-            List(SelfProcessCall(actionName))
-          else
-            Nil
-
         val paramMap: Map[String, String] = resolvedParams.toMap
         val presentParamNames: Set[String] = resolvedParams.map(_._1).filter(_.nonEmpty).toSet
 
@@ -950,8 +949,7 @@ object ProcessParams {
             if (activeInGroup.size > 1) Some(MutuallyExclusiveParams(actionName, activeInGroup)) else None
           }
 
-        selfCallErrors ++
-          duplicateErrors ++
+        duplicateErrors ++
           unknownParamErrors ++
           missingRequiredErrors ++
           missingOneOfErrors ++

@@ -174,7 +174,7 @@
                         required="true()"
                         constraint="
                             xxf:non-blank() and
-                            matches(., '^[a-zA-Z0-9_\-\.]+$') and
+                            matches(., '^[A-Za-z_\-][A-Za-z0-9_\-]*$') and
                             not(($i/process/@name except .) = .)"/>
                     <xf:bind
                         ref="."
@@ -355,18 +355,10 @@
                                                                 <xf:switch caseref="$step-type" class="fb-process-row-switch" xxf:update="full">
                                                                     <!-- Action step -->
                                                                     <xf:case value="'action'">
-                                                                        <xf:var name="enclosing-process-name" value="($current/ancestor::process/@name)[1]"/>
-                                                                        <xf:var name="action-def"             value="instance('actions-instance')/action[@name = $current/@name]"/>
-                                                                        <xf:var name="present-param-names"    value="$current/param/@name[xxf:non-blank()]"/>
-                                                                        <xf:var name="addable-params"         value="$action-def/param[@deprecated = 'false' and not(@name = $present-param-names)]"/>
-                                                                        <xf:var name="allows-custom-params"   value="$action-def/@allows-custom-params = 'true'"/>
-                                                                        <xf:var name="sibling-processes"      value="
-                                                                            $i/process/@name[
-                                                                                xxf:non-blank() and
-                                                                                . != $enclosing-process-name and
-                                                                                matches(., '^[A-Za-z_\-][A-Za-z0-9_\-:]*$') and
-                                                                                not(. = instance('actions-instance')/action[@deprecated = 'false']/@name)
-                                                                            ]"/>
+                                                                        <xf:var name="action-def"           value="instance('actions-instance')/action[@name = $current/@name]"/>
+                                                                        <xf:var name="present-param-names"  value="$current/param/@name[xxf:non-blank()]"/>
+                                                                        <xf:var name="addable-params"       value="$action-def/param[@deprecated = 'false' and not(@name = $present-param-names)]"/>
+                                                                        <xf:var name="allows-custom-params" value="$action-def/@allows-custom-params = 'true'"/>
 
                                                                         <xh:div class="fb-process-action-bar">
                                                                             <xf:select1 ref="@name" class="fb-process-action-select1">
@@ -376,22 +368,6 @@
                                                                                 <xf:choices>
                                                                                     <xf:label ref="$resources/dialog-process-editor/categories/form-runner"/>
                                                                                     <xf:itemset ref="instance('actions-instance')/action[@category = 'form-runner' and @deprecated = 'false']">
-                                                                                        <xf:label ref="@label"/>
-                                                                                        <xf:value ref="@name"/>
-                                                                                    </xf:itemset>
-                                                                                </xf:choices>
-
-                                                                                <xf:choices>
-                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/form-processes[exists($sibling-processes)]"/>
-                                                                                    <xf:itemset ref="$sibling-processes">
-                                                                                        <xf:label value="."/>
-                                                                                        <xf:value value="."/>
-                                                                                    </xf:itemset>
-                                                                                </xf:choices>
-
-                                                                                <xf:choices>
-                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/sub-process"/>
-                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'sub-process' and @deprecated = 'false']">
                                                                                         <xf:label ref="@label"/>
                                                                                         <xf:value ref="@name"/>
                                                                                     </xf:itemset>
@@ -418,8 +394,8 @@
                                                                                     <xf:value ref="@name"/>
                                                                                 </xf:itemset>
 
-                                                                                <xf:itemset ref="$current/@name[empty($action-def) and not(. = $sibling-processes)]">
-                                                                                    <xf:label value="concat('Sub-process: ', .)"/>
+                                                                                <xf:itemset ref="$current/@name[empty($action-def)]">
+                                                                                    <xf:label value="."/>
                                                                                     <xf:value value="."/>
                                                                                 </xf:itemset>
 
@@ -688,7 +664,7 @@
 
                                                                                             <xf:case value="'process-name'">
                                                                                                 <xf:var name="form-procs"    value="$i/process/@name[xxf:non-blank() and . != $enclosing-proc-name]"/>
-                                                                                                <xf:var name="builtin-procs" value="instance('actions-instance')/action[@category = 'sub-process' and @name != 'process' and @deprecated = 'false' and not(@name = $form-procs)]"/>
+                                                                                                <xf:var name="builtin-procs" value="instance('actions-instance')/sub-process[@deprecated = 'false' and not(@name = $form-procs)]"/>
                                                                                                 <xf:select1 ref=".[$effective-widget = 'process-name']" class="fb-process-param-select1">
                                                                                                     <xf:label value="$summary-label"/>
                                                                                                     <xf:alert value="$alert-text"/>

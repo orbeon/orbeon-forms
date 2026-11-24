@@ -1439,10 +1439,17 @@ class FormDefinitionValidatorTest
           </process>
           <process name="cycle-a">cycle-b</process>
           <process name="cycle-b">process(name = "cycle-a")</process>
+          <process name="my.dotted">save</process>
+          <process name="1leading-digit">save</process>
+          <process name="xf:colon">save</process>
         </processes>
       )
 
       val issues = validateFormDefinition(form)
+
+      assert(issues.contains(InvalidProcess("my.dotted", "Invalid process name")))
+      assert(issues.contains(InvalidProcess("1leading-digit", "Invalid process name")))
+      assert(issues.contains(InvalidProcess("xf:colon", "Invalid process name")))
 
       assert(issues.contains(InvalidProcess("bad-syntax", "Process syntax is invalid")))
       assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("does not support parameter \"bogus\""); case _ => false })

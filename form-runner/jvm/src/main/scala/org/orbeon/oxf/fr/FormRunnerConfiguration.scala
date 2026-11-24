@@ -238,21 +238,21 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
   val Categories: List[String] =
     List(
       "system",
-      "caches",
-      "navbar",
       "appearance",
+      "navbar",
+      "landing",
+      "summary",
       "detail",
       "wizard",
       "formulas",
-      "landing",
-      "summary",
       "admin",
-      "import",
       "pdf",
       "email",
+      "import",
       "form-builder",
+      "security",
       "formats",
-      "security"
+      "caches"
     )
 
   val CuratedProperties: List[CuratedPropertyDef] = List(

@@ -1027,7 +1027,9 @@ class ConfigurationPropertiesTest
 
             // Global-only controls must be non-relevant while an override scope is selected
             assert(! resolveObject[XFormsSingleNodeControl]("global-available-languages-value-control").get.isRelevant)
+            assert(! resolveObject[XFormsSingleNodeControl]("global-style-theme-value-control").get.isRelevant)
             assert(! resolveObject[XFormsSingleNodeControl]("cache-documents-size-value-control").get.isRelevant)
+            assert(! resolveObject[XFormsValueControl]("custom-property-name-control").exists(_.isRelevant))
 
             // Override default-language to "de" and attachment-max-size-per-file back to Unlimited ("-1") on acme / order using the shared controls
             assert(valueControl.isReadonly)
@@ -1045,6 +1047,10 @@ class ConfigurationPropertiesTest
             activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("select-global-scope-button").get.effectiveId)(ec)
             assert((uiInstance.rootElement / "selected-scope").stringValue == "__global__")
             assert(resolveObject[XFormsSingleNodeControl]("global-available-languages-value-control").get.isRelevant)
+            val globalStyleThemeSelect = resolveObject[XFormsSelect1Control]("global-style-theme-value-control").get
+            assert(globalStyleThemeSelect.isRelevant)
+            val theme2025Item = globalStyleThemeSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("2025")).get._1
+            setControlValueWithEventSearchNested(globalStyleThemeSelect.effectiveId, theme2025Item.externalValue(globalStyleThemeSelect.mustEncodeValues))
             assert(pdfValueControl.isValid) // Global's own pdf-filename is valid
 
             SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
@@ -1083,16 +1089,24 @@ class ConfigurationPropertiesTest
             assert((initialCustomProps.head /@ "type").stringValue == "xs:string")
             assert(initialCustomProps.head.stringValue == "")
 
+            assert(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-tabs").isEmpty)
+
             def customTabLabelHtml: String =
-              ControlsIterator(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-tabs").get, includeSelf = false)
+              ControlsIterator(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-categories-tabs").get, includeSelf = false)
                 .collect { case c: XFormsValueControl => c.getValue(EventCollector.Throw) }
                 .find(_.contains("Custom Properties"))
                 .get
 
             assert(! customTabLabelHtml.contains("fr-config-tab-badge"))
 
-            val customNameControl   = resolveObject[XFormsValueControl]("custom-property-name-control").get
-            val customValueControl  = resolveObject[XFormsValueControl]("custom-property-value-control").get
+            val customNameControl     = resolveObject[XFormsValueControl]("custom-property-name-control").get
+            val customTypeControl     = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("custom-property-type-control").get
+            val customValueControl    = resolveObject[XFormsValueControl]("custom-property-value-control").get
+            val customProfilesControl = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("custom-property-profiles-control").get
+            assert(customNameControl.getHint(EventCollector.Throw).contains("e.g. oxf.custom.my-property"))
+            assert(customProfilesControl.getHint(EventCollector.Throw).contains("Optional"))
+            for (ctrl <- List(customNameControl, customTypeControl, customValueControl, customProfilesControl))
+              assert(ctrl.getHelp(EventCollector.Throw).exists(_.trim.nonEmpty))
             assert(customNameControl.isValid)
 
             setControlValueWithEventSearchNested(customValueControl.effectiveId, "orphan-value")
@@ -1148,6 +1162,7 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.fr.detail.pdf.filename.acme.order").contains("concat('order-', fr:document-id())"))
             assert(store.globalPropertySet.getString("oxf.fr.available-languages.my-app.my-form").contains("en fr es"))
             assert(store.globalPropertySet.getString("oxf.fr.available-languages").contains("en fr de"))
+            assert(store.globalPropertySet.getString("oxf.fr.style.theme").contains("2025"))
             assert(store.globalPropertySet.getString("oxf.fr.pdf.jpeg.compression").contains("0.85"))
             assert(store.globalPropertySet.getString("oxf.fr.home.table.link-to").contains("new summary"))
             assert(store.globalPropertySet.getString("oxf.fr.home.remote-servers").contains("staging.example.org"))

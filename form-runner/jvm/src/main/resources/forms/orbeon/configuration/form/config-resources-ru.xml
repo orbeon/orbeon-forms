@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Пользовательские свойства</label>
         <name>Имя свойства</name>
-        <name-hint>Полное имя свойства (включая подстановочные знаки, если применимо)</name-hint>
+        <name-hint>напр. oxf.custom.my-property</name-hint>
+        <name-help>Введите полное имя свойства, включая сегменты приложения и формы или подстановочные знаки &lt;code&gt;*&lt;/code&gt; при необходимости (например, &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; или пользовательское свойство, считываемое через &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Тип</type>
+        <type-help>Выберите тип XML Schema в соответствии с тем, как Orbeon Forms интерпретирует это свойство (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; или &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Значение</value>
+        <value-help>Введите значение свойства в соответствии с выбранным типом (например, текст, выражение XPath, URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, целое число или разделённые пробелами токены).</value-help>
         <profiles>Профили</profiles>
-        <profiles-hint>Необязательные профили свойств, разделённые пробелами</profiles-hint>
+        <profiles-hint>Необязательно</profiles-hint>
+        <profiles-help>Необязательные профили свойств. Если указан один или несколько профилей, свойство применяется только к запросам, в которых эти профили активны; оставьте пустым для безусловного применения.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Язык по умолчанию</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Глобальная тема</label>
+        <hint>Визуальная тема для начальной страницы, страниц форм и администрирования &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Цветовая схема по умолчанию</label>
         <hint>Цветовая схема страниц по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

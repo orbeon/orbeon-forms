@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Propietats personalitzades</label>
         <name>Nom de la propietat</name>
-        <name-hint>Nom complet de la propietat (amb comodins si escau)</name-hint>
+        <name-hint>p. ex. oxf.custom.my-property</name-hint>
+        <name-help>Introduïu el nom complet de la propietat, inclosos els segments d'aplicació i formulari o els comodins &lt;code&gt;*&lt;/code&gt; si escau (per exemple, &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; o una propietat personalitzada llegida amb &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Tipus</type>
+        <type-help>Seleccioneu el tipus d'esquema XML corresponent a com Orbeon Forms analitza aquesta propietat (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; o &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Valor</value>
+        <value-help>Introduïu el valor de la propietat corresponent al tipus seleccionat (per exemple, text, una expressió XPath, un URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, un enter o testimonis separats per espais).</value-help>
         <profiles>Perfils</profiles>
-        <profiles-hint>Perfils de propietats opcionals separats per espais</profiles-hint>
+        <profiles-hint>Opcional</profiles-hint>
+        <profiles-help>Perfils de propietats opcionals. Quan s'especifiquen un o més perfils, aquesta propietat només s'aplica a les sol·licituds on aquests perfils són actius; deixeu-ho en blanc perquè s'apliqui incondicionalment.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Idioma per defecte</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Tema global</label>
+        <hint>Tema visual per a les pàgines d'inici, formularis i administració &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Esquema de color per defecte</label>
         <hint>Esquema de color per defecte per a les pàgines &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

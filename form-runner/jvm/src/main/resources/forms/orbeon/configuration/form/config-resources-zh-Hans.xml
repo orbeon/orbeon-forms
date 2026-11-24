@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>自定义属性</label>
         <name>属性名称</name>
-        <name-hint>完整的属性名称（如适用可包含通配符）</name-hint>
+        <name-hint>例如 oxf.custom.my-property</name-hint>
+        <name-help>输入完整的属性名称，适用时包含应用程序和表单段或 &lt;code&gt;*&lt;/code&gt; 通配符（例如 &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; 或通过 &lt;code&gt;xxf:property()&lt;/code&gt; 读取的自定义属性）。</name-help>
         <type>类型</type>
+        <type-help>选择与 Orbeon Forms 解析此属性方式相匹配的 XML Schema 类型（&lt;code&gt;xs:string&lt;/code&gt;、&lt;code&gt;xs:boolean&lt;/code&gt;、&lt;code&gt;xs:integer&lt;/code&gt;、&lt;code&gt;xs:anyURI&lt;/code&gt; 或 &lt;code&gt;xs:NMTOKENS&lt;/code&gt;）。</type-help>
         <value>值</value>
+        <value-help>输入与所选类型匹配的属性值（例如文本、XPath 表达式、URL、&lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;、整数或空格分隔的标记）。</value-help>
         <profiles>配置文件</profiles>
-        <profiles-hint>以空格分隔的可选属性配置文件</profiles-hint>
+        <profiles-hint>可选</profiles-hint>
+        <profiles-help>可选属性配置文件。指定一个或多个配置文件名称时，此属性仅适用于激活了这些配置文件的请求；留空则无条件适用。</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>默认语言</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>全局主题</label>
+        <hint>首页、表单和管理页面的视觉主题 &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>默认配色方案</label>
         <hint>页面的默认配色方案 &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>自訂屬性</label>
         <name>屬性名稱</name>
-        <name-hint>完整的屬性名稱（若適用可包含萬用字元）</name-hint>
+        <name-hint>例如 oxf.custom.my-property</name-hint>
+        <name-help>輸入完整的屬性名稱，適用時包含應用程式與表單區段或 &lt;code&gt;*&lt;/code&gt; 萬用字元（例如 &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; 或透過 &lt;code&gt;xxf:property()&lt;/code&gt; 讀取的自訂屬性）。</name-help>
         <type>類型</type>
+        <type-help>選擇與 Orbeon Forms 解析此屬性方式相符的 XML Schema 類型（&lt;code&gt;xs:string&lt;/code&gt;、&lt;code&gt;xs:boolean&lt;/code&gt;、&lt;code&gt;xs:integer&lt;/code&gt;、&lt;code&gt;xs:anyURI&lt;/code&gt; 或 &lt;code&gt;xs:NMTOKENS&lt;/code&gt;）。</type-help>
         <value>值</value>
+        <value-help>輸入與所選類型相符的屬性值（例如文字、XPath 運算式、URL、&lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;、整數或以空格分隔的標記）。</value-help>
         <profiles>設定檔</profiles>
-        <profiles-hint>以空格分隔的選填屬性設定檔</profiles-hint>
+        <profiles-hint>選填</profiles-hint>
+        <profiles-help>選填的屬性設定檔。指定一個或多個設定檔名稱時，此屬性僅套用於啟用了這些設定檔的請求；留空則無條件套用。</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>預設語言</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>全域主題</label>
+        <hint>首頁、表單與管理頁面的視覺主題 &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>預設 (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>預設配色方案</label>
         <hint>頁面的預設配色方案 &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

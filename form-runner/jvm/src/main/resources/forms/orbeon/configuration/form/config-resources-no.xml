@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Tilpassede egenskaper</label>
         <name>Egenskapsnavn</name>
-        <name-hint>Fullt egenskapsnavn (inkludert jokertegn hvis aktuelt)</name-hint>
+        <name-hint>f.eks. oxf.custom.my-property</name-hint>
+        <name-help>Skriv inn det fullstendige egenskapsnavnet, inkludert applikasjons- og skjemasegmenter eller &lt;code&gt;*&lt;/code&gt;-jokere hvis aktuelt (f.eks. &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; eller en tilpasset egenskap lest med &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Type</type>
+        <type-help>Velg XML Schema-typen som samsvarer med hvordan Orbeon Forms tolker egenskapen (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; eller &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Verdi</value>
+        <value-help>Skriv inn egenskapsverdien som passer til den valgte typen (f.eks. tekst, et XPath-uttrykk, en URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, et heltall eller mellomromsseparerte verdier).</value-help>
         <profiles>Profiler</profiles>
-        <profiles-hint>Valgfrie mellomromsatskilte egenskapsprofiler</profiles-hint>
+        <profiles-hint>Valgfri</profiles-hint>
+        <profiles-help>Valgfrie egenskapsprofiler. Når én eller flere profiler er angitt, gjelder denne egenskapen kun for forespørsler der disse profilene er aktive; la feltet stå tomt for å gjelde ubetinget.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Standardspråk</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Globalt tema</label>
+        <hint>Visuelt tema for start-, skjema- og administrasjonssider &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Standard fargemodus</label>
         <hint>Standard fargemodus for sider &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

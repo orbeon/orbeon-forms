@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Mukautetut ominaisuudet</label>
         <name>Ominaisuuden nimi</name>
-        <name-hint>Ominaisuuden koko nimi (mukaan lukien mahdolliset jokerimerkit)</name-hint>
+        <name-hint>esim. oxf.custom.my-property</name-hint>
+        <name-help>Syötä ominaisuuden koko nimi, mukaan lukien sovellus- ja lomakeosat tai &lt;code&gt;*&lt;/code&gt;-jokerimerkit tarvittaessa (esim. &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; tai &lt;code&gt;xxf:property()&lt;/code&gt;-funktiolla luettava mukautettu ominaisuus).</name-help>
         <type>Tyyppi</type>
+        <type-help>Valitse XML Schema -tyyppi sen mukaan, miten Orbeon Forms jäsentää tämän ominaisuuden (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; tai &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Arvo</value>
+        <value-help>Syötä valittua tyyppiä vastaava ominaisuuden arvo (esim. teksti, XPath-lauseke, URL-osoite, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, kokonaisluku tai välilyönnein erotetut tunnisteet).</value-help>
         <profiles>Profiilit</profiles>
-        <profiles-hint>Valinnaiset välilyönnein erotetut ominaisuusprofiilit</profiles-hint>
+        <profiles-hint>Valinnainen</profiles-hint>
+        <profiles-help>Valinnaiset ominaisuusprofiilit. Kun yksi tai useampi profiilinimi on määritetty, tämä ominaisuus koskee vain pyyntöjä, joissa kyseiset profiilit ovat käytössä; jätä tyhjäksi käyttääksesi ehdoitta.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Oletuskieli</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Globaali teema</label>
+        <hint>Aloitus-, lomake- ja hallintasivujen visuaalinen teema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Oletusväriteema</label>
         <hint>Sivujen oletusväriteema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

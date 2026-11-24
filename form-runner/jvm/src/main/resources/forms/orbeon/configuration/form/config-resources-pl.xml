@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Właściwości niestandardowe</label>
         <name>Nazwa właściwości</name>
-        <name-hint>Pełna nazwa właściwości (w tym znaki wieloznaczne, jeśli dotyczy)</name-hint>
+        <name-hint>np. oxf.custom.my-property</name-hint>
+        <name-help>Wprowadź pełną nazwę właściwości, w tym segmenty aplikacji i formularza lub symbole wieloznaczne &lt;code&gt;*&lt;/code&gt; jeśli dotyczy (np. &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; lub właściwość niestandardową odczytywaną za pomocą &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Typ</type>
+        <type-help>Wybierz typ XML Schema odpowiadający sposobowi interpretacji tej właściwości przez Orbeon Forms (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; lub &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Wartość</value>
+        <value-help>Wprowadź wartość właściwości zgodną z wybranym typem (np. tekst, wyrażenie XPath, adres URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, liczbę całkowitą lub tokeny rozdzielone spacjami).</value-help>
         <profiles>Profile</profiles>
-        <profiles-hint>Opcjonalne profile właściwości oddzielone spacjami</profiles-hint>
+        <profiles-hint>Opcjonalnie</profiles-hint>
+        <profiles-help>Opcjonalne profile właściwości. Gdy podano jedną lub więcej nazw profili, właściwość ma zastosowanie tylko do żądań, w których te profile są aktywne; pozostaw puste, aby stosować bezwarunkowo.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Domyślny język</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Motyw globalny</label>
+        <hint>Motyw wizualny dla stron startowej, formularzy i administracji &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Domyślnie (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Domyślny schemat kolorów</label>
         <hint>Domyślny schemat kolorów dla stron &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

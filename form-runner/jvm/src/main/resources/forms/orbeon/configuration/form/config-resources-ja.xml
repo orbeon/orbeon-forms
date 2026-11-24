@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>カスタムプロパティ</label>
         <name>プロパティ名</name>
-        <name-hint>完全なプロパティ名（該当する場合はワイルドカードを含む）</name-hint>
+        <name-hint>例: oxf.custom.my-property</name-hint>
+        <name-help>必要に応じてアプリケーション名・フォーム名のセグメントやワイルドカード &lt;code&gt;*&lt;/code&gt; を含む完全なプロパティ名を入力します（例: &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; や &lt;code&gt;xxf:property()&lt;/code&gt; で参照するカスタムプロパティ）。</name-help>
         <type>データ型</type>
+        <type-help>Orbeon Forms がこのプロパティを解釈する際の XML Schema 型（&lt;code&gt;xs:string&lt;/code&gt;、&lt;code&gt;xs:boolean&lt;/code&gt;、&lt;code&gt;xs:integer&lt;/code&gt;、&lt;code&gt;xs:anyURI&lt;/code&gt;、&lt;code&gt;xs:NMTOKENS&lt;/code&gt;）を選択します。</type-help>
         <value>値</value>
+        <value-help>選択した型に応じたプロパティ値（テキスト、XPath 式、URL、&lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;、整数、またはスペース区切りのトークンなど）を入力します。</value-help>
         <profiles>プロファイル</profiles>
-        <profiles-hint>スペース区切りのプロパティプロファイル（任意）</profiles-hint>
+        <profiles-hint>任意</profiles-hint>
+        <profiles-help>任意のプロパティプロファイルです。1 つ以上のプロファイル名を指定すると、それらのプロファイルが有効なリクエストにのみこのプロパティが適用されます。無条件に適用する場合は空欄のままにします。</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>デフォルト言語</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>グローバルテーマ</label>
+        <hint>ランディング、フォーム一覧、管理ページのビジュアルテーマ &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>デフォルトのカラースキーム</label>
         <hint>ページのデフォルトのカラースキーム &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

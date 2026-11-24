@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>الخصائص المخصصة</label>
         <name>اسم الخاصية</name>
-        <name-hint>الاسم الكامل للخاصية (بما في ذلك أحرف البدل عند الاقتضاء)</name-hint>
+        <name-hint>مثال: oxf.custom.my-property</name-hint>
+        <name-help>أدخل اسم الخاصية الكامل، بما في ذلك مقاطع التطبيق والنموذج أو أحرف البدل &lt;code&gt;*&lt;/code&gt; عند الاقتضاء (على سبيل المثال &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; أو خاصية مخصصة تُقرأ عبر &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>النوع</type>
+        <type-help>حدد نوع XML Schema الموافق لكيفية تحليل Orbeon Forms لهذه الخاصية (&lt;code&gt;xs:string&lt;/code&gt; أو &lt;code&gt;xs:boolean&lt;/code&gt; أو &lt;code&gt;xs:integer&lt;/code&gt; أو &lt;code&gt;xs:anyURI&lt;/code&gt; أو &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>القيمة</value>
+        <value-help>أدخل قيمة الخاصية المتوافقة مع النوع المحدد (مثل نص أو تعبير XPath أو عنوان URL أو &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt; أو عدد صحيح أو رموز مفصولة بمسافات).</value-help>
         <profiles>ملفات التعريف</profiles>
-        <profiles-hint>ملفات تعريف خصائص اختيارية مفصولة بمسافات</profiles-hint>
+        <profiles-hint>اختياري</profiles-hint>
+        <profiles-help>ملفات تعريف الخصائص الاختيارية. عند تحديد ملف تعريف واحد أو أكثر، تُطبَّق هذه الخاصية فقط على الطلبات التي تكون فيها ملفات التعريف هذه نشطة؛ اتركه فارغًا للتطبيق دون شروط.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>اللغة الافتراضية</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>السمة العامة</label>
+        <hint>السمة المرئية لصفحات البداية والنماذج والإدارة &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>نظام الألوان الافتراضي</label>
         <hint>نظام الألوان الافتراضي للصفحات &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

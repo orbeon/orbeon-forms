@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Özel Özellikler</label>
         <name>Özellik Adı</name>
-        <name-hint>Tam özellik adı (varsa joker karakterler dahil)</name-hint>
+        <name-hint>örn. oxf.custom.my-property</name-hint>
+        <name-help>Uygulama ve form bölümleri veya geçerliyse &lt;code&gt;*&lt;/code&gt; joker karakterleri dahil tam özellik adını girin (örneğin &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; veya &lt;code&gt;xxf:property()&lt;/code&gt; ile okunan özel bir özellik).</name-help>
         <type>Tür</type>
+        <type-help>Orbeon Forms'un bu özelliği ayrıştırma biçimine uygun XML Schema türünü seçin (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; veya &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Değer</value>
+        <value-help>Seçilen türe uygun özellik değerini girin (örneğin metin, XPath ifadesi, URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, tam sayı veya boşlukla ayrılmış belirteçler).</value-help>
         <profiles>Profiller</profiles>
-        <profiles-hint>Boşlukla ayrılmış isteğe bağlı özellik profilleri</profiles-hint>
+        <profiles-hint>İsteğe bağlı</profiles-hint>
+        <profiles-help>İsteğe bağlı özellik profilleri. Bir veya daha fazla profil adı belirtildiğinde, bu özellik yalnızca bu profillerin etkin olduğu isteklere uygulanır; koşulsuz uygulamak için boş bırakın.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Varsayılan Dil</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Genel Tema</label>
+        <hint>Başlangıç, Formlar ve Yönetim sayfaları için görsel tema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Varsayılan Renk Düzeni</label>
         <hint>Sayfalar için varsayılan renk düzeni &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

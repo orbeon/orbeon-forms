@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Aangepaste eigenschappen</label>
         <name>Eigenschapsnaam</name>
-        <name-hint>Volledige eigenschapsnaam (inclusief jokertekens indien van toepassing)</name-hint>
+        <name-hint>bijv. oxf.custom.my-property</name-hint>
+        <name-help>Voer de volledige eigenschapsnaam in, inclusief applicatie- en formuliersegmenten of &lt;code&gt;*&lt;/code&gt;-jokers indien van toepassing (bijvoorbeeld &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; of een aangepaste eigenschap uitgelezen met &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Type</type>
+        <type-help>Selecteer het XML Schema-type dat overeenkomt met hoe Orbeon Forms deze eigenschap verwerkt (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; of &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Waarde</value>
+        <value-help>Voer de eigenschapswaarde in die past bij het geselecteerde type (bijvoorbeeld tekst, een XPath-expressie, een URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, een geheel getal of spatiegescheiden tokens).</value-help>
         <profiles>Profielen</profiles>
-        <profiles-hint>Optionele door spaties gescheiden eigenschappenprofielen</profiles-hint>
+        <profiles-hint>Optioneel</profiles-hint>
+        <profiles-help>Optionele eigenschapsprofielen. Wanneer een of meer profielnamen zijn opgegeven, geldt deze eigenschap alleen voor verzoeken waarbij die profielen actief zijn; laat leeg om onvoorwaardelijk toe te passen.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Standaardtaal</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Globaal thema</label>
+        <hint>Visueel thema voor start-, formulier- en beheerpagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Standaardkleurenschema</label>
         <hint>Standaardkleurenschema voor pagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

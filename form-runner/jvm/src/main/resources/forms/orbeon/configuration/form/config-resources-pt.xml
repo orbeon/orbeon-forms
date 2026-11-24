@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Propriedades personalizadas</label>
         <name>Nome da propriedade</name>
-        <name-hint>Nome completo da propriedade (incluindo caracteres universais se aplicável)</name-hint>
+        <name-hint>p. ex. oxf.custom.my-property</name-hint>
+        <name-help>Introduza o nome completo da propriedade, incluindo os segmentos de aplicação e formulário ou caracteres universais &lt;code&gt;*&lt;/code&gt; quando aplicável (por exemplo, &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; ou uma propriedade personalizada lida com &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Tipo</type>
+        <type-help>Selecione o tipo XML Schema correspondente à forma como o Orbeon Forms interpreta esta propriedade (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; ou &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Valor</value>
+        <value-help>Introduza o valor da propriedade correspondente ao tipo selecionado (por exemplo, texto, uma expressão XPath, um URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, um inteiro ou tokens separados por espaços).</value-help>
         <profiles>Perfis</profiles>
-        <profiles-hint>Perfis de propriedades opcionais separados por espaços</profiles-hint>
+        <profiles-hint>Opcional</profiles-hint>
+        <profiles-help>Perfis de propriedades opcionais. Quando um ou mais perfis são especificados, esta propriedade aplica-se apenas aos pedidos em que esses perfis estão ativos; deixe em branco para aplicar incondicionalmente.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Idioma predefinido</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Tema global</label>
+        <hint>Tema visual para as páginas inicial, de formulários e de administração &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Predefinição (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Esquema de cores predefinido</label>
         <hint>Esquema de cores predefinido para as páginas &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

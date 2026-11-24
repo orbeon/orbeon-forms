@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Egyéni tulajdonságok</label>
         <name>Tulajdonság neve</name>
-        <name-hint>Teljes tulajdonságnév (szükség esetén helyettesítő karakterekkel)</name-hint>
+        <name-hint>pl. oxf.custom.my-property</name-hint>
+        <name-help>Adja meg a tulajdonság teljes nevét, beleértve az alkalmazás- és űrlapszegmenseket vagy szükség esetén a &lt;code&gt;*&lt;/code&gt; helyettesítő karaktereket (például &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; vagy az &lt;code&gt;xxf:property()&lt;/code&gt; függvénnyel olvasott egyéni tulajdonság).</name-help>
         <type>Típus</type>
+        <type-help>Válassza ki az XML Schema típust annak megfelelően, ahogyan az Orbeon Forms értelmezi ezt a tulajdonságot (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; vagy &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Érték</value>
+        <value-help>Adja meg a kiválasztott típusnak megfelelő tulajdonságértéket (például szöveget, XPath-kifejezést, URL-címet, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt; értéket, egész számot vagy szóközzel elválasztott tokeneket).</value-help>
         <profiles>Profilok</profiles>
-        <profiles-hint>Opcionális, szóközzel elválasztott tulajdonságprofilok</profiles-hint>
+        <profiles-hint>Opcionális</profiles-hint>
+        <profiles-help>Opcionális tulajdonságprofilok. Ha egy vagy több profilnév meg van adva, ez a tulajdonság csak azokra a kérésekre érvényes, ahol ezek a profilok aktívak; hagyja üresen a feltétel nélküli alkalmazáshoz.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Alapértelmezett nyelv</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Globális téma</label>
+        <hint>Kezdőlap, űrlapok és adminisztrációs oldalak vizuális témája &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Alapértelmezett színséma</label>
         <hint>Oldalak alapértelmezett színsémája &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

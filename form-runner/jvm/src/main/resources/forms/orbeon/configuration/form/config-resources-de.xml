@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Benutzerdefinierte Eigenschaften</label>
         <name>Eigenschaftsname</name>
-        <name-hint>Vollständiger Eigenschaftsname (einschließlich Platzhaltern, falls zutreffend)</name-hint>
+        <name-hint>z. B. oxf.custom.my-property</name-hint>
+        <name-help>Geben Sie den vollständigen Eigenschaftsnamen ein, einschließlich Anwendungs- und Formularsegmenten oder &lt;code&gt;*&lt;/code&gt;-Platzhaltern sofern zutreffend (z. B. &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; oder eine mit &lt;code&gt;xxf:property()&lt;/code&gt; gelesene benutzerdefinierte Eigenschaft).</name-help>
         <type>Typ</type>
+        <type-help>Wählen Sie den XML-Schema-Typ aus, der angibt, wie Orbeon Forms diese Eigenschaft interpretiert (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; oder &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Wert</value>
+        <value-help>Geben Sie den Eigenschaftswert passend zum ausgewählten Typ ein (z. B. Text, XPath-Ausdruck, URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, Ganzzahl oder durch Leerzeichen getrennte Tokens).</value-help>
         <profiles>Profile</profiles>
-        <profiles-hint>Optionale durch Leerzeichen getrennte Eigenschaftsprofile</profiles-hint>
+        <profiles-hint>Optional</profiles-hint>
+        <profiles-help>Optionale Eigenschaftsprofile. Wenn ein oder mehrere Profilnamen angegeben sind, gilt diese Eigenschaft nur für Anfragen, bei denen diese Profile aktiv sind; leer lassen, um sie uneingeschränkt anzuwenden.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Standardsprache</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Globales Design</label>
+        <hint>Visuelles Design für Landing-, Formular- und Verwaltungsseiten &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Standard-Farbschema</label>
         <hint>Standard-Farbschema für Seiten &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

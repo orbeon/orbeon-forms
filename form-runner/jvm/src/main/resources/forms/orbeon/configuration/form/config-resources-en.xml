@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Custom Properties</label>
         <name>Property Name</name>
-        <name-hint>Full property name (including wildcards if applicable)</name-hint>
+        <name-hint>e.g. oxf.custom.my-property</name-hint>
+        <name-help>Enter the full property name, including application and form segments or &lt;code&gt;*&lt;/code&gt; wildcards when applicable (for example, &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; or a custom property read with &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Type</type>
+        <type-help>Select the XML Schema type matching how Orbeon Forms parses this property (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt;, or &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Value</value>
+        <value-help>Enter the property value matching the selected type (for example text, an XPath expression, a URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, an integer, or space-separated tokens).</value-help>
         <profiles>Profiles</profiles>
-        <profiles-hint>Optional space-separated property profiles</profiles-hint>
+        <profiles-hint>Optional</profiles-hint>
+        <profiles-help>Optional property profiles. When one or more profile names are specified, this property only applies to requests where those profiles are active; leave blank to apply unconditionally.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Default Language</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Global Theme</label>
+        <hint>Visual theme for Landing, Forms, and Admin pages &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Default (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Default Color Scheme</label>
         <hint>Default color scheme for pages &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

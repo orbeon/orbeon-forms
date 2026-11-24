@@ -430,6 +430,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "2026"
     ),
     CuratedPropertyDef(
+      key          = "global-style-theme",
+      category     = "appearance",
+      baseName     = "oxf.fr.style.theme",
+      xsType       = "xs:string",
+      hasAppForm   = false,
+      defaultValue = "2026"
+    ),
+    CuratedPropertyDef(
       key          = "color-scheme",
       category     = "appearance",
       baseName     = "oxf.fr.style.color-scheme",

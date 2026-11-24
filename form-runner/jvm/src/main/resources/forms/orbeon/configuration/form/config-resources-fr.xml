@@ -154,11 +154,15 @@
     <custom-properties-section>
         <label>Propriétés personnalisées</label>
         <name>Nom de la propriété</name>
-        <name-hint>Nom complet de la propriété (avec jokers si applicable)</name-hint>
+        <name-hint>ex. oxf.custom.my-property</name-hint>
+        <name-help>Saisissez le nom complet de la propriété, y compris les segments d'application et de formulaire ou les jokers &lt;code&gt;*&lt;/code&gt; le cas échéant (par exemple &lt;code&gt;oxf.fr.detail.send.success.uri.*.*&lt;/code&gt; ou une propriété personnalisée lue avec &lt;code&gt;xxf:property()&lt;/code&gt;).</name-help>
         <type>Type</type>
+        <type-help>Sélectionnez le type XML Schema correspondant à l'interprétation de la propriété par Orbeon Forms (&lt;code&gt;xs:string&lt;/code&gt;, &lt;code&gt;xs:boolean&lt;/code&gt;, &lt;code&gt;xs:integer&lt;/code&gt;, &lt;code&gt;xs:anyURI&lt;/code&gt; ou &lt;code&gt;xs:NMTOKENS&lt;/code&gt;).</type-help>
         <value>Valeur</value>
+        <value-help>Saisissez la valeur de la propriété correspondant au type sélectionné (par exemple texte, expression XPath, URL, &lt;code&gt;true&lt;/code&gt;/&lt;code&gt;false&lt;/code&gt;, entier ou jetons séparés par des espaces).</value-help>
         <profiles>Profils</profiles>
-        <profiles-hint>Profils de propriétés optionnels séparés par des espaces</profiles-hint>
+        <profiles-hint>Optionnel</profiles-hint>
+        <profiles-help>Profils de propriétés facultatifs. Lorsqu'un ou plusieurs profils sont indiqués, cette propriété s'applique uniquement aux requêtes où ces profils sont actifs ; laissez vide pour l'appliquer sans condition.</profiles-help>
     </custom-properties-section>
     <default-language>
         <label>Langue par défaut</label>
@@ -328,6 +332,22 @@
             <value>2025</value>
         </item>
     </style-theme>
+    <global-style-theme>
+        <label>Thème global</label>
+        <hint>Thème visuel pour les pages d'accueil, formulaires et administration &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme&lt;/code&gt;</hint>
+        <item>
+            <label>Par défaut (2026)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>2026</label>
+            <value>2026</value>
+        </item>
+        <item>
+            <label>2025</label>
+            <value>2025</value>
+        </item>
+    </global-style-theme>
     <color-scheme>
         <label>Mode de couleur par défaut</label>
         <hint>Mode de couleur par défaut &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.color-scheme.*.*&lt;/code&gt;</hint>

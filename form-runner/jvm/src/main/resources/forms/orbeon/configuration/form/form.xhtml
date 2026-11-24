@@ -28,22 +28,12 @@
         <xh:title>Orbeon Forms Configuration</xh:title>
         <xh:style type="text/css">
             /* Dedicated Settings Page Layout */
-            .orbeon .container-fluid:has(.fr-config-main-tabs) {
+            .orbeon .container-fluid:has(.fr-config-global-wrapper) {
                 max-width: 1520px;
                 margin-inline: auto;
             }
-            .orbeon .fr-config-main-tabs &gt; div &gt; .nav-tabs {
-                margin-bottom: 18px;
-            }
-            .orbeon .fr-config-main-tabs &gt; div &gt; .nav-tabs &gt; li &gt; a {
-                font-weight: 600;
-                font-size: 14px;
-                padding: 10px 18px;
-            }
-            .orbeon .fr-config-main-tabs &gt; div &gt; .nav-tabs &gt; li &gt; a &gt; .xforms-output &gt; .xforms-output-output {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
+            .orbeon .fr-view .fr-view-appearance-full:has(.fr-config-global-wrapper) {
+                overflow: visible;
             }
             /* Quick Filter Bar */
             .orbeon .fr-config-sr-only {
@@ -197,7 +187,7 @@
             }
             .orbeon .fr-config-scope-sidebar {
                 width: fit-content;
-                min-width: 216px;
+                min-width: 296px;
                 max-width: 360px;
                 flex-shrink: 0;
                 background-color: var(--orbeon-tab-bar-background-color);
@@ -458,16 +448,19 @@
                 flex: 1;
                 min-width: 0;
             }
-            .orbeon .fr-config-category-tabs &gt; .tabs-left {
+            .orbeon .xbl-fr-tabbable.fr-config-category-tabs.xforms-tabbable-appearance-left &gt; .tabs-left {
                 display: flex;
                 align-items: flex-start;
-                gap: 20px;
+                gap: 18px;
             }
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs {
+            .orbeon .xbl-fr-tabbable.fr-config-category-tabs.xforms-tabbable-appearance-left &gt; .tabs-left &gt; .nav-tabs {
                 float: none;
-                width: 216px;
+                width: fit-content;
+                min-width: 296px;
+                max-width: 360px;
                 flex-shrink: 0;
                 margin-right: 0;
+                box-sizing: border-box;
             }
             @media (max-width: 992px) {
                 .orbeon .fr-config-three-pane {
@@ -481,6 +474,10 @@
                 }
                 .orbeon .fr-config-category-tabs {
                     width: 100%;
+                }
+                .orbeon .xbl-fr-tabbable.fr-config-category-tabs.xforms-tabbable-appearance-left &gt; .tabs-left &gt; .nav-tabs {
+                    min-width: 0;
+                    max-width: none;
                 }
             }
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li &gt; a {
@@ -500,13 +497,14 @@
                 width: 100%;
                 gap: 8px;
             }
-            /* Group dividers between General/Shell (1-4), Pages (5-11), Documents/Messaging (12-14), and Authoring/Security/Ops (15-18) */
+            /* Group dividers between General/Shell (1-4), Pages (5-11), Documents/Messaging (12-14), Authoring/Security/Ops (15-18), and Custom Properties (19) */
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6).xforms-hidden + li:nth-child(7):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(12):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(15):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(15).xforms-hidden + li:nth-child(16):not(.xforms-hidden)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(15).xforms-hidden + li:nth-child(16):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(19):not(.xforms-hidden)::before {
                 content: "";
                 display: block;
                 height: 1px;
@@ -917,6 +915,13 @@
                 font-weight: 400;
                 color: var(--orbeon-hint-color);
             }
+            .orbeon .fr-config-custom-props-grid .fr-grid-head .fr-grid-th &gt; .xforms-label {
+                padding-top: 0;
+            }
+            .orbeon .fr-config-custom-props-grid .fr-grid-head .xforms-hint {
+                font-size: 0.85em;
+                line-height: 1.25;
+            }
         </xh:style>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:xpath-analysis="false">
 
@@ -1258,60 +1263,38 @@
                             'xbl.fr:us-ssn.hide',
                             'xbl.fr:us-ssn.show'
                         )"/>
-                <fr:tabbable id="fr-configuration-tabs" class="fr-config-main-tabs">
+                <xf:var
+                    name="selected-scope-id"
+                    value="string(instance('fr-configuration-ui-instance')/selected-scope)"/>
+                <xf:var
+                    name="active-override"
+                    value="instance('fr-configuration-instance')/app-form-overrides/override[@id = $selected-scope-id]"/>
+                <xf:var
+                    name="is-global-scope"
+                    value="empty($active-override)"/>
+                <xf:var
+                    name="active-scope"
+                    value="($active-override, instance('fr-configuration-instance'))[1]"/>
+                <xf:var
+                    name="active-scope-profiles"
+                    value="string($active-override/@profiles)"/>
+                <xf:var
+                    name="active-scope-display"
+                    value="
+                        if ($is-global-scope or ($active-override/@app = '*' and $active-override/@form = '*')) then
+                            string($form-resources/scopes/global)
+                        else if ($active-override/@form = '*') then
+                            concat($active-override/@app, ' (', $form-resources/scopes/all-forms, ')')
+                        else
+                            concat($active-override/@app, ' / ', $active-override/@form)
+                    "/>
 
-                    <!-- Tab 1: Standard Settings (Global + Application / Form Overrides) -->
-                    <fr:tab id="standard-settings-tab">
-                        <xf:label
-                            mediatype="text/html"
-                            value="
-                                let $c :=
-                                    count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
-                                    count(instance('fr-configuration-instance')/resources/message) +
-                                    count(instance('fr-configuration-instance')/processes/process) +
-                                    count(instance('fr-configuration-instance')/app-form-overrides/override/curated/*/*[
-                                        string(@override) = 'true' and
-                                        (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')
-                                    ]) +
-                                    count(instance('fr-configuration-instance')/app-form-overrides/override[xxf:is-blank(@profiles)]/resources/message) +
-                                    count(instance('fr-configuration-instance')/app-form-overrides/override/processes/process)
-                                return concat(
-                                    $form-resources/tabs/standard-settings,
-                                    if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
-                                )"/>
-
-                        <xf:var
-                            name="selected-scope-id"
-                            value="string(instance('fr-configuration-ui-instance')/selected-scope)"/>
-                        <xf:var
-                            name="active-override"
-                            value="instance('fr-configuration-instance')/app-form-overrides/override[@id = $selected-scope-id]"/>
-                        <xf:var
-                            name="is-global-scope"
-                            value="empty($active-override)"/>
-                        <xf:var
-                            name="active-scope"
-                            value="($active-override, instance('fr-configuration-instance'))[1]"/>
-                        <xf:var
-                            name="active-scope-profiles"
-                            value="string($active-override/@profiles)"/>
-                        <xf:var
-                            name="active-scope-display"
-                            value="
-                                if ($is-global-scope or ($active-override/@app = '*' and $active-override/@form = '*')) then
-                                    string($form-resources/scopes/global)
-                                else if ($active-override/@form = '*') then
-                                    concat($active-override/@app, ' (', $form-resources/scopes/all-forms, ')')
-                                else
-                                    concat($active-override/@app, ' / ', $active-override/@form)
-                            "/>
-
-                        <xf:group
-                            class="
-                                fr-config-global-wrapper
-                                {'fr-config-filtering'[xxf:non-blank(instance('fr-configuration-ui-instance')/filter)]}
-                                {'fr-config-override-scope'[not($is-global-scope)]}
-                            ">
+                <xf:group
+                    class="
+                        fr-config-global-wrapper
+                        {'fr-config-filtering'[xxf:non-blank(instance('fr-configuration-ui-instance')/filter)]}
+                        {'fr-config-override-scope'[not($is-global-scope)]}
+                    ">
                             <!-- Quick Filter Bar -->
                             <xh:search class="fr-config-filter-bar">
                                 <xh:div
@@ -1380,7 +1363,15 @@
                                             value="
                                                 count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
                                                 count(instance('fr-configuration-instance')/resources/message) +
-                                                count(instance('fr-configuration-instance')/processes/process)
+                                                count(instance('fr-configuration-instance')/processes/process) +
+                                                count(
+                                                    instance('fr-configuration-instance')/custom-properties/property[
+                                                        xxf:non-blank(@name) or
+                                                        xxf:non-blank(.) or
+                                                        xxf:non-blank(@profiles) or
+                                                        xxf:non-blank(@processor-name)
+                                                    ]
+                                                )
                                             "/>
                                         <xf:var
                                             name="global-has-error"
@@ -1389,7 +1380,8 @@
                                                 exists((
                                                     instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']/@value |
                                                     instance('fr-configuration-instance')/resources/message/(@xml:lang | @name) |
-                                                    instance('fr-configuration-instance')/processes/process/(. | @name)
+                                                    instance('fr-configuration-instance')/processes/process/(. | @name) |
+                                                    instance('fr-configuration-instance')/custom-properties/property/(@name | @type | @profiles)
                                                 )[not(xxf:valid(.))])
                                             "/>
                                         <xh:div class="fr-config-scope-row fr-config-scope-global {'fr-config-scope-active'[$is-global-scope]}">
@@ -1754,6 +1746,21 @@
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="12">
+                                        <xf:select1 id="global-style-theme-value-control" appearance="minimal" ref="global-style-theme/@selection" class="fr-config-select1">
+                                            <xf:label ref="$form-resources/global-style-theme/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/global-style-theme/hint else replace($form-resources/global-style-theme/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:itemset ref="$form-resources/global-style-theme/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="3" w="12">
                                         <xf:select1 id="color-scheme-value-control" appearance="minimal" ref="color-scheme/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/color-scheme/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/color-scheme/hint else replace($form-resources/color-scheme/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1768,7 +1775,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="3" w="12">
+                                    <fr:c x="1" y="4" w="12">
                                         <xf:select1 id="html-page-layout-value-control" appearance="minimal" ref="html-page-layout/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/html-page-layout/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/html-page-layout/hint else replace($form-resources/html-page-layout/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1783,7 +1790,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="4" w="12">
+                                    <fr:c x="1" y="5" w="12">
                                         <xf:select1 id="detail-density-value-control" appearance="minimal" ref="detail-density/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/detail-density/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/detail-density/hint else replace($form-resources/detail-density/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1798,7 +1805,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="5" w="12">
+                                    <fr:c x="1" y="6" w="12">
                                         <xf:select1 id="grid-markup-value-control" appearance="minimal" ref="grid-markup/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/grid-markup/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/grid-markup/hint else replace($form-resources/grid-markup/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1813,7 +1820,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="6" w="12">
+                                    <fr:c x="1" y="7" w="12">
                                         <xf:select1 id="label-appearance-value-control" appearance="minimal" ref="label-appearance/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/label-appearance/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/label-appearance/hint else replace($form-resources/label-appearance/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1828,7 +1835,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="7" w="12">
+                                    <fr:c x="1" y="8" w="12">
                                         <xf:select1 id="hint-appearance-value-control" appearance="minimal" ref="hint-appearance/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/hint-appearance/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/hint-appearance/hint else replace($form-resources/hint-appearance/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1843,7 +1850,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="8" w="12">
+                                    <fr:c x="1" y="9" w="12">
                                         <xf:select1 id="static-readonly-hint-value-control" appearance="minimal" ref="static-readonly-hint/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/static-readonly-hint/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/static-readonly-hint/hint else replace($form-resources/static-readonly-hint/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1858,7 +1865,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="9" w="12">
+                                    <fr:c x="1" y="10" w="12">
                                         <xf:select1 id="static-readonly-alert-value-control" appearance="minimal" ref="static-readonly-alert/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/static-readonly-alert/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/static-readonly-alert/hint else replace($form-resources/static-readonly-alert/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1873,7 +1880,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="10" w="12">
+                                    <fr:c x="1" y="11" w="12">
                                         <xf:select1 id="static-readonly-required-value-control" appearance="minimal" ref="static-readonly-required/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/static-readonly-required/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/static-readonly-required/hint else replace($form-resources/static-readonly-required/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1888,7 +1895,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="11" w="12">
+                                    <fr:c x="1" y="12" w="12">
                                         <xf:select1 id="view-show-explanation-value-control" appearance="minimal" ref="view-show-explanation/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/view-show-explanation/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/view-show-explanation/hint else replace($form-resources/view-show-explanation/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1903,7 +1910,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="12" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="13" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="default-logo-uri-override-control" ref="default-logo-uri/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -1916,7 +1923,7 @@
                                         </xf:input>
                                     </fr:c>
 
-                                    <fr:c x="1" y="13" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="14" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="favicon-uri-override-control" ref="favicon-uri/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -1929,7 +1936,7 @@
                                         </xf:input>
                                     </fr:c>
 
-                                    <fr:c x="1" y="14" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="15" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="custom-css-uri-override-control" ref="custom-css-uri/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -1942,7 +1949,7 @@
                                         </fr:tags-input>
                                     </fr:c>
 
-                                    <fr:c x="1" y="15" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="16" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="custom-js-uri-override-control" ref="custom-js-uri/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -1955,7 +1962,7 @@
                                         </fr:tags-input>
                                     </fr:c>
 
-                                    <fr:c x="1" y="16" w="12">
+                                    <fr:c x="1" y="17" w="12">
                                         <xf:select1 id="hide-logo-value-control" appearance="minimal" ref="hide-logo/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/hide-logo/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/hide-logo/hint else replace($form-resources/hide-logo/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1970,7 +1977,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="17" w="12">
+                                    <fr:c x="1" y="18" w="12">
                                         <xf:select1 id="hide-header-value-control" appearance="minimal" ref="hide-header/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/hide-header/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/hide-header/hint else replace($form-resources/hide-header/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -1985,7 +1992,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="18" w="12">
+                                    <fr:c x="1" y="19" w="12">
                                         <xf:select1 id="hide-footer-value-control" appearance="minimal" ref="hide-footer/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/hide-footer/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/hide-footer/hint else replace($form-resources/hide-footer/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2000,7 +2007,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="19" w="12">
+                                    <fr:c x="1" y="20" w="12">
                                         <xf:select1 id="hide-buttons-bar-value-control" appearance="minimal" ref="hide-buttons-bar/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/hide-buttons-bar/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/hide-buttons-bar/hint else replace($form-resources/hide-buttons-bar/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2015,7 +2022,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="20" w="12">
+                                    <fr:c x="1" y="21" w="12">
                                         <xf:select1 id="keyboard-shortcuts-show-hints-value-control" appearance="minimal" ref="keyboard-shortcuts-show-hints/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/keyboard-shortcuts-show-hints/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/keyboard-shortcuts-show-hints/hint else replace($form-resources/keyboard-shortcuts-show-hints/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4923,6 +4930,106 @@
                                     </xh:div>
                                 </xf:group>
                             </fr:tab>
+
+                            <!-- Custom Properties (Global Settings only) -->
+                            <fr:tab
+                                id="custom-properties-tab"
+                                visible="$is-global-scope">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count(
+                                            instance('fr-configuration-instance')/custom-properties/property[
+                                                xxf:non-blank(@name) or
+                                                xxf:non-blank(.) or
+                                                xxf:non-blank(@profiles) or
+                                                xxf:non-blank(@processor-name)
+                                            ]
+                                        )
+                                        return concat(
+                                            $form-resources/custom-properties-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/custom-properties-section/label"/>
+                                    </xh:h3>
+                                    <xh:span class="fr-config-scope-context-pill">
+                                        <xh:i class="fa fa-fw fa-globe" aria-hidden="true"/>
+                                        <xf:output value="$active-scope-display"/>
+                                    </xh:span>
+                                </xh:div>
+                                <xf:group
+                                    id="custom-properties-filter-group"
+                                    ref=".[
+                                        let $f := lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))
+                                        return
+                                            $f = '' or
+                                            contains(lower-case(concat('custom property properties ', $form-resources/custom-properties-section/label)), $f) or
+                                            exists(
+                                                instance('fr-configuration-instance')/custom-properties/property[
+                                                    (xxf:non-blank(@name) or xxf:non-blank(.) or xxf:non-blank(@profiles) or xxf:non-blank(@processor-name)) and
+                                                    contains(lower-case(concat(@name, ' ', @type, ' ', ., ' ', @profiles)), $f)
+                                                ]
+                                            )
+                                    ]">
+                                    <fr:grid
+                                        id="custom-properties-grid"
+                                        class="fr-config-custom-props-grid"
+                                        repeat="content"
+                                        min="0"
+                                        ref="instance('fr-configuration-instance')/custom-properties"
+                                        template="instance('fr-configuration-instance')/templates/property"
+                                        apply-defaults="false">
+                                        <fr:c x="1" y="1" w="4">
+                                            <xf:input id="custom-property-name-control" ref="@name">
+                                                <xf:label ref="$form-resources/custom-properties-section/name"/>
+                                                <xf:hint ref="$form-resources/custom-properties-section/name-hint"/>
+                                                <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/name-help"/>
+                                            </xf:input>
+                                        </fr:c>
+                                        <fr:c x="5" y="1" w="2">
+                                            <fr:dropdown-select1 id="custom-property-type-control" ref="@type">
+                                                <xf:label ref="$form-resources/custom-properties-section/type"/>
+                                                <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/type-help"/>
+                                                <xf:item>
+                                                    <xf:label>xs:string</xf:label>
+                                                    <xf:value>xs:string</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label>xs:boolean</xf:label>
+                                                    <xf:value>xs:boolean</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label>xs:integer</xf:label>
+                                                    <xf:value>xs:integer</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label>xs:anyURI</xf:label>
+                                                    <xf:value>xs:anyURI</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label>xs:NMTOKENS</xf:label>
+                                                    <xf:value>xs:NMTOKENS</xf:value>
+                                                </xf:item>
+                                            </fr:dropdown-select1>
+                                        </fr:c>
+                                        <fr:c x="7" y="1" w="4">
+                                            <xf:textarea id="custom-property-value-control" ref=".">
+                                                <xf:label ref="$form-resources/custom-properties-section/value"/>
+                                                <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/value-help"/>
+                                            </xf:textarea>
+                                        </fr:c>
+                                        <fr:c x="11" y="1" w="2">
+                                            <fr:tags-input id="custom-property-profiles-control" ref="@profiles" validation-type="pattern" pattern="^[A-Za-z0-9._\-:]+$">
+                                                <xf:label ref="$form-resources/custom-properties-section/profiles"/>
+                                                <xf:hint ref="$form-resources/custom-properties-section/profiles-hint"/>
+                                                <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/profiles-help"/>
+                                            </fr:tags-input>
+                                        </fr:c>
+                                    </fr:grid>
+                                </xf:group>
+                            </fr:tab>
                                 </fr:tabbable>
                             </xh:div>
 
@@ -4935,7 +5042,8 @@
                                             instance('fr-configuration-instance')[not($is-global-scope)]/(
                                                 curated/*/*[string(@override) = 'true']/@value |
                                                 resources/message/(@xml:lang | @name) |
-                                                processes/process/(. | @name)
+                                                processes/process/(. | @name) |
+                                                custom-properties/property/(@name | @type | @profiles)
                                             ),
                                             instance('fr-configuration-instance')/app-form-overrides/override[@id != $selected-scope-id]/(
                                                 curated/*/*[string(@override) = 'true' and (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')]/@value |
@@ -4959,6 +5067,8 @@
                                                             $form-resources/resources-section/label
                                                         else if (exists(self::process | parent::process)) then
                                                             $form-resources/processes-section/label
+                                                        else if (exists(parent::property)) then
+                                                            $form-resources/custom-properties-section/label
                                                         else
                                                             ($form-resources/*[name() = local-name(current()/..)]/label, local-name(..))[1]
                                                 return concat($scope-label, ' — ', $prop-label)
@@ -4968,80 +5078,6 @@
                                 </xf:repeat>
                             </xh:div>
                         </xf:group>
-                    </fr:tab>
-
-                    <!-- Tab 2: Custom Properties -->
-
-                    <fr:tab id="custom-properties-tab">
-                        <xf:label
-                            mediatype="text/html"
-                            value="
-                                let $c := count(
-                                    instance('fr-configuration-instance')/custom-properties/property[
-                                        xxf:non-blank(@name) or
-                                        xxf:non-blank(.) or
-                                        xxf:non-blank(@profiles) or
-                                        xxf:non-blank(@processor-name)
-                                    ]
-                                )
-                                return concat(
-                                    $form-resources/tabs/custom-properties,
-                                    if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
-                                )"/>
-
-                        <fr:grid
-                            id="custom-properties-grid"
-                            repeat="content"
-                            min="0"
-                            ref="instance('fr-configuration-instance')/custom-properties"
-                            template="instance('fr-configuration-instance')/templates/property"
-                            apply-defaults="false">
-                            <fr:c x="1" y="1" w="4">
-                                <xf:input id="custom-property-name-control" ref="@name">
-                                    <xf:label ref="$form-resources/custom-properties-section/name"/>
-                                    <xf:hint ref="$form-resources/custom-properties-section/name-hint"/>
-                                </xf:input>
-                            </fr:c>
-                            <fr:c x="5" y="1" w="2">
-                                <fr:dropdown-select1 id="custom-property-type-control" ref="@type">
-                                    <xf:label ref="$form-resources/custom-properties-section/type"/>
-                                    <xf:item>
-                                        <xf:label>xs:string</xf:label>
-                                        <xf:value>xs:string</xf:value>
-                                    </xf:item>
-                                    <xf:item>
-                                        <xf:label>xs:boolean</xf:label>
-                                        <xf:value>xs:boolean</xf:value>
-                                    </xf:item>
-                                    <xf:item>
-                                        <xf:label>xs:integer</xf:label>
-                                        <xf:value>xs:integer</xf:value>
-                                    </xf:item>
-                                    <xf:item>
-                                        <xf:label>xs:anyURI</xf:label>
-                                        <xf:value>xs:anyURI</xf:value>
-                                    </xf:item>
-                                    <xf:item>
-                                        <xf:label>xs:NMTOKENS</xf:label>
-                                        <xf:value>xs:NMTOKENS</xf:value>
-                                    </xf:item>
-                                </fr:dropdown-select1>
-                            </fr:c>
-                            <fr:c x="7" y="1" w="4">
-                                <xf:textarea id="custom-property-value-control" ref=".">
-                                    <xf:label ref="$form-resources/custom-properties-section/value"/>
-                                </xf:textarea>
-                            </fr:c>
-                            <fr:c x="11" y="1" w="2">
-                                <fr:tags-input id="custom-property-profiles-control" ref="@profiles" validation-type="pattern" pattern="^[A-Za-z0-9._\-:]+$">
-                                    <xf:label ref="$form-resources/custom-properties-section/profiles"/>
-                                    <xf:hint ref="$form-resources/custom-properties-section/profiles-hint"/>
-                                </fr:tags-input>
-                            </fr:c>
-                        </fr:grid>
-                    </fr:tab>
-
-                </fr:tabbable>
 
                 <!-- Reusable Form Runner Process Editor Dialog (single-process mode) -->
                 <fr:dialog-process-editor id="fr-config-process-editor-dialog">

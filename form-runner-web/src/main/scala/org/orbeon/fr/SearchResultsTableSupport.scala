@@ -116,6 +116,7 @@ object SearchResultsTableSupport {
               state.lastSignature = Some(sig)
 
               if (! state.isLocked) {
+                state.clearTransientMeasurementCaches()
                 val restoredFromSession =
                   ! forceRemeasure &&
                     hasActiveSearchUrlParam &&
@@ -153,6 +154,7 @@ object SearchResultsTableSupport {
     findTableStateOpt(tableElem).foreach { state =>
       state.isLocked = false
       state.lockedWidths.clear()
+      state.clearTransientMeasurementCaches()
       if (clearManual)
         state.manualWidths.clear()
       syncTable(tableElem, forceRemeasure = true)
@@ -250,17 +252,28 @@ object SearchResultsTableSupport {
     )
 
     class TableState(
-      val lockedWidths      : mutable.LinkedHashMap[String, Double] = mutable.LinkedHashMap.empty,
-      val manualWidths      : mutable.LinkedHashMap[String, Double] = mutable.LinkedHashMap.empty,
-      var isLocked          : Boolean                               = false,
-      var lastSignature     : Option[Vector[String]]                = None,
-      var lastWrapperWidth  : Int                                   = 0,
-      var currentTableElem  : Option[html.Element]                  = None,
-      var observedWrapper   : Option[html.Element]                  = None,
-      var wrapperObserver   : Option[ResizeObserver]                = None,
-      var cellObserver      : Option[ResizeObserver]                = None,
-      val observedCells     : WeakMap[html.Element, Boolean]        = new WeakMap[html.Element, Boolean]()
-    )
+      val lockedWidths            : mutable.LinkedHashMap[String, Double]   = mutable.LinkedHashMap.empty,
+      val manualWidths            : mutable.LinkedHashMap[String, Double]   = mutable.LinkedHashMap.empty,
+      val versionPillWidthByShape : mutable.HashMap[(Int, Boolean), Double] = mutable.HashMap.empty,
+      val triggerWidthByDigits    : mutable.HashMap[Int, Double]            = mutable.HashMap.empty,
+      var cachedPillsGapPxOpt     : Option[Double]                          = None,
+      var memoGeneration          : Int                                     = 0,
+      var isLocked                : Boolean                                 = false,
+      var lastSignature           : Option[Vector[String]]                  = None,
+      var lastWrapperWidth        : Int                                     = 0,
+      var currentTableElem        : Option[html.Element]                    = None,
+      var observedWrapper         : Option[html.Element]                    = None,
+      var wrapperObserver         : Option[ResizeObserver]                  = None,
+      var cellObserver            : Option[ResizeObserver]                  = None,
+      val observedCells           : WeakMap[html.Element, Boolean]          = new WeakMap[html.Element, Boolean]()
+    ) {
+      def clearTransientMeasurementCaches(): Unit = {
+        versionPillWidthByShape.clear()
+        triggerWidthByDigits.clear()
+        cachedPillsGapPxOpt = None
+        memoGeneration += 1
+      }
+    }
 
     var initialized   : Boolean                              = false
     var unlockPending : Boolean                              = false
@@ -419,14 +432,15 @@ object SearchResultsTableSupport {
             val created = new TableState()
             loadManualWidthsFromSession(created)
             if (hasResizeObserver) {
-              val cellObs = new ResizeObserver((entries, _) =>
-                entries.foreach { entry =>
-                  entry.target match {
-                    case el: html.Element => refreshSingleCellTruncation(el)
-                    case _                =>
-                  }
-                }
-              )
+              val cellObs = new ResizeObserver((entries, _) => {
+                val elems =
+                  entries.iterator.collect {
+                    case entry if entry.target.isInstanceOf[html.Element] =>
+                      entry.target.asInstanceOf[html.Element]
+                  }.toList
+                if (elems.nonEmpty)
+                  refreshCellsTruncationsBatch(elems, Some(created), fromResizeObserver = true)
+              })
               created.cellObserver = Some(cellObs)
             }
             created
@@ -565,6 +579,53 @@ object SearchResultsTableSupport {
           math.ceil(math.max(SelectionMinPx, thElem.getBoundingClientRect().width))
       }
 
+    // Batch header `pageW` and `max-content` button measurements across all columns to avoid per-column synchronous reflows
+    def measureHeaderWidthsBatch(
+      cols         : Vector[ColumnDescriptor],
+      manualWidths : collection.Map[String, Double]
+    ): Map[String, (Double, Double)] = {
+      val nonManualCols = cols.filterNot(c => manualWidths.contains(c.key))
+      if (nonManualCols.isEmpty) {
+        Map.empty
+      } else {
+        // Read pass 1: natural column widths in `table-layout: auto`
+        val pageWidths =
+          nonManualCols.map { c =>
+            c.key -> math.ceil(c.thElem.getBoundingClientRect().width)
+          }.toMap
+
+        val btnEntries =
+          nonManualCols.flatMap { c =>
+            c.thElem.querySelectorOpt("button.btn-link").map(btn => (c.key, btn, btn.style.width))
+          }
+
+        val btnMinWidths =
+          if (btnEntries.isEmpty) {
+            Map.empty[String, Double]
+          } else {
+            // Write pass 1: switch all header buttons to `max-content` together
+            btnEntries.foreach { case (_, btn, _) => btn.style.width = "max-content" }
+            try {
+              // Read pass 2: sample all header buttons in one layout pass
+              btnEntries.map { case (key, btn, _) =>
+                val measured = math.max(btn.scrollWidth.toDouble, btn.getBoundingClientRect().width)
+                val raw      = if (measured > 0.0) measured + 8.0 else MinManualWidthPx
+                key -> math.ceil(math.max(MinManualWidthPx, raw))
+              }.toMap
+            } finally {
+              // Write pass 2: restore inline widths together
+              btnEntries.foreach { case (_, btn, prevWidth) => btn.style.width = prevWidth }
+            }
+          }
+
+        nonManualCols.map { c =>
+          val pageW     = pageWidths(c.key)
+          val headerMin = btnMinWidths.getOrElse(c.key, math.ceil(math.max(SelectionMinPx, pageW)))
+          c.key -> (pageW, headerMin)
+        }.toMap
+      }
+    }
+
     def findFlexColumnKeyOpt(cols: Vector[ColumnDescriptor]): Option[String] = {
       val dataCols = cols.filter(_.isDataColumn)
       dataCols
@@ -644,7 +705,8 @@ object SearchResultsTableSupport {
       }
 
       try {
-        val bodyRows = findVisibleBodyRows(tableElem)
+        val bodyRows     = findVisibleBodyRows(tableElem)
+        val headerWidths = measureHeaderWidthsBatch(cols, state.manualWidths)
         state.lockedWidths.clear()
 
         cols.foreach { col =>
@@ -652,8 +714,11 @@ object SearchResultsTableSupport {
             case Some(manualPx) =>
               state.lockedWidths.put(col.key, manualPx)
             case None =>
-              val pageW     = math.ceil(col.thElem.getBoundingClientRect().width)
-              val headerMin = measureHeaderMinWidth(col.thElem)
+              val (pageW, headerMin) =
+                headerWidths.getOrElse(
+                  col.key,
+                  math.ceil(col.thElem.getBoundingClientRect().width) -> measureHeaderMinWidth(col.thElem)
+                )
 
               val resolvedPx = col.kind match {
                 case ColumnKind.Selection =>
@@ -751,26 +816,33 @@ object SearchResultsTableSupport {
       missingCols : Vector[ColumnDescriptor],
       state       : TableState
     ): Unit = {
-      val (ch, padPx) = measureFontAndPadding(tableElem)
-      val rows        = findVisibleBodyRows(tableElem)
+      val (ch, padPx)    = measureFontAndPadding(tableElem)
+      val rows           = findVisibleBodyRows(tableElem)
+      val wrapperElemOpt = tableElem.closestOpt(".fr-search-results")
+      val headerWidths   = measureHeaderWidthsBatch(missingCols, Map.empty)
 
       missingCols.foreach { col =>
-        val headerMin = measureHeaderMinWidth(col.thElem)
+        val (_, headerMin) = headerWidths.getOrElse(col.key, 0.0 -> measureHeaderMinWidth(col.thElem))
         val maxCellW  =
           rows.iterator.flatMap { r =>
-            findVisibleRowCells(r).lift(col.index).map(measureCellIntrinsicWidth(_, padPx))
+            findVisibleRowCells(r).lift(col.index).map(measureCellIntrinsicWidth(_, padPx, Some(state), wrapperElemOpt))
           }.maxOption.getOrElse(0.0)
         val measured = math.ceil(math.max(headerMin, maxCellW + math.ceil(0.5 * ch)))
         state.lockedWidths.put(col.key, measured)
       }
     }
 
-    def measureCellIntrinsicWidth(tdElem: html.Element, fallbackPadPx: Double): Double = {
+    def measureCellIntrinsicWidth(
+      tdElem         : html.Element,
+      fallbackPadPx  : Double,
+      stateOpt       : Option[TableState]   = None,
+      wrapperElemOpt : Option[html.Element] = None
+    ): Double = {
       val padPx = effectiveCellHorizontalPadding(tdElem, fallbackPadPx)
       val innerW =
         tdElem.querySelectorOpt(".fr-status-pills") match {
           case Some(pillsElem) =>
-            measureUncollapsedStatusPillsWidth(pillsElem)
+            measureUncollapsedStatusPillsWidth(pillsElem, stateOpt, wrapperElemOpt)
           case None =>
             tdElem
               .querySelectorOpt(".fr-summary-cell-value > *")
@@ -980,7 +1052,7 @@ object SearchResultsTableSupport {
         val rows       = findVisibleBodyRows(tableElem)
         val maxBodyW   =
           rows.iterator.flatMap { r =>
-            findVisibleRowCells(r).lift(col.index).map(measureCellIntrinsicWidth(_, padPx))
+            findVisibleRowCells(r).lift(col.index).map(measureCellIntrinsicWidth(_, padPx, Some(state), Some(wrapperElem)))
           }.maxOption.getOrElse(0.0)
 
         val fittedPx = math.ceil(math.max(headerMin, maxBodyW + 4.0))
@@ -991,6 +1063,45 @@ object SearchResultsTableSupport {
         observeAndRefreshTruncations(tableElem, state)
       }
     }
+
+    sealed trait CellTruncationPlan
+    object CellTruncationPlan {
+      case object NoOp extends CellTruncationPlan
+
+      case class TextCellPlan(
+        elem                 : html.Element,
+        isTruncated          : Boolean,
+        hiddenPx             : Int,
+        shouldAddTabIndex    : Boolean,
+        shouldRemoveTabIndex : Boolean
+      ) extends CellTruncationPlan
+
+      case class StatusPillsRestorePlan(
+        cellElem     : html.Element,
+        pillsElem    : html.Element,
+        pills        : Vector[html.Element],
+        availWidthPx : Int,
+        generation   : Int
+      ) extends CellTruncationPlan
+
+      case class StatusPillsCollapsePlan(
+        cellElem     : html.Element,
+        pillsElem    : html.Element,
+        pills        : Vector[html.Element],
+        availWidthPx : Int,
+        visibleSet   : Set[Int],
+        hiddenCount  : Int,
+        generation   : Int
+      ) extends CellTruncationPlan
+    }
+
+    case class PillsLayoutMemo(
+      availWidthPx : Int,
+      childCount   : Int,
+      firstChild   : dom.Element,
+      lastChild    : dom.Element,
+      generation   : Int
+    )
 
     def observeAndRefreshTruncations(tableElem: html.Element, state: TableState): Unit = {
       activePopoverTriggerOpt.foreach { trigger =>
@@ -1010,46 +1121,229 @@ object SearchResultsTableSupport {
           }
           .toList
 
+      refreshCellsTruncationsBatch(candidates, Some(state), fromResizeObserver = false)
+
       candidates.foreach { el =>
         if (! state.observedCells.has(el)) {
           state.observedCells.set(el, true)
           state.cellObserver.foreach(_.observe(el))
         }
-        refreshSingleCellTruncation(el)
       }
     }
 
-    def refreshSingleCellTruncation(elem: html.Element): Unit =
+    // Batch all DOM layout reads across `cells` first, then apply all DOM class/style/attribute writes together
+    def refreshCellsTruncationsBatch(
+      cells              : List[html.Element],
+      stateOpt           : Option[TableState],
+      fromResizeObserver : Boolean
+    ): Unit =
+      if (cells.nonEmpty) {
+        val wrapperElemOpt =
+          stateOpt
+            .flatMap(_.currentTableElem)
+            .orElse(cells.headOption)
+            .flatMap(_.closestOpt(".fr-search-results"))
+
+        // Pre-warm `+N` trigger widths once per `TableState` using an out-of-flow probe before starting the read pass
+        if (stateOpt.exists(_.triggerWidthByDigits.isEmpty) && cells.exists(_.querySelectorOpt(".fr-status-pills").isDefined))
+          warmOverflowTriggerWidths(wrapperElemOpt, stateOpt)
+
+        // Phase 1: Pure DOM reads across all candidate cells (no interleaved DOM writes)
+        val plans = cells.map(planSingleCellTruncation(_, stateOpt, wrapperElemOpt, fromResizeObserver))
+
+        // Phase 2: Pure DOM writes across all candidate cells (no interleaved layout reads)
+        var openPopoverRefreshOpt: Option[(html.Element, html.Element)] = None
+
+        plans.foreach {
+          case CellTruncationPlan.NoOp =>
+
+          case CellTruncationPlan.TextCellPlan(elem, isTruncated, hiddenPx, shouldAddTabIndex, shouldRemoveTabIndex) =>
+            if (elem.hasClass(CellTruncatedClass) != isTruncated)
+              elem.toggleClass(CellTruncatedClass, isTruncated)
+            if (isTruncated) {
+              val hiddenStr = hiddenPx.toString
+              if (elem.style.getPropertyValue(ScrollWidthCssVar) != hiddenStr)
+                elem.style.setProperty(ScrollWidthCssVar, hiddenStr)
+              if (shouldAddTabIndex)
+                elem.tabIndex = 0
+            } else {
+              if (elem.style.getPropertyValue(ScrollWidthCssVar).nonEmpty)
+                elem.style.removeProperty(ScrollWidthCssVar)
+              if (shouldRemoveTabIndex)
+                elem.removeAttribute("tabindex")
+            }
+
+          case CellTruncationPlan.StatusPillsRestorePlan(cellElem, pillsElem, pills, availWidthPx, generation) =>
+            clearCellTextTruncationAttrs(cellElem)
+            restoreAllStatusPills(pillsElem, pills)
+            recordPillsLayoutMemo(pillsElem, availWidthPx, generation)
+
+          case CellTruncationPlan.StatusPillsCollapsePlan(cellElem, pillsElem, pills, availWidthPx, visibleSet, hiddenCount, generation) =>
+            clearCellTextTruncationAttrs(cellElem)
+            val triggerBtn = getOrCreateOverflowTrigger(pillsElem)
+
+            var idx = 0
+            val len = pills.length
+            while (idx < len) {
+              val pill = pills(idx)
+              if (visibleSet.contains(idx)) {
+                if (pill.hasClass(PillCollapsedClass))
+                  pill.classList.remove(PillCollapsedClass)
+                val targetOrder = if (idx == 0) "0" else "2"
+                if (pill.style.getPropertyValue("order") != targetOrder)
+                  pill.style.setProperty("order", targetOrder)
+              } else {
+                if (! pill.hasClass(PillCollapsedClass))
+                  pill.classList.add(PillCollapsedClass)
+              }
+              idx += 1
+            }
+
+            if (isElemHidden(triggerBtn))
+              setElemHidden(triggerBtn, hide = false)
+            val triggerLabel = s"+$hiddenCount"
+            if (triggerBtn.textContent != triggerLabel)
+              triggerBtn.textContent = triggerLabel
+            if (triggerBtn.style.getPropertyValue("order") != "1")
+              triggerBtn.style.setProperty("order", "1")
+
+            recordPillsLayoutMemo(pillsElem, availWidthPx, generation)
+
+            if (activePopoverTriggerOpt.contains(triggerBtn))
+              openPopoverRefreshOpt = Some(triggerBtn -> pillsElem)
+        }
+
+        // Refresh open popover (if any) after all table cell writes have completed
+        openPopoverRefreshOpt.foreach { case (triggerBtn, pillsElem) =>
+          activePopoverElemOpt.foreach { pop =>
+            renderPopoverPills(pop, pillsElem)
+            positionPopover(triggerBtn, pop)
+          }
+        }
+      }
+
+    def clearCellTextTruncationAttrs(elem: html.Element): Unit = {
+      if (elem.hasClass(CellTruncatedClass))
+        elem.classList.remove(CellTruncatedClass)
+      if (elem.style.getPropertyValue(ScrollWidthCssVar).nonEmpty)
+        elem.style.removeProperty(ScrollWidthCssVar)
+      if (elem.attValueOpt("tabindex").contains("0"))
+        elem.removeAttribute("tabindex")
+    }
+
+    def recordPillsLayoutMemo(pillsElem: html.Element, availWidthPx: Int, generation: Int): Unit =
+      pillsLayoutMemo.set(
+        pillsElem,
+        PillsLayoutMemo(
+          availWidthPx = availWidthPx,
+          childCount   = pillsElem.childElementCount,
+          firstChild   = pillsElem.firstElementChild,
+          lastChild    = pillsElem.lastElementChild,
+          generation   = generation
+        )
+      )
+
+    def planSingleCellTruncation(
+      elem               : html.Element,
+      stateOpt           : Option[TableState],
+      wrapperElemOpt     : Option[html.Element],
+      fromResizeObserver : Boolean
+    ): CellTruncationPlan =
       elem.querySelectorOpt(".fr-status-pills") match {
         case Some(pillsElem) =>
-          elem.classList.remove(CellTruncatedClass)
-          elem.style.removeProperty(ScrollWidthCssVar)
-          if (elem.attValueOpt("tabindex").contains("0"))
-            elem.removeAttribute("tabindex")
-          refreshStatusPillsOverflow(pillsElem)
+          val availWidth   = availableStatusPillsWidth(pillsElem)
+          val availWidthPx = math.round(availWidth).toInt
+          val generation   = stateOpt.map(_.memoGeneration).getOrElse(0)
+          val canUseMemo   = fromResizeObserver || pillsElem.closestOpt(".xforms-mediatype-text-html").isDefined
+
+          val isUnchanged =
+            canUseMemo &&
+              ! elem.hasClass(CellTruncatedClass) &&
+              pillsLayoutMemo.get(pillsElem).toOption.exists { memo =>
+                memo.availWidthPx == availWidthPx &&
+                  memo.generation == generation &&
+                  memo.childCount == pillsElem.childElementCount &&
+                  (memo.firstChild eq pillsElem.firstElementChild) &&
+                  (memo.lastChild eq pillsElem.lastElementChild)
+              }
+
+          if (isUnchanged) {
+            CellTruncationPlan.NoOp
+          } else {
+            val pills = originalPillsOf(pillsElem)
+            val n     = pills.length
+            if (n <= 1 || availWidth <= 0.0) {
+              CellTruncationPlan.StatusPillsRestorePlan(elem, pillsElem, pills, availWidthPx, generation)
+            } else {
+              val widths       = pills.map(resolvePillNaturalWidth(_, stateOpt, wrapperElemOpt))
+              val gap          = readFlexGapPx(pillsElem, stateOpt)
+              val naturalTotal = widths.sum + (n - 1) * gap
+
+              if (naturalTotal <= availWidth + 0.5) {
+                CellTruncationPlan.StatusPillsRestorePlan(elem, pillsElem, pills, availWidthPx, generation)
+              } else {
+                // Span / latest-preserving selection (`O(k)` upward scan where `k` is the max pills fitting `availWidth`):
+                // 1. Keep `P_0` + latest `m - 1` pills (`[v1] [+k] ... [v_n]`) for largest fitting `m >= 2`
+                // 2. Else keep latest pill `P_{n-1}` (`[+(n-1)] [v_n]`)
+                // 3. Else collapse all into `[+n]`
+                var m       = 2
+                var tailSum = 0.0
+                var bestM   = -1
+                while (m <= n - 1) {
+                  tailSum += widths(n - (m - 1))
+                  val pillsAndGapsW = widths(0) + tailSum + m * gap
+                  if (pillsAndGapsW > availWidth + 0.5) {
+                    m = n // Monotonic lower bound exceeded: no larger `m` can fit
+                  } else {
+                    val hiddenCount = n - m
+                    val triggerW    = triggerWidthForHiddenCount(wrapperElemOpt, stateOpt, hiddenCount)
+                    if (pillsAndGapsW + triggerW <= availWidth + 0.5)
+                      bestM = m
+                    m += 1
+                  }
+                }
+
+                val chosenIndices: Vector[Int] =
+                  if (bestM >= 2) {
+                    0 +: ((n - (bestM - 1)) until n).toVector
+                  } else {
+                    val latestTriggerW = triggerWidthForHiddenCount(wrapperElemOpt, stateOpt, n - 1)
+                    if (widths(n - 1) + latestTriggerW + gap <= availWidth + 0.5) Vector(n - 1)
+                    else Vector.empty
+                  }
+
+                val visibleSet  = chosenIndices.toSet
+                val hiddenCount = n - visibleSet.size
+                CellTruncationPlan.StatusPillsCollapsePlan(elem, pillsElem, pills, availWidthPx, visibleSet, hiddenCount, generation)
+              }
+            }
+          }
 
         case None =>
-          val hiddenPx    = math.ceil((elem.scrollWidth - elem.clientWidth).toDouble).toInt
-          val isTruncated = elem.clientWidth > 0 && hiddenPx > 1
-          elem.toggleClass(CellTruncatedClass, isTruncated)
-          if (isTruncated) {
-            elem.style.setProperty(ScrollWidthCssVar, hiddenPx.toString)
+          val cw          = elem.clientWidth
+          val hiddenPx    = math.ceil((elem.scrollWidth - cw).toDouble).toInt
+          val isTruncated = cw > 0 && hiddenPx > 1
+          val wasTrunc    = elem.hasClass(CellTruncatedClass)
+
+          if (! isTruncated && ! wasTrunc && elem.style.getPropertyValue(ScrollWidthCssVar).isEmpty && ! elem.attValueOpt("tabindex").contains("0")) {
+            CellTruncationPlan.NoOp
+          } else if (isTruncated) {
             val alreadyFocusableOrLinked =
               elem.localName == "a" ||
                 elem.closestOpt("a:not(.xforms-hidden)").isDefined ||
                 elem.closestOpt("td").flatMap(_.querySelectorOpt("a.fr-summary-cell-link:not(.xforms-hidden)")).isDefined
-            if (! alreadyFocusableOrLinked && ! elem.hasAttribute("tabindex"))
-              elem.tabIndex = 0
+            val shouldAddTabIndex = ! alreadyFocusableOrLinked && ! elem.hasAttribute("tabindex")
+            CellTruncationPlan.TextCellPlan(elem, isTruncated = true, hiddenPx = hiddenPx, shouldAddTabIndex = shouldAddTabIndex, shouldRemoveTabIndex = false)
           } else {
-            elem.style.removeProperty(ScrollWidthCssVar)
-            if (elem.attValueOpt("tabindex").contains("0"))
-              elem.removeAttribute("tabindex")
+            val shouldRemoveTabIndex = elem.attValueOpt("tabindex").contains("0")
+            CellTruncationPlan.TextCellPlan(elem, isTruncated = false, hiddenPx = 0, shouldAddTabIndex = false, shouldRemoveTabIndex = shouldRemoveTabIndex)
           }
       }
 
     // ***** Status / version pills `+N` overflow & anchored popover ***************************************************
 
     val pillWidthsCache                        = new WeakMap[html.Element, Double]()
+    val pillsLayoutMemo                        = new WeakMap[html.Element, PillsLayoutMemo]()
     var popoverListenersInstalled : Boolean    = false
     var activePopoverTriggerOpt   : Option[html.Element] = None
     var activePopoverElemOpt      : Option[html.Element] = None
@@ -1075,53 +1369,101 @@ object SearchResultsTableSupport {
       if (hide) elem.setAttribute("hidden", "")
       else elem.removeAttribute("hidden")
 
-    def readFlexGapPx(pillsElem: html.Element): Double = {
-      val st = dom.window.getComputedStyle(pillsElem)
-      Option(st.getPropertyValue("column-gap")).flatMap(DomSupport.parseDoubleIgnoreTail)
-        .orElse(Option(st.getPropertyValue("gap")).flatMap(DomSupport.parseDoubleIgnoreTail))
-        .filter(_ > 0.0)
-        .getOrElse(DefaultPillsGapPx)
-    }
+    def readFlexGapPx(pillsElem: html.Element, stateOpt: Option[TableState] = None): Double =
+      stateOpt.flatMap(_.cachedPillsGapPxOpt).getOrElse {
+        val st       = dom.window.getComputedStyle(pillsElem)
+        val resolved =
+          Option(st.getPropertyValue("column-gap")).flatMap(DomSupport.parseDoubleIgnoreTail)
+            .orElse(Option(st.getPropertyValue("gap")).flatMap(DomSupport.parseDoubleIgnoreTail))
+            .filter(_ > 0.0)
+            .getOrElse(DefaultPillsGapPx)
+        stateOpt.foreach(_.cachedPillsGapPxOpt = Some(resolved))
+        resolved
+      }
+
+    def appendVisiblePillText(node: dom.Node, sb: StringBuilder): Unit =
+      node.childNodes.foreach {
+        case childElem: html.Element =>
+          if (! childElem.hasClass("visually-hidden") && ! childElem.hasAnyClass(HiddenOrDelimiterClasses*))
+            appendVisiblePillText(childElem, sb)
+        case textNode if textNode.nodeType == dom.Node.TEXT_NODE =>
+          sb.append(textNode.textContent)
+        case _ =>
+      }
 
     def visibleLabelLengthOfPill(pillElem: html.Element): Int = {
-      val clone = pillElem.cloneNodeT(deep = true)
-      clone.querySelectorAllT(".visually-hidden, .xforms-hidden").foreach(_.remove())
-      clone.textContent.trimAllToEmpty.length
+      val sb = new StringBuilder
+      appendVisiblePillText(pillElem, sb)
+      sb.result().trimAllToEmpty.length
     }
 
-    def measurePillNaturalWidth(pillElem: html.Element): Double =
-      if (! pillElem.hasClass(PillCollapsedClass)) {
-        val measured = math.max(pillElem.getBoundingClientRect().width, pillElem.offsetWidth.toDouble)
-        if (measured > 0.0) {
-          pillWidthsCache.set(pillElem, measured)
-          measured
-        } else {
-          pillWidthsCache
-            .get(pillElem)
-            .toOption
-            .getOrElse(math.max(28.0, visibleLabelLengthOfPill(pillElem) * 7.5 + 18.0))
-        }
-      } else {
-        pillWidthsCache.get(pillElem).toOption.getOrElse {
-          pillElem.classList.remove(PillCollapsedClass)
-          val measured = math.max(pillElem.getBoundingClientRect().width, pillElem.offsetWidth.toDouble)
-          pillElem.classList.add(PillCollapsedClass)
-          if (measured > 0.0) {
-            pillWidthsCache.set(pillElem, measured)
-            measured
-          } else {
-            math.max(28.0, visibleLabelLengthOfPill(pillElem) * 7.5 + 18.0)
-          }
+    def fallbackPillWidthForLength(charLen: Int): Double =
+      math.max(28.0, charLen * 7.5 + 18.0)
+
+    def measureOffFlowCloneWidth(pillElem: html.Element, wrapperElemOpt: Option[html.Element]): Double = {
+      val host      = wrapperElemOpt.orElse(Option(dom.document.body))
+      val container = dom.document.createElement("div").asInstanceOf[html.Element]
+      container.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:-9999px;top:0;width:0;height:0;overflow:visible;"
+      val clone = pillElem.cloneNodeT(deep = true)
+      clone.classList.remove(PillCollapsedClass)
+      clone.removeAttribute("id")
+      clone.querySelectorAllT("[id]").foreach(_.removeAttribute("id"))
+      container.appendChild(clone)
+      host.foreach(_.appendChild(container))
+      val measured =
+        try math.max(clone.getBoundingClientRect().width, clone.offsetWidth.toDouble)
+        finally container.remove()
+      measured
+    }
+
+    def resolvePillNaturalWidth(
+      pillElem       : html.Element,
+      stateOpt       : Option[TableState]   = None,
+      wrapperElemOpt : Option[html.Element] = None
+    ): Double =
+      pillWidthsCache.get(pillElem).toOption.getOrElse {
+        val isVersionBadge = pillElem.hasClass("fr-version-badge")
+        lazy val charLen   = visibleLabelLengthOfPill(pillElem)
+        lazy val shapeKey  = charLen -> pillElem.hasClass("fr-pill-unavailable")
+
+        val fromShapeOpt =
+          if (isVersionBadge) stateOpt.flatMap(_.versionPillWidthByShape.get(shapeKey))
+          else None
+
+        fromShapeOpt match {
+          case Some(cachedShapeW) =>
+            pillWidthsCache.set(pillElem, cachedShapeW)
+            cachedShapeW
+
+          case None =>
+            val measured =
+              if (! pillElem.hasClass(PillCollapsedClass))
+                math.max(pillElem.getBoundingClientRect().width, pillElem.offsetWidth.toDouble)
+              else
+                measureOffFlowCloneWidth(pillElem, wrapperElemOpt)
+
+            if (measured > 0.0) {
+              pillWidthsCache.set(pillElem, measured)
+              if (isVersionBadge)
+                stateOpt.foreach(_.versionPillWidthByShape.put(shapeKey, measured))
+              measured
+            } else {
+              fallbackPillWidthForLength(charLen)
+            }
         }
       }
 
-    def measureUncollapsedStatusPillsWidth(pillsElem: html.Element): Double = {
+    def measureUncollapsedStatusPillsWidth(
+      pillsElem      : html.Element,
+      stateOpt       : Option[TableState]   = None,
+      wrapperElemOpt : Option[html.Element] = None
+    ): Double = {
       val pills = originalPillsOf(pillsElem)
       if (pills.isEmpty) {
         0.0
       } else {
-        val gap = readFlexGapPx(pillsElem)
-        pills.map(measurePillNaturalWidth).sum + math.max(0, pills.length - 1) * gap
+        val gap = readFlexGapPx(pillsElem, stateOpt)
+        pills.map(resolvePillNaturalWidth(_, stateOpt, wrapperElemOpt)).sum + math.max(0, pills.length - 1) * gap
       }
     }
 
@@ -1140,91 +1482,70 @@ object SearchResultsTableSupport {
           }
       }
 
-    def measureOverflowTriggerWidth(triggerBtn: html.Element, hiddenCount: Int): Double = {
-      val wasHidden          = isElemHidden(triggerBtn)
-      val prevText           = triggerBtn.textContent
-      setElemHidden(triggerBtn, hide = false)
-      triggerBtn.textContent = s"+$hiddenCount"
-      val measured = math.max(triggerBtn.getBoundingClientRect().width, triggerBtn.offsetWidth.toDouble)
-      triggerBtn.textContent = prevText
-      setElemHidden(triggerBtn, hide = wasHidden)
-      if (measured > 0.0) measured
-      else if (hiddenCount >= 10) 42.0
-      else 34.0
+    def fallbackTriggerWidthForDigits(digits: Int): Double =
+      if (digits <= 1) 34.0
+      else if (digits == 2) 42.0
+      else 42.0 + (digits - 2) * 7.5
+
+    def warmOverflowTriggerWidths(
+      wrapperElemOpt : Option[html.Element],
+      stateOpt       : Option[TableState],
+      extraDigitsOpt : Option[Int] = None
+    ): Map[Int, Double] = {
+      val digitsToMeasure = (Set(1, 2, 3) ++ extraDigitsOpt).toVector.sorted
+      val hostOpt         = wrapperElemOpt.orElse(Option(dom.document.body))
+      val container       = dom.document.createElement("div").asInstanceOf[html.Element]
+      container.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:-9999px;top:0;width:0;height:0;overflow:visible;"
+
+      val buttons = digitsToMeasure.map { d =>
+        val btn = dom.document.createElement("button").asInstanceOf[html.Element]
+        btn.setAttribute("type", "button")
+        btn.className   = s"fr-table-pill fr-version-badge fr-pill-neutral $PillsOverflowTriggerClass"
+        btn.textContent = "+" + ("8" * d)
+        container.appendChild(btn)
+        d -> btn
+      }
+
+      hostOpt.foreach(_.appendChild(container))
+      val results =
+        try {
+          buttons.map { case (d, btn) =>
+            val measured = math.max(btn.getBoundingClientRect().width, btn.offsetWidth.toDouble)
+            val resolved = if (measured > 0.0) measured else fallbackTriggerWidthForDigits(d)
+            stateOpt.foreach(_.triggerWidthByDigits.put(d, resolved))
+            d -> resolved
+          }.toMap
+        } finally {
+          container.remove()
+        }
+
+      results
     }
 
-    def refreshStatusPillsOverflow(pillsElem: html.Element): Unit = {
-      val pills      = originalPillsOf(pillsElem)
-      val n          = pills.length
-      val availWidth = availableStatusPillsWidth(pillsElem)
-
-      if (n <= 1 || availWidth <= 0.0) {
-        restoreAllStatusPills(pillsElem, pills)
-      } else {
-        val widths       = pills.map(measurePillNaturalWidth)
-        val gap          = readFlexGapPx(pillsElem)
-        val naturalTotal = widths.sum + (n - 1) * gap
-
-        if (naturalTotal <= availWidth + 0.5) {
-          restoreAllStatusPills(pillsElem, pills)
-        } else {
-          val triggerBtn = getOrCreateOverflowTrigger(pillsElem)
-
-          // Span / latest-preserving selection:
-          // 1. Try keeping first pill `P_0` + latest `m - 1` pills (`[v1] [+k] ... [v_n]`) for largest `m` in `(n - 1) .. 2`
-          // 2. Else try keeping latest pill `P_{n-1}` (`[+(n-1)] [v_n]`)
-          // 3. Else collapse all into `[+n]`
-          val spanVisibleOpt: Option[Vector[Int]] =
-            ((n - 1) to 2 by -1).iterator.map { m =>
-              val indices     = 0 +: ((n - (m - 1)) until n).toVector
-              val hiddenCount = n - m
-              val triggerW    = measureOverflowTriggerWidth(triggerBtn, hiddenCount)
-              val neededW     = indices.map(widths).sum + triggerW + m * gap
-              indices -> neededW
-            }.collectFirst {
-              case (indices, neededW) if neededW <= availWidth + 0.5 => indices
-            }
-
-          val chosenIndices: Vector[Int] =
-            spanVisibleOpt.getOrElse {
-              val latestOnlyHidden = n - 1
-              val latestTriggerW   = measureOverflowTriggerWidth(triggerBtn, latestOnlyHidden)
-              val latestNeededW    = widths(n - 1) + latestTriggerW + gap
-              if (latestNeededW <= availWidth + 0.5) Vector(n - 1)
-              else Vector.empty
-            }
-
-          val visibleSet  = chosenIndices.toSet
-          val hiddenCount = n - visibleSet.size
-
-          pills.zipWithIndex.foreach { case (pill, idx) =>
-            pill.toggleClass(PillCollapsedClass, ! visibleSet.contains(idx))
-            pill.style.setProperty("order", if (idx == 0) "0" else "2")
-          }
-
-          setElemHidden(triggerBtn, hide = false)
-          triggerBtn.textContent = s"+$hiddenCount"
-          triggerBtn.style.setProperty("order", "1")
-
-          if (activePopoverTriggerOpt.contains(triggerBtn)) {
-            activePopoverElemOpt.foreach { pop =>
-              renderPopoverPills(pop, pillsElem)
-              positionPopover(triggerBtn, pop)
-            }
-          }
-        }
+    def triggerWidthForHiddenCount(
+      wrapperElemOpt : Option[html.Element],
+      stateOpt       : Option[TableState],
+      hiddenCount    : Int
+    ): Double = {
+      val digits = math.max(1, hiddenCount.toString.length)
+      stateOpt.flatMap(_.triggerWidthByDigits.get(digits)).getOrElse {
+        warmOverflowTriggerWidths(wrapperElemOpt, stateOpt, extraDigitsOpt = Some(digits))
+          .getOrElse(digits, fallbackTriggerWidthForDigits(digits))
       }
     }
 
     def restoreAllStatusPills(pillsElem: html.Element, pills: Vector[html.Element]): Unit = {
       pills.foreach { pill =>
-        pill.classList.remove(PillCollapsedClass)
-        pill.style.removeProperty("order")
+        if (pill.hasClass(PillCollapsedClass))
+          pill.classList.remove(PillCollapsedClass)
+        if (pill.style.getPropertyValue("order").nonEmpty)
+          pill.style.removeProperty("order")
       }
       pillsElem.querySelectorOpt(s":scope > .$PillsOverflowTriggerClass").foreach { btn =>
         if (activePopoverTriggerOpt.contains(btn))
           closeActivePillsPopover()
-        setElemHidden(btn, hide = true)
+        if (! isElemHidden(btn))
+          setElemHidden(btn, hide = true)
       }
     }
 

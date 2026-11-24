@@ -821,5 +821,108 @@ class SearchResultsTableSupportTest extends AnyFunSpecLike {
       assert(visiblePillLabelsInVisualOrder() == List("v1", "v2", "v3", "v4", "v5"))
       assert(triggerBtn.hasAttribute("hidden"))
     }
+
+    it("must avoid layout thrashing and redundant measurements across many rows with 58 published versions") {
+      SearchResultsTableSupport.resetAllStates()
+      dom.window.sessionStorage.clear()
+
+      def versionPillsMarkup(count: Int): String =
+        (1 to count).map { v =>
+          s"""<span class="fr-table-pill fr-version-badge fr-pill-success" title="Version: v$v — Available">v$v<span class="visually-hidden"> (Available)</span></span>"""
+        }.mkString
+
+      val rowsMarkup =
+        (1 to 9).map { r =>
+          s"""<tr id="row-$r">
+             |  <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+             |    <div class="fr-summary-cell-value"><span>a</span></div>
+             |  </td>
+             |  <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+             |    <div id="ver-cell-$r" class="fr-summary-cell-value">
+             |      <span class="xforms-output xforms-mediatype-text-html xforms-static">
+             |        <span class="xforms-output-output">
+             |          <span class="fr-status-pills">${versionPillsMarkup(58)}</span>
+             |        </span>
+             |      </span>
+             |    </div>
+             |  </td>
+             |</tr>""".stripMargin
+        }.mkString("\n")
+
+      dom.document.body.innerHTML =
+        s"""<form class="xforms-form">
+           |  <div class="fr-dynamic">
+           |    <div class="fr-search-results fr-table-frame">
+           |      <table class="table table-condensed">
+           |        <thead>
+           |          <tr>
+           |            <th id="th-app" scope="col"><span><button class="btn-link" type="button"><span class="xforms-output">App</span></button></span></th>
+           |            <th id="th-version" scope="col"><span><button class="btn-link" type="button"><span class="xforms-output">Version</span></button></span></th>
+           |          </tr>
+           |        </thead>
+           |        <tbody>$rowsMarkup</tbody>
+           |      </table>
+           |    </div>
+           |  </div>
+           |</form>""".stripMargin
+      dom.document.body.className = "orbeon"
+
+      val wrapper = dom.document.querySelectorT(".fr-search-results")
+      val table   = dom.document.querySelectorT(".fr-search-results table")
+      defineNumericProp(wrapper, "clientWidth", 1000)
+      mockRect(table.querySelectorT("#th-app"),     100.0)
+      mockRect(table.querySelectorT("#th-version"), 76.0)
+
+      var pillRectReads = 0
+      val allPills      = table.querySelectorAllT(".fr-version-badge")
+      assert(allPills.length == 9 * 58)
+
+      allPills.foreach { pill =>
+        val w = if (pill.textContent.trim.startsWith("v1") && pill.textContent.trim.takeWhile(! _.isWhitespace).length >= 3 ||
+                    pill.textContent.trim.takeWhile(! _.isWhitespace).length >= 3) 42.0 else 34.0
+        pill.asInstanceOf[js.Dynamic].getBoundingClientRect = () => {
+          pillRectReads += 1
+          js.Dynamic.literal(width = w, height = 24.0, top = 0.0, left = 0.0, right = w, bottom = 24.0)
+        }
+      }
+
+      (1 to 9).foreach { r =>
+        val verCell = dom.document.getElementById(s"ver-cell-$r").asInstanceOf[html.Element]
+        defineNumericProp(verCell, "clientWidth", 90)
+      }
+
+      SearchResultsTableSupport.syncTable(table)
+
+      // Only 2 distinct `(charLen, isUnavailable)` shapes exist across all 522 badges (`v1`..`v9` and `v10`..`v58`)
+      assert(pillRectReads == 2)
+
+      (1 to 9).foreach { r =>
+        val pillsElem = dom.document.querySelectorT(s"#ver-cell-$r .fr-status-pills")
+        val visibleLabels =
+          pillsElem
+            .childrenT
+            .zipWithIndex
+            .filter { case (el, _) => ! el.hasAttribute("hidden") && ! el.hasClass(SearchResultsTableSupport.PillCollapsedClass) }
+            .sortBy { case (el, idx) => (Option(el.style.getPropertyValue("order")).flatMap(_.toIntOption).getOrElse(0), idx) }
+            .map { case (el, _) =>
+              val clone = el.cloneNodeT(deep = true)
+              clone.querySelectorAllT(".visually-hidden").foreach(_.remove())
+              clone.textContent.trim
+            }
+            .toList
+        assert(visibleLabels == List("+57", "v58"))
+
+        // Collapsed badges do not receive redundant inline `order` styles
+        val collapsedWithOrder =
+          pillsElem
+            .querySelectorAllT(s".${SearchResultsTableSupport.PillCollapsedClass}")
+            .count(_.style.getPropertyValue("order").nonEmpty)
+        assert(collapsedWithOrder == 0)
+      }
+
+      // A subsequent sync pass with unchanged geometry hits `pillsLayoutMemo` with zero additional badge reads
+      SearchResultsTableSupport.syncTable(table)
+      assert(pillRectReads == 2)
+    }
   }
 }

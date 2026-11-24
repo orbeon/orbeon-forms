@@ -317,7 +317,11 @@ class StyleVariablesTest
 
         val printBlocks = variantBlocks.collect { case (header, content) if header == "@media print" => content }
         assert(printBlocks.exists(content => """(?s)^\s*\.orbeon \{[^}]*--orbeon-base-font-size:""".r.findFirstIn(content).isDefined))
-        assert(printBlocks.forall(content => ! """\.fr-pdf-color-mode-[a-z-]+\s*[,{]""".r.findFirstIn(content).isDefined))
+        // Only the gray borders of black-and-white PDF files depend on a color mode
+        assert(
+          printBlocks.flatMap("""([^{}]*\.fr-pdf-color-mode-[a-z-]+)\s*[,{]""".r.findAllMatchIn(_).map(_.group(1).trim)) ==
+            List(".orbeon.fr-pdf-color-mode-black-and-white")
+        )
       }
 
     it("must read the variables of the built-in themes") {

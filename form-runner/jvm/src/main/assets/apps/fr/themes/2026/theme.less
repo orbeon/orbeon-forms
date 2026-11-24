@@ -989,6 +989,20 @@
       --orbeon-alert-warning-color                             : black;
       --orbeon-alert-warning-background-color                  : white;
       --orbeon-alert-warning-border-color                      : #ffecb5;
+
+      // Black-and-white PDF files: gray borders for the alerts and for the invalid controls
+      &.fr-pdf-color-mode-black-and-white {
+        --orbeon-invalid-alert-border-color        : var(--orbeon-alert-border-color);
+        --orbeon-warning-alert-border-color        : var(--orbeon-alert-border-color);
+        --orbeon-info-alert-border-color           : var(--orbeon-alert-border-color);
+        --orbeon-alert-error-border-color          : var(--orbeon-alert-border-color);
+        --orbeon-alert-success-border-color        : var(--orbeon-alert-border-color);
+        --orbeon-alert-warning-border-color        : var(--orbeon-alert-border-color);
+        --orbeon-error-summary-error-border-color  : var(--orbeon-alert-border-color);
+        --orbeon-error-summary-warning-border-color: var(--orbeon-alert-border-color);
+        --orbeon-error-summary-info-border-color   : var(--orbeon-alert-border-color);
+        --orbeon-invalid-control-border-color      : var(--orbeon-control-border-color);
+      }
     }
   }
 }

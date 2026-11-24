@@ -1,0 +1,10 @@
+/* Theme for StyleVariablesTest */
+.orbeon {
+  --orbeon-accent-color: #1043a8;
+  --orbeon-base-font-size: 14px;
+}
+@media print {
+  .orbeon {
+    --orbeon-base-font-size: 13px;
+  }
+}

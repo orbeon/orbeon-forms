@@ -299,7 +299,7 @@ trait FormRunnerComponentsCompileTime {
   }
 
   //@XPathFunction
-  def styleVariablesCss(app: String, form: String, propertyProfile: String): Option[String] = {
+  def styleVariablesCss(app: String, form: String, propertyProfile: String, themeCssUri: String): Option[String] = {
 
     implicit val propertySet: PropertySet = CoreCrossPlatformSupport.properties
     val profileOpt = propertyProfile.trimAllToOpt
@@ -320,6 +320,19 @@ trait FormRunnerComponentsCompileTime {
     val light = validVariables(None)
     val dark  = validVariables(Some(StyleVariables.DarkVariant))
     val print = validVariables(Some(StyleVariables.PrintVariant))
+
+    val themeVariablesOpt =
+      (light.nonEmpty || dark.nonEmpty || print.nonEmpty).flatOption(StyleVariables.themeVariablesForPath(themeCssUri))
+
+    // Only a warning, as a custom CSS file can also declare the variable
+    for {
+      themeVariables  <- themeVariablesOpt.toList
+      (name, variant) <-
+        StyleVariables.unknownVariables(
+          themeVariables = themeVariables,
+          variables      = List(None -> light, Some(StyleVariables.DarkVariant) -> dark, Some(StyleVariables.PrintVariant) -> print)
+        )
+    } FormRunnerLogger.warn(s"Property `${StyleVariables.declaredPropertyName(name, app, form, profileOpt, variant)}` for `$app/$form` overrides `--orbeon-$name`, which the theme `$themeCssUri` doesn't declare")
 
     StyleVariables.toCss(light, dark, print)
   }

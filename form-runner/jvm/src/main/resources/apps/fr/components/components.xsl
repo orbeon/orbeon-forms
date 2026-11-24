@@ -275,7 +275,7 @@
     <xsl:variable
         name="style-variables-css"
         as="xs:string?"
-        select="frf:styleVariablesCss($app, $form, $property-profile-opt)"/>
+        select="frf:styleVariablesCss($app, $form, $property-profile-opt, $theme-css-uri)"/>
 
     <xsl:variable
         name="assets-baseline-updates"

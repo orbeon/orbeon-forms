@@ -243,6 +243,45 @@ class StyleVariablesTest
       assert(StyleVariables.declaredPropertyName("accent-color", "issue", "7641", None, variant = "print".some) == "oxf.fr.style.variable.accent-color.print.issue.*")
     }
 
+    it("must find the variables which the theme doesn't declare") {
+      assert(
+        StyleVariables.unknownVariables(
+          themeVariables = Set("accent-color", "base-font-size"),
+          variables      = List(
+            None                             -> List("accent-color" -> "#333333", "no-such-color" -> "#444444"),
+            StyleVariables.PrintVariant.some -> List("base-font-size" -> "14px", "no-such-size" -> "1px")
+          )
+        ) == List("no-such-color" -> None, "no-such-size" -> StyleVariables.PrintVariant.some)
+      )
+    }
+
+    it("must find the variables which the CSS of a theme declares") {
+
+      val css =
+        """.orbeon { --orbeon-accent-color: #333; --orbeon-base-font-size: 14px; color: var(--orbeon-unused-color); }
+          |/* --orbeon-in-comment: red; */
+          |@media screen { .orbeon.fr-color-scheme-dark { --orbeon-accent-color: #ccc; --orbeon-dark-only: 1; } }
+          |@media print {
+          |  .orbeon:has(.a) { --orbeon-page-background-color: white !important; }
+          |  .orbeon, .orbeon .a { --orbeon-base-font-size: 13px; }
+          |}
+          |.after { --orbeon-after-print: 0; }""".stripMargin
+
+      assert(StyleVariables.themeVariables(css) == Set("accent-color", "base-font-size", "dark-only", "page-background-color", "after-print"))
+    }
+
+    it("must read the variables of a theme from its CSS resource, and nothing if the CSS can't be read") {
+      assert(
+        StyleVariables.themeVariablesForPath("/forms/issue/7641/theme.css") ==
+          Set("accent-color", "base-font-size").some
+      )
+      assert(StyleVariables.themeVariablesForPath("/forms/issue/7641/theme.css") == StyleVariables.themeVariablesForPath(" /forms/issue/7641/theme.css "))
+      assert(StyleVariables.themeVariablesForPath("/forms/issue/7641/missing.css").isEmpty)
+      assert(StyleVariables.themeVariablesForPath("https://example.org/theme.css").isEmpty)
+      assert(StyleVariables.themeVariablesForPath("//example.org/theme.css").isEmpty)
+      assert(StyleVariables.themeVariablesForPath(null).isEmpty)
+    }
+
     for (theme <- List("2025", "2026"))
       it(s"must put the light values of the $theme theme in a layer, and its dark and print blocks in a later layer") {
 
@@ -263,6 +302,11 @@ class StyleVariablesTest
         assert(printBlocks.exists(content => """(?s)^\s*\.orbeon \{[^}]*--orbeon-base-font-size:""".r.findFirstIn(content).isDefined))
         assert(printBlocks.forall(content => ! """\.fr-pdf-color-mode-[a-z-]+\s*[,{]""".r.findFirstIn(content).isDefined))
       }
+
+    it("must read the variables of the built-in themes") {
+      for (theme <- List("2025", "2026"))
+        assert(StyleVariables.themeVariablesForPath(s"/apps/fr/themes/$theme/theme.css").exists(_("accent-color")), theme)
+    }
 
     it("must produce CSS without a media query for the light values, and nothing without variables") {
       assert(

@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option.*
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
 
@@ -55,6 +58,21 @@ object StyleVariables {
     hasBalancedParentheses
   }
 
+  private val CssCommentRE          = """(?s)/\*.*?\*/""".r
+  private val VariableDeclarationRE = """--orbeon-([a-z][a-z0-9-]*)\s*:""".r
+
+  def themeVariables(css: String): Set[String] =
+    // Names without their `--orbeon-` prefix
+    VariableDeclarationRE.findAllMatchIn(CssCommentRE.replaceAllIn(css, "")).map(_.group(1)).toSet
+
+  def themeVariablesForPath(path: String): Option[Set[String]] = {
+    // `None` if the path isn't that of a resource, as for a theme served by another site
+    val resourceManager = ResourceManagerWrapper.instance
+    path.trimAllToOpt.filter(resourceManager.exists).map { p =>
+      themeVariables(IOUtils.readStreamAsStringAndClose(resourceManager.getContentAsStream(p), CharsetNames.Utf8.some))
+    }
+  }
+
   def propertyName(name: String, variant: Option[String]): String =
     (PropertyPrefix :: name :: variant.toList).mkString(".")
 
@@ -69,6 +87,17 @@ object StyleVariables {
   ): String =
     // As written in the properties, with its wildcards, for a variable that `fromProperties` returned
     propertySet.getPropertyOrThrow(s"${propertyName(name, variant)}.$app.$form", profileOpt).name
+
+  def unknownVariables(
+    themeVariables : Set[String],
+    variables      : List[(Option[String], List[(String, String)])]
+  ): List[(String, Option[String])] =
+    for {
+      (variant, vars) <- variables
+      (name, _)       <- vars
+      if ! themeVariables(name)
+    } yield
+      name -> variant
 
   def fromProperties(
     app        : String,

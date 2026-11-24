@@ -109,6 +109,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-toolbar"                         , initLandingQuickFilter)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon [data-fr-filter-shortcut]"                   , initQuickFilterShortcut)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
       SearchResultsTableSupport.init()
       initSummaryCellTooltipClickForwarding()
@@ -652,6 +653,52 @@ object FormRunnerApp extends App {
       syncInputChrome()
     }
   }
+
+  private def initQuickFilterShortcut(boxElem: html.Element): Unit =
+    boxElem.querySelectorOpt("input").map(_.asInstanceOf[html.Input]).foreach { inputElem =>
+      inputElem.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+        if (e.key == "Escape") {
+          if (inputElem.value.nonEmpty) {
+            e.preventDefault()
+            e.stopPropagation()
+            inputElem.closestOpt(".xforms-input") match {
+              case Some(controlElem) =>
+                DocumentAPI.setValue(controlElem, "")
+              case None =>
+                inputElem.value = ""
+                inputElem.dispatchEvent(new dom.Event("input", new dom.EventInit { bubbles = true }))
+            }
+          } else {
+            inputElem.blur()
+          }
+        }
+      })
+
+      document.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+        if (
+          e.key == "/" &&
+          !e.ctrlKey &&
+          !e.metaKey &&
+          !e.altKey &&
+          boxElem.isConnected &&
+          boxElem.offsetParent != null &&
+          document.querySelectorOpt("dialog[open]").isEmpty
+        ) {
+          val inEditable =
+            e.target match {
+              case el: dom.Element =>
+                el.closestOpt("input, textarea, select, [contenteditable='true'], [contenteditable='']").isDefined
+              case _ =>
+                false
+            }
+          if (!inEditable) {
+            e.preventDefault()
+            inputElem.focus()
+            inputElem.select()
+          }
+        }
+      })
+    }
 
   private def initLandingCardExtraRows(gridElem: html.Element): Unit = {
 

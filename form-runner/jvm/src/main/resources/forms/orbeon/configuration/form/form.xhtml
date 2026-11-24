@@ -46,35 +46,148 @@
                 gap: 6px;
             }
             /* Quick Filter Bar */
+            .orbeon .fr-config-sr-only {
+                position: absolute;
+                clip-path: inset(50%);
+                overflow: hidden;
+                inline-size: 1px;
+                block-size: 1px;
+                margin: -1px;
+                padding: 0;
+                border: 0;
+                white-space: nowrap;
+            }
             .orbeon .fr-config-filter-bar {
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
-                gap: 12px;
-                background-color: var(--orbeon-control-read-only-background-color);
-                border: 1px solid var(--orbeon-base-border-color);
-                border-radius: 6px;
-                padding: 10px 16px;
+                gap: 0.75em;
                 margin-bottom: 16px;
             }
-            .orbeon .fr-config-filter-bar .fr-config-filter-input {
+            .orbeon .fr-config-filter-box {
+                position: relative;
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                flex: 1;
-                margin-bottom: 0;
+                flex: 0 1 24em;
+                min-inline-size: min(100%, 16em);
             }
-            .orbeon .fr-config-filter-bar .fr-config-filter-input .xforms-label {
+            .orbeon .fr-config-filter-box .fr-config-filter-icon {
+                position: absolute;
+                inset-inline-start: 0.85em;
+                color: var(--orbeon-hint-color);
+                font-size: 0.9em;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-input {
+                display: block;
+                inline-size: 100%;
                 margin: 0;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-input &gt; .xforms-label {
+                position: absolute;
+                clip-path: inset(50%);
+                overflow: hidden;
+                inline-size: 1px;
+                block-size: 1px;
+                margin: -1px;
+                padding: 0;
+                border: 0;
                 white-space: nowrap;
-                font-weight: 600;
             }
-            .orbeon .fr-config-filter-bar .fr-config-filter-input input {
-                max-width: 420px;
-                margin-bottom: 0;
-            }
-            .orbeon .fr-config-filter-bar .fr-config-filter-input .xforms-hint {
+            .orbeon .fr-config-filter-box .fr-config-filter-input &gt; input {
+                inline-size: 100%;
+                max-inline-size: none;
+                box-sizing: border-box;
+                min-block-size: var(--orbeon-control-height);
+                block-size: var(--orbeon-control-height);
+                padding-inline: 2.35em 2.35em;
+                padding-block: 0;
                 margin: 0;
-                white-space: nowrap;
+                font: inherit;
+                color: var(--orbeon-control-color);
+                background-color: var(--orbeon-control-background-color);
+                border: 1px solid var(--orbeon-control-border-color);
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                box-shadow: none;
+            }
+            @media (pointer: coarse) {
+                .orbeon .fr-config-filter-box .fr-config-filter-input &gt; input {
+                    min-block-size: 40px;
+                }
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-input &gt; input::placeholder {
+                color: var(--orbeon-control-placeholder-color);
+                opacity: 1;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-input &gt; input:focus,
+            .orbeon .fr-config-filter-box .fr-config-filter-input &gt; input:focus-visible {
+                border-color: var(--orbeon-focus-border-color);
+                box-shadow: var(--orbeon-control-focus-ring);
+                outline: none;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-kbd {
+                position: absolute;
+                inset-inline-end: 0.65em;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 1.45em;
+                block-size: 1.45em;
+                padding: 0 0.35em;
+                font-family: var(--orbeon-code-font-family);
+                font-size: 0.8em;
+                font-weight: 500;
+                line-height: 1;
+                color: var(--orbeon-pill-muted-color);
+                background-color: var(--orbeon-pill-muted-background-color);
+                border: 1px solid var(--orbeon-pill-muted-border-color);
+                border-radius: 4px;
+                pointer-events: none;
+            }
+            .orbeon .fr-config-filter-box:focus-within .fr-config-filter-kbd,
+            .orbeon .fr-config-filter-box:has(input:not(:placeholder-shown)) .fr-config-filter-kbd,
+            .orbeon .fr-config-filtering .fr-config-filter-kbd {
+                display: none;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-clear {
+                position: absolute;
+                inset-inline-end: 0.3em;
+                display: inline-flex;
+                align-items: center;
+                margin: 0;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-clear.xforms-disabled {
+                display: none;
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-clear &gt; button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 26px;
+                min-block-size: 26px;
+                padding: 0;
+                margin: 0;
+                border: 1px solid transparent;
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                background: transparent;
+                color: var(--orbeon-hint-color);
+                font-size: 0.92em;
+                line-height: 1;
+                text-decoration: none;
+                cursor: pointer;
+            }
+            @media (hover: hover) {
+                .orbeon .fr-config-filter-box .fr-config-filter-clear &gt; button:hover {
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-pill-muted-background-color);
+                    border-color: var(--orbeon-pill-muted-border-color);
+                }
+            }
+            .orbeon .fr-config-filter-box .fr-config-filter-clear &gt; button:focus-visible {
+                color: var(--orbeon-base-color);
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: -2px;
             }
             /* 3-Pane Standard Settings Layout (Scope Tree | Category List | Settings Panel) */
             .orbeon .fr-config-three-pane {
@@ -5622,20 +5735,34 @@
                                 {'fr-config-override-scope'[not($is-global-scope)]}
                             ">
                             <!-- Quick Filter Bar -->
-                            <xh:div class="fr-config-filter-bar">
-                                <xf:input id="filter-settings-control" ref="instance('fr-configuration-ui-instance')/filter" incremental="true" class="fr-config-filter-input">
-                                    <xf:label ref="$form-resources/filter/label"/>
-                                    <xf:hint ref="$form-resources/filter/hint"/>
-                                </xf:input>
-                                <xf:trigger
-                                    id="clear-filter-button"
-                                    appearance="minimal"
-                                    ref="instance('fr-configuration-ui-instance')/filter[xxf:non-blank()]"
-                                    class="fr-config-filter-clear">
-                                    <xf:label ref="$form-resources/filter/clear"/>
-                                    <xf:setvalue event="DOMActivate" ref="instance('fr-configuration-ui-instance')/filter" value="''"/>
-                                </xf:trigger>
-                            </xh:div>
+                            <xh:search class="fr-config-filter-bar">
+                                <xh:div
+                                    class="fr-config-filter-box"
+                                    data-fr-filter-shortcut="true"
+                                    title="{$form-resources/filter/hint}">
+                                    <xh:i class="fa fa-magnifying-glass fr-config-filter-icon" aria-hidden="true"/>
+                                    <xf:input id="filter-settings-control" ref="instance('fr-configuration-ui-instance')/filter" incremental="true" class="fr-config-filter-input">
+                                        <xf:label ref="$form-resources/filter/label"/>
+                                        <xf:hint appearance="minimal" value="concat($form-resources/filter/label, '…')"/>
+                                    </xf:input>
+                                    <xh:kbd class="fr-config-filter-kbd" aria-hidden="true">/</xh:kbd>
+                                    <xf:trigger
+                                        id="clear-filter-button"
+                                        appearance="minimal"
+                                        ref="instance('fr-configuration-ui-instance')/filter[xxf:non-blank()]"
+                                        class="fr-config-filter-clear">
+                                        <xf:label>
+                                            <xh:i class="fa fa-xmark" aria-hidden="true"/>
+                                            <xh:span class="fr-config-sr-only"><xf:output ref="$form-resources/filter/clear"/></xh:span>
+                                        </xf:label>
+                                        <xf:hint ref="$form-resources/filter/clear"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:setvalue ref="instance('fr-configuration-ui-instance')/filter" value="''"/>
+                                            <xf:setfocus control="filter-settings-control"/>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </xh:div>
+                            </xh:search>
 
                             <!-- 3-Pane Standard Settings Body: Scope Tree | Category List | Settings Panel -->
                             <xh:div class="fr-config-three-pane">

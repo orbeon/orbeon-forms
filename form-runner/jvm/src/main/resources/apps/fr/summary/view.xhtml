@@ -1535,10 +1535,11 @@
                             </xf:select1>
 
                             <xh:div class="btn-group fr-summary-selection">
+                                <xf:var name="selection-count" value="count(xxf:split(instance('fr-selection-instance')))"/>
                                 <xh:button id="select-button" class="btn dropdown-toggle" data-orbeon-bs-toggle="dropdown" aria-expanded="false">
                                     <xf:output value="$fr-resources/summary/titles/selected"/>
-                                    <xh:span class="badge badge-info" title="Documents Selected">
-                                        <xf:output value="count(xxf:split(instance('fr-selection-instance')))"/>
+                                    <xh:span class="badge fr-selection-count{' fr-selection-count-active'[$selection-count gt 0]}" title="Documents Selected">
+                                        <xf:output value="$selection-count"/>
                                     </xh:span>
                                     <xh:span class="caret"/>
                                 </xh:button>

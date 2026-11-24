@@ -484,6 +484,29 @@
 
     .badge {
       margin-left: 2px;
+
+      &.fr-selection-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: 1.7em;
+        margin-left: 4px;
+        padding: 1px 7px;
+        border-radius: 9999px;
+        border: 1px solid var(--orbeon-pill-muted-border-color);
+        background-color: var(--orbeon-form-background-color);
+        color: var(--orbeon-pill-muted-color);
+        font-size: 0.86em;
+        font-weight: var(--orbeon-label-font-weight);
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+
+        &.fr-selection-count-active {
+          border-color: var(--orbeon-pill-info-border-color);
+          background-color: var(--orbeon-pill-info-background-color);
+          color: var(--orbeon-pill-info-color);
+        }
+      }
     }
   }
 

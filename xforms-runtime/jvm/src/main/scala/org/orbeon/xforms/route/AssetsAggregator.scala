@@ -44,7 +44,11 @@ class AssetsAggregator extends ProcessorImpl {
     addOutput(name, new ProcessorOutputImpl(self, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
-          if (! XFormsGlobalProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
+          if (! XFormsGlobalProperties.isCombinedResources) new SimpleForwardingXMLReceiver(xmlReceiver) {
+            // Remove the `f:inline-resources` attribute
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
+              super.startElement(uri, localname, qName, if (localname == "head") removeInlineResourcesMarker(attributes) else attributes)
+          } else new SimpleForwardingXMLReceiver(xmlReceiver) {
 
             implicit val logger: IndentedLogger = Loggers.newIndentedLogger("resources")
 
@@ -63,6 +67,7 @@ class AssetsAggregator extends ProcessorImpl {
             var level = 0
             var inHead = false
             var filter = false
+            var inlineResources = false
 
             var currentInlineElement: InlineElement = _
 
@@ -93,6 +98,7 @@ class AssetsAggregator extends ProcessorImpl {
 
               if (level == 2 && localname == "head") {
                 inHead = true
+                inlineResources = attributes.getValue(InlineResourcesQName.namespace.uri, InlineResourcesQName.localName) == "true"
               } else if (level == 3 && inHead) {
 
                 implicit def attributesToSAXAttribute(attributes: Attributes) = new {
@@ -136,7 +142,7 @@ class AssetsAggregator extends ProcessorImpl {
               }
 
               if (! filter)
-                super.startElement(uri, localname, qName, attributes)
+                super.startElement(uri, localname, qName, if (localname == "head") removeInlineResourcesMarker(attributes) else attributes)
             }
 
             override def endElement(uri: String, localname: String, qName: String): Unit = {
@@ -163,7 +169,12 @@ class AssetsAggregator extends ProcessorImpl {
                 aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
                 // #8101: `LinkedHashSet` and not `Set`, to keep the order of the CSS files (custom CSS after the theme CSS)
                 aggregate(supplementalCSS.view.filterNot(baselineCSS).to(mutable.LinkedHashSet), outputCSSElement, namespaceOpt, isCSS = true)
-                preservedCSS foreach outputPreservedElement
+                preservedCSS foreach {
+                  case e: InlineElement if ! inlineResources && canServeByUrl(e.attributes, e.content.toString) =>
+                    outputCSSElement(XFormsAssetServerRoute.storeInlineStylesheet(e.content.toString))
+                  case e =>
+                    outputPreservedElement(e)
+                }
               }
 
               def outputJS(hasInlineScript: Boolean): Unit = {
@@ -226,6 +237,38 @@ class AssetsAggregator extends ProcessorImpl {
 }
 
 object AssetsAggregator extends Logging {
+
+  private val InlineResourcesQName = XMLConstants.FORMATTING_INLINE_RESOURCES_QNAME
+
+  // `XHTMLHeadHandler` sets this attribute on the `<head>` when resources are inline
+  private def removeInlineResourcesMarker(attributes: Attributes): Attributes =
+    attributes.getIndex(InlineResourcesQName.namespace.uri, InlineResourcesQName.localName) match {
+      case -1    => attributes
+      case index =>
+        val newAttributes = new AttributesImpl(attributes)
+        newAttributes.removeAttribute(index)
+        newAttributes
+    }
+
+  private def canServeByUrl(attributes: Attributes, css: String): Boolean = {
+
+    // An inline stylesheet can be served by URL if it only has default attributes, isn't blank, and doesn't reference
+    // other resources
+
+    def hasAllowedValue(i: Int): Boolean =
+      attributes.getURI(i).isEmpty &&
+        AllowedStyleAttributes.get(attributes.getLocalName(i)).exists { allowed =>
+          val value = attributes.getValue(i).trimAllToEmpty
+          value.isEmpty || value.equalsIgnoreCase(allowed)
+        }
+
+    (0 until attributes.getLength).forall(hasAllowedValue) &&
+      css.nonAllBlank                                      &&
+      UrlOrImportRE.findFirstIn(css).isEmpty
+  }
+
+  private val AllowedStyleAttributes = Map("type" -> "text/css", "media" -> "all")
+  private val UrlOrImportRE          = """(?i)url\(|@import""".r
 
   val ScriptBaseAtts =
     List(

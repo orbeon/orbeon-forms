@@ -209,6 +209,19 @@ object XFormsAssetServerRoute extends NativeRoute {
           if (state.singleUseStaticState)
             XFormsStaticStateCache.removeDocument(staticStateDigest)
         }
+      case Constants.FormStyleResourcesRegex(digest) =>
+        // No access rights required: the stylesheet is part of the page template, and has no form data
+        findInlineStylesheet(digest) match {
+          case Some(css) =>
+            response.setContentType(ContentTypes.CssContentTypeWithCharset)
+            // Make sure the CSS is only interpreted as CSS
+            response.setHeader("X-Content-Type-Options", "nosniff")
+            // Use expiration far in the future, as the path changes with the content
+            response.setResourceCaching(requestTime, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+            IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8))(_.write(css))
+          case None =>
+            response.setStatus(StatusCode.NotFound)
+        }
       case ResourceRegex(hash, ext) =>
         serveCSSOrJavaScript(requestTime, hash, ext)
       case _ =>
@@ -508,6 +521,20 @@ object XFormsAssetServerRoute extends NativeRoute {
       .flatMap(session => session.getAttribute(lookupKey, SessionScope.Application).map(_.asInstanceOf[DynamicResource]))
       .orElse(findRequestDynamicResources(externalContext.getRequest).flatMap(m => Option(m.get(digestFromPath))))
   }
+
+  // Inline stylesheets of the `<head>`, kept in the asset bundles store by digest of their content
+  private val InlineStylesheetKeyPrefix = "style-"
+
+  def storeInlineStylesheet(css: String): String = {
+    val digest = SecureUtils.digestStringToHexShort(css)
+    XFormsStores.assetBundlesStore.put(InlineStylesheetKeyPrefix + digest, Array(css))
+    Constants.FormStyleResourcesPath + digest + ".css"
+  }
+
+  def findInlineStylesheet(digest: String): Option[String] =
+    XFormsStores.assetBundlesStore.get(InlineStylesheetKeyPrefix + digest) collect {
+      case value: Array[String] => value.head
+    }
 
   // For unit tests only (called from XSLT)
   def testGetResources(key: String): Array[String] =

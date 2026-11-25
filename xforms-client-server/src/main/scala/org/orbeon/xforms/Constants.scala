@@ -58,6 +58,9 @@ object Constants {
   val FormDynamicResourcesPath  = XFormServerPrefix + "form/dynamic/"
   val FormDynamicResourcesRegex = s"$FormDynamicResourcesPath(.+).js".r
 
+  val FormStyleResourcesPath    = XFormServerPrefix + "form/style/"
+  val FormStyleResourcesRegex   = s"$FormStyleResourcesPath([0-9a-f]+)\\.css".r
+
   val EmbeddingNamespaceParameter = "orbeon-embedding-namespace"
   val EmbeddingContextParameter   = "orbeon-embedding-context"
   val UrlRewriteParameter         = "orbeon-url-rewrite"

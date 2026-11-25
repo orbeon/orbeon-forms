@@ -1508,7 +1508,7 @@
                 <p:processor name="oxf:assets-aggregator">
                     <p:input name="data">
                         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-                            <xh:head xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                            <xh:head xmlns:f="http://orbeon.org/oxf/xml/formatting" f:inline-resources="true">
                                 <xh:title>Title</xh:title>
                                 <xh:link rel="STYLESHEET" class="xforms-baseline" href="/css1.css" type="text/css"/>
                                 <xh:style>.red { color: red }</xh:style>

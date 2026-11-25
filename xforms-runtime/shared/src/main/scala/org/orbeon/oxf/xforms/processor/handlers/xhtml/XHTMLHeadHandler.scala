@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.processor.ScriptBuilder.*
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.{AssetsSupport, XBLAssets}
-import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_INLINE_RESOURCES_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.Constants
@@ -62,7 +62,17 @@ class XHTMLHeadHandler(
     formattingPrefix = handlerContext.findFormattingPrefixDeclare
 
     // Open head element
-    xmlReceiver.startElement(uri, localname, qName, attributes)
+    val output = handlerContext.controller.output
+    output.startElement(uri, localname, qName, attributes)
+
+    // Tell `AssetsAggregator`, which removes the attribute
+    if (containingDocument.isServeInlineResources)
+      output.addAttribute(
+        FORMATTING_INLINE_RESOURCES_QNAME.namespace.uri,
+        FORMATTING_INLINE_RESOURCES_QNAME.localName,
+        XMLUtils.buildQName(formattingPrefix, FORMATTING_INLINE_RESOURCES_QNAME.localName),
+        "true"
+      )
 
     val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
 

@@ -1168,42 +1168,42 @@
                     class="btn btn-secondary dropdown-toggle"
                     data-orbeon-bs-toggle="dropdown"
                     aria-expanded="false">
-                    <xh:i class="fa fa-fw fa-sliders" aria-hidden="true"/>
-                    <xh:span class="fr-admin-nav-label"><xf:output value="xxf:r('landing.titles.admin', '|fr-fr-resources|')"/></xh:span>
+                    <xh:i class="fa fa-fw fa-sliders me-1" aria-hidden="true"/>
+                    <xf:output value="xxf:r('landing.titles.admin', '|fr-fr-resources|')"/>
                 </xh:button>
                 <xh:ul class="dropdown-menu dropdown-menu-end" aria-labelledby="fr-admin-menu-button">
-                    <xh:li class="{{'xforms-hidden'[not($show-forms-admin)]}}">
-                        <xh:a href="/fr/admin" class="dropdown-item">
+                    <xh:li class="dropdown-item {{'xforms-hidden'[not($show-forms-admin)]}}">
+                        <xh:a href="/fr/admin" class="btn-link">
                             <xsl:if test="$is-home">
                                 <xsl:attribute name="aria-current">page</xsl:attribute>
                             </xsl:if>
-                            <xh:i class="fa fa-fw fa-sliders" aria-hidden="true"/>
+                            <xh:i class="fa fa-fw fa-sliders me-2" aria-hidden="true"/>
                             <xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/>
                             <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
                         </xh:a>
                     </xh:li>
-                    <xh:li class="{{'xforms-hidden'[not($show-configuration)]}}">
-                        <xh:a href="/fr/orbeon/configuration/new" class="dropdown-item">
+                    <xh:li class="dropdown-item {{'xforms-hidden'[not($show-configuration)]}}">
+                        <xh:a href="/fr/orbeon/configuration/new" class="btn-link">
                             <xsl:if test="$is-form-configuration">
                                 <xsl:attribute name="aria-current">page</xsl:attribute>
                             </xsl:if>
-                            <xh:i class="fa fa-fw fa-gear" aria-hidden="true"/>
+                            <xh:i class="fa fa-fw fa-gear me-2" aria-hidden="true"/>
                             <xf:output value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/>
                             <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
                         </xh:a>
                     </xh:li>
-                    <xh:li class="{{'xforms-hidden'[not($show-console)]}}">
-                        <xh:a href="/fr/console" class="dropdown-item">
+                    <xh:li class="dropdown-item {{'xforms-hidden'[not($show-console)]}}">
+                        <xh:a href="/fr/console" class="btn-link">
                             <xsl:if test="$is-console">
                                 <xsl:attribute name="aria-current">page</xsl:attribute>
                             </xsl:if>
-                            <xh:i class="fa fa-fw fa-gauge-high" aria-hidden="true"/>
+                            <xh:i class="fa fa-fw fa-gauge-high me-2" aria-hidden="true"/>
                             <xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/>
                             <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
                         </xh:a>
                     </xh:li>
-                    <xh:li class="{{'xforms-hidden'[not($show-analytics)]}}">
-                        <xh:a class="dropdown-item">
+                    <xh:li class="dropdown-item {{'xforms-hidden'[not($show-analytics)]}}">
+                        <xh:a class="btn-link">
                             <xsl:attribute name="href">
                                 <xsl:choose>
                                     <xsl:when test="$is-form-analytics">/fr/analytics?app={{encode-for-uri(fr:app-name())}}&amp;form={{encode-for-uri(fr:form-name())}}</xsl:when>
@@ -1213,7 +1213,7 @@
                             <xsl:if test="$is-analytics">
                                 <xsl:attribute name="aria-current">page</xsl:attribute>
                             </xsl:if>
-                            <xh:i class="fa fa-fw fa-chart-column" aria-hidden="true"/>
+                            <xh:i class="fa fa-fw fa-chart-column me-2" aria-hidden="true"/>
                             <xf:output value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/>
                             <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
                         </xh:a>

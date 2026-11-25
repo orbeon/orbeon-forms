@@ -135,14 +135,14 @@ class FormRunnerAnalyticsTest
         val adminNav           = parsedAnalyticsDoc.selectFirst(".fr-admin-nav")
         assert(adminNav != null)
         assert(! adminNav.hasClass("xforms-disabled"))
-        val currentItem        = adminNav.selectFirst("a.dropdown-item[href*=\"/fr/analytics\"]")
+        val currentItem        = adminNav.selectFirst("li.dropdown-item a[href*=\"/fr/analytics\"]")
         assert(currentItem != null)
         assert(currentItem.attr("aria-current") == "page")
         assert(! currentItem.parent().hasClass("xforms-hidden"))
         // Analytics-only role must not expose Forms Admin, Configuration, or Admin Console items
-        assert(adminNav.selectFirst("a.dropdown-item[href*=\"/fr/admin\"]").parent().hasClass("xforms-hidden"))
-        assert(adminNav.selectFirst("a.dropdown-item[href*=\"/fr/orbeon/configuration/new\"]").parent().hasClass("xforms-hidden"))
-        assert(adminNav.selectFirst("a.dropdown-item[href*=\"/fr/console\"]").parent().hasClass("xforms-hidden"))
+        assert(adminNav.selectFirst("li.dropdown-item a[href*=\"/fr/admin\"]").parent().hasClass("xforms-hidden"))
+        assert(adminNav.selectFirst("li.dropdown-item a[href*=\"/fr/orbeon/configuration/new\"]").parent().hasClass("xforms-hidden"))
+        assert(adminNav.selectFirst("li.dropdown-item a[href*=\"/fr/console\"]").parent().hasClass("xforms-hidden"))
 
         // Also verify `/fr/console` classifies `/fr/analytics` static state as `Forms Analytics`
         val consoleStaticStates =

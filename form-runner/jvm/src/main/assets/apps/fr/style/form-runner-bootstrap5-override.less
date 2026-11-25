@@ -294,32 +294,17 @@
 
   .fr-admin-nav {
     .dropdown-toggle {
-      display    : inline-flex;
-      align-items: center;
-      gap        : 0.35em;
-      color      : var(--orbeon-navbar-color);
-
-      .xforms-output,
-      .xforms-output-output {
-        display: inline;
-      }
+      color: var(--orbeon-navbar-color);
     }
 
     .dropdown-menu {
-      a.dropdown-item {
-        display         : flex;
-        align-items     : center;
-        gap             : 0.55em;
-        font-size       : var(--orbeon-base-font-size);
-        padding         : var(--orbeon-dropdown-menu-item-padding);
-        color           : var(--orbeon-dropdown-menu-color);
-        background-color: var(--orbeon-dropdown-menu-background-color);
-        text-decoration : none;
-        white-space     : nowrap;
+      &:not(:has([aria-current="page"])) .fr-admin-nav-check {
+        display: none;
+      }
 
-        .fa {
-          color: inherit;
-        }
+      a.btn-link {
+        display    : flex;
+        align-items: center;
 
         .xforms-output,
         .xforms-output-output {
@@ -338,14 +323,6 @@
           .fr-admin-nav-check {
             visibility: visible;
           }
-        }
-
-        &:hover,
-        &:focus,
-        &:focus-visible {
-          color           : var(--orbeon-dropdown-menu-hover-color);
-          background-color: var(--orbeon-dropdown-menu-hover-background-color);
-          outline         : none;
         }
       }
     }

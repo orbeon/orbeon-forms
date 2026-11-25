@@ -1725,6 +1725,8 @@
             <mediatype>Mediatype</mediatype>
             <size>Grootte</size>
         </attachment-metadata>
+        <add-param>+ Parameter</add-param>
+        <add-mapping>+ Koppeling</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Form voorvertoning</label>

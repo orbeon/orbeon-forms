@@ -1741,6 +1741,8 @@
             <mediatype>Typ mediów</mediatype>
             <size>Rozmiar</size>
         </attachment-metadata>
+        <add-param>+ Parametr</add-param>
+        <add-mapping>+ Mapowanie</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Podgląd formularza</label>

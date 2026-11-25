@@ -1772,6 +1772,8 @@
             <mediatype>Mediatyp</mediatype>
             <size>Storlek</size>
         </attachment-metadata>
+        <add-param>+ Parameter</add-param>
+        <add-mapping>+ Mappning</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Förhandsvisa formulär</label>

@@ -1724,6 +1724,8 @@
             <mediatype>Tipo de conteúdo</mediatype>
             <size>Tamanho</size>
         </attachment-metadata>
+        <add-param>+ Parâmetro</add-param>
+        <add-mapping>+ Mapeamento</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Previsualização do formulário</label>

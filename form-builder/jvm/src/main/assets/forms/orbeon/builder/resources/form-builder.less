@@ -2500,9 +2500,9 @@ body.orbeon {
         }
     }
 
-    // Bindings editor dialog
+    // Action Editor dialog
     .fb-action-dialog {
-        width: 950px;
+        width: 980px;
         max-width: ~"calc(100vw - 20px)";
 
         &.fb-dragging-container {
@@ -2517,57 +2517,11 @@ body.orbeon {
             .dialog-scrollable();
         }
 
-        .fb-service-call-parameters {
-            clear: both;
-            padding-top: 5px;
-            margin-left: 20px;
-            margin-right: 10px;
-
-            .fb-service-call-parameter-row {
-                display: flex;
-                align-items: flex-start;
-                padding-bottom: 5px;
-
-                .fb-service-call-parameter-fields {
-                    display: flex;
-                    flex: 1 1 auto;
-                    min-width: 0;
-
-                    .fb-service-call-parameter-column {
-                        flex: 1 1 0;
-                        min-width: 0;
-                        padding-right: 10px;
-                        box-sizing: border-box;
-
-                        &.fb-service-call-parameter-column-type {
-                            flex: 0 0 140px;
-                        }
-
-                        input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-                            width: 100%;
-                            box-sizing: border-box;
-                        }
-
-                        .fr-select1-picker,
-                        .select2-container {
-                            display: flex;
-                            width: 100% !important;
-                        }
-
-                        .fr-xpath-completion-wrapper {
-                            width: 100%;
-                            box-sizing: border-box;
-                        }
-                    }
-                }
-
-                .fb-service-call-parameter-buttons {
-                    flex: 0 0 auto;
-                    white-space: nowrap;
-                    text-align: right;
-                    padding-top: 3px;
-                }
-            }
+        .fb-action-editor-panel {
+            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            background-color: var(--orbeon-tab-background-color);
+            padding: var(--orbeon-tab-padding);
         }
 
         .fb-action-phrase-outer > .xforms-label {
@@ -2598,11 +2552,20 @@ body.orbeon {
             height: auto;
         }
 
-        // On the left, taking most of the space, all for the fields for one line
+        .fb-action-step-repeat,
+        .xbl-fr-dnd-repeat {
+            display: block;
+            width: 100%;
+        }
+
         .fb-action-step-options {
+            display: block;
+            width: 100%;
+            min-width: 0;
 
             input:not([type="checkbox"]):not([type="radio"]), textarea, select {
                 width: 100%;
+                box-sizing: border-box;
             }
 
             input[type="checkbox"], input[type="radio"] {
@@ -2617,68 +2580,267 @@ body.orbeon {
                 display: inline-block;
             }
 
-            // `N-col-span-M` means that the option take M/N of the available space
-            // E.g. `3-col-span-2` takes 2/3 of the available space for options
+            .fr-select1-picker,
+            .select2-container {
+                display: flex;
+                width: 100% !important;
+            }
 
-            .fb-action-step-option-2-col-span-1,
-            .fb-action-step-option-3-col-span-1,
-            .fb-action-step-option-3-col-span-2 {
-                float: left;
-                margin: 0;
-                padding-right: 10px;
+            .fr-xpath-completion-wrapper {
+                width: 100%;
                 box-sizing: border-box;
             }
-
-            .fb-action-step-option-2-col-span-1 { width: 50%; }
-            .fb-action-step-option-3-col-span-1 { width: 33.333%; }
-            .fb-action-step-option-3-col-span-2 { width: 66.666%; }
-
-            // Wider dropdown to accommodate group labels
-            .fb-parameter-or-header-select { min-width: 200px }
-
-            // Copied from grid.less, as we are not in a grid
-            // https://github.com/orbeon/orbeon-forms/issues/6893
-            // TODO: Remove code duplication.
-            .xforms-label {
-                font-weight: var(--orbeon-label-font-weight);
-                margin-top: 2px;
-                margin-bottom: @frGridCellPadding;
-                overflow: hidden;
-                display: table;
-            }
         }
 
-        .fb-action-step-repeat,
-        .xbl-fr-dnd-repeat {
-            display: block;
-            width: 100%;
-        }
+        .fb-action-step-bar {
+            display: grid;
+            grid-template-columns: minmax(170px, 210px) minmax(0, 1fr);
+            column-gap: 8px;
+            align-items: start;
 
-        // A reorderable line
-        .fb-action-step-iteration {
-
-            // On the right, the buttons to reorder, remove, and add rows
-            .fb-action-step-buttons {
-                width: 155px;
-                text-align: left;
-                padding-top: 3px;
-                margin-left: 6px;
-
-                .xforms-trigger-appearance-minimal i {
-                    font-size: 14px;
-                    margin-left: 2px;
-                }
-            }
-
-            .fb-action-step-options {
-                display: block;
-                width: calc(100% + 10px);
+            .fb-action-step-type-col,
+            .fb-action-step-inline-col {
                 min-width: 0;
-                &:after {
-                    content: "";
-                    display: table;
-                    clear: both;
+            }
+
+            .fb-action-step-inline-switch,
+            .fb-action-step-inline-switch > .xforms-case-selected {
+                display: block;
+                width: 100%;
+                min-width: 0;
+            }
+        }
+
+        .fb-action-step-inline-cols {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 8px;
+            align-items: start;
+
+            .fb-action-step-col {
+                min-width: 0;
+
+                &.fb-action-step-col-span-2 {
+                    grid-column: 1 / -1;
                 }
+
+                &.fb-action-step-col-auto {
+                    justify-self: start;
+                }
+            }
+        }
+
+        .fb-action-step-inline-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            column-gap: 10px;
+            row-gap: 4px;
+            min-height: 30px;
+
+            .xbl-fr-checkbox-input {
+                margin-top: 0;
+            }
+        }
+
+        .fb-action-add-subrow-btn {
+            button, a {
+                display: inline-block;
+                width: auto;
+                font-size: 12px;
+                line-height: 18px;
+                padding: 4px 10px;
+                color: var(--orbeon-link-color);
+                background-color: var(--orbeon-control-background-color);
+                border: 1px dashed var(--orbeon-control-border-color);
+                border-radius: var(--orbeon-control-border-radius);
+                text-decoration: none;
+
+                &:hover {
+                    color: var(--orbeon-link-hover-color);
+                    border-color: var(--orbeon-focus-border-color);
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .fb-action-keyword-with-xpath {
+            display: flex;
+            column-gap: 8px;
+            align-items: flex-start;
+
+            .fb-action-keyword {
+                flex-grow: 0;
+                flex-shrink: 0;
+                margin-top: 5px;
+            }
+
+            .fb-action-keyword-control {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+        }
+
+        .fb-action-keyword {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid transparent;
+            border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 18px;
+
+            &.fb-action-keyword-if {
+                color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 78%, var(--orbeon-base-color));
+                border-color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 40%, transparent);
+                background-color: color-mix(in oklab, var(--orbeon-alert-success-background-color) 14%, transparent);
+            }
+
+            &.fb-action-keyword-iterate {
+                color: var(--orbeon-accent-color);
+                border-color: color-mix(in oklab, var(--orbeon-accent-color) 35%, transparent);
+                background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+            }
+        }
+
+        .fb-action-step-subrows-switch,
+        .fb-action-step-subrows-switch > .xforms-case-selected {
+            display: block;
+            min-width: 0;
+        }
+
+        .fb-action-step-subrows {
+            margin-top: 4px;
+            margin-left: 4px;
+            padding: 2px 0 2px 10px;
+            border-left: 2px solid color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
+            display: flex;
+            flex-direction: column;
+            row-gap: 4px;
+        }
+
+        .fb-service-call-parameters {
+            .fb-service-call-parameter-row {
+                display: grid;
+                grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1fr) auto;
+                column-gap: 8px;
+                align-items: start;
+                padding: 2px 0;
+
+                .fb-service-call-parameter-column {
+                    min-width: 0;
+                }
+
+                .fb-service-call-parameter-buttons {
+                    display: flex;
+                    align-items: center;
+                    min-height: 30px;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .fb-action-param-row {
+            display: grid;
+            grid-template-columns: 140px minmax(0, 1fr);
+            column-gap: 8px;
+            align-items: start;
+            padding: 2px 0;
+
+            .fb-action-param-name {
+                min-width: 0;
+                padding-top: 5px;
+                line-height: 20px;
+
+                .fb-action-param-label {
+                    display: block;
+                    font-size: 12px;
+                    color: var(--orbeon-base-color);
+                    opacity: 0.85;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    &.fb-action-param-required::after {
+                        content: " *";
+                        color: var(--orbeon-error-color);
+                        font-weight: bold;
+                    }
+                }
+            }
+
+            .fb-action-param-control {
+                min-width: 0;
+            }
+        }
+
+        .fb-copy-content-maps {
+            .fb-copy-content-map-row {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+                column-gap: 8px;
+                align-items: center;
+                padding: 2px 0;
+
+                .fb-copy-content-map-column {
+                    min-width: 0;
+
+                    &.fb-copy-content-map-column-at select {
+                        width: auto;
+                    }
+                }
+
+                .fb-copy-content-map-buttons {
+                    display: flex;
+                    align-items: center;
+                    min-width: 26px;
+                    min-height: 30px;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .fb-action-step-iteration {
+            .fb-action-step-buttons {
+                display: grid;
+                grid-template-columns: 22px 26px 26px 26px 26px 38px;
+                align-items: center;
+                justify-items: center;
+                width: 164px;
+                min-height: 34px;
+                margin-top: 2px;
+                margin-bottom: 2px;
+                margin-left: 4px;
+
+                .fb-action-step-grab     { grid-column: 1; }
+                .fb-action-btn-remove    { grid-column: 2; }
+                .fb-action-btn-add       { grid-column: 3; }
+                .fb-action-btn-iterate   { grid-column: 4; }
+                .fb-action-btn-ungroup   { grid-column: 5; }
+                .fb-action-btn-condition { grid-column: 6; }
+            }
+        }
+
+        .fb-action-btn {
+            padding: 2px 4px;
+
+            i {
+                font-size: 14px;
+            }
+
+            .fb-action-btn-badge {
+                display: inline-block;
+                padding: 1px 5px;
+                border: 1px solid var(--orbeon-control-border-color);
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                font-family: monospace;
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 16px;
+                color: var(--orbeon-base-color);
+                background-color: var(--orbeon-control-background-color);
+                white-space: nowrap;
             }
         }
 
@@ -2704,7 +2866,6 @@ body.orbeon {
 
                     .fb-action-step-at-index-input {
                         flex: 0 0 50px;
-                        width: 50px;
                         input {
                             width: 100%;
                             text-align: center;
@@ -2744,58 +2905,9 @@ body.orbeon {
             }
         }
 
-        .fb-copy-content-maps {
-            clear: both;
-            padding-top: 6px;
-            margin-left: 20px;
-            margin-right: 10px;
-
-            .fb-copy-content-map-row {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding-bottom: 4px;
-
-                .fb-copy-content-map-column {
-                    flex: 1 1 0;
-                    min-width: 0;
-
-                    input, select {
-                        width: 100%;
-                        box-sizing: border-box;
-                    }
-
-                    .select2-container {
-                        display: block;
-                        width: 100% !important;
-                    }
-                }
-
-                .fb-copy-content-map-buttons {
-                    flex: 0 0 auto;
-                    white-space: nowrap;
-                    text-align: right;
-                }
-            }
-        }
-
-        .fb-action-step-xpath {
-
-            &> textarea {
-                //width: 100%;
-            }
-        }
-
         .xforms-trigger-appearance-minimal.xforms-readonly i {
             opacity: 0.4;
-            cursor: pointer;
-        }
-
-        .fb-action-step-options {
-            .fr-select1-picker,
-            .select2-container {
-                display: flex;
-            }
+            cursor: default;
         }
     }
 

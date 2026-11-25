@@ -1762,6 +1762,8 @@
             <mediatype>Mediatype</mediatype>
             <size>Size</size>
         </attachment-metadata>
+        <add-param>+ Parameter</add-param>
+        <add-mapping>+ Mapping</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Form Preview</label>

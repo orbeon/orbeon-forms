@@ -1736,6 +1736,8 @@
             <mediatype>メディアタイプ</mediatype>
             <size>サイズ</size>
         </attachment-metadata>
+        <add-param>+ パラメーター</add-param>
+        <add-mapping>+ マッピング</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>フォームプレビュー</label>

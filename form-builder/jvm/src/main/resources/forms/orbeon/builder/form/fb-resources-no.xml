@@ -1725,6 +1725,8 @@
             <mediatype>Mediatype</mediatype>
             <size>Størrelse</size>
         </attachment-metadata>
+        <add-param>+ Parameter</add-param>
+        <add-mapping>+ Kobling</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Skjemaforhåndsvisning</label>

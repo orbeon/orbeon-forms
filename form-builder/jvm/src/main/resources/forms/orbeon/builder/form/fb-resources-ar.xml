@@ -1744,6 +1744,8 @@
             <mediatype>نوع الوسائط</mediatype>
             <size>الحجم</size>
         </attachment-metadata>
+        <add-param>+ معامل</add-param>
+        <add-mapping>+ ربط</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>معاينة النموذج</label>

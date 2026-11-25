@@ -1724,6 +1724,8 @@
             <mediatype>Медиатип</mediatype>
             <size>Размер</size>
         </attachment-metadata>
+        <add-param>+ Параметр</add-param>
+        <add-mapping>+ Сопоставление</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Предварительный просмотр формы</label>

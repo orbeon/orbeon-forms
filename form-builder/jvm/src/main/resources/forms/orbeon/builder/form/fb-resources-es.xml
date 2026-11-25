@@ -1738,6 +1738,8 @@
             <mediatype>Tipo de medio</mediatype>
             <size>Tamaño</size>
         </attachment-metadata>
+        <add-param>+ Parámetro</add-param>
+        <add-mapping>+ Asignación</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Vista Previa del Formulario</label>

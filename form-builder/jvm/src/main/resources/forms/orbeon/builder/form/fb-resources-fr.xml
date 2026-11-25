@@ -1763,6 +1763,8 @@
             <mediatype>Type de média</mediatype>
             <size>Taille</size>
         </attachment-metadata>
+        <add-param>+ Paramètre</add-param>
+        <add-mapping>+ Correspondance</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Test du formulaire</label>

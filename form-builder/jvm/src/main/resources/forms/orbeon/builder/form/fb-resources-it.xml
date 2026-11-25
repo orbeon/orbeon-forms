@@ -1697,6 +1697,8 @@
             <mediatype>Tipo di media</mediatype>
             <size>Dimensione</size>
         </attachment-metadata>
+        <add-param>+ Parametro</add-param>
+        <add-mapping>+ Associazione</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Anteprima del modulo</label>

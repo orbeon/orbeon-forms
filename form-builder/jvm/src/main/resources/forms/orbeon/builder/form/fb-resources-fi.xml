@@ -1738,6 +1738,8 @@
             <mediatype>Mediatyyppi</mediatype>
             <size>Koko</size>
         </attachment-metadata>
+        <add-param>+ Parametri</add-param>
+        <add-mapping>+ Kohdistus</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Lomakkeen esikatselu</label>

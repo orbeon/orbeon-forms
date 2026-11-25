@@ -1694,6 +1694,8 @@
             <mediatype>Mediatyp</mediatype>
             <size>Größe</size>
         </attachment-metadata>
+        <add-param>+ Parameter</add-param>
+        <add-mapping>+ Zuordnung</add-mapping>
     </dialog-actions>
     <dialog-test>
         <label>Formularvorschau</label>

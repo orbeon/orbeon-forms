@@ -13,8 +13,13 @@
   */
 package org.orbeon.oxf.fr
 
+import org.apache.commons.io.IOUtils
+import org.orbeon.connection.StreamedContent
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
@@ -228,8 +233,17 @@ class WizardTest
 
     it("must not emit XPath formula errors during initialization or navigation in test mode") {
 
+      // Like Form Builder, POST the form definition to the `test` mode
+      val formDefinition =
+        useAndClose(ResourceManagerWrapper.instance.getContentAsStream("/forms/tests/wizard/form/form.xhtml"))(IOUtils.toByteArray)
+
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "wizard", "test")
+        runFormRunner(
+          app     = "tests",
+          form    = "wizard",
+          mode    = "test",
+          content = Some(StreamedContent.fromBytes(formDefinition, Some(ContentTypes.XmlContentType)))
+        )
 
       def hasConsoleDataScript: Boolean =
         doc.getScriptsToRun.exists {

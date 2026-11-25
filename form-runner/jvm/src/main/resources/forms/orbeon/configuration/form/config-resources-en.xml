@@ -232,6 +232,30 @@
         <label>Max Idle</label>
         <hint>Optional idle timeout before spilling static states to store (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Max Entries</label>
+        <hint>Maximum compiled pipelines, stylesheets, and XML resources kept in JVM heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Byte Budget</label>
+        <hint>Max JVM heap percentage, fixed data size (stored in bytes), or unlimited &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Max Idle</label>
+        <hint>Optional idle timeout before evicting cached pipeline and XML entries (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Max Entries</label>
+        <hint>Maximum compiled XPath expressions kept in JVM heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Byte Budget</label>
+        <hint>Max JVM heap percentage, fixed data size (stored in bytes), or unlimited &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Max Idle</label>
+        <hint>Optional idle timeout before evicting cached XPath expressions (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Show Home Link in Navbar</label>
         <hint>Enable the Home link in the navigation bar &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

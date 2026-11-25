@@ -232,6 +232,30 @@
         <label>الحد الأقصى للخمول</label>
         <hint>مهلة خمول اختيارية قبل نقل الحالات الثابتة إلى المخزن (مثل &lt;code&gt;2h&lt;/code&gt; أو &lt;code&gt;1d&lt;/code&gt; أو فارغ) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>الحد الأقصى للإدخالات</label>
+        <hint>الحد الأقصى لخطوط المعالجة وأنماط XSLT وموارد XML المترجمة المحتفظ بها في كومة JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>ميزانية البايتات</label>
+        <hint>نسبة الحد الأقصى لكومة JVM، أو حجم بيانات ثابت (مخزن بالبايت)، أو غير محدود &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>الحد الأقصى للخمول</label>
+        <hint>مهلة خمول اختيارية قبل إخلاء إدخالات خطوط المعالجة وXML المخزنة مؤقتًا (مثل &lt;code&gt;2h&lt;/code&gt; أو &lt;code&gt;1d&lt;/code&gt; أو فارغ) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>الحد الأقصى للإدخالات</label>
+        <hint>الحد الأقصى لتعبيرات XPath المترجمة المحتفظ بها في كومة JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>ميزانية البايتات</label>
+        <hint>نسبة الحد الأقصى لكومة JVM، أو حجم بيانات ثابت (مخزن بالبايت)، أو غير محدود &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>الحد الأقصى للخمول</label>
+        <hint>مهلة خمول اختيارية قبل إخلاء تعبيرات XPath المخزنة مؤقتًا (مثل &lt;code&gt;2h&lt;/code&gt; أو &lt;code&gt;1d&lt;/code&gt; أو فارغ) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>إظهار رابط «الرئيسية» في شريط التنقل</label>
         <hint>تفعيل رابط «الرئيسية» في شريط التنقل &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

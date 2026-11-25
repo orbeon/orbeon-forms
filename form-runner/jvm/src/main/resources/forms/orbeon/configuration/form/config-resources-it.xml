@@ -232,6 +232,30 @@
         <label>Inattività massima</label>
         <hint>Timeout di inattività opzionale prima del trasferimento degli stati statici nell'archivio (ad es. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o vuoto) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Voci massime</label>
+        <hint>Numero massimo di pipeline compilate, fogli di stile e risorse XML mantenuti nell'heap JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Budget di memoria</label>
+        <hint>Percentuale massima dell'heap JVM, dimensione fissa dei dati (memorizzata in byte) o illimitato &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Inattività massima</label>
+        <hint>Timeout di inattività opzionale prima della rimozione delle voci di pipeline e XML dalla cache (ad es. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o vuoto) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Voci massime</label>
+        <hint>Numero massimo di espressioni XPath compilate mantenute nell'heap JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Budget di memoria</label>
+        <hint>Percentuale massima dell'heap JVM, dimensione fissa dei dati (memorizzata in byte) o illimitato &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Inattività massima</label>
+        <hint>Timeout di inattività opzionale prima della rimozione delle espressioni XPath dalla cache (ad es. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o vuoto) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Mostra link Home nella barra di navigazione</label>
         <hint>Abilita il link Home nella barra di navigazione &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

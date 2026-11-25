@@ -67,19 +67,60 @@ class ConfigurationPropertiesTest
       assert(staticBytesElem.attributeValue("value") == "15%")
       assert(staticBytesElem.attributeValue("name") == "oxf.xforms.cache.static-states.max-size-bytes")
 
+      val pipelinesSizeElem = curatedElem.element("caches").element("cache-pipelines-size")
+      assert(pipelinesSizeElem.attributeValue("override") == "false")
+      assert(pipelinesSizeElem.attributeValue("value") == "2000")
+      assert(pipelinesSizeElem.attributeValue("name") == "oxf.core.cache.pipelines.size")
+
+      val pipelinesBytesElem = curatedElem.element("caches").element("cache-pipelines-max-size-bytes")
+      assert(pipelinesBytesElem.attributeValue("override") == "false")
+      assert(pipelinesBytesElem.attributeValue("value") == "10%")
+      assert(pipelinesBytesElem.attributeValue("name") == "oxf.core.cache.pipelines.max-size-bytes")
+      assert(pipelinesBytesElem.element("percentage").getText == "0.1")
+
+      val xpathSizeElem = curatedElem.element("caches").element("cache-xpath-size")
+      assert(xpathSizeElem.attributeValue("override") == "false")
+      assert(xpathSizeElem.attributeValue("value") == "20000")
+      assert(xpathSizeElem.attributeValue("name") == "oxf.core.cache.xpath.size")
+
+      val xpathBytesElem = curatedElem.element("caches").element("cache-xpath-max-size-bytes")
+      assert(xpathBytesElem.attributeValue("override") == "false")
+      assert(xpathBytesElem.attributeValue("value") == "5%")
+      assert(xpathBytesElem.attributeValue("name") == "oxf.core.cache.xpath.max-size-bytes")
+      assert(xpathBytesElem.element("percentage").getText == "0.05")
+
       // Legacy property names saved in older configuration XML must migrate into the curated controls seamlessly
       val legacyCachePropsDoc =
         IOSupport.readOrbeonDom(
           """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
             |    <property as="xs:integer" name="oxf.xforms.cache.documents.size" value="33"/>
+            |    <property as="xs:integer" name="oxf.cache.size"                  value="1500"/>
+            |    <property as="xs:string"  name="oxf.cache.main.max-size-bytes"   value="12%"/>
+            |    <property as="xs:integer" name="oxf.cache.xpath.size"            value="12000"/>
             |</properties>""".stripMargin
         )
-      val migratedConfigDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(legacyCachePropsDoc)
-      val migratedDocsElem  = migratedConfigDoc.getRootElement.element("curated").element("caches").element("cache-documents-size")
+      val migratedConfigDoc     = FormRunnerConfiguration.propertiesDomToConfigurationDom(legacyCachePropsDoc)
+      val migratedCachesElem    = migratedConfigDoc.getRootElement.element("curated").element("caches")
+      val migratedDocsElem      = migratedCachesElem.element("cache-documents-size")
+      val migratedPipelinesSize = migratedCachesElem.element("cache-pipelines-size")
+      val migratedPipelinesByte = migratedCachesElem.element("cache-pipelines-max-size-bytes")
+      val migratedXpathSize     = migratedCachesElem.element("cache-xpath-size")
       assert(migratedDocsElem.attributeValue("override") == "true")
       assert(migratedDocsElem.attributeValue("value") == "33")
-      val migratedOutDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(migratedConfigDoc)
-      assert(migratedOutDoc.getRootElement.element("property").attributeValue("name") == "oxf.xforms.cache.live-documents.size")
+      assert(migratedPipelinesSize.attributeValue("override") == "true")
+      assert(migratedPipelinesSize.attributeValue("value") == "1500")
+      assert(migratedPipelinesByte.attributeValue("override") == "true")
+      assert(migratedPipelinesByte.attributeValue("value") == "12%")
+      assert(migratedXpathSize.attributeValue("override") == "true")
+      assert(migratedXpathSize.attributeValue("value") == "12000")
+      val migratedOutDoc   = FormRunnerConfiguration.configurationDomToPropertiesDom(migratedConfigDoc)
+      val migratedOutNames = migratedOutDoc.getRootElement.elements("property").map(_.attributeValue("name")).toSet
+      assert(migratedOutNames == Set(
+        "oxf.xforms.cache.live-documents.size",
+        "oxf.core.cache.pipelines.size",
+        "oxf.core.cache.pipelines.max-size-bytes",
+        "oxf.core.cache.xpath.size"
+      ))
 
       val navbarHomeElem = curatedElem.element("navbar").element("navbar-home-link")
       assert(navbarHomeElem.attributeValue("override") == "false")
@@ -956,6 +997,34 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(docsSizeValue.effectiveId, numberExternalValue("25"))
             assert(docsSizeValue.isValid)
 
+            val pipelinesSizeOverride       = resolveObject[XFormsSingleNodeControl]("cache-pipelines-size-override-control").get
+            val pipelinesSizeOverrideSelect = ControlsIterator(pipelinesSizeOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val pipelinesSizeValue          = resolveObject[XFormsSingleNodeControl]("cache-pipelines-size-value-control").get
+            setControlValueWithEventSearchNested(pipelinesSizeOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(pipelinesSizeValue.effectiveId, numberExternalValue("3000"))
+            assert(pipelinesSizeValue.isValid)
+
+            val pipelinesIdleOverride       = resolveObject[XFormsSingleNodeControl]("cache-pipelines-max-idle-override-control").get
+            val pipelinesIdleOverrideSelect = ControlsIterator(pipelinesIdleOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val pipelinesIdleValue          = resolveObject[XFormsSingleNodeControl]("cache-pipelines-max-idle-value-control").get
+            setControlValueWithEventSearchNested(pipelinesIdleOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(pipelinesIdleValue.effectiveId, "30m")
+            assert(pipelinesIdleValue.isValid)
+
+            val xpathSizeOverride       = resolveObject[XFormsSingleNodeControl]("cache-xpath-size-override-control").get
+            val xpathSizeOverrideSelect = ControlsIterator(xpathSizeOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val xpathSizeValue          = resolveObject[XFormsSingleNodeControl]("cache-xpath-size-value-control").get
+            setControlValueWithEventSearchNested(xpathSizeOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(xpathSizeValue.effectiveId, numberExternalValue("25000"))
+            assert(xpathSizeValue.isValid)
+
+            val xpathBytesOverride       = resolveObject[XFormsSingleNodeControl]("cache-xpath-max-size-bytes-override-control").get
+            val xpathBytesOverrideSelect = ControlsIterator(xpathBytesOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val xpathBytesPercent        = resolveObject[XFormsSingleNodeControl]("cache-xpath-max-size-bytes-percent-control").get
+            setControlValueWithEventSearchNested(xpathBytesOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(xpathBytesPercent.effectiveId, numberExternalValue("8"))
+            assert(xpathBytesPercent.isValid)
+
             // Test <fr:landing-cards-editor> visual configurator: enable override, reorder via DnD, remove card, add custom card
             val landingCardsOverride       = resolveObject[XFormsSingleNodeControl]("landing-cards-override-control").get
             val landingCardsOverrideSelect = ControlsIterator(landingCardsOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
@@ -1339,6 +1408,10 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256000000"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
             assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.live-documents.size").contains(25))
+            assert(store.globalPropertySet.getIntOpt("oxf.core.cache.pipelines.size").contains(3000))
+            assert(store.globalPropertySet.getString("oxf.core.cache.pipelines.max-idle").contains("30m"))
+            assert(store.globalPropertySet.getIntOpt("oxf.core.cache.xpath.size").contains(25000))
+            assert(store.globalPropertySet.getString("oxf.core.cache.xpath.max-size-bytes").contains("8%"))
             val savedLandingCards = LandingCardsJSON.parseString(store.globalPropertySet.getString("oxf.fr.landing.cards")).get.get._1
             assert(savedLandingCards.head == LandingCard.QuickLinks(
               title = Some(LocalizedString.ByResource("landing.titles.admin")),
@@ -1346,11 +1419,16 @@ class ConfigurationPropertiesTest
             ))
 
             // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
-            val _ = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)
+            val xpathCache = ObjectCache.instance("core.cache.xpath", 20000)
+            val _          = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)
             ObjectCache.configureAllIfNeeded(store.globalPropertySet)
             assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxSizeBytes.contains(256_000_000L))
             assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxIdleMillis.contains(45L * 60_000L))
             assert(XFormsDocumentCache.getCacheForDiagnostics.getMaxSize == 25)
+            assert(ObjectCache.instance.getMaxSize == 3000)
+            assert(ObjectCache.instance.getMaxIdleMillis.contains(30L * 60_000L))
+            assert(xpathCache.getMaxSize == 25000)
+            assert(xpathCache.getMaxSizeBytes.isDefined)
           }
         }
 
@@ -1374,6 +1452,15 @@ class ConfigurationPropertiesTest
 
             assert((defaultLangNode /@ "override").stringValue == "true")
             assert((defaultLangNode /@ "value").stringValue == "fr")
+
+            val reloadedPipelinesSize = (configRoot / "curated" / "caches" / "cache-pipelines-size").head
+            assert((reloadedPipelinesSize /@ "override").stringValue == "true")
+            assert((reloadedPipelinesSize /@ "value").stringValue == "3000")
+
+            val reloadedXpathBytes = (configRoot / "curated" / "caches" / "cache-xpath-max-size-bytes").head
+            assert((reloadedXpathBytes /@ "override").stringValue == "true")
+            assert((reloadedXpathBytes /@ "value").stringValue == "8%")
+            assert((reloadedXpathBytes / "percentage").stringValue == "0.08")
 
             val reloadedPerFileNode = (configRoot / "curated" / "detail" / "attachment-max-size-per-file").head
             assert((reloadedPerFileNode /@ "value").stringValue == "10000000")

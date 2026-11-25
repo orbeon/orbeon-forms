@@ -232,6 +232,30 @@
         <label>Max. inactiviteit</label>
         <hint>Optionele inactiviteitstime-out vóór verplaatsing van statische statussen naar opslag (bijv. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; of leeg) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Max. items</label>
+        <hint>Maximumaantal gecompileerde pipelines, stijlbladen en XML-bronnen in de JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Geheugenbudget</label>
+        <hint>Maximaal JVM-heappercentage, vaste gegevensgrootte (opgeslagen in bytes) of onbeperkt &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Max. inactiviteit</label>
+        <hint>Optionele inactiviteitstime-out vóór verwijdering van gecachete pipeline- en XML-items (bijv. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; of leeg) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Max. items</label>
+        <hint>Maximumaantal gecompileerde XPath-expressies in de JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Geheugenbudget</label>
+        <hint>Maximaal JVM-heappercentage, vaste gegevensgrootte (opgeslagen in bytes) of onbeperkt &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Max. inactiviteit</label>
+        <hint>Optionele inactiviteitstime-out vóór verwijdering van gecachete XPath-expressies (bijv. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; of leeg) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Start-koppeling in navigatiebalk tonen</label>
         <hint>De Start-koppeling in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

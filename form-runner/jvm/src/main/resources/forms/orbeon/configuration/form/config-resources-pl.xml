@@ -232,6 +232,30 @@
         <label>Maks. czas bezczynności</label>
         <hint>Opcjonalny limit czasu bezczynności przed przeniesieniem stanów statycznych do magazynu (np. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; lub puste) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Maks. liczba wpisów</label>
+        <hint>Maksymalna liczba skompilowanych potoków, arkuszy stylów i zasobów XML utrzymywanych na stercie JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Limit bajtów</label>
+        <hint>Maksymalny procent sterty JVM, stały rozmiar danych (zapisywany w bajtach) lub bez limitu &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Maks. czas bezczynności</label>
+        <hint>Opcjonalny limit czasu bezczynności przed usunięciem z pamięci podręcznej wpisów potoków i XML (np. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; lub puste) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Maks. liczba wpisów</label>
+        <hint>Maksymalna liczba skompilowanych wyrażeń XPath utrzymywanych na stercie JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Limit bajtów</label>
+        <hint>Maksymalny procent sterty JVM, stały rozmiar danych (zapisywany w bajtach) lub bez limitu &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Maks. czas bezczynności</label>
+        <hint>Opcjonalny limit czasu bezczynności przed usunięciem z pamięci podręcznej wyrażeń XPath (np. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; lub puste) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Pokaż łącze strony głównej na pasku nawigacji</label>
         <hint>Włącz łącze strony głównej na pasku nawigacji &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

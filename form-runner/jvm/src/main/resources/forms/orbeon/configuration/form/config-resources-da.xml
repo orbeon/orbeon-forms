@@ -232,6 +232,30 @@
         <label>Maks. inaktivitet</label>
         <hint>Valgfri inaktivitetsgrænse før flytning af statiske tilstande til lager (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Maks. antal poster</label>
+        <hint>Maksimalt antal kompilerede pipelines, typografiark og XML-ressourcer i JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Bytebudget</label>
+        <hint>Maks. procentdel af JVM-heap, fast datastørrelse (gemt i byte) eller ubegrænset &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Maks. inaktivitet</label>
+        <hint>Valgfri inaktivitetsgrænse før fjernelse af cachede pipeline- og XML-poster (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Maks. antal poster</label>
+        <hint>Maksimalt antal kompilerede XPath-udtryk i JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Bytebudget</label>
+        <hint>Maks. procentdel af JVM-heap, fast datastørrelse (gemt i byte) eller ubegrænset &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Maks. inaktivitet</label>
+        <hint>Valgfri inaktivitetsgrænse før fjernelse af cachede XPath-udtryk (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Vis Hjem-link i navigationslinjen</label>
         <hint>Aktivér Hjem-linket i navigationslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

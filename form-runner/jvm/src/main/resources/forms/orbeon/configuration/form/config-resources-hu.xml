@@ -232,6 +232,30 @@
         <label>Max. tétlenségi idő</label>
         <hint>Opcionális tétlenségi időkorlát a statikus állapotok tárolóba írása előtt (pl. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; vagy üres) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Max. elemszám</label>
+        <hint>A JVM-kupacmemóriában tartott lefordított csővezetékek, stíluslapok és XML-erőforrások maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Bájtkeret</label>
+        <hint>Maximális JVM-kupac százalékos aránya, rögzített adatméret (bájtban tárolva) vagy korlátlan &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Max. tétlenségi idő</label>
+        <hint>Opcionális tétlenségi időkorlát a gyorsítótárazott csővezeték- és XML-elemek eltávolítása előtt (pl. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; vagy üres) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Max. elemszám</label>
+        <hint>A JVM-kupacmemóriában tartott lefordított XPath-kifejezések maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Bájtkeret</label>
+        <hint>Maximális JVM-kupac százalékos aránya, rögzített adatméret (bájtban tárolva) vagy korlátlan &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Max. tétlenségi idő</label>
+        <hint>Opcionális tétlenségi időkorlát a gyorsítótárazott XPath-kifejezések eltávolítása előtt (pl. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; vagy üres) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Kezdőlap hivatkozás megjelenítése a navigációs sávon</label>
         <hint>A Kezdőlap hivatkozás engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

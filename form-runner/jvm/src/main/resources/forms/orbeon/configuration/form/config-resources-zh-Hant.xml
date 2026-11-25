@@ -232,6 +232,30 @@
         <label>最大閒置時間</label>
         <hint>靜態狀態溢位至儲存區前的選填閒置逾時時間（例如 &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt; 或留空） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>最大項目數</label>
+        <hint>保留在 JVM 堆積中的已編譯管線、樣式表與 XML 資源的最大數量 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>記憶體預算</label>
+        <hint>最大 JVM 堆積百分比、固定資料大小（以位元組為單位儲存）或無限制 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>最大閒置時間</label>
+        <hint>逐出快取的管線與 XML 項目前的選填閒置逾時時間（例如 &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt; 或留空） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>最大項目數</label>
+        <hint>保留在 JVM 堆積中的已編譯 XPath 運算式的最大數量 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>記憶體預算</label>
+        <hint>最大 JVM 堆積百分比、固定資料大小（以位元組為單位儲存）或無限制 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>最大閒置時間</label>
+        <hint>逐出快取的 XPath 運算式前的選填閒置逾時時間（例如 &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt; 或留空） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>在導覽列中顯示首頁連結</label>
         <hint>在導覽列中啟用首頁連結 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

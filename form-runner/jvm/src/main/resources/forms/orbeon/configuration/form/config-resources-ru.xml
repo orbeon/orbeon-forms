@@ -232,6 +232,30 @@
         <label>Макс. время простоя</label>
         <hint>Необязательный тайм-аут простоя перед выгрузкой статических состояний в хранилище (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Макс. число записей</label>
+        <hint>Максимальное число скомпилированных конвейеров, таблиц стилей и XML-ресурсов в куче JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Лимит памяти в байтах</label>
+        <hint>Макс. процент кучи JVM, фиксированный размер данных (в байтах) или без ограничений &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Макс. время простоя</label>
+        <hint>Необязательный тайм-аут простоя перед вытеснением кэшированных конвейеров и XML-ресурсов (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Макс. число записей</label>
+        <hint>Максимальное число скомпилированных выражений XPath в куче JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Лимит памяти в байтах</label>
+        <hint>Макс. процент кучи JVM, фиксированный размер данных (в байтах) или без ограничений &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Макс. время простоя</label>
+        <hint>Необязательный тайм-аут простоя перед вытеснением кэшированных выражений XPath (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Показывать ссылку «На главную» на панели навигации</label>
         <hint>Включить ссылку «На главную» на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

@@ -232,6 +232,30 @@
         <label>Inactivitat màx.</label>
         <hint>Temps d'inactivitat opcional abans d'evacuar els estats estàtics al magatzem (p. ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o en blanc) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Entrades màx.</label>
+        <hint>Nombre màxim de pipelines compilats, fulls d'estil i recursos XML conservats a la memòria JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Pressupost de memòria</label>
+        <hint>Percentatge màxim de memòria JVM, mida fixa de dades (desada en bytes) o il·limitat &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Inactivitat màx.</label>
+        <hint>Temps d'inactivitat opcional abans d'expulsar les entrades de pipelines i XML de la memòria cau (p. ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o en blanc) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Entrades màx.</label>
+        <hint>Nombre màxim d'expressions XPath compilades conservades a la memòria JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Pressupost de memòria</label>
+        <hint>Percentatge màxim de memòria JVM, mida fixa de dades (desada en bytes) o il·limitat &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Inactivitat màx.</label>
+        <hint>Temps d'inactivitat opcional abans d'expulsar les expressions XPath de la memòria cau (p. ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o en blanc) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Mostrar l'enllaç Inici a la barra de navegació</label>
         <hint>Activar l'enllaç Inici a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

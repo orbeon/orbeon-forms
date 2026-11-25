@@ -232,6 +232,30 @@
         <label>最大アイドル時間</label>
         <hint>静的状態をストアへ退避するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>最大エントリ数</label>
+        <hint>JVMヒープ内に保持するコンパイル済みパイプライン、スタイルシート、およびXMLリソースの最大数 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>メモリ上限</label>
+        <hint>最大JVMヒープに対する割合、固定データサイズ（バイト単位で保存）、または無制限 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>最大アイドル時間</label>
+        <hint>キャッシュされたパイプラインおよびXMLエントリを破棄するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>最大エントリ数</label>
+        <hint>JVMヒープ内に保持するコンパイル済みXPath式の最大数 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>メモリ上限</label>
+        <hint>最大JVMヒープに対する割合、固定データサイズ（バイト単位で保存）、または無制限 &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>最大アイドル時間</label>
+        <hint>キャッシュされたXPath式を破棄するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>ナビゲーションバーにホームリンクを表示</label>
         <hint>ナビゲーションバーのホームリンクを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

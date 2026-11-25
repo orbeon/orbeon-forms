@@ -5157,6 +5157,168 @@
                                             </fr:c>
                                         </fr:grid>
                                     </xh:div>
+
+                                    <xh:div class="fr-config-subgroup">
+                                        <xf:var name="pipelines-desc" value="$fr-resources/console/cache-descriptions/core-cache-pipelines"/>
+                                        <xh:div class="fr-config-subgroup-header">
+                                            <xf:output
+                                                appearance="minimal"
+                                                value="$pipelines-desc/@title"
+                                                class="fr-config-subgroup-title xforms-help-popover-control">
+                                                <xf:label value="concat($pipelines-desc/@title, ' (core.cache.pipelines)')"/>
+                                                <xf:help mediatype="text/html" value="$pipelines-desc/string()"/>
+                                                <xf:hint value="'core.cache.pipelines'"/>
+                                            </xf:output>
+                                        </xh:div>
+                                        <fr:grid id="caches-pipelines-grid" ref="$active-scope/curated/caches">
+                                            <fr:c x="1" y="1" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-pipelines-size-override-control" ref="cache-pipelines-size/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../@value" value="../@default"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <fr:number id="cache-pipelines-size-value-control" ref="cache-pipelines-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
+                                                    <xf:label ref="$form-resources/cache-pipelines-size/label"/>
+                                                    <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-pipelines-size/hint else replace($form-resources/cache-pipelines-size/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                                </fr:number>
+                                            </fr:c>
+
+                                            <fr:c x="1" y="2" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-pipelines-max-size-bytes-override-control" ref="cache-pipelines-max-size-bytes/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../mode" value="'percent'"/>
+                                                        <xf:setvalue ref="../percentage" value="'0.1'"/>
+                                                        <xf:setvalue ref="../quantity" value="''"/>
+                                                        <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <xf:group ref="cache-pipelines-max-size-bytes" class="fr-config-value-control fr-config-size-editor">
+                                                    <xf:select1 id="cache-pipelines-max-size-bytes-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
+                                                        <xf:label ref="$form-resources/cache-pipelines-max-size-bytes/label"/>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/heap-percent"/>
+                                                            <xf:value>percent</xf:value>
+                                                        </xf:item>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/fixed-size"/>
+                                                            <xf:value>size</xf:value>
+                                                        </xf:item>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/unlimited"/>
+                                                            <xf:value>unlimited</xf:value>
+                                                        </xf:item>
+                                                    </xf:select1>
+                                                    <fr:percentage id="cache-pipelines-max-size-bytes-percent-control" ref="percentage" field-width="full">
+                                                        <xf:alert ref="$form-resources/alerts/heap-percentage"/>
+                                                    </fr:percentage>
+                                                    <fr:quantity id="cache-pipelines-max-size-bytes-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
+                                                        <xf:alert ref="$form-resources/alerts/positive-byte-size"/>
+                                                    </fr:quantity>
+                                                    <xh:div class="xforms-hint">
+                                                        <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-pipelines-max-size-bytes/hint else replace($form-resources/cache-pipelines-max-size-bytes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    </xh:div>
+                                                </xf:group>
+                                            </fr:c>
+
+                                            <fr:c x="1" y="3" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-pipelines-max-idle-override-control" ref="cache-pipelines-max-idle/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../@value" value="../@default"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <xf:input id="cache-pipelines-max-idle-value-control" ref="cache-pipelines-max-idle/@value" class="fr-config-value-control">
+                                                    <xf:label ref="$form-resources/cache-pipelines-max-idle/label"/>
+                                                    <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-pipelines-max-idle/hint else replace($form-resources/cache-pipelines-max-idle/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    <xf:alert ref="$form-resources/alerts/duration"/>
+                                                </xf:input>
+                                            </fr:c>
+                                        </fr:grid>
+                                    </xh:div>
+
+                                    <xh:div class="fr-config-subgroup">
+                                        <xf:var name="xpath-desc" value="$fr-resources/console/cache-descriptions/core-cache-xpath"/>
+                                        <xh:div class="fr-config-subgroup-header">
+                                            <xf:output
+                                                appearance="minimal"
+                                                value="$xpath-desc/@title"
+                                                class="fr-config-subgroup-title xforms-help-popover-control">
+                                                <xf:label value="concat($xpath-desc/@title, ' (core.cache.xpath)')"/>
+                                                <xf:help mediatype="text/html" value="$xpath-desc/string()"/>
+                                                <xf:hint value="'core.cache.xpath'"/>
+                                            </xf:output>
+                                        </xh:div>
+                                        <fr:grid id="caches-xpath-grid" ref="$active-scope/curated/caches">
+                                            <fr:c x="1" y="1" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-xpath-size-override-control" ref="cache-xpath-size/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../@value" value="../@default"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <fr:number id="cache-xpath-size-value-control" ref="cache-xpath-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
+                                                    <xf:label ref="$form-resources/cache-xpath-size/label"/>
+                                                    <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-xpath-size/hint else replace($form-resources/cache-xpath-size/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                                </fr:number>
+                                            </fr:c>
+
+                                            <fr:c x="1" y="2" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-xpath-max-size-bytes-override-control" ref="cache-xpath-max-size-bytes/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../mode" value="'percent'"/>
+                                                        <xf:setvalue ref="../percentage" value="'0.05'"/>
+                                                        <xf:setvalue ref="../quantity" value="''"/>
+                                                        <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <xf:group ref="cache-xpath-max-size-bytes" class="fr-config-value-control fr-config-size-editor">
+                                                    <xf:select1 id="cache-xpath-max-size-bytes-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
+                                                        <xf:label ref="$form-resources/cache-xpath-max-size-bytes/label"/>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/heap-percent"/>
+                                                            <xf:value>percent</xf:value>
+                                                        </xf:item>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/fixed-size"/>
+                                                            <xf:value>size</xf:value>
+                                                        </xf:item>
+                                                        <xf:item>
+                                                            <xf:label ref="$form-resources/size-modes/unlimited"/>
+                                                            <xf:value>unlimited</xf:value>
+                                                        </xf:item>
+                                                    </xf:select1>
+                                                    <fr:percentage id="cache-xpath-max-size-bytes-percent-control" ref="percentage" field-width="full">
+                                                        <xf:alert ref="$form-resources/alerts/heap-percentage"/>
+                                                    </fr:percentage>
+                                                    <fr:quantity id="cache-xpath-max-size-bytes-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
+                                                        <xf:alert ref="$form-resources/alerts/positive-byte-size"/>
+                                                    </fr:quantity>
+                                                    <xh:div class="xforms-hint">
+                                                        <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-xpath-max-size-bytes/hint else replace($form-resources/cache-xpath-max-size-bytes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    </xh:div>
+                                                </xf:group>
+                                            </fr:c>
+
+                                            <fr:c x="1" y="3" w="12" class="fr-config-has-override">
+                                                <fr:checkbox-input id="cache-xpath-max-idle-override-control" ref="cache-xpath-max-idle/@override" class="fr-config-override-checkbox">
+                                                    <xf:label ref="$form-resources/override/label"/>
+                                                    <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                        <xf:setvalue ref="../@value" value="../@default"/>
+                                                    </xf:action>
+                                                </fr:checkbox-input>
+                                                <xf:input id="cache-xpath-max-idle-value-control" ref="cache-xpath-max-idle/@value" class="fr-config-value-control">
+                                                    <xf:label ref="$form-resources/cache-xpath-max-idle/label"/>
+                                                    <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/cache-xpath-max-idle/hint else replace($form-resources/cache-xpath-max-idle/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                                    <xf:alert ref="$form-resources/alerts/duration"/>
+                                                </xf:input>
+                                            </fr:c>
+                                        </fr:grid>
+                                    </xh:div>
                                 </xh:div>
                                 <xf:group
                                     id="caches-console-callout-group"
@@ -5164,7 +5326,7 @@
                                         let $f := lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))
                                         return
                                             $f = '' or
-                                            contains('cache caches memory heap console static-state static-states live-documents documents oxf.xforms.cache', $f)
+                                            contains('cache caches memory heap console static-state static-states live-documents documents pipelines xpath oxf.xforms.cache oxf.core.cache', $f)
                                     ]">
                                     <xh:div class="fr-config-enc-callout fr-config-enc-callout-info" style="margin-top: 14px;">
                                         <xh:i class="fa fa-fw fa-info-circle"/>

@@ -411,6 +411,66 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       validationOpt   = Some("duration"),
       legacyBaseNames = List("oxf.xforms.cache.static-state.max-idle")
     ),
+    CuratedPropertyDef(
+      key             = "cache-pipelines-size",
+      category        = "caches",
+      baseName        = "oxf.core.cache.pipelines.size",
+      xsType          = "xs:integer",
+      hasAppForm      = false,
+      defaultValue    = "2000",
+      validationOpt   = Some("non-negative-integer"),
+      legacyBaseNames = List("oxf.cache.size", "oxf.cache.main.size")
+    ),
+    CuratedPropertyDef(
+      key             = "cache-pipelines-max-size-bytes",
+      category        = "caches",
+      baseName        = "oxf.core.cache.pipelines.max-size-bytes",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "10%",
+      validationOpt   = Some("byte-size-or-percent"),
+      legacyBaseNames = List("oxf.cache.max-size-bytes", "oxf.cache.main.max-size-bytes")
+    ),
+    CuratedPropertyDef(
+      key             = "cache-pipelines-max-idle",
+      category        = "caches",
+      baseName        = "oxf.core.cache.pipelines.max-idle",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "",
+      validationOpt   = Some("duration"),
+      legacyBaseNames = List("oxf.cache.max-idle", "oxf.cache.main.max-idle")
+    ),
+    CuratedPropertyDef(
+      key             = "cache-xpath-size",
+      category        = "caches",
+      baseName        = "oxf.core.cache.xpath.size",
+      xsType          = "xs:integer",
+      hasAppForm      = false,
+      defaultValue    = "20000",
+      validationOpt   = Some("non-negative-integer"),
+      legacyBaseNames = List("oxf.cache.xpath.size")
+    ),
+    CuratedPropertyDef(
+      key             = "cache-xpath-max-size-bytes",
+      category        = "caches",
+      baseName        = "oxf.core.cache.xpath.max-size-bytes",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "5%",
+      validationOpt   = Some("byte-size-or-percent"),
+      legacyBaseNames = List("oxf.cache.xpath.max-size-bytes")
+    ),
+    CuratedPropertyDef(
+      key             = "cache-xpath-max-idle",
+      category        = "caches",
+      baseName        = "oxf.core.cache.xpath.max-idle",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "",
+      validationOpt   = Some("duration"),
+      legacyBaseNames = List("oxf.cache.xpath.max-idle")
+    ),
 
     // 2. Navigation Bar
     CuratedPropertyDef(
@@ -2318,12 +2378,19 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
             val modeElem = elem.addElement("mode")
             val pctElem  = elem.addElement("percentage")
             val qtyElem  = elem.addElement("quantity")
+            val defaultRatioStr =
+              if (c.defaultValue.endsWith("%"))
+                Try(BigDecimal(c.defaultValue.dropRight(1).trim) / BigDecimal(100))
+                  .map(QuantitySupport.formatBigDecimalPlain(_))
+                  .getOrElse("0.15")
+              else
+                "0.15"
             val effectiveRaw = rawOverrideOpt.getOrElse(c.defaultValue).trim
             if (effectiveRaw.isEmpty || effectiveRaw == "0" || effectiveRaw == "-1") {
               if (rawOverrideOpt.isDefined)
                 elem.addAttribute("value", "0")
               modeElem.setText("unlimited")
-              pctElem.setText("0.15")
+              pctElem.setText(defaultRatioStr)
               qtyElem.addAttribute("unit", "MB")
             } else if (effectiveRaw.endsWith("%")) {
               val pctNumStr = effectiveRaw.dropRight(1).trim
@@ -2346,12 +2413,12 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
                   val (numStr, unitCode) = bytesToDisplayQuantity(bytes)
                   elem.addAttribute("value", bytes.toString)
                   modeElem.setText("size")
-                  pctElem.setText("0.15")
+                  pctElem.setText(defaultRatioStr)
                   qtyElem.addAttribute("unit", unitCode)
                   qtyElem.setText(numStr)
                 case None =>
                   modeElem.setText("size")
-                  pctElem.setText("0.15")
+                  pctElem.setText(defaultRatioStr)
                   qtyElem.addAttribute("unit", "B")
                   qtyElem.setText(effectiveRaw)
               }

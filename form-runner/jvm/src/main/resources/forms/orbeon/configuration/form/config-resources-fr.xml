@@ -232,6 +232,30 @@
         <label>Inactivité max</label>
         <hint>Délai d'inactivité optionnel avant éviction vers le magasin d'état (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Entrées max</label>
+        <hint>Nombre maximal de pipelines compilés, feuilles de style et ressources XML conservés en mémoire JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Budget mémoire</label>
+        <hint>Pourcentage du tas JVM max, taille fixe (enregistrée en octets) ou illimité &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Inactivité max</label>
+        <hint>Délai d'inactivité optionnel avant éviction des entrées de pipelines et XML en cache (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Entrées max</label>
+        <hint>Nombre maximal d'expressions XPath compilées conservées en mémoire JVM &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Budget mémoire</label>
+        <hint>Pourcentage du tas JVM max, taille fixe (enregistrée en octets) ou illimité &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Inactivité max</label>
+        <hint>Délai d'inactivité optionnel avant éviction des expressions XPath en cache (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Lien d'accueil dans la barre de navigation</label>
         <hint>Afficher le lien d'accueil dans la barre de navigation &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

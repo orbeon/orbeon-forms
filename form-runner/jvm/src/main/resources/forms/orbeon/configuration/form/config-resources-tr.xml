@@ -232,6 +232,30 @@
         <label>Maks. Boşta Kalma Süresi</label>
         <hint>Statik durumlar depoya aktarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Maks. Giriş Sayısı</label>
+        <hint>JVM yığınında tutulan maksimum derlenmiş işlem hattı, stil sayfası ve XML kaynağı sayısı &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Bayt Bütçesi</label>
+        <hint>Maks. JVM yığın yüzdesi, sabit veri boyutu (bayt olarak saklanır) veya sınırsız &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Maks. Boşta Kalma Süresi</label>
+        <hint>Önbelleğe alınmış işlem hattı ve XML girişleri çıkarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Maks. Giriş Sayısı</label>
+        <hint>JVM yığınında tutulan maksimum derlenmiş XPath ifadesi sayısı &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Bayt Bütçesi</label>
+        <hint>Maks. JVM yığın yüzdesi, sabit veri boyutu (bayt olarak saklanır) veya sınırsız &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Maks. Boşta Kalma Süresi</label>
+        <hint>Önbelleğe alınmış XPath ifadeleri çıkarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Gezinme Çubuğunda Ana Sayfa Bağlantısını Göster</label>
         <hint>Gezinme çubuğunda Ana Sayfa bağlantısını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

@@ -232,6 +232,30 @@
         <label>Enimmäisjoutoaika</label>
         <hint>Valinnainen joutoajan aikakatkaisu ennen staattisten tilojen siirtämistä tallennustilaan (esim. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; tai tyhjä) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Enimmäismäärä</label>
+        <hint>JVM-kekomuistissa pidettävien käännettyjen putkien, tyylitiedostojen ja XML-resurssien enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Tavukiintiö</label>
+        <hint>JVM-enimmäiskeon prosenttiosuus, kiinteä tietokoko (tallennetaan tavuina) tai rajoittamaton &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Enimmäisjoutoaika</label>
+        <hint>Valinnainen joutoajan aikakatkaisu ennen välimuistissa olevien putki- ja XML-kohteiden poistamista (esim. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; tai tyhjä) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Enimmäismäärä</label>
+        <hint>JVM-kekomuistissa pidettävien käännettyjen XPath-lausekkeiden enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Tavukiintiö</label>
+        <hint>JVM-enimmäiskeon prosenttiosuus, kiinteä tietokoko (tallennetaan tavuina) tai rajoittamaton &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Enimmäisjoutoaika</label>
+        <hint>Valinnainen joutoajan aikakatkaisu ennen välimuistissa olevien XPath-lausekkeiden poistamista (esim. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; tai tyhjä) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Näytä Koti-linkki navigointipalkissa</label>
         <hint>Ota Koti-linkki käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

@@ -232,6 +232,30 @@
         <label>Max. Leerlaufzeit</label>
         <hint>Optionales Leerlauf-Zeitlimit vor dem Auslagern statischer Zustände in den Speicher (z. B. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; oder leer) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
     </cache-static-state-max-idle>
+    <cache-pipelines-size>
+        <label>Max. Einträge</label>
+        <hint>Maximale Anzahl kompilierter Pipelines, Stylesheets und XML-Ressourcen im JVM-Heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.size&lt;/code&gt;</hint>
+    </cache-pipelines-size>
+    <cache-pipelines-max-size-bytes>
+        <label>Speicherbudget</label>
+        <hint>Maximaler Prozentsatz des JVM-Heaps, feste Datengröße (in Byte gespeichert) oder unbegrenzt &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-size-bytes&lt;/code&gt;</hint>
+    </cache-pipelines-max-size-bytes>
+    <cache-pipelines-max-idle>
+        <label>Max. Leerlaufzeit</label>
+        <hint>Optionales Leerlauf-Zeitlimit vor dem Entfernen zwischengespeicherter Pipeline- und XML-Einträge (z. B. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; oder leer) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.pipelines.max-idle&lt;/code&gt;</hint>
+    </cache-pipelines-max-idle>
+    <cache-xpath-size>
+        <label>Max. Einträge</label>
+        <hint>Maximale Anzahl kompilierter XPath-Ausdrücke im JVM-Heap &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.size&lt;/code&gt;</hint>
+    </cache-xpath-size>
+    <cache-xpath-max-size-bytes>
+        <label>Speicherbudget</label>
+        <hint>Maximaler Prozentsatz des JVM-Heaps, feste Datengröße (in Byte gespeichert) oder unbegrenzt &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-size-bytes&lt;/code&gt;</hint>
+    </cache-xpath-max-size-bytes>
+    <cache-xpath-max-idle>
+        <label>Max. Leerlaufzeit</label>
+        <hint>Optionales Leerlauf-Zeitlimit vor dem Entfernen zwischengespeicherter XPath-Ausdrücke (z. B. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; oder leer) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
+    </cache-xpath-max-idle>
     <navbar-home-link>
         <label>Home-Link in der Navigationsleiste anzeigen</label>
         <hint>Den Home-Link in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>

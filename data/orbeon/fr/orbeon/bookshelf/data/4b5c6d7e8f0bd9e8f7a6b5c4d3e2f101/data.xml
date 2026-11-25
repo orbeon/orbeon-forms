@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>Cosmos</title>
+        <author>Carl Sagan</author>
+        <image filename="cosmos.webp" mediatype="image/webp" size="7840">/fr/service/persistence/crud/orbeon/bookshelf/data/4b5c6d7e8f0bd9e8f7a6b5c4d3e2f101/d8b7da78f6d91d58864182d90ebe70da4ffb99eb.bin</image>
+        <genre>science</genre>
+        <language>en</language>
+        <publication-year>1980</publication-year>
+        <pages>365</pages>
+        <isbn>978-0-345-53943-4</isbn>
+        <link>https://en.wikipedia.org/wiki/Cosmos_(Sagan_book)</link>
+        <tags>astronomy science-communication space classic</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>hardcover</format>
+        <favorite>true</favorite>
+        <rating>5</rating>
+        <date-finished>2025-06-30</date-finished>
+        <review>&lt;p&gt;Carl Sagan bridges astronomy, history, and human wonder with unmatched warmth and clarity. From Eratosthenes measuring the Earth's circumference with sticks and shadows to Voyager's grand tour of the outer planets, every chapter celebrates curiosity and careful evidence.&lt;/p&gt;&lt;p&gt;Even decades later, &lt;em&gt;Cosmos&lt;/em&gt; remains the benchmark for popular science writing.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>14</note-page>
+            <note-text>Eratosthenes calculating the circumference of the Earth in Alexandria using simple geometry and a well in Syene.</note-text>
+        </note>
+        <note>
+            <note-page>233</note-page>
+            <note-text>The Cosmic Calendar compresses 13.8 billion years into a single year so human history fits in the final seconds of December 31.</note-text>
+        </note>
+    </notes>
+</form>

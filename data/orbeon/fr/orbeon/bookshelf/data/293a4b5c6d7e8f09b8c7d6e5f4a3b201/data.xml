@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>The Devotion of Suspect X</title>
+        <author>Keigo Higashino</author>
+        <image filename="devotion-of-suspect-x.webp" mediatype="image/webp" size="8660">/fr/service/persistence/crud/orbeon/bookshelf/data/293a4b5c6d7e8f09b8c7d6e5f4a3b201/ab37069502ddf93d8c2a66481ec7d248784d339b.bin</image>
+        <genre>mystery</genre>
+        <language>ja</language>
+        <publication-year>2005</publication-year>
+        <pages>298</pages>
+        <isbn>978-1-250-00269-3</isbn>
+        <link>https://en.wikipedia.org/wiki/The_Devotion_of_Suspect_X</link>
+        <tags>mystery tokyo puzzle mathematics</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>ebook</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2025-09-17</date-finished>
+        <review>&lt;p&gt;An inverted detective story that plays like a chess match between two brilliant former university classmates: a quiet high-school mathematics teacher and a physicist who assists the Tokyo police.&lt;/p&gt;&lt;p&gt;Crisp, tightly plotted, and unexpectedly moving in its final twist.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>112</note-page>
+            <note-text>Ishigami's remark on geometry problems: sometimes a problem looks unsolvable only because of a hidden assumption.</note-text>
+        </note>
+    </notes>
+</form>

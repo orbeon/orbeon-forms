@@ -1,17 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Jacques le fataliste et son maître</title>
         <author>Denis Diderot</author>
+        <image filename="jacques-le-fataliste.webp" mediatype="image/webp" size="9532">/fr/service/persistence/crud/orbeon/bookshelf/data/16ab5903c7f0deb74fdc51dbdf705375/600fd471fdcd4b396a63466dbffc54b80825efc1.bin</image>
+        <genre>philosophy</genre>
         <language>fr</language>
-        <link>http://en.wikipedia.org/wiki/Jacques_le_fataliste</link>
-        <rating/>
         <publication-year>1796</publication-year>
-        <review>&lt;span&gt;&lt;i&gt;&lt;b&gt;Jacques the Fatalist and his Master&lt;/b&gt;&lt;/i&gt; (&lt;a class="" href="http://en.wikipedia.org/wiki/French_language" title="French language"&gt;French&lt;/a&gt;: &lt;span lang="fr"&gt;&lt;i&gt;Jacques le fataliste et son maître&lt;/i&gt;&lt;/span&gt;) is a &lt;a class="" href="http://en.wikipedia.org/wiki/Novel" title="Novel"&gt;novel&lt;/a&gt; by &lt;a class="" href="http://en.wikipedia.org/wiki/Denis_Diderot" title="Denis Diderot"&gt;Denis Diderot&lt;/a&gt;, written during the period 1765-1780. The first French edition was published posthumously in &lt;a class="" href="http://en.wikipedia.org/wiki/1796_in_literature" title="1796 in literature"&gt;1796&lt;/a&gt;. But prior to this it was known in Germany, thanks to Schiller's partial translation of the work in 1785 (which was retranslated into French in 1793) and Mylius's complete version in 1792.&lt;br clear="none"/&gt;&lt;/span&gt;&lt;br clear="none"/&gt;&lt;span&gt;Text is available under the &lt;a rel="license" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative Commons Attribution-ShareAlike License&lt;/a&gt;; additional terms may apply. See &lt;a href="http://wikimediafoundation.org/wiki/Terms_of_Use"&gt;Terms of Use&lt;/a&gt; for details.&lt;/span&gt;&lt;br clear="none"/&gt;</review>
-        <image filename="JacquesLeFataliste.jpg" mediatype="image/jpeg" size="22143">/fr/service/persistence/crud/orbeon/bookshelf/data/16ab5903c7f0deb74fdc51dbdf705375/26abcf492f64db9808f2b13847e0cf8b.jpg</image>
+        <pages>320</pages>
+        <isbn>978-2-07-036459-6</isbn>
+        <link>https://en.wikipedia.org/wiki/Jacques_the_Fatalist</link>
+        <tags>enlightenment satire metafiction french</tags>
     </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>paperback</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2024-09-11</date-finished>
+        <review>&lt;p&gt;Playful, self-aware, and centuries ahead of its time. Diderot constantly interrupts his own story to banter with the reader about narrative conventions, chance, and free will while Jacques and his master meander along unnamed roads.&lt;/p&gt;&lt;p&gt;A delightful reminder that experimental fiction did not begin in the twentieth century.&lt;/p&gt;</review>
+    </reading>
     <notes>
         <note>
-            <note-text/>
+            <note-page>11</note-page>
+            <note-text>The narrator teasingly refuses to tell us where Jacques and his master came from or where they are going.</note-text>
         </note>
     </notes>
 </form>

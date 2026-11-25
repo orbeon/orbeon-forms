@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>The Hobbit</title>
+        <author>J. R. R. Tolkien</author>
+        <image filename="the-hobbit.webp" mediatype="image/webp" size="6802">/fr/service/persistence/crud/orbeon/bookshelf/data/c3d4e5f60718293a4b5c6d7e8f03b2c1/d0437ac60763c051d92e63c460bd173a0a0f6dae.bin</image>
+        <genre>scifi-fantasy</genre>
+        <language>en</language>
+        <publication-year>1937</publication-year>
+        <pages>310</pages>
+        <isbn>978-0-547-92822-7</isbn>
+        <link>https://en.wikipedia.org/wiki/The_Hobbit</link>
+        <tags>fantasy adventure classic middle-earth</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>hardcover</format>
+        <favorite>false</favorite>
+        <rating>5</rating>
+        <date-finished>2024-12-28</date-finished>
+        <review>&lt;p&gt;Warm, brisk, and full of hearthside charm, &lt;em&gt;The Hobbit&lt;/em&gt; is the gold standard of adventure storytelling. Watching Bilbo Baggins grow from a comfort-loving homebody into a resourceful, compassionate burglar is a joy from first page to last.&lt;/p&gt;&lt;p&gt;The riddle game in the dark and the conversation with Smaug remain two of the finest chapters in fantasy literature.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>79</note-page>
+            <note-text>Riddles in the Dark — tense, atmospheric, and quietly pivotal to everything that follows in Middle-earth.</note-text>
+        </note>
+        <note>
+            <note-page>215</note-page>
+            <note-text>Bilbo's quiet courage at the Lonely Mountain shows how kindness can outweigh greed.</note-text>
+        </note>
+    </notes>
+</form>

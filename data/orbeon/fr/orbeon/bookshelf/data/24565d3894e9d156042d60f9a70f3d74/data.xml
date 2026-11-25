@@ -1,17 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Team of Rivals</title>
         <author>Doris Kearns Goodwin</author>
+        <image filename="team-of-rivals.webp" mediatype="image/webp" size="7872">/fr/service/persistence/crud/orbeon/bookshelf/data/24565d3894e9d156042d60f9a70f3d74/d3fe2272d33321c434b8332995a9cefcbd6c34d7.bin</image>
+        <genre>history</genre>
         <language>en</language>
-        <link>http://en.wikipedia.org/wiki/Team_of_rivals</link>
-        <rating/>
         <publication-year>2005</publication-year>
-        <review>&lt;span&gt;&lt;b&gt;Team of Rivals: The Political Genius of Abraham Lincoln&lt;/b&gt; is a book by historian &lt;a href="http://en.wikipedia.org/wiki/Doris_Kearns_Goodwin" title="Doris Kearns Goodwin"&gt;Doris Kearns Goodwin&lt;/a&gt; published in 2005. The book is a biographical portrait of &lt;a href="http://en.wikipedia.org/wiki/President_of_the_United_States" title="President of the United States"&gt;U.S. President&lt;/a&gt; &lt;a href="http://en.wikipedia.org/wiki/Abraham_Lincoln" title="Abraham Lincoln"&gt;Abraham Lincoln&lt;/a&gt; and some of the men who served with him in his &lt;a href="http://en.wikipedia.org/wiki/United_States_Cabinet" title="United States Cabinet"&gt;Cabinet&lt;/a&gt; from 1861 to 1865. Three of his Cabinet members had previously run against Lincoln in the &lt;a href="http://en.wikipedia.org/wiki/United_States_presidential_election,_1860" title="United States presidential election, 1860"&gt;1860 election&lt;/a&gt;: &lt;a href="http://en.wikipedia.org/wiki/United_States_Attorney_General" title="United States Attorney General"&gt;Attorney General &lt;/a&gt;&lt;a href="http://en.wikipedia.org/wiki/Edward_Bates" title="Edward Bates"&gt;Edward Bates&lt;/a&gt;, &lt;a href="http://en.wikipedia.org/wiki/United_States_Secretary_of_the_Treasury" title="United States Secretary of the Treasury"&gt;Secretary of the Treasury&lt;/a&gt; &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/Salmon_Chase" title="Salmon Chase"&gt;Salmon Chase&lt;/a&gt; and &lt;a href="http://en.wikipedia.org/wiki/United_States_Secretary_of_State" title="United States Secretary of State"&gt;Secretary of State&lt;/a&gt; &lt;a href="http://en.wikipedia.org/wiki/William_H._Seward" title="William H. Seward"&gt;William H. Seward&lt;/a&gt;. The book focuses on Lincoln's mostly successful attempts to reconcile conflicting personalities and political factions on the path to &lt;a href="http://en.wikipedia.org/wiki/Abolitionism" title="Abolitionism"&gt;abolition&lt;/a&gt; and victory in the &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/US_Civil_War" title="US Civil War"&gt;US Civil War&lt;/a&gt;.&lt;br clear="none"/&gt;&lt;/span&gt;&lt;br clear="none"/&gt;&lt;span&gt;Text is available under the &lt;a rel="license" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative Commons Attribution-ShareAlike License&lt;/a&gt;; additional terms may apply. See &lt;a href="http://wikimediafoundation.org/wiki/Terms_of_Use"&gt;Terms of Use&lt;/a&gt; for details.&lt;/span&gt;</review>
-        <image filename="TeamOfRivals.jpg" mediatype="image/jpeg" size="22870">/fr/service/persistence/crud/orbeon/bookshelf/data/24565d3894e9d156042d60f9a70f3d74/6513539ce181e43c31ca42accd47b6ac.jpg</image>
+        <pages>916</pages>
+        <isbn>978-0-7432-7075-5</isbn>
+        <link>https://en.wikipedia.org/wiki/Team_of_Rivals</link>
+        <tags>history leadership biography american-history</tags>
     </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>hardcover</format>
+        <favorite>false</favorite>
+        <rating>5</rating>
+        <date-finished>2025-03-27</date-finished>
+        <review>&lt;p&gt;A masterclass in collective biography. Doris Kearns Goodwin traces how Abraham Lincoln invited his sharpest 1860 rivals — Seward, Chase, and Bates — into his Cabinet and won their trust through patience, humor, and generosity of credit.&lt;/p&gt;&lt;p&gt;Despite its length, the narrative reads like a brisk drama and offers timeless lessons on listening to dissenting voices.&lt;/p&gt;</review>
+    </reading>
     <notes>
         <note>
-            <note-text/>
+            <note-page>284</note-page>
+            <note-text>Lincoln's habit of writing 'hot letters' to vent frustration and then leaving them unsent in his desk.</note-text>
+        </note>
+        <note>
+            <note-page>351</note-page>
+            <note-text>How William Seward evolved from skeptical rival into Lincoln's closest confidant.</note-text>
         </note>
     </notes>
 </form>

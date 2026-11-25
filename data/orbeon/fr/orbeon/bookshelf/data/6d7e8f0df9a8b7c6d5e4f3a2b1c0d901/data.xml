@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>Project Hail Mary</title>
+        <author>Andy Weir</author>
+        <image filename="project-hail-mary.webp" mediatype="image/webp" size="8918">/fr/service/persistence/crud/orbeon/bookshelf/data/6d7e8f0df9a8b7c6d5e4f3a2b1c0d901/b05877bc274bd32a508895e866e243e4a6fc0a6a.bin</image>
+        <genre>scifi-fantasy</genre>
+        <language>en</language>
+        <publication-year>2021</publication-year>
+        <pages>496</pages>
+        <isbn>978-0-593-13520-4</isbn>
+        <link>https://en.wikipedia.org/wiki/Project_Hail_Mary</link>
+        <tags>sci-fi space-travel problem-solving friendship</tags>
+    </details>
+    <reading>
+        <reading-status>want-to-read</reading-status>
+        <format>ebook</format>
+        <favorite>false</favorite>
+        <rating/>
+        <date-finished/>
+        <review>&lt;p&gt;Recommended by several friends who loved &lt;em&gt;The Martian&lt;/em&gt; — an upbeat, science-driven interstellar survival story built around creative engineering and unexpected collaboration. Saving this for an upcoming flight.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page/>
+            <note-text/>
+        </note>
+    </notes>
+</form>

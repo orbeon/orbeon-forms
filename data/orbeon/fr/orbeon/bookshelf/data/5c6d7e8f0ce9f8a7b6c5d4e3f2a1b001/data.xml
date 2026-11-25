@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>A Short History of Nearly Everything</title>
+        <author>Bill Bryson</author>
+        <image filename="short-history-of-nearly-everything.webp" mediatype="image/webp" size="10776">/fr/service/persistence/crud/orbeon/bookshelf/data/5c6d7e8f0ce9f8a7b6c5d4e3f2a1b001/02d9cb4e90c658c0d2788a9364857fb0393ad4a5.bin</image>
+        <genre>science</genre>
+        <language>en</language>
+        <publication-year>2003</publication-year>
+        <pages>544</pages>
+        <isbn>978-0-7679-0818-4</isbn>
+        <link>https://en.wikipedia.org/wiki/A_Short_History_of_Nearly_Everything</link>
+        <tags>popular-science history humor geology</tags>
+    </details>
+    <reading>
+        <reading-status>reading</reading-status>
+        <format>audiobook</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished/>
+        <review>&lt;p&gt;Bill Bryson turns geology, chemistry, paleontology, and cosmology into an irresistible tour packed with eccentric discoverers and memorable analogies. Ideal for listening on walks — you come away marveling at how much we know and how recently we learned it.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>148</note-page>
+            <note-text>Clair Patterson's decades-long effort to measure the age of the Earth accurately using lead isotopes in meteorites.</note-text>
+        </note>
+    </notes>
+</form>

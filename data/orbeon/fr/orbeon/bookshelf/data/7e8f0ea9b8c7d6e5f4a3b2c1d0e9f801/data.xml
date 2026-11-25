@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>The Design of Everyday Things</title>
+        <author>Don Norman</author>
+        <image filename="design-of-everyday-things.webp" mediatype="image/webp" size="8694">/fr/service/persistence/crud/orbeon/bookshelf/data/7e8f0ea9b8c7d6e5f4a3b2c1d0e9f801/a51784f1ac6537615cecfbf70782d78eadb6ce08.bin</image>
+        <genre>design-arts</genre>
+        <language>en</language>
+        <publication-year>1988</publication-year>
+        <pages>368</pages>
+        <isbn>978-0-465-05065-9</isbn>
+        <link>https://en.wikipedia.org/wiki/The_Design_of_Everyday_Things</link>
+        <tags>ux-design usability psychology product-design</tags>
+    </details>
+    <reading>
+        <reading-status>reading</reading-status>
+        <format>paperback</format>
+        <favorite>false</favorite>
+        <rating>5</rating>
+        <date-finished/>
+        <review>&lt;p&gt;Once you read Don Norman, you never look at a door handle, light switch, or form interface the same way again. His vocabulary of &lt;strong&gt;affordances&lt;/strong&gt;, &lt;strong&gt;signifiers&lt;/strong&gt;, &lt;strong&gt;mapping&lt;/strong&gt;, and &lt;strong&gt;feedback&lt;/strong&gt; translates directly into building clearer digital products.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>13</note-page>
+            <note-text>Affordances determine what actions are possible; signifiers communicate where and how to act.</note-text>
+        </note>
+        <note>
+            <note-page>72</note-page>
+            <note-text>Good constraints make the right action obvious and prevent errors before they happen.</note-text>
+        </note>
+    </notes>
+</form>

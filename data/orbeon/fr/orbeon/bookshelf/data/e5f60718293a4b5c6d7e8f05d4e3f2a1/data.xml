@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>One Hundred Years of Solitude</title>
+        <author>Gabriel García Márquez</author>
+        <image filename="one-hundred-years-of-solitude.webp" mediatype="image/webp" size="13762">/fr/service/persistence/crud/orbeon/bookshelf/data/e5f60718293a4b5c6d7e8f05d4e3f2a1/ca2cd2a4f86acabe6941cdf28e09e027e84e2c0c.bin</image>
+        <genre>fiction</genre>
+        <language>es</language>
+        <publication-year>1967</publication-year>
+        <pages>417</pages>
+        <isbn>978-0-06-088328-7</isbn>
+        <link>https://en.wikipedia.org/wiki/One_Hundred_Years_of_Solitude</link>
+        <tags>magical-realism nobel-prize family-saga</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>paperback</format>
+        <favorite>true</favorite>
+        <rating>5</rating>
+        <date-finished>2025-07-04</date-finished>
+        <review>&lt;p&gt;Seven generations of the Buendía family rise and fall in the mythical town of Macondo, where the miraculous is narrated with the calm matter-of-factness of daily news. García Márquez's prose has an unmistakable musical cadence.&lt;/p&gt;&lt;p&gt;Keeping the family tree handy helps on a first read, though the recurring names are themselves part of the novel's hypnotic theme of cyclical time.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>1</note-page>
+            <note-text>The famous opening sentence telescopes past, present, and future into a single breath.</note-text>
+        </note>
+        <note>
+            <note-page>45</note-page>
+            <note-text>The insomnia plague and labeling every object in town — a brilliant metaphor for memory and language.</note-text>
+        </note>
+    </notes>
+</form>

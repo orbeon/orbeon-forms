@@ -1,17 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Surely You're Joking, Mr. Feynman!</title>
-        <author>Richard Feynman</author>
+        <author>Richard P. Feynman</author>
+        <image filename="surely-youre-joking-mr-feynman.webp" mediatype="image/webp" size="11698">/fr/service/persistence/crud/orbeon/bookshelf/data/891ce63e59c17348f6fda273afe28c2b/7605b3b6be27e671f2c320dce963edeb61da63c6.bin</image>
+        <genre>biography</genre>
         <language>en</language>
-        <link>http://en.wikipedia.org/wiki/Surely_You're_Joking,_Mr._Feynman!</link>
-        <rating/>
         <publication-year>1985</publication-year>
-        <review>&lt;span/&gt;&lt;p&gt;&lt;i&gt;&lt;b&gt;"Surely You're Joking, Mr. Feynman!": Adventures of a Curious Character&lt;/b&gt;&lt;/i&gt; is an edited collection of reminiscences by the &lt;a class="" href="http://en.wikipedia.org/wiki/Nobel_Prize_in_Physics" title="Nobel Prize in Physics"&gt;Nobel Prize&lt;/a&gt;-winning physicist &lt;a class="" href="http://en.wikipedia.org/wiki/Richard_Feynman" title="Richard Feynman"&gt;Richard Feynman&lt;/a&gt;. The book, released in 1985, covers a variety of instances in Feynman's life. Some are lighthearted in tone, such as his fascination with &lt;a class="" href="http://en.wikipedia.org/wiki/Safe-cracking" title="Safe-cracking"&gt;safe-cracking&lt;/a&gt;, fondness for topless bars, and ventures into art and &lt;a class="" href="http://en.wikipedia.org/wiki/Samba" title="Samba"&gt;samba&lt;/a&gt; music. Others cover more serious material, including his work on the &lt;a class="" href="http://en.wikipedia.org/wiki/Manhattan_Project" title="Manhattan Project"&gt;Manhattan Project&lt;/a&gt; (during which his first wife Arline Greenbaum died of &lt;a class="" href="http://en.wikipedia.org/wiki/Tuberculosis" title="Tuberculosis"&gt;tuberculosis&lt;/a&gt;) and his critique of the science &lt;a class="" href="http://en.wikipedia.org/wiki/Education_in_Brazil" title="Education in Brazil"&gt;education system in Brazil&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;The anecdotes were edited from &lt;a class="" href="http://en.wikipedia.org/wiki/Tape_recorder" title="Tape recorder"&gt;taped&lt;/a&gt; conversations that Feynman had with his close friend and drumming partner &lt;a class="" href="http://en.wikipedia.org/wiki/Ralph_Leighton" title="Ralph Leighton"&gt;Ralph Leighton&lt;/a&gt;. Its surprise success led to a sequel entitled &lt;i&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/What_Do_You_Care_What_Other_People_Think%3F" title="What Do You Care What Other People Think?"&gt;What Do You Care What Other People Think?&lt;/a&gt;&lt;/i&gt;, also taken from Leighton's taped conversations. &lt;i&gt;Surely You're Joking, Mr. Feynman!&lt;/i&gt; sold more than 500,000 copies.&lt;/p&gt;&lt;p&gt;The title derives from a woman's response at &lt;a class="" href="http://en.wikipedia.org/wiki/Princeton_University" title="Princeton University"&gt;Princeton University&lt;/a&gt; when, after she asked the newly-arrived Feynman if he wanted cream or lemon in his tea, he absentmindedly requested both (not knowing that they would &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/Curdling" title="Curdling"&gt;curdle&lt;/a&gt;).&lt;br clear="none"/&gt;&lt;br clear="none"/&gt;&lt;/p&gt;&lt;span&gt;Text is available under the &lt;a rel="license" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative Commons Attribution-ShareAlike License&lt;/a&gt;; additional terms may apply. See &lt;a href="http://wikimediafoundation.org/wiki/Terms_of_Use"&gt;Terms of Use&lt;/a&gt; for details.&lt;/span&gt;&lt;br clear="none"/&gt;</review>
-        <image filename="SurelyYoureJokingMrFeynman.png" mediatype="image/png" size="88413">/fr/service/persistence/crud/orbeon/bookshelf/data/891ce63e59c17348f6fda273afe28c2b/00d662b00f963732326d6343e760a7a1.png</image>
+        <pages>350</pages>
+        <isbn>978-0-393-31604-9</isbn>
+        <link>https://en.wikipedia.org/wiki/Surely_You%27re_Joking,_Mr._Feynman!</link>
+        <tags>memoir physics curiosity humor</tags>
     </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>paperback</format>
+        <favorite>true</favorite>
+        <rating>5</rating>
+        <date-finished>2025-01-12</date-finished>
+        <review>&lt;p&gt;Infectiously curious and genuinely laugh-out-loud funny. Transcribed from conversations with Ralph Leighton, these anecdotes follow Nobel laureate Richard Feynman through radio repair, safecracking, bongo drumming, Mayan hieroglyphs, and the joy of figuring things out from first principles.&lt;/p&gt;&lt;p&gt;A wonderful antidote to taking oneself too seriously.&lt;/p&gt;</review>
+    </reading>
     <notes>
         <note>
-            <note-text/>
+            <note-page>173</note-page>
+            <note-text>The wobbling cafeteria plate that reignited his joy in physics and led directly to his Nobel-winning work on quantum electrodynamics.</note-text>
+        </note>
+        <note>
+            <note-page>338</note-page>
+            <note-text>Cargo Cult Science — 'The first principle is that you must not fool yourself, and you are the easiest person to fool.'</note-text>
         </note>
     </notes>
 </form>

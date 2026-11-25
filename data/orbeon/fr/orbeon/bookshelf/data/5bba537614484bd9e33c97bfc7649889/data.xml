@@ -1,17 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Divine Comedy</title>
-        <author>Dante</author>
+        <author>Dante Alighieri</author>
+        <image filename="divine-comedy.webp" mediatype="image/webp" size="10272">/fr/service/persistence/crud/orbeon/bookshelf/data/5bba537614484bd9e33c97bfc7649889/b0ced7c676f78129a9a7d3b5f401cc456f30dd8e.bin</image>
+        <genre>poetry-drama</genre>
         <language>it</language>
-        <link>http://en.wikipedia.org/wiki/Divine_Comedy</link>
-        <rating/>
         <publication-year>1472</publication-year>
-        <review>&lt;span&gt;The &lt;i&gt;&lt;b&gt;Divine Comedy&lt;/b&gt;&lt;/i&gt; (&lt;a class="" href="http://en.wikipedia.org/wiki/Italian_language" title="Italian language"&gt;Italian&lt;/a&gt;: la &lt;i&gt;&lt;b&gt;Divina Commedia&lt;/b&gt;&lt;/i&gt;) is an &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/Epic_poem" title="Epic poem"&gt;epic poem&lt;/a&gt; written by &lt;a class="" href="http://en.wikipedia.org/wiki/Dante_Alighieri" title="Dante Alighieri"&gt;Dante Alighieri&lt;/a&gt; between 1308 and his death in 1321. It is widely considered the preeminent work of &lt;a class="" href="http://en.wikipedia.org/wiki/Italian_literature" title="Italian literature"&gt;Italian literature&lt;/a&gt;,&lt;sup class="reference" id="cite_ref-0"&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Divine_Comedy#cite_note-0"&gt;&lt;span&gt;[&lt;/span&gt;1&lt;span&gt;]&lt;/span&gt;&lt;/a&gt;&lt;/sup&gt; and is seen as one of the greatest works of &lt;a class="" href="http://en.wikipedia.org/wiki/World_literature" title="World literature"&gt;world literature&lt;/a&gt;.&lt;sup class="reference" id="cite_ref-1"&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Divine_Comedy#cite_note-1"&gt;&lt;span&gt;[&lt;/span&gt;2&lt;span&gt;]&lt;/span&gt;&lt;/a&gt;&lt;/sup&gt; The poem's imaginative and &lt;a class="" href="http://en.wikipedia.org/wiki/Allegory" title="Allegory"&gt;allegorical&lt;/a&gt; vision of the &lt;a class="" href="http://en.wikipedia.org/wiki/Afterlife" title="Afterlife"&gt;afterlife&lt;/a&gt; is a culmination of the&lt;a class="" href="http://en.wikipedia.org/wiki/Medieval_philosophy" title="Medieval philosophy"&gt;medieval world-view&lt;/a&gt; as it had developed in the &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/Roman_Catholic_Church" title="Roman Catholic Church"&gt;Western Church&lt;/a&gt;. It helped establish the &lt;a class="mw-redirect" href="http://en.wikipedia.org/wiki/Tuscan_dialect" title="Tuscan dialect"&gt;Tuscan dialect&lt;/a&gt; in which it is written as the standardized &lt;a class="" href="http://en.wikipedia.org/wiki/Italian_language" title="Italian language"&gt;Italian&lt;/a&gt;.&lt;sup class="reference" id="cite_ref-2"&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Divine_Comedy#cite_note-2"&gt;&lt;span&gt;[&lt;/span&gt;3&lt;span&gt;]&lt;/span&gt;&lt;/a&gt;&lt;/sup&gt; It is divided into three parts, the &lt;i&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Inferno_(Dante)" title="Inferno (Dante)"&gt;Inferno&lt;/a&gt;&lt;/i&gt;, &lt;i&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Purgatorio" title="Purgatorio"&gt;Purgatorio&lt;/a&gt;&lt;/i&gt;, and &lt;i&gt;&lt;a class="" href="http://en.wikipedia.org/wiki/Paradiso_(Dante)" title="Paradiso (Dante)"&gt;Paradiso&lt;/a&gt;&lt;/i&gt;.&lt;br clear="none"/&gt;&lt;/span&gt;&lt;br clear="none"/&gt;&lt;span&gt;Text is available under the &lt;a rel="license" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative Commons Attribution-ShareAlike License&lt;/a&gt;; additional terms may apply. See &lt;a href="http://wikimediafoundation.org/wiki/Terms_of_Use"&gt;Terms of Use&lt;/a&gt; for details.&lt;/span&gt;&lt;br clear="none"/&gt;</review>
-        <image filename="DivineComedy.jpg" mediatype="image/jpeg" size="24525">/fr/service/persistence/crud/orbeon/bookshelf/data/5bba537614484bd9e33c97bfc7649889/ed5257e984f3311da8e1092f69a00a1c.jpg</image>
+        <pages>798</pages>
+        <isbn>978-0-14-243722-3</isbn>
+        <link>https://en.wikipedia.org/wiki/Divine_Comedy</link>
+        <tags>epic-poetry classic medieval italian</tags>
     </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>hardcover</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2024-06-15</date-finished>
+        <review>&lt;p&gt;An astonishing architectural feat of verse. Across &lt;em&gt;Inferno&lt;/em&gt;, &lt;em&gt;Purgatorio&lt;/em&gt;, and &lt;em&gt;Paradiso&lt;/em&gt;, Dante weaves medieval astronomy, Florentine history, and vivid human portraits into a unified hundred-canto journey.&lt;/p&gt;&lt;p&gt;Reading with concise endnotes makes the historical references come alive without slowing the momentum of the poetry.&lt;/p&gt;</review>
+    </reading>
     <notes>
         <note>
-            <note-text/>
+            <note-page>14</note-page>
+            <note-text>Inferno Canto I — beginning 'midway upon the journey of our life' immediately grounds the cosmic scale in personal experience.</note-text>
+        </note>
+        <note>
+            <note-page>512</note-page>
+            <note-text>Each of the three canticles ends on the same word: 'stars' (stelle).</note-text>
         </note>
     </notes>
 </form>

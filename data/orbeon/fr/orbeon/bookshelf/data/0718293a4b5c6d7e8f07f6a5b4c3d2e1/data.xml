@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>Invisible Cities</title>
+        <author>Italo Calvino</author>
+        <image filename="invisible-cities.webp" mediatype="image/webp" size="7388">/fr/service/persistence/crud/orbeon/bookshelf/data/0718293a4b5c6d7e8f07f6a5b4c3d2e1/d51698aea9616a283bba3856b43cf3529394c4af.bin</image>
+        <genre>fiction</genre>
+        <language>it</language>
+        <publication-year>1972</publication-year>
+        <pages>165</pages>
+        <isbn>978-0-15-645380-6</isbn>
+        <link>https://en.wikipedia.org/wiki/Invisible_Cities</link>
+        <tags>imaginative architecture short-prose classic</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>paperback</format>
+        <favorite>true</favorite>
+        <rating>5</rating>
+        <date-finished>2025-10-03</date-finished>
+        <review>&lt;p&gt;Framed as a quiet dialogue between Marco Polo and an aging Kublai Khan, &lt;em&gt;Invisible Cities&lt;/em&gt; offers fifty-five brief, jewel-like descriptions of impossible cities — cities of memory, mirrors, thin air, and hidden geometry.&lt;/p&gt;&lt;p&gt;Best savored a few pages at a time, like poetry or an architectural sketchbook.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>86</note-page>
+            <note-text>Marco Polo's quiet confession that every city he describes is, in some way, Venice.</note-text>
+        </note>
+        <note>
+            <note-page>165</note-page>
+            <note-text>The closing reflection on recognizing what endures amid the noise and giving it space.</note-text>
+        </note>
+    </notes>
+</form>

@@ -1,17 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <details>
         <title>Programming in Scala</title>
-        <author>Martin Odersky, etc.</author>
+        <author>Martin Odersky, Lex Spoon, Bill Venners</author>
+        <image filename="programming-in-scala.webp" mediatype="image/webp" size="10886">/fr/service/persistence/crud/orbeon/bookshelf/data/ad6f8583a9644c36aa1794eb69024a37/e4009239e5d18765265667acc8d31a25d2b66750.bin</image>
+        <genre>technology</genre>
         <language>en</language>
-        <link/>
-        <rating/>
-        <publication-year/>
-        <review/>
-        <image filename="scala250.gif" mediatype="image/gif" size="19064">/fr/service/persistence/crud/orbeon/bookshelf/data/ad6f8583a9644c36aa1794eb69024a37/036f7ef78da0a162d11f77ab879eb3a7.gif</image>
+        <publication-year>2008</publication-year>
+        <pages>858</pages>
+        <isbn>978-0-9971480-0-8</isbn>
+        <link>https://en.wikipedia.org/wiki/Scala_(programming_language)</link>
+        <tags>scala functional-programming software-engineering reference</tags>
     </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>ebook</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2024-03-10</date-finished>
+        <review>&lt;p&gt;The definitive guide to Scala, written by the language's creator and collaborators. Rather than just listing syntax, it patiently explains &lt;em&gt;why&lt;/em&gt; functional and object-oriented constructs fit together cleanly.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Clear progression from immutable collections to pattern matching and type classes&lt;/li&gt;&lt;li&gt;Practical refactoring examples that encourage concise, readable code&lt;/li&gt;&lt;/ul&gt;</review>
+    </reading>
     <notes>
         <note>
-            <note-text/>
+            <note-page>272</note-page>
+            <note-text>Case classes and sealed traits make modeling algebraic data types remarkably expressive and compiler-checked.</note-text>
+        </note>
+        <note>
+            <note-page>345</note-page>
+            <note-text>Preferring immutable collections by default eliminates an entire class of subtle shared-state bugs.</note-text>
         </note>
     </notes>
 </form>

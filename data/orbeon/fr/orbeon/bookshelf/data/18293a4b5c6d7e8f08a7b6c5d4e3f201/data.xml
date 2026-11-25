@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>The Count of Monte Cristo</title>
+        <author>Alexandre Dumas</author>
+        <image filename="the-count-of-monte-cristo.webp" mediatype="image/webp" size="11064">/fr/service/persistence/crud/orbeon/bookshelf/data/18293a4b5c6d7e8f08a7b6c5d4e3f201/1c3aadd0dc5b7c7eedde781bf1b0490ef443f176.bin</image>
+        <genre>classics</genre>
+        <language>fr</language>
+        <publication-year>1844</publication-year>
+        <pages>1276</pages>
+        <isbn>978-0-14-044926-6</isbn>
+        <link>https://en.wikipedia.org/wiki/The_Count_of_Monte_Cristo</link>
+        <tags>adventure classic historical french</tags>
+    </details>
+    <reading>
+        <reading-status>want-to-read</reading-status>
+        <format>hardcover</format>
+        <favorite>false</favorite>
+        <rating/>
+        <date-finished/>
+        <review>&lt;p&gt;On the reading list for a long winter break — universally praised as one of the most gripping adventure novels ever written, following Edmond Dantès from wrongful imprisonment at the Château d'If to Parisian high society.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page/>
+            <note-text/>
+        </note>
+    </notes>
+</form>

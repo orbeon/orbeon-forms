@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>Murder on the Orient Express</title>
+        <author>Agatha Christie</author>
+        <image filename="murder-on-the-orient-express.webp" mediatype="image/webp" size="10606">/fr/service/persistence/crud/orbeon/bookshelf/data/d4e5f60718293a4b5c6d7e8f04c3d2e1/dc36ce8bd76e7bdaad47235ebac907b58564d0cb.bin</image>
+        <genre>mystery</genre>
+        <language>en</language>
+        <publication-year>1934</publication-year>
+        <pages>256</pages>
+        <isbn>978-0-06-269366-2</isbn>
+        <link>https://en.wikipedia.org/wiki/Murder_on_the_Orient_Express</link>
+        <tags>detective whodunit classic poirot</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>paperback</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2025-02-09</date-finished>
+        <review>&lt;p&gt;A snowbound luxury train, twelve seemingly unrelated passengers, and Hercule Poirot working strictly from interviews and small contradictions. Agatha Christie constructs a puzzle box where every single clue is laid out fairly in plain sight.&lt;/p&gt;&lt;p&gt;Fast-paced and atmospheric — ideal winter reading.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>47</note-page>
+            <note-text>Poirot's floor plan of the Calais Coach makes following the alibis and timings remarkably crisp.</note-text>
+        </note>
+        <note>
+            <note-page>238</note-page>
+            <note-text>One of the most ingenious and memorable resolutions in mystery fiction.</note-text>
+        </note>
+    </notes>
+</form>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <details>
+        <title>The Alchemist</title>
+        <author>Paulo Coelho</author>
+        <image filename="the-alchemist.webp" mediatype="image/webp" size="7850">/fr/service/persistence/crud/orbeon/bookshelf/data/3a4b5c6d7e8f0ac9d8e7f6a5b4c3d201/5b1494024c0042c38d1aade90fd072c1acbdc7e3.bin</image>
+        <genre>fiction</genre>
+        <language>pt</language>
+        <publication-year>1988</publication-year>
+        <pages>208</pages>
+        <isbn>978-0-06-231500-7</isbn>
+        <link>https://en.wikipedia.org/wiki/The_Alchemist_(novel)</link>
+        <tags>fable journey inspiration portuguese</tags>
+    </details>
+    <reading>
+        <reading-status>finished</reading-status>
+        <format>audiobook</format>
+        <favorite>false</favorite>
+        <rating>4</rating>
+        <date-finished>2024-11-05</date-finished>
+        <review>&lt;p&gt;A sunlit modern parable about Santiago, an Andalusian shepherd who travels across the Sahara in search of a recurring dream. Read aloud as an audiobook, its rhythmic storytelling feels like a traditional folktale.&lt;/p&gt;&lt;p&gt;Quick, uplifting, and easy to finish over a weekend.&lt;/p&gt;</review>
+    </reading>
+    <notes>
+        <note>
+            <note-page>52</note-page>
+            <note-text>The crystal merchant's shop: how a single small improvement can revive a stagnant routine.</note-text>
+        </note>
+    </notes>
+</form>

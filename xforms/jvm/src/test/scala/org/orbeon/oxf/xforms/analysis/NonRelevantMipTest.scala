@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.dom.Converter.*
@@ -168,6 +169,7 @@ class NonRelevantMipTest
     }
 
     it("must keep calculated nodes empty while non-relevant and recompute in topological order when becoming relevant again, without re-applying `xxf:default`") {
+      assume(Version.isPE)
       val doc =
         <xh:html
           xmlns:xh="http://www.w3.org/1999/xhtml"

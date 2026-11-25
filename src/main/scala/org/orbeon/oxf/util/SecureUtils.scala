@@ -78,13 +78,19 @@ object SecureUtils extends SecureUtilsTrait {
   private val AESBlockSize = 128
   private val AESIVSize    = AESBlockSize / 8
 
-  private val AesGcmVersion1Byte: Byte = 0x01
+  private val AesGcmV1Magic0: Byte     = 0x4F // 'O'
+  private val AesGcmV1Magic1: Byte     = 0x46 // 'F'
+  private val AesGcmV1Magic2: Byte     = 0x00
+  private val AesGcmV1Magic3: Byte     = 0x01
+  private val AesGcmV1HeaderSize       = 8    // 4-byte magic/version + 4-byte big-endian iterations
+  private val MinKdfIterations         = 1000
+  private val MaxKdfIterations         = 10000000
   private val AesGcmSaltSize           = 16
   private val AesGcmIvSize             = 12
   private val AesGcmTagByteLength      = 16
   private val AesGcmTagBitLength       = AesGcmTagByteLength * 8
   private val AesGcmV1KeyBitLength     = 256
-  private val AesGcmV1MinLength        = 1 + AesGcmSaltSize + AesGcmIvSize + AesGcmTagByteLength
+  private val AesGcmV1MinLength        = AesGcmV1HeaderSize + AesGcmSaltSize + AesGcmIvSize + AesGcmTagByteLength
 
   private def validatePasswordForFips(propertyName: String, password: String): String = {
     if (isFipsMode && password.getBytes(CharsetNames.Utf8).length < FipsMinPasswordBytes)
@@ -236,6 +242,27 @@ object SecureUtils extends SecureUtilsTrait {
       }
     }
 
+    private def extractV1IterationsOpt(ciphertext: Array[Byte]): Option[Int] =
+      if (
+        ciphertext.length >= AesGcmV1MinLength &&
+        ciphertext(0) == AesGcmV1Magic0        &&
+        ciphertext(1) == AesGcmV1Magic1        &&
+        ciphertext(2) == AesGcmV1Magic2        &&
+        ciphertext(3) == AesGcmV1Magic3
+      ) {
+        val iter =
+          ((ciphertext(4) & 0xff) << 24) |
+          ((ciphertext(5) & 0xff) << 16) |
+          ((ciphertext(6) & 0xff) << 8)  |
+          (ciphertext(7)  & 0xff)
+        if (iter >= MinKdfIterations && iter <= MaxKdfIterations)
+          Some(iter)
+        else
+          None
+      } else {
+        None
+      }
+
     private def encryptV0WithPassword(password: String, plaintext: Array[Byte]): Array[Byte] = {
       val iv = new Array[Byte](AesGcmIvSize)
       secureRandom.nextBytes(iv)
@@ -247,6 +274,10 @@ object SecureUtils extends SecureUtilsTrait {
     }
 
     private def encryptV1WithPassword(password: String, plaintext: Array[Byte], iterations: Int): Array[Byte] = {
+      if (iterations < MinKdfIterations || iterations > MaxKdfIterations)
+        throw new ConfigurationException(
+          s"Property `$KdfIterationsProperty` must be between $MinKdfIterations and $MaxKdfIterations (got $iterations)"
+        )
       val salt      = currentEncryptionSalt()
       val iv        = new Array[Byte](AesGcmIvSize)
       secureRandom.nextBytes(iv)
@@ -254,11 +285,18 @@ object SecureUtils extends SecureUtilsTrait {
       withAesGcmCipher { cipher =>
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
         val encrypted = cipher.doFinal(plaintext)
-        val out       = new Array[Byte](1 + AesGcmSaltSize + AesGcmIvSize + encrypted.length)
-        out(0) = AesGcmVersion1Byte
-        System.arraycopy(salt,      0, out, 1,                                AesGcmSaltSize)
-        System.arraycopy(iv,        0, out, 1 + AesGcmSaltSize,               AesGcmIvSize)
-        System.arraycopy(encrypted, 0, out, 1 + AesGcmSaltSize + AesGcmIvSize, encrypted.length)
+        val out       = new Array[Byte](AesGcmV1HeaderSize + AesGcmSaltSize + AesGcmIvSize + encrypted.length)
+        out(0) = AesGcmV1Magic0
+        out(1) = AesGcmV1Magic1
+        out(2) = AesGcmV1Magic2
+        out(3) = AesGcmV1Magic3
+        out(4) = ((iterations >>> 24) & 0xff).toByte
+        out(5) = ((iterations >>> 16) & 0xff).toByte
+        out(6) = ((iterations >>> 8)  & 0xff).toByte
+        out(7) = (iterations          & 0xff).toByte
+        System.arraycopy(salt,      0, out, AesGcmV1HeaderSize,                                AesGcmSaltSize)
+        System.arraycopy(iv,        0, out, AesGcmV1HeaderSize + AesGcmSaltSize,               AesGcmIvSize)
+        System.arraycopy(encrypted, 0, out, AesGcmV1HeaderSize + AesGcmSaltSize + AesGcmIvSize, encrypted.length)
         out
       }
     }
@@ -274,8 +312,8 @@ object SecureUtils extends SecureUtilsTrait {
     }
 
     private def decryptV1WithPassword(password: String, ciphertext: Array[Byte], iterations: Int): Array[Byte] = {
-      val salt       = java.util.Arrays.copyOfRange(ciphertext, 1, 1 + AesGcmSaltSize)
-      val ivOffset   = 1 + AesGcmSaltSize
+      val salt       = java.util.Arrays.copyOfRange(ciphertext, AesGcmV1HeaderSize, AesGcmV1HeaderSize + AesGcmSaltSize)
+      val ivOffset   = AesGcmV1HeaderSize + AesGcmSaltSize
       val dataOffset = ivOffset + AesGcmIvSize
       val secretKey  = getOrComputeV1SecretKey(password, salt, iterations)
       withAesGcmCipher { cipher =>
@@ -298,13 +336,37 @@ object SecureUtils extends SecureUtilsTrait {
     def decrypt(ciphertext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken =>
-          decryptWithPassword(getPassword(keyUsage), ciphertext, iterations = getKdfIterations)
+          decryptWithPassword(getPassword(keyUsage), ciphertext)
         case KeyUsage.FieldEncryption =>
-          try {
-            decryptWithPassword(getPassword(KeyUsage.FieldEncryption), ciphertext, iterations = getKdfIterations)
-          } catch {
-            case _: GeneralSecurityException if checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback) =>
-              decryptWithPassword(getPassword(KeyUsage.FieldEncryptionFallback), ciphertext, iterations = getKdfIterations)
+          val primaryPassword     = getPassword(KeyUsage.FieldEncryption)
+          val fallbackPasswordOpt =
+            if (checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback))
+              Some(getPassword(KeyUsage.FieldEncryptionFallback))
+            else
+              None
+
+          def tryPasswords(decryptFn: String => Array[Byte]): Array[Byte] =
+            try {
+              decryptFn(primaryPassword)
+            } catch {
+              case e: GeneralSecurityException =>
+                fallbackPasswordOpt match {
+                  case Some(fallbackPassword) => decryptFn(fallbackPassword)
+                  case None                   => throw e
+                }
+            }
+
+          extractV1IterationsOpt(ciphertext) match {
+            case Some(headerIterations) =>
+              try {
+                tryPasswords(pwd => decryptV1WithPassword(pwd, ciphertext, headerIterations))
+              } catch {
+                case _: GeneralSecurityException =>
+                  // Safeguard for the < 2^-40 case where a legacy Version 0 random IV starts with `"OF\0\1"` + valid int
+                  tryPasswords(pwd => decryptV0WithPassword(pwd, ciphertext))
+              }
+            case None =>
+              tryPasswords(pwd => decryptV0WithPassword(pwd, ciphertext))
           }
         case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM decryption: `$keyUsage`")
@@ -329,23 +391,24 @@ object SecureUtils extends SecureUtilsTrait {
 
     private[util] def decryptWithPassword(
       password  : String,
-      ciphertext: Array[Byte],
-      iterations: Int = getKdfIterations
+      ciphertext: Array[Byte]
     ): Array[Byte] =
-      if (ciphertext.length >= AesGcmV1MinLength && ciphertext(0) == AesGcmVersion1Byte) {
-        try {
-          decryptV1WithPassword(password, ciphertext, iterations)
-        } catch {
-          case _: GeneralSecurityException =>
-            // Fallback for pre-change Version 0 (Tink) ciphertexts whose random 12-byte IV happens to start with `0x01`
-            decryptV0WithPassword(password, ciphertext)
-        }
-      } else {
-        decryptV0WithPassword(password, ciphertext)
+      extractV1IterationsOpt(ciphertext) match {
+        case Some(headerIterations) =>
+          try {
+            decryptV1WithPassword(password, ciphertext, headerIterations)
+          } catch {
+            case _: GeneralSecurityException =>
+              decryptV0WithPassword(password, ciphertext)
+          }
+        case None =>
+          decryptV0WithPassword(password, ciphertext)
       }
 
     private[util] def decryptWithPassword(password: String, ciphertext: String): String =
       new String(decryptWithPassword(password, decodeBase64(ciphertext)), CharsetNames.Utf8)
+    private[util] def cachedPbkdf2KeyCount: Int =
+      pbkdf2KeyCache.synchronized(pbkdf2KeyCache.size())
   }
 
   def isFipsMode: Boolean =

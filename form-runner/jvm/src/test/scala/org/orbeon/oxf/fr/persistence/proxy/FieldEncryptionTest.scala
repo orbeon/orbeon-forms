@@ -129,8 +129,8 @@ class FieldEncryptionTest
 
           val encryptedText = dom.getRootElement.element("section").element("encrypted").getStringValue
           val rawBytes      = JBase64.getDecoder.decode(encryptedText)
-          assert(rawBytes(0) == 0x01.toByte)
-          assert(rawBytes.length == 1 + 16 + 12 + "Sensitive FIPS data".getBytes(CharsetNames.Utf8).length + 16)
+          assert(rawBytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
+          assert(rawBytes.length == 8 + 16 + 12 + "Sensitive FIPS data".getBytes(CharsetNames.Utf8).length + 16)
 
           dom.getRootElement.serializeToString()
         }

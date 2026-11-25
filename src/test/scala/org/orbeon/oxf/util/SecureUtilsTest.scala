@@ -168,20 +168,23 @@ class SecureUtilsTest
       }
     }
 
-    it("must round-trip encrypt and decrypt Version 1 (PBKDF2WithHmacSHA256) across sizes") {
+    it("must round-trip encrypt and decrypt Version 1 (PBKDF2WithHmacSHA256) across sizes and preserve embedded iterations") {
       for (size <- Sizes) {
         val bytes      = randomBytes(size)
         val encrypted1 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 10000)
-        val encrypted2 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 10000)
-        assert(encrypted1(0) == 0x01.toByte)
-        assert(encrypted1.length == 1 + 16 + 12 + size + 16)
+        val encrypted2 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 25000)
+        assert(encrypted1.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
+        assert(encrypted1.slice(4, 8) sameElements Array[Byte](0x00, 0x00, 0x27, 0x10)) // 10000 big-endian
+        assert(encrypted2.slice(4, 8) sameElements Array[Byte](0x00, 0x00, 0x61, 0xA8.toByte)) // 25000 big-endian
+        assert(encrypted1.length == 8 + 16 + 12 + size + 16)
         assert(! (encrypted1 sameElements encrypted2))
-        val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted1, iterations = 10000)
-        assert(bytes sameElements decrypted)
+        // Both ciphertexts decrypt without passing iterations, even though they used different iteration counts
+        assert(bytes sameElements SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted1))
+        assert(bytes sameElements SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted2))
       }
     }
 
-    it("must decrypt ciphertexts produced by Google Tink 1.20.0 AesGcmJce (including 0x01-leading IV)") {
+    it("must decrypt ciphertexts produced by Google Tink 1.20.0 AesGcmJce without polluting PBKDF2 key cache") {
       val stringVectors = List(
         "Hello, Orbeon Forms! Testing Tink backward compatibility." -> "7eFI2d4BL5WqHPs7yf2iEfM0hnnKgVfNe8cUqIZCA+B9nAOlT7JIRosHdZ4wyWOvQoE+FWUEz/hiOIRyubF6t13gH/LPt171Cr+g/ZnSpcWio/1l+w==",
         "43"                                                        -> "4gcE0cY39H6A28IYyjzcaHwT4nCtlfVOISljZ6qD",
@@ -190,49 +193,50 @@ class SecureUtilsTest
         "Value whose legacy Tink IV starts with 0x01"               -> "AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU="
       )
 
+      val cacheCountBefore = SecureUtils.AesGcm.cachedPbkdf2KeyCount
       for ((expectedText, tinkCiphertext) <- stringVectors)
         assert(SecureUtils.AesGcm.decryptWithPassword(TestPassword, tinkCiphertext) == expectedText)
-
-      // Confirm the 0x01-leading-IV vector genuinely starts with byte 0x01 and meets Version 1 minimum length
-      val iv01Bytes = java.util.Base64.getDecoder.decode("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=")
-      assert(iv01Bytes(0) == 0x01.toByte)
-      assert(iv01Bytes.length >= 1 + 16 + 12 + 16)
+      assert(SecureUtils.AesGcm.cachedPbkdf2KeyCount == cacheCountBefore)
     }
 
     it("must fail when tampering with Version 0 or Version 1 AES-GCM ciphertext") {
       for (fipsMode <- List(false, true)) {
         val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64), fipsMode = fipsMode, iterations = 10000)
         encrypted(encrypted.length - 1) = (encrypted(encrypted.length - 1) ^ 0x01).toByte
-        assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted, iterations = 10000)).isFailure)
+        assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)).isFailure)
       }
     }
 
     it("must honor oxf.crypto.fips-mode for AesGcm, ephemeral encrypt/decrypt, provider lookup, and password length") {
-      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-1.xml") {
-        assert(SecureUtils.isFipsMode)
+      val v1FromFirstPassword =
+        withProperties("oxf:/ops/unit-tests/properties-encryption-fips-1.xml") {
+          assert(SecureUtils.isFipsMode)
 
-        // In FIPS mode, legacy `SunJCE` default must not be forced
-        assert(! SecureUtils.preferredProviderOpt("Cipher", "AES/GCM/NoPadding").exists(_.getName == "SunJCE"))
+          // In FIPS mode, legacy `SunJCE` default must not be forced
+          assert(! SecureUtils.preferredProviderOpt("Cipher", "AES/GCM/NoPadding").exists(_.getName == "SunJCE"))
 
-        // AesGcm writes Version 1 (`0x01` prefix) and reads both Version 1 and legacy Tink Version 0
-        val v1Encrypted = SecureUtils.AesGcm.encrypt("FIPS secret value")
-        val v1Bytes     = java.util.Base64.getDecoder.decode(v1Encrypted)
-        assert(v1Bytes(0) == 0x01.toByte)
-        assert(SecureUtils.AesGcm.decrypt(v1Encrypted) == "FIPS secret value")
-        assert(SecureUtils.AesGcm.decrypt("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=") == "Value whose legacy Tink IV starts with 0x01")
+          // AesGcm writes Version 1 (`"OF\0\1"` + iterations prefix) and reads both Version 1 and legacy Tink Version 0
+          val v1Encrypted = SecureUtils.AesGcm.encrypt("FIPS secret value")
+          val v1Bytes     = java.util.Base64.getDecoder.decode(v1Encrypted)
+          assert(v1Bytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
+          assert(SecureUtils.AesGcm.decrypt(v1Encrypted) == "FIPS secret value")
+          assert(SecureUtils.AesGcm.decrypt("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=") == "Value whose legacy Tink IV starts with 0x01")
 
-        // Ephemeral `SecureUtils.encrypt` / `decrypt` round-trips in FIPS mode (PBKDF2WithHmacSHA256 + AES/GCM/NoPadding)
-        val payload    = randomBytes(128)
-        val encrypted1 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
-        val encrypted2 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
-        assert(encrypted1 != encrypted2)
-        assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted1) sameElements payload)
-        assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2) sameElements payload)
-      }
+          // Ephemeral `SecureUtils.encrypt` / `decrypt` round-trips in FIPS mode (PBKDF2WithHmacSHA256 + AES/GCM/NoPadding)
+          val payload    = randomBytes(128)
+          val encrypted1 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
+          val encrypted2 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
+          assert(encrypted1 != encrypted2)
+          assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted1) sameElements payload)
+          assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2) sameElements payload)
 
-      // Rotated password in FIPS mode still decrypts pre-change Tink data via read-fallback
+          v1Encrypted
+        }
+
+      // Rotated password in FIPS mode decrypts both Version 1 data (via V1-first fallback) and pre-change Tink data
       withProperties("oxf:/ops/unit-tests/properties-encryption-fips-2.xml") {
         assert(SecureUtils.isFipsMode)
+        assert(SecureUtils.AesGcm.decrypt(v1FromFirstPassword) == "FIPS secret value")
         assert(SecureUtils.AesGcm.decrypt("4gcE0cY39H6A28IYyjzcaHwT4nCtlfVOISljZ6qD") == "43")
         assert(SecureUtils.AesGcm.decrypt("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=") == "Value whose legacy Tink IV starts with 0x01")
       }

@@ -135,8 +135,10 @@ class FormRunnerConsoleTest
       val wizardStaticOpt =
         staticStatesElem
           .elements("static-state")
-          .find(e => e.attributeValue("app") == "tests" && e.attributeValue("form") == "wizard")
+          .find(_.attributeValue("digest") == docOpt.get.staticState.digest)
       assert(wizardStaticOpt.isDefined)
+      assert(wizardStaticOpt.get.attributeValue("app") == "tests")
+      assert(wizardStaticOpt.get.attributeValue("form") == "wizard")
       assert(wizardStaticOpt.get.attributeValue("version") == "1")
       assert(wizardStaticOpt.get.attributeValue("version-raw") == "1")
       assert(wizardStaticOpt.get.attributeValue("major-mode") == "detail")

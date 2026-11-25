@@ -198,59 +198,6 @@
                 margin-inline-start: auto;
             }
 
-            .fr-landing-updated {
-                display: inline-flex;
-                align-items: baseline;
-                gap: 0.25em;
-                color: var(--orbeon-hint-color);
-                font-size: 0.9em;
-                font-variant-numeric: tabular-nums;
-                white-space: nowrap;
-
-                &.xforms-hidden {
-                    display: none;
-                }
-
-                .fr-landing-updated-label {
-                    font-weight: 500;
-                }
-            }
-
-            .fr-landing-toolbar-select {
-                &:not(.xforms-disabled) {
-                    display: inline-flex;
-                    align-items: center;
-                    margin: 0;
-                }
-
-                select {
-                    inline-size: auto;
-                    min-block-size: var(--orbeon-control-height);
-                    margin: 0;
-                    padding-block: 0;
-                    padding-inline-start: 0.65em;
-                    padding-right: 24px;
-                    font: inherit;
-                    font-variant-numeric: tabular-nums;
-                    color: var(--orbeon-control-color);
-                    background-color: var(--orbeon-control-background-color);
-                    border: 1px solid var(--orbeon-control-border-color);
-                    border-radius: var(--orbeon-landing-tile-border-radius);
-                    cursor: pointer;
-
-                    @media (pointer: coarse) {
-                        min-block-size: 40px;
-                    }
-
-                    &:focus,
-                    &:focus-visible {
-                        border-color: var(--orbeon-focus-border-color);
-                        box-shadow: var(--orbeon-control-focus-ring);
-                        outline: none;
-                    }
-                }
-            }
-
             .fr-landing-refresh-trigger {
                 &:not(.xforms-disabled) {
                     display: inline-flex;
@@ -262,19 +209,21 @@
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 0.4em;
-                    min-inline-size: 24px;
+                    inline-size: var(--orbeon-control-height);
+                    block-size: var(--orbeon-control-height);
+                    min-inline-size: 28px;
                     min-block-size: var(--orbeon-control-height);
-                    padding: 0 0.75em;
+                    padding: 0;
                     margin: 0;
                     font: inherit;
-                    font-weight: 500;
                     line-height: 1;
-                    color: var(--orbeon-base-color);
-                    background-color: var(--orbeon-control-background-color);
-                    border: 1px solid var(--orbeon-control-border-color);
+                    text-decoration: none;
+                    color: var(--orbeon-hint-color);
+                    background-color: transparent;
+                    border: 1px solid transparent;
                     border-radius: var(--orbeon-landing-tile-border-radius);
                     box-shadow: none;
+                    cursor: pointer;
                     transition: color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
                                 background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
                                 border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
@@ -284,6 +233,7 @@
                     }
 
                     @media (pointer: coarse) {
+                        min-inline-size: 40px;
                         min-block-size: 40px;
                     }
 
@@ -291,11 +241,13 @@
                         &:hover {
                             color: var(--orbeon-base-color);
                             background-color: var(--orbeon-pill-muted-background-color);
-                            border-color: var(--orbeon-base-border-color);
+                            border-color: var(--orbeon-pill-muted-border-color);
+                            text-decoration: none;
                         }
                     }
 
                     &:focus-visible {
+                        color: var(--orbeon-base-color);
                         border-color: var(--orbeon-focus-border-color);
                         box-shadow: var(--orbeon-control-focus-ring);
                         outline: none;
@@ -309,7 +261,7 @@
             }
         }
 
-        &:has(~ .fr-landing-grid .fr-card-refresh-btn.is-spinning) .fr-landing-refresh-trigger button.btn i.fa {
+        &:has(~ .fr-landing-grid .fr-card-is-refreshing) .fr-landing-refresh-trigger button.btn i.fa {
             animation: fr-landing-spin 0.8s linear infinite;
 
             @media (prefers-reduced-motion: reduce) {
@@ -508,14 +460,6 @@
                         color: var(--orbeon-base-color);
                         outline: 2px solid var(--orbeon-focus-border-color);
                         outline-offset: -2px;
-                    }
-                }
-
-                .fr-card-refresh-btn.is-spinning i.fa {
-                    animation: fr-landing-spin 0.8s linear infinite;
-
-                    @media (prefers-reduced-motion: reduce) {
-                        animation-duration: 3s;
                     }
                 }
             }

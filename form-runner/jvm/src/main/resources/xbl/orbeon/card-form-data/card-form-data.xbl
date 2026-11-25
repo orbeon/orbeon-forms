@@ -453,7 +453,6 @@
 
             <xf:var name="new-label"     value="xxf:r('landing.buttons.new', '|fr-fr-resources|')"/>
             <xf:var name="summary-label" value="xxf:r('landing.buttons.summary', '|fr-fr-resources|')"/>
-            <xf:var name="refresh-label" value="xxf:r('landing.buttons.refresh', '|fr-fr-resources|')"/>
 
             <xf:var
                 name="refresh-watch"
@@ -501,23 +500,6 @@
                         class="fr-card-action-btn {'xforms-hidden'[not($can-list)]}">
                         <xh:i class="fa fa-list" aria-hidden="true"/>
                     </xh:a>
-                    <xf:trigger
-                        appearance="minimal"
-                        class="fr-card-action-btn fr-card-refresh-btn {'is-spinning'[instance('fr-state-instance')/@state = 'loading' and instance('fr-state-instance')/@has-loaded = 'true']}">
-                        <xf:label>
-                            <xh:i class="fa fa-rotate-right" aria-hidden="true"/>
-                            <xh:span class="xforms-hidden"><xf:output value="$refresh-label"/></xh:span>
-                        </xf:label>
-                        <xf:hint value="$refresh-label"/>
-                        <xf:action event="DOMActivate">
-                            <xf:send
-                                if="instance('fr-state-instance')/@source-form-loaded = 'true'"
-                                submission="fr-search-submission"/>
-                            <xf:send
-                                if="not(instance('fr-state-instance')/@source-form-loaded = 'true')"
-                                submission="fr-get-source-form-submission"/>
-                        </xf:action>
-                    </xf:trigger>
                 </fr:card-actions>
 
                 <fr:headings>

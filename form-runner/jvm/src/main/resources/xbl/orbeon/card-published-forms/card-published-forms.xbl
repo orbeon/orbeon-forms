@@ -199,7 +199,6 @@
                         xxf:r('landing.buttons.sort-by-last-modified', '|fr-fr-resources|')
                     else
                         xxf:r('landing.buttons.sort-by-title', '|fr-fr-resources|')"/>
-            <xf:var name="refresh-label" value="xxf:r('landing.buttons.refresh', '|fr-fr-resources|')"/>
 
             <xf:var
                 name="refresh-watch"
@@ -254,17 +253,6 @@
                                         )"/>
                             <xf:send submission="fr-read-demo-forms-submission"/>
                         </xf:action>
-                    </xf:trigger>
-
-                    <xf:trigger
-                        appearance="minimal"
-                        class="fr-card-action-btn fr-card-refresh-btn {'is-spinning'[instance('fr-ui-instance')/@state = 'loading' and instance('fr-ui-instance')/@has-loaded = 'true']}">
-                        <xf:label>
-                            <xh:i class="fa fa-rotate-right" aria-hidden="true"/>
-                            <xh:span class="xforms-hidden"><xf:output value="$refresh-label"/></xh:span>
-                        </xf:label>
-                        <xf:hint value="$refresh-label"/>
-                        <xf:send event="DOMActivate" submission="fr-read-demo-forms-submission"/>
                     </xf:trigger>
                 </fr:card-actions>
 

@@ -86,7 +86,7 @@
             </xf:instance>
 
             <xf:instance id="fr-landing-ui-instance" xxf:exclude-result-prefixes="#all">
-                <ui refresh-token="0" filter="" updated-at="" auto-refresh="0" refresh-announcement=""/>
+                <ui refresh-token="0" filter="" refresh-announcement=""/>
             </xf:instance>
 
             <xf:action event="xforms-model-construct-done">
@@ -98,7 +98,6 @@
                 </xf:action>
                 <xf:action if="exists($cards-config-xml)">
                     <xf:insert ref="instance('fr-cards-config-xml')" origin="$cards-config-xml"/>
-                    <xf:setvalue ref="instance('fr-landing-ui-instance')/@updated-at" value="string(current-dateTime())"/>
                 </xf:action>
             </xf:action>
 
@@ -134,29 +133,6 @@
                         }
                     </xf:body>
                 </xf:action>
-                <xf:dispatch name="fr-landing-sync-ui" targetid="fr-form-model"/>
-            </xf:action>
-
-            <xf:action event="fr-landing-sync-ui" type="javascript">
-                <xf:param name="refreshSec" value="string(instance('fr-landing-ui-instance')/@auto-refresh)"/>
-                <xf:body>
-                    if (window.__frLandingAutoRefreshTimer) {
-                        window.clearInterval(window.__frLandingAutoRefreshTimer);
-                        window.__frLandingAutoRefreshTimer = null;
-                    }
-                    const sec = Number(refreshSec);
-                    if (sec &gt; 0) {
-                        window.__frLandingAutoRefreshTimer = window.setInterval(() =&gt; {
-                            if (document.visibilityState === 'visible') {
-                                ORBEON.xforms.Document.dispatchEvent({
-                                    targetId: 'fr-form-model',
-                                    eventName: 'fr-landing-refresh',
-                                    showProgress: false
-                                });
-                            }
-                        }, sec * 1000);
-                    }
-                </xf:body>
             </xf:action>
 
             <xf:action event="fr-landing-refresh">
@@ -164,9 +140,6 @@
                 <xf:setvalue
                     ref="instance('fr-landing-ui-instance')/@refresh-token"
                     value="xs:integer(.) + 1"/>
-                <xf:setvalue
-                    ref="instance('fr-landing-ui-instance')/@updated-at"
-                    value="string($now)"/>
                 <xf:action if="event('announce') = 'true'">
                     <xf:var
                         name="updated-label"
@@ -181,10 +154,6 @@
                         ref="instance('fr-landing-ui-instance')/@refresh-announcement"
                         value="concat($updated-label, ': ', format-dateTime($local-now, $fmt, xxf:lang(), (), ()))"/>
                 </xf:action>
-                <xf:dispatch
-                    if="xs:integer((instance('fr-landing-ui-instance')/@auto-refresh[. castable as xs:integer], 0)[1]) gt 0"
-                    name="fr-landing-sync-ui"
-                    targetid="fr-form-model"/>
             </xf:action>
 
             <xf:action event="fr-landing-filter">
@@ -208,18 +177,6 @@
                             (card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder')))
                         ]
                     )"/>
-            <xf:var
-                name="updated-dt"
-                value="instance('fr-landing-ui-instance')/@updated-at[. castable as xs:dateTime]/xs:dateTime(.)"/>
-            <xf:var
-                name="updated-label"
-                value="(xxf:r('landing.labels.updated', '|fr-fr-resources|')[xxf:non-blank()], xxf:r('analytics.labels.updated', '|fr-fr-resources|'))[1]"/>
-            <xf:var
-                name="auto-refresh-label"
-                value="(xxf:r('landing.labels.auto-refresh', '|fr-fr-resources|')[xxf:non-blank()], xxf:r('analytics.labels.auto-refresh', '|fr-fr-resources|'))[1]"/>
-            <xf:var
-                name="auto-off-label"
-                value="(xxf:r('landing.labels.auto-off', '|fr-fr-resources|')[xxf:non-blank()], xxf:r('analytics.labels.auto-off', '|fr-fr-resources|'))[1]"/>
             <xf:var
                 name="refresh-label"
                 value="xxf:r('landing.buttons.refresh', '|fr-fr-resources|')"/>
@@ -263,52 +220,15 @@
                 </xh:search>
 
                 <xf:group ref=".[$has-data-cards]" class="fr-landing-toolbar-actions">
-                    <xh:span class="fr-landing-updated {'xforms-hidden'[empty($updated-dt)]}">
-                        <xh:span class="fr-landing-updated-label"><xf:output value="concat($updated-label, ':')"/></xh:span>
-                        <xh:time datetime="{instance('fr-landing-ui-instance')/@updated-at}" title="{instance('fr-landing-ui-instance')/@updated-at}">
-                            <xf:output value="
-                                if (empty($updated-dt)) then
-                                    ''
-                                else
-                                    let $v   := if (exists($tz)) then adjust-dateTime-to-timezone($updated-dt, $tz) else adjust-dateTime-to-timezone($updated-dt),
-                                        $fmt := replace(xxf:r('common.formats.within-day', '|fr-fr-resources|'), '\[m(01)?\]', '[m01]:[s01]')
-                                    return
-                                        format-dateTime($v, $fmt, xxf:lang(), (), ())"/>
-                        </xh:time>
-                    </xh:span>
-
-                    <xf:select1
-                        id="fr-landing-autorefresh-select"
-                        ref="instance('fr-landing-ui-instance')/@auto-refresh"
-                        class="fr-landing-toolbar-select"
-                    >
-                        <xf:label class="xforms-hidden" value="$auto-refresh-label"/>
-                        <xf:item>
-                            <xf:label value="concat($auto-refresh-label, ': ', $auto-off-label)"/>
-                            <xf:value>0</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label value="concat($auto-refresh-label, ': 30s')"/>
-                            <xf:value>30</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label value="concat($auto-refresh-label, ': 1m')"/>
-                            <xf:value>60</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label value="concat($auto-refresh-label, ': 5m')"/>
-                            <xf:value>300</xf:value>
-                        </xf:item>
-                        <xf:dispatch event="xforms-value-changed" name="fr-landing-sync-ui" targetid="fr-form-model"/>
-                    </xf:select1>
-
                     <xf:trigger
                         id="fr-landing-refresh-button"
+                        appearance="minimal"
                         class="fr-landing-refresh-trigger"
+                        xxf:title="{$refresh-label}"
                     >
                         <xf:label>
                             <xh:i class="fa fa-fw fa-rotate-right" aria-hidden="true"/>
-                            <xh:span><xf:output value="$refresh-label"/></xh:span>
+                            <xh:span class="fr-sr-status"><xf:output value="$refresh-label"/></xh:span>
                         </xf:label>
                         <xf:dispatch event="DOMActivate" name="fr-landing-refresh" targetid="fr-form-model">
                             <xf:property name="announce" value="'true'"/>

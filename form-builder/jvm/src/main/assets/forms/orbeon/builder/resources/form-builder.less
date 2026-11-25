@@ -2107,14 +2107,9 @@ body.orbeon {
             margin: 0;
             padding: 0;
             .xforms-alert.xforms-active {
-                background  : var(--orbeon-info-alert-background-color);
-                border-color: var(--orbeon-info-alert-border-color);
                 margin: 0;
-                &::before {
+                &::after {
                     content: none;
-                }
-                a {
-                    color: var(--orbeon-active-alert-color);
                 }
             }
         }

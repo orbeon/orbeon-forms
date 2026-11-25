@@ -49,6 +49,7 @@
             <display-name lang="ar">تحديد متعدد ديناميكي</display-name>
             <display-name lang="pl">Dynamiczny wybór wielokrotny</display-name>
             <display-name lang="ja">動的マルチセレクト</display-name>
+            <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-search</icon-class>
             </icon>

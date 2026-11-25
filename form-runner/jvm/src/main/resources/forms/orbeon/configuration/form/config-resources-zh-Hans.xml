@@ -141,6 +141,18 @@
         <dialog-title-add>添加自定义流程</dialog-title-add>
         <dialog-title-edit>编辑流程</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>控件设置</label>
+        <select-placeholder>选择要配置的控件…</select-placeholder>
+        <configure-button>配置</configure-button>
+        <edit>编辑</edit>
+        <revert>还原</revert>
+        <apply>应用</apply>
+        <cancel>取消</cancel>
+        <dialog-title>控件设置</dialog-title>
+        <empty>此范围尚未配置自定义控件设置。请在上方选择一个控件以覆盖其默认设置。</empty>
+        <none-value>（无）</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>应用程序 / 表单覆盖</label>
         <add-override>添加应用程序 / 表单覆盖</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>上传错误外观</label>
-        <hint>文件上传错误的显示方式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>默认 (模态对话框)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>模态对话框</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>内联警告</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>向导视图</label>
         <hint>将顶层章节显示为整页或独立的向导页面 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>状态令牌有效期 (分钟)</label>
         <hint>状态令牌的有效时长（分钟） &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>可编辑模式</editable>
+        <review>审阅模式</review>
+        <pdf-automatic>自动 PDF</pdf-automatic>
+        <pdf-template>PDF 模板</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>字段宽度</field-width>
+        <default>使用默认值</default>
+        <full>全宽</full>
+        <natural>自然宽度</natural>
+        <field-align>字段对齐</field-align>
+        <left>左对齐</left>
+        <right>右对齐</right>
+        <learn-settings-below>了解有关以下设置的更多信息</learn-settings-below>
+        <field-value-visibility>
+            <label>字段值可见性</label>
+            <hint>控制字段值的显示方式</hint>
+            <item id="visible">可见</item>
+            <item id="obscured">遮蔽</item>
+            <item id="partial">部分可见</item>
+            <item id="reveal">允许用户显示</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>开放选择</label>
+            <help>启用“开放选择”选项后，用户在填写表单时可以在此控件中输入自定义值。该值会保存在数据中，并用作下拉列表中显示的标签。</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

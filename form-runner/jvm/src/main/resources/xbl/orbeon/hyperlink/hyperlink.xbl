@@ -83,6 +83,7 @@
                     <xf:bind ref="instance('local')">
                         <xf:bind
                             ref="href"
+                            relevant="exists(instance()/@id)"
                             xxf:whitespace="trim"
                             type="xxf:XPath2ValueTemplate"/>
                     </xf:bind>

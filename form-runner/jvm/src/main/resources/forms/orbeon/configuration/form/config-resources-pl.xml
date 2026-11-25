@@ -141,6 +141,18 @@
         <dialog-title-add>Dodaj proces niestandardowy</dialog-title-add>
         <dialog-title-edit>Edytuj proces</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Ustawienia kontrolek</label>
+        <select-placeholder>Wybierz kontrolkę do skonfigurowania…</select-placeholder>
+        <configure-button>Konfiguruj</configure-button>
+        <edit>Edytuj</edit>
+        <revert>Przywróć</revert>
+        <apply>Zastosuj</apply>
+        <cancel>Anuluj</cancel>
+        <dialog-title>Ustawienia kontrolki</dialog-title>
+        <empty>Brak niestandardowych ustawień kontrolek dla tego zakresu. Wybierz kontrolkę powyżej, aby nadpisać jej ustawienia domyślne.</empty>
+        <none-value>(brak)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Nadpisania aplikacji / formularzy</label>
         <add-override>Dodaj nadpisanie aplikacji / formularza</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Wygląd błędów przesyłania plików</label>
-        <hint>Sposób wyświetlania błędów przesyłania plików &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Domyślnie (Okno modalne)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Okno modalne</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Ostrzeżenie w wierszu</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Widok kreatora</label>
         <hint>Pokazuj sekcje najwyższego poziomu jako pełną stronę lub osobne strony kreatora &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Ważność tokenu stanu (minuty)</label>
         <hint>Czas ważności tokenów stanu w minutach &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Tryby edycji</editable>
+        <review>Tryb przeglądu</review>
+        <pdf-automatic>PDF automatyczny</pdf-automatic>
+        <pdf-template>PDF z szablonu</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Szerokość pola</field-width>
+        <default>Domyślna</default>
+        <full>Pełna</full>
+        <natural>Naturalna</natural>
+        <field-align>Wyrównanie pola</field-align>
+        <left>Lewo</left>
+        <right>Prawo</right>
+        <learn-settings-below>Dowiedz się więcej o poniższych ustawieniach</learn-settings-below>
+        <field-value-visibility>
+            <label>Widoczność wartości pola</label>
+            <hint>Określa, jak wyświetlana jest wartość pola</hint>
+            <item id="visible">Widoczna</item>
+            <item id="obscured">Ukryta</item>
+            <item id="partial">Częściowa</item>
+            <item id="reveal">Pozwól użytkownikowi odsłonić</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Otwarty wybór</label>
+            <help>Gdy opcja „Otwarty wybór" jest włączona, użytkownicy mogą wpisać własną wartość w tym polu podczas wypełniania formularza. Wartość ta jest zapisywana w danych i używana jako etykieta wyświetlana na liście.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

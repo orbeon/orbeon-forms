@@ -141,6 +141,18 @@
         <dialog-title-add>Añadir proceso personalizado</dialog-title-add>
         <dialog-title-edit>Editar proceso</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Configuración de controles</label>
+        <select-placeholder>Elija un control para configurar…</select-placeholder>
+        <configure-button>Configurar</configure-button>
+        <edit>Editar</edit>
+        <revert>Restablecer</revert>
+        <apply>Aplicar</apply>
+        <cancel>Cancelar</cancel>
+        <dialog-title>Configuración del control</dialog-title>
+        <empty>No hay opciones personalizadas de controles configuradas para este ámbito. Elija un control arriba para sobrescribir sus valores predeterminados.</empty>
+        <none-value>(ninguno)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Redefiniciones por aplicación / formulario</label>
         <add-override>Añadir redefinición por aplicación / formulario</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Apariencia de errores de subida</label>
-        <hint>Modo de presentación de los errores al subir archivos &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Por defecto (Diálogo modal)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Diálogo modal</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Alerta en línea</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Vista de asistente</label>
         <hint>Mostrar las secciones de primer nivel en una sola página o en páginas separadas del asistente &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Validez del token de estado (minutos)</label>
         <hint>Duración de validez en minutos para los tokens de estado &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Modos editables</editable>
+        <review>Modo de revisión</review>
+        <pdf-automatic>PDF automático</pdf-automatic>
+        <pdf-template>Plantilla PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Ancho del campo</field-width>
+        <default>Usar predeterminado</default>
+        <full>Completo</full>
+        <natural>Natural</natural>
+        <field-align>Alineación del campo</field-align>
+        <left>Izquierda</left>
+        <right>Derecha</right>
+        <learn-settings-below>Más información sobre los ajustes siguientes</learn-settings-below>
+        <field-value-visibility>
+            <label>Visibilidad del valor del campo</label>
+            <hint>Controla cómo se muestra el valor del campo</hint>
+            <item id="visible">Visible</item>
+            <item id="obscured">Oculto</item>
+            <item id="partial">Parcial</item>
+            <item id="reveal">Permitir que el usuario lo revele</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Selección abierta</label>
+            <help>Cuando la opción "Selección abierta" está habilitada, los usuarios pueden introducir su propio valor en este control al rellenar el formulario. Este valor se almacena en los datos y se usa como etiqueta mostrada en la lista desplegable.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

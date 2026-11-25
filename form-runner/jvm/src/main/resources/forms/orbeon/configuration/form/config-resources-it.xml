@@ -141,6 +141,18 @@
         <dialog-title-add>Aggiungi processo personalizzato</dialog-title-add>
         <dialog-title-edit>Modifica processo</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Impostazioni controlli</label>
+        <select-placeholder>Scegli un controllo da configurare…</select-placeholder>
+        <configure-button>Configura</configure-button>
+        <edit>Modifica</edit>
+        <revert>Ripristina</revert>
+        <apply>Applica</apply>
+        <cancel>Annulla</cancel>
+        <dialog-title>Impostazioni controllo</dialog-title>
+        <empty>Nessuna impostazione personalizzata dei controlli configurata per questo ambito. Scegli un controllo sopra per sovrascrivere le impostazioni predefinite.</empty>
+        <none-value>(nessuno)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Sovrascritture applicazione / modulo</label>
         <add-override>Aggiungi sovrascrittura applicazione / modulo</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Aspetto degli errori di caricamento</label>
-        <hint>Modalità di visualizzazione degli errori di caricamento dei file &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Predefinito (Finestra di dialogo modale)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Finestra di dialogo modale</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Avviso in linea</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Vista procedura guidata</label>
         <hint>Mostra le sezioni di primo livello come pagina intera o come pagine separate della procedura guidata &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Validità del token di stato (minuti)</label>
         <hint>Durata di validità in minuti per i token di stato &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Modalità modificabili</editable>
+        <review>Modalità revisione</review>
+        <pdf-automatic>PDF automatico</pdf-automatic>
+        <pdf-template>Modello PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Larghezza campo</field-width>
+        <default>Usa predefinito</default>
+        <full>Intera</full>
+        <natural>Naturale</natural>
+        <field-align>Allineamento campo</field-align>
+        <left>Sinistra</left>
+        <right>Destra</right>
+        <learn-settings-below>Ulteriori informazioni sulle impostazioni sottostanti</learn-settings-below>
+        <field-value-visibility>
+            <label>Visibilità del valore del campo</label>
+            <hint>Controlla come viene mostrato il valore del campo</hint>
+            <item id="visible">Visibile</item>
+            <item id="obscured">Oscurato</item>
+            <item id="partial">Parziale</item>
+            <item id="reveal">Consenti all'utente di visualizzare</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Selezione aperta</label>
+            <help>Quando l'opzione "Selezione aperta" è abilitata, gli utenti possono inserire un proprio valore in questo controllo durante la compilazione del modulo. Questo valore viene memorizzato nei dati e utilizzato come etichetta mostrata nell'elenco a discesa.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

@@ -141,6 +141,18 @@
         <dialog-title-add>Benutzerdefinierten Prozess hinzufügen</dialog-title-add>
         <dialog-title-edit>Prozess ändern</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Steuerelementeinstellungen</label>
+        <select-placeholder>Steuerelement zum Konfigurieren auswählen…</select-placeholder>
+        <configure-button>Konfigurieren</configure-button>
+        <edit>Ändern</edit>
+        <revert>Zurücksetzen</revert>
+        <apply>Übernehmen</apply>
+        <cancel>Abbrechen</cancel>
+        <dialog-title>Steuerelementeinstellungen</dialog-title>
+        <empty>Keine benutzerdefinierten Steuerelementeinstellungen für diesen Bereich konfiguriert. Wählen Sie oben ein Steuerelement aus, um dessen Standardeinstellungen zu überschreiben.</empty>
+        <none-value>(keine)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Anwendungs- / Formular-Überschreibungen</label>
         <add-override>Anwendungs- / Formular-Überschreibung hinzufügen</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Darstellung von Upload-Fehlern</label>
-        <hint>Wie Fehler beim Datei-Upload angezeigt werden &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Modaler Dialog)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modaler Dialog</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Inline-Warnung</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Assistenten-Ansicht</label>
         <hint>Abschnitte der obersten Ebene als vollständige Seite oder als separate Assistentenseiten anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Gültigkeit des Zustandstokens (Minuten)</label>
         <hint>Gültigkeitsdauer in Minuten für Zustandstoken &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Bearbeitungsmodi</editable>
+        <review>Überprüfungsmodus</review>
+        <pdf-automatic>Automatisches PDF</pdf-automatic>
+        <pdf-template>PDF-Vorlage</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Feldbreite</field-width>
+        <default>Standard verwenden</default>
+        <full>Voll</full>
+        <natural>Natürlich</natural>
+        <field-align>Feldausrichtung</field-align>
+        <left>Links</left>
+        <right>Rechts</right>
+        <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
+        <field-value-visibility>
+            <label>Sichtbarkeit des Feldwerts</label>
+            <hint>Steuert, wie der Feldwert angezeigt wird</hint>
+            <item id="visible">Sichtbar</item>
+            <item id="obscured">Verdeckt</item>
+            <item id="partial">Teilweise</item>
+            <item id="reveal">Benutzer darf anzeigen</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Offene Auswahl</label>
+            <help>Wenn die Option „Offene Auswahl" aktiviert ist, können Benutzer beim Ausfüllen des Formulars einen eigenen Wert in dieses Feld eingeben. Dieser Wert wird in den Daten gespeichert und als Beschriftung in der Auswahlliste verwendet.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

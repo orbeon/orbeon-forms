@@ -220,7 +220,14 @@ object FRComponentParamSupport {
     fromMetadataAndPropertiesSupport(
       partAnalysis     = partAnalysis,
       findInMetadata   = findHierarchicalElem(directNameOpt),
-      findInProperties = (paramName, appFormOpt) => ComponentParamSupport.fromProperties(paramName, appFormOpt.map(_.toList).getOrElse(Nil), directNameOpt, property),
+      findInProperties = (paramName, appFormOpt) =>
+        ComponentParamSupport.fromProperties(
+          paramName      = paramName,
+          paramSuffix    = appFormOpt.map(_.toList).getOrElse(Nil),
+          directNameOpt  = directNameOpt,
+          property       = property,
+          filterNonEmpty = appFormOpt.isEmpty
+        ),
       paramName        = paramName
     )
 

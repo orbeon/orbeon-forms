@@ -141,6 +141,18 @@
         <dialog-title-add>Aangepast proces toevoegen</dialog-title-add>
         <dialog-title-edit>Proces bewerken</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Veldinstellingen</label>
+        <select-placeholder>Kies een besturingselement om te configureren…</select-placeholder>
+        <configure-button>Configureren</configure-button>
+        <edit>Bewerken</edit>
+        <revert>Herstellen</revert>
+        <apply>Toepassen</apply>
+        <cancel>Annuleren</cancel>
+        <dialog-title>Veldinstellingen</dialog-title>
+        <empty>Geen aangepaste veldinstellingen geconfigureerd voor dit bereik. Kies hierboven een besturingselement om de standaardinstellingen te overschrijven.</empty>
+        <none-value>(geen)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Applicatie- / formulieroverschrijvingen</label>
         <add-override>Applicatie- / formulieroverschrijving toevoegen</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Weergave van uploadfouten</label>
-        <hint>Hoe fouten bij het uploaden van bestanden worden getoond &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Standaard (Modaal dialoogvenster)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modaal dialoogvenster</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Inline-melding</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Wizardweergave</label>
         <hint>Secties op het hoogste niveau tonen als één volledige pagina of als afzonderlijke wizardpagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Geldigheid van statustoken (minuten)</label>
         <hint>Geldigheidsduur in minuten voor statustokens &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Bewerkbare modi</editable>
+        <review>Beoordelingsmodus</review>
+        <pdf-automatic>Automatische PDF</pdf-automatic>
+        <pdf-template>PDF-sjabloon</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Veldbreedte</field-width>
+        <default>Gebruik standaard</default>
+        <full>Volledig</full>
+        <natural>Natuurlijk</natural>
+        <field-align>Velduitlijning</field-align>
+        <left>Links</left>
+        <right>Rechts</right>
+        <learn-settings-below>Meer informatie over de onderstaande instellingen</learn-settings-below>
+        <field-value-visibility>
+            <label>Zichtbaarheid veldwaarde</label>
+            <hint>Bepaalt hoe de waarde van het veld wordt weergegeven</hint>
+            <item id="visible">Zichtbaar</item>
+            <item id="obscured">Afgeschermd</item>
+            <item id="partial">Gedeeltelijk</item>
+            <item id="reveal">Sta gebruiker toe om te tonen</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Open selectie</label>
+            <help>Wanneer de optie "Open selectie" is ingeschakeld, kunnen gebruikers bij het invullen van het formulier een eigen waarde invoeren in dit veld. Deze waarde wordt opgeslagen in de gegevens en gebruikt als het label dat in de vervolgkeuzelijst wordt weergegeven.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

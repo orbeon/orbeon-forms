@@ -141,6 +141,18 @@
         <dialog-title-add>Ajouter un processus personnalisé</dialog-title-add>
         <dialog-title-edit>Modifier le processus</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Paramètres des contrôles</label>
+        <select-placeholder>Choisir un contrôle à configurer…</select-placeholder>
+        <configure-button>Configurer</configure-button>
+        <edit>Modifier</edit>
+        <revert>Réinitialiser</revert>
+        <apply>Appliquer</apply>
+        <cancel>Annuler</cancel>
+        <dialog-title>Paramètres du contrôle</dialog-title>
+        <empty>Aucun paramètre de contrôle personnalisé configuré pour cette portée. Choisissez un contrôle ci-dessus pour surcharger ses paramètres par défaut.</empty>
+        <none-value>(aucun)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Surcharges par application / formulaire</label>
         <add-override>Ajouter une surcharge application / formulaire</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Apparence des erreurs de téléversement</label>
-        <hint>Mode d'affichage des erreurs de téléversement &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Par défaut (Dialogue modal)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Dialogue modal</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Alerte en ligne</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Vue wizard</label>
         <hint>Montrer les sections de premier niveau sur une seule page ou dans des pages de wizard séparées &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Validité du jeton d'état (Minutes)</label>
         <hint>Durée de validité en minutes des jetons d'état &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Modes éditables</editable>
+        <review>Mode lecture seule</review>
+        <pdf-automatic>PDF automatique</pdf-automatic>
+        <pdf-template>Modèle PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Largeur du champ</field-width>
+        <default>Utiliser le défaut</default>
+        <full>Espace disponible</full>
+        <natural>Naturel</natural>
+        <field-align>Alignement du champ</field-align>
+        <left>À gauche</left>
+        <right>À droite</right>
+        <learn-settings-below>Plus d'informations à propos des paramètres ci-dessous</learn-settings-below>
+        <field-value-visibility>
+            <label>Visibilité de la valeur du champ</label>
+            <hint>Contrôle la façon dont la valeur du champ est affichée</hint>
+            <item id="visible">Visible</item>
+            <item id="obscured">Masquée</item>
+            <item id="partial">Partielle</item>
+            <item id="reveal">Permettre à l'utilisateur de révéler</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Sélection libre</label>
+            <help>Lorsque l'option « Sélection libre » est activée, les utilisateurs peuvent saisir leur propre valeur dans ce contrôle lors du remplissage du formulaire. Cette valeur est stockée dans les données et utilisée comme libellé affiché dans la liste déroulante.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

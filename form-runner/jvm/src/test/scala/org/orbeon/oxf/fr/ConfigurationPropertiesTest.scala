@@ -629,6 +629,111 @@ class ConfigurationPropertiesTest
       assert(docsCacheEl.element("quantity").attributeValue("unit") == "MB")
       assert(docsCacheEl.attributeValue("value") == "256000000")
     }
+
+    it("must discover XBL custom control settings and round-trip global, app/form, and profiled overrides") {
+      val catalog = FormRunnerConfiguration.ControlSettingsSupport.currentCatalog()
+      val qNames  = catalog.byQName.keySet
+
+      assert(qNames.contains("fr:number"))
+      assert(qNames.contains("fr:currency"))
+      assert(qNames.contains("fr:percentage"))
+      assert(qNames.contains("fr:number-stepper"))
+      assert(qNames.contains("fr:attachment"))
+      assert(qNames.contains("fr:date"))
+      assert(qNames.contains("fr:dropdown-select1"))
+      assert(qNames.contains("fr:dropdown-select1-search"))
+      assert(qNames.contains("fr:phone"))
+      assert(qNames.contains("fr:us-ssn"))
+      assert(! qNames.contains("fr:databound-select1"))
+      assert(! qNames.contains("fr:databound-select1-search"))
+      assert(! qNames.contains("fr:databound-select-search"))
+      assert(! qNames.contains("fr:open-select1-search"))
+
+      val inputPropsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                             value="$"/>
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal.*.*"           value="2"/>
+          |  <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting.*.*"          value="true"/>
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-select1.pdf-appearance.*.*"       value="full"/>
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*"    value="inline"/>
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator.acme.order"      value=""/>
+          |  <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.edit-format.acme.*" profiles="ext"  value="obscured"/>
+          |</properties>""".stripMargin
+
+      val propsDoc   = IOSupport.readOrbeonDom(inputPropsXml)
+      val configDoc  = FormRunnerConfiguration.propertiesDomToConfigurationDom(propsDoc)
+      val configRoot = configDoc.getRootElement
+
+      // Must not fall into <custom-properties>
+      val customProps = configRoot.element("custom-properties").elements("property")
+      assert(customProps.size == 1 && customProps.head.attributeValue("name") == "")
+
+      val globalCs     = configRoot.element("control-settings")
+      val globalNumber = globalCs.elements.find(_.getQualifiedName == "fr:number").get
+      assert(globalNumber.attributeValue("prefix") == "$")
+      assert(globalNumber.attributeValue("digits-after-decimal") == "2")
+      assert(globalNumber.attributeValue("round-when-formatting") == "true")
+
+      val globalDropdown = globalCs.elements.find(_.getQualifiedName == "fr:dropdown-select1").get
+      assert(globalDropdown.attributes.exists(a => a.getQualifiedName == "fr:pdf-appearance" && a.getValue == "full"))
+
+      val globalAttach = globalCs.elements.find(_.getQualifiedName == "fr:attachment").get
+      assert(globalAttach.attributeValue("upload-error-appearance") == "inline")
+
+      val overrides = configRoot.element("app-form-overrides").elements("override")
+      val acmeOrder = overrides.find(o => o.attributeValue("app") == "acme" && o.attributeValue("form") == "order").get
+      val orderNum  = acmeOrder.element("control-settings").elements.find(_.getQualifiedName == "fr:number").get
+      assert(orderNum.attributeValue("grouping-separator") == "")
+
+      val acmeExt = overrides.find(o => o.attributeValue("app") == "acme" && o.attributeValue("form") == "*" && o.attributeValue("profiles") == "ext").get
+      val extSsn  = acmeExt.element("control-settings").elements.find(_.getQualifiedName == "fr:us-ssn").get
+      assert(extSsn.attributeValue("edit-format") == "obscured")
+
+      // Export back to <properties>
+      val exportedDoc   = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val exportedElems = exportedDoc.getRootElement.elements("property")
+
+      def findProp(name: String, profiles: String = "") =
+        exportedElems.find(e =>
+          e.attributeValue("name") == name &&
+          e.attributeValueOpt("profiles").getOrElse("") == profiles
+        )
+
+      assert(findProp("oxf.xforms.xbl.fr.number.prefix.*.*").exists(e => e.attributeValue("as") == "xs:string" && e.attributeValue("value") == "$"))
+      assert(findProp("oxf.xforms.xbl.fr.number.digits-after-decimal.*.*").exists(e => e.attributeValue("as") == "xs:string" && e.attributeValue("value") == "2"))
+      assert(findProp("oxf.xforms.xbl.fr.number.round-when-formatting.*.*").exists(e => e.attributeValue("as") == "xs:boolean" && e.attributeValue("value") == "true"))
+      assert(findProp("oxf.xforms.xbl.fr.dropdown-select1.pdf-appearance.*.*").exists(_.attributeValue("value") == "full"))
+      assert(findProp("oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*").exists(_.attributeValue("value") == "inline"))
+      assert(findProp("oxf.xforms.xbl.fr.number.grouping-separator.acme.order").exists(e => e.attributeValue("as") == "xs:string" && e.attributeValue("value") == ""))
+      assert(findProp("oxf.xforms.xbl.fr.us-ssn.edit-format.acme.*", "ext").exists(_.attributeValue("value") == "obscured"))
+
+      // Verify ComponentParamSupport scoped empty-string handling ("No separator" vs unscoped empty default)
+      val directNum = Some(org.orbeon.dom.QName("number", org.orbeon.dom.Namespace("fr", "http://orbeon.org/oxf/xml/form-runner")))
+      val propLookup: String => Option[org.orbeon.saxon.value.AtomicValue] = {
+        case "oxf.xforms.xbl.fr.number.grouping-separator.acme.order" => Some(org.orbeon.saxon.value.StringValue.EMPTY_STRING)
+        case "oxf.xforms.xbl.fr.number.digits-after-decimal"          => Some(org.orbeon.saxon.value.StringValue.EMPTY_STRING)
+        case _                                                        => None
+      }
+      val scopedEmpty =
+        org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport.fromProperties(
+          paramName      = org.orbeon.dom.QName("grouping-separator"),
+          paramSuffix    = List("acme", "order"),
+          directNameOpt  = directNum,
+          property       = propLookup,
+          filterNonEmpty = false
+        )
+      assert(scopedEmpty.exists(_.getStringValue == ""))
+
+      val unscopedEmpty =
+        org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport.fromProperties(
+          paramName      = org.orbeon.dom.QName("digits-after-decimal"),
+          paramSuffix    = Nil,
+          directNameOpt  = directNum,
+          property       = propLookup,
+          filterNonEmpty = true
+        )
+      assert(unscopedEmpty.isEmpty)
+    }
   }
 
   describe("PersistencePropertyProvider and built-in orbeon/configuration form") {
@@ -1129,6 +1234,55 @@ class ConfigurationPropertiesTest
             assert((customPropsNodes / "property").size == 2)
             assert(customTabLabelHtml.contains(">1<"))
 
+            // Configure custom control settings for fr:number via the <xxf:dynamic> Control Settings dialog
+            def controlSettingsTabLabelHtml: String =
+              ControlsIterator(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-categories-tabs").get, includeSelf = false)
+                .collect { case c: XFormsValueControl => c.getValue(EventCollector.Throw) }
+                .find(_.contains("Control Settings"))
+                .get
+
+            assert(! controlSettingsTabLabelHtml.contains("fr-config-tab-badge"))
+
+            XFormsAPI.setvalue(uiInstance.rootElement / "control-editor" / "selection", "fr:number")
+            XFormsAPI.rebuild("fr-form-model")
+            XFormsAPI.recalculate("fr-form-model")
+            XFormsAPI.refresh("fr-form-model")
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("configure-control-settings-button").get.effectiveId)(ec)
+
+            val controlDialog = resolveObject[org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl]("fr-config-control-settings-dialog").get
+            assert(controlDialog.isDialogVisible)
+
+            val dynamicRoot = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-config-control-details-dynamic").get
+            def findDynamicValueControl(staticId: String): XFormsValueControl =
+              ControlsIterator(dynamicRoot, includeSelf = false)
+                .collectFirst { case c: XFormsValueControl if c.getId == staticId && c.isRelevant => c }
+                .get
+
+            val digitsControl = findDynamicValueControl("digits-after-decimal-control")
+            setControlValueWithEventSearchNested(digitsControl.effectiveId, numberExternalValue("2"))
+            assert(digitsControl.getValue(EventCollector.Throw) == "2")
+
+            // Set both decimal-separator and grouping-separator to "." -> invalid ("separators-must-differ"), confirm must stay open
+            val decSepControl = findDynamicValueControl("decimal-separator-control")
+            val grpSepControl = findDynamicValueControl("grouping-separator-control")
+            val decSelect1 = ControlsIterator(decSepControl, includeSelf = false).collectFirst { case s: XFormsSelect1Control if s.getId == "select1" => s }.get
+            val grpSelect1 = ControlsIterator(grpSepControl, includeSelf = false).collectFirst { case s: XFormsSelect1Control if s.getId == "select1" => s }.get
+            val dotDecItem = decSelect1.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left(".")).get._1
+            val dotGrpItem = grpSelect1.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left(".")).get._1
+            setControlValueWithEventSearchNested(decSelect1.effectiveId, dotDecItem.externalValue(decSelect1.mustEncodeValues))
+            setControlValueWithEventSearchNested(grpSelect1.effectiveId, dotGrpItem.externalValue(grpSelect1.mustEncodeValues))
+
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-control-settings-dialog-button").get.effectiveId)(ec)
+            assert(controlDialog.isDialogVisible)
+
+            // Choose "No separator" ("&#2262;" = decimal 2262 -> "") for grouping-separator and apply
+            val noneGrpItem = grpSelect1.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left(2262.toChar.toString)).get._1
+            setControlValueWithEventSearchNested(grpSelect1.effectiveId, noneGrpItem.externalValue(grpSelect1.mustEncodeValues))
+
+            activateControlWithEvent(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("confirm-control-settings-dialog-button").get.effectiveId)(ec)
+            assert(! controlDialog.isDialogVisible)
+            assert(controlSettingsTabLabelHtml.contains(">1<"))
+
             // Run save-final process
             SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
           }
@@ -1146,6 +1300,7 @@ class ConfigurationPropertiesTest
               assert(savedXml.contains("oxf.fr.default-language.acme.order"))
               assert(savedXml.contains("oxf.fr.email.smtp.port.acme.*"))
               assert(savedXml.contains("oxf.test.custom.persistence.prop"))
+              assert(savedXml.contains("oxf.xforms.xbl.fr.number.digits-after-decimal.*.*"))
               assert(! savedXml.contains("""name="""""))
               assert(! savedXml.contains("data-format-version"))
             }
@@ -1173,6 +1328,9 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getString("oxf.fr.detail.attachment.max-size-per-file.acme.order").contains("-1"))
             assert(store.globalPropertySet.getString("oxf.fr.detail.attachment.max-size-aggregate-per-control.my-app.my-form").contains("500000"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
+            assert(store.globalPropertySet.getString("oxf.xforms.xbl.fr.number.digits-after-decimal.my-app.my-form").contains("2"))
+            assert(store.globalPropertySet.getString("oxf.xforms.xbl.fr.number.decimal-separator.my-app.my-form").contains("."))
+            assert(store.globalPropertySet.getPropertyOpt("oxf.xforms.xbl.fr.number.grouping-separator.my-app.my-form").map(_.stringValue).contains(""))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256000000"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
             assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.live-documents.size").contains(25))
@@ -1240,6 +1398,13 @@ class ConfigurationPropertiesTest
             assert((customPropNode /@ "name").stringValue == "oxf.test.custom.persistence.prop")
             assert((customPropNode /@ "type").stringValue == "xs:integer")
             assert(customPropNode.stringValue == "42")
+
+            val reloadedControlSettings = (configRoot / "control-settings" / *).toList
+            assert(reloadedControlSettings.size == 1)
+            assert(reloadedControlSettings.head.localname == "number")
+            assert((reloadedControlSettings.head /@ "digits-after-decimal").stringValue == "2")
+            assert((reloadedControlSettings.head /@ "decimal-separator").stringValue == ".")
+            assert((reloadedControlSettings.head /@ "grouping-separator").stringValue == "")
           }
         }
       }

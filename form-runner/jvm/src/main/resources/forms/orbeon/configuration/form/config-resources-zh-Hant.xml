@@ -141,6 +141,18 @@
         <dialog-title-add>新增自訂流程</dialog-title-add>
         <dialog-title-edit>編輯流程</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>控制項設定</label>
+        <select-placeholder>選擇要設定的控制項…</select-placeholder>
+        <configure-button>設定</configure-button>
+        <edit>編輯</edit>
+        <revert>還原</revert>
+        <apply>套用</apply>
+        <cancel>取消</cancel>
+        <dialog-title>控制項設定</dialog-title>
+        <empty>此範圍尚未設定自訂控制項設定。請在上方選擇一個控制項以覆寫其預設設定。</empty>
+        <none-value>（無）</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>應用程式 / 表單覆寫</label>
         <add-override>新增應用程式 / 表單覆寫</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>上傳錯誤外觀</label>
-        <hint>檔案上傳錯誤的顯示方式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>預設 (強制回應對話方塊)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>強制回應對話方塊</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>內嵌警告</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>精靈視圖</label>
         <hint>將頂層章節顯示為整頁或獨立的精靈頁面 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>狀態令牌有效期限 (分鐘)</label>
         <hint>狀態令牌的有效時長（分鐘） &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>可編輯模式</editable>
+        <review>檢閱模式</review>
+        <pdf-automatic>自動 PDF</pdf-automatic>
+        <pdf-template>PDF 範本</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>欄位寬度</field-width>
+        <default>使用預設值</default>
+        <full>全寬</full>
+        <natural>自然寬度</natural>
+        <field-align>欄位對齊</field-align>
+        <left>靠左</left>
+        <right>靠右</right>
+        <learn-settings-below>進一步瞭解以下設定</learn-settings-below>
+        <field-value-visibility>
+            <label>欄位值可見度</label>
+            <hint>控制欄位值的顯示方式</hint>
+            <item id="visible">可見</item>
+            <item id="obscured">遮蔽</item>
+            <item id="partial">部分可見</item>
+            <item id="reveal">允許使用者顯示</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>開放選擇</label>
+            <help>啟用「開放選擇」選項後，使用者在填寫表單時可在此控制項中輸入自訂值。該值會儲存在資料中，並用作下拉式清單中顯示的標籤。</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

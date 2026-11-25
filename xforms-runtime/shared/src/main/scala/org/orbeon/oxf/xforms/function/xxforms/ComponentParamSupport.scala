@@ -88,10 +88,11 @@ object ComponentParamSupport {
     atts(paramName) map stringToStringValue
 
   def fromProperties(
-    paramName       : QName,
-    paramSuffix     : List[String],
-    directNameOpt   : Option[QName],
-    property        : String => Option[AtomicValue]
+    paramName     : QName,
+    paramSuffix   : List[String],
+    directNameOpt : Option[QName],
+    property      : String => Option[AtomicValue],
+    filterNonEmpty: Boolean = true
   ): Option[AtomicValue] = {
 
     val propertyNameOpt =
@@ -99,12 +100,11 @@ object ComponentParamSupport {
         "oxf" :: "xforms" :: parts ::: paramSuffix mkString "."
       }
 
-    // NOTE: We currently don't have a way, besides removing a property entirely, to indicate that a property is
-    // `null` or `None`. For properties like `number.digits-after-decimal`, `number.prefix`, etc., we do need
-    // such a way. So if the value is an empty string (which means the value is actually an empty `xs:string` or maybe
-    // `xs:anyURI`), consider the property missing. We could revise this in the future to make a distinction between
-    // a blank or empty string and a missing property.
-    propertyNameOpt flatMap property filter (_.getStringValue.nonEmpty)
+    // NOTE: For unscoped defaults in `properties-xforms.xml` (such as `number.digits-after-decimal`, `number.prefix`),
+    // an empty string means the property is unset (`filterNonEmpty = true`). For scoped properties (`<app>.<form>` or
+    // `*.*`), an explicit empty string (such as `grouping-separator = ""` for "No separator") must be preserved so it
+    // overrides a non-empty unscoped default.
+    propertyNameOpt flatMap property filter (v => ! filterNonEmpty || v.getStringValue.nonEmpty)
   }
 
   // For example `xbl.fr.number.decimal-separator`

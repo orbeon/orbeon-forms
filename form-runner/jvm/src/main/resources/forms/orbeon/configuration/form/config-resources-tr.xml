@@ -141,6 +141,18 @@
         <dialog-title-add>Özel Süreç Ekle</dialog-title-add>
         <dialog-title-edit>Süreci Düzenle</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Denetim Ayarları</label>
+        <select-placeholder>Yapılandırılacak bir denetim seçin…</select-placeholder>
+        <configure-button>Yapılandır</configure-button>
+        <edit>Düzenle</edit>
+        <revert>Geri Al</revert>
+        <apply>Uygula</apply>
+        <cancel>İptal</cancel>
+        <dialog-title>Denetim Ayarları</dialog-title>
+        <empty>Bu kapsam için yapılandırılmış özel denetim ayarı yok. Varsayılan ayarlarını geçersiz kılmak için yukarıdan bir denetim seçin.</empty>
+        <none-value>(yok)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Uygulama / Form Geçersiz Kılmaları</label>
         <add-override>Uygulama / Form Geçersiz Kılması Ekle</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Yükleme Hatası Görünümü</label>
-        <hint>Dosya yükleme hatalarının nasıl gösterileceği &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Varsayılan (Kalıcı İletişim Kutusu)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Kalıcı İletişim Kutusu</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Satır İçi Uyarı</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Sihirbaz Görünümü</label>
         <hint>Üst düzey bölümleri tek bir tam sayfa olarak veya ayrı sihirbaz sayfaları olarak göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Durum Belirteci Geçerlilik Süresi (Dakika)</label>
         <hint>Durum belirteçleri için dakika cinsinden geçerlilik süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Düzenlenebilir kipler</editable>
+        <review>İnceleme kipi</review>
+        <pdf-automatic>Otomatik PDF</pdf-automatic>
+        <pdf-template>PDF şablonu</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Alan genişliği</field-width>
+        <default>Varsayılanı kullan</default>
+        <full>Tam</full>
+        <natural>Doğal</natural>
+        <field-align>Alan hizalaması</field-align>
+        <left>Sol</left>
+        <right>Sağ</right>
+        <learn-settings-below>Aşağıdaki ayarlar hakkında daha fazla bilgi edinin</learn-settings-below>
+        <field-value-visibility>
+            <label>Alan Değeri Görünürlüğü</label>
+            <hint>Alan değerinin nasıl görüntüleneceğini belirler</hint>
+            <item id="visible">Görünür</item>
+            <item id="obscured">Gizlenmiş</item>
+            <item id="partial">Kısmi</item>
+            <item id="reveal">Kullanıcının göstermesine izin ver</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Açık seçim</label>
+            <help>"Açık seçim" seçeneği etkinleştirildiğinde, kullanıcılar formu doldururken bu denetime kendi değerlerini girebilirler. Bu değer verilerde saklanır ve açılır listede gösterilen etiket olarak kullanılır.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

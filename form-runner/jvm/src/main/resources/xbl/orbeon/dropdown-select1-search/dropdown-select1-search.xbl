@@ -108,8 +108,8 @@
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
-                        <xf:bind ref="open-selection"   type="xs:boolean"/>
-                        <xf:bind ref="suggest-existing" type="xs:boolean" relevant="../open-selection = 'true'"/>
+                        <xf:bind ref="open-selection"   type="xs:boolean" relevant="exists(instance()/@id)"/>
+                        <xf:bind ref="suggest-existing" type="xs:boolean" relevant="not(exists(instance()/@id)) or ../open-selection = 'true'"/>
                         <xf:bind ref="show-value"       type="xs:boolean"/>
                     </xf:bind>
 

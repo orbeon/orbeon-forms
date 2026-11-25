@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.*
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventHandlerAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartAnalysis}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
@@ -371,9 +371,12 @@ object Dispatch extends Logging {
   val propagateBreaks = new Breaks
   import propagateBreaks.{break, breakable}
 
+  private def handlersForObserverAcrossAncestorParts(part: PartAnalysis, observerPrefixedId: String): List[EventHandler] =
+    part.ancestorOrSelfIterator.flatMap(_.getEventHandlersForObserver(observerPrefixedId)).toList
+
   // Find all the handlers for the given event name if an event with that name is dispatched to this element.
   // For all relevant observers, find the handlers which match by phase
-  private def handlersForEventImpl(ops: PartEventHandlerAnalysis, e: ElementAnalysis, eventName: String): HandlerAnalysis = {
+  private def handlersForEventImpl(part: PartAnalysis, e: ElementAnalysis, eventName: String): HandlerAnalysis = {
 
     // NOTE: For `phase == Target`, `observer eq element`.
     def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
@@ -401,7 +404,7 @@ object Dispatch extends Logging {
         else
           matchesPhaseNameTarget(eventHandler)
 
-      val relevantHandlers = ops.getEventHandlersForObserver(observer.prefixedId) filter matches
+      val relevantHandlers = handlersForObserverAcrossAncestorParts(part, observer.prefixedId) filter matches
 
       // DOM 3:
       //
@@ -456,7 +459,7 @@ object Dispatch extends Logging {
         None
     }
 
-    val observersFromLeafToRoot = relevantObserversAcrossPartsFromLeafToRoot(ops, e)
+    val observersFromLeafToRoot = relevantObserversAcrossPartsFromLeafToRoot(part, e)
 
     val captureHandlers =
       handlersForPhase(observersFromLeafToRoot.tail.reverse, Phase.Capture)
@@ -477,10 +480,10 @@ object Dispatch extends Logging {
   }
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartEventHandlerAnalysis, e: ElementAnalysis): NonEmptyList[ElementAnalysis] = {
+  private def relevantObserversAcrossPartsFromLeafToRoot(part: PartAnalysis, e: ElementAnalysis): NonEmptyList[ElementAnalysis] = {
 
     def hasPhantomHandler(observer: ElementAnalysis) =
-      ops.getEventHandlersForObserver(observer.prefixedId) exists (_.isPhantom)
+      handlersForObserverAcrossAncestorParts(part, observer.prefixedId) exists (_.isPhantom)
 
     def relevant(observer: ElementAnalysis) =
       observer.scope == e.scope || hasPhantomHandler(observer)

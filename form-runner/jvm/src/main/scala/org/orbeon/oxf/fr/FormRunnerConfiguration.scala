@@ -13,18 +13,25 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.{Document, Element, Namespace}
+import org.orbeon.css.CSSSelectorParser
+import org.orbeon.dom.{Document, Element, Namespace, QName}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.fr.persistence.PersistencePropertyProvider
 import org.orbeon.oxf.fr.process.{ProcessEditorParams, ProcessEditorUI, ProcessParser}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLConstants}
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.xbl.QuantitySupport
+import org.orbeon.xforms.XFormsNames
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
 import scala.util.Try
@@ -166,6 +173,45 @@ trait FormRunnerConfiguration {
   //@XPathFunction
   def formatProcessDefinitionHtml(source: String): String =
     ProcessEditorUI.formatProcessStringToHtml(source)
+
+  //@XPathFunction
+  def availableControlSettingsXml(lang: String): DocumentNodeInfoType =
+    new DocumentWrapper(ControlSettingsSupport.availableControlSettingsDom(lang), null, StaticXPath.GlobalConfiguration)
+
+  //@XPathFunction
+  def controlSettingsQName(elemOrNull: NodeInfo): String =
+    Option(elemOrNull)
+      .map(n => ControlSettingsSupport.canonicalQNameForNode(n.getURI, n.getPrefix, n.getLocalPart))
+      .getOrElse("")
+
+  //@XPathFunction
+  def controlSettingsDisplayName(qName: String, lang: String): String =
+    ControlSettingsSupport.displayNameForQName(qName, lang)
+
+  //@XPathFunction
+  def controlSettingsIconClass(qName: String): String =
+    ControlSettingsSupport.iconClassForQName(qName)
+
+  //@XPathFunction
+  def buildControlSettingsSubform(qName: String, existingElemOrNull: NodeInfo, lang: String): DocumentNodeInfoType = {
+    val existingOpt = Option(existingElemOrNull).map(n => StaticXPath.tinyTreeToOrbeonDom(n).getRootElement)
+    val subformDoc  = ControlSettingsSupport.buildSubformDom(qName, existingOpt, lang)
+    new DocumentWrapper(subformDoc, null, StaticXPath.GlobalConfiguration)
+  }
+
+  //@XPathFunction
+  def extractNormalizedControlSettingsElem(qName: String, customInstanceElemOrNull: NodeInfo): DocumentNodeInfoType = {
+    val elemOpt   = Option(customInstanceElemOrNull).map(n => StaticXPath.tinyTreeToOrbeonDom(n).getRootElement)
+    val resultDoc = ControlSettingsSupport.extractNormalizedControlSettingsDom(qName, elemOpt)
+    new DocumentWrapper(resultDoc, null, StaticXPath.GlobalConfiguration)
+  }
+
+  //@XPathFunction
+  def formatControlSettingsSummaryHtml(controlElemNode: NodeInfo, lang: String, formResourcesOrNull: NodeInfo): String = {
+    val controlElem      = StaticXPath.tinyTreeToOrbeonDom(controlElemNode).getRootElement
+    val formResourcesOpt = Option(formResourcesOrNull).map(n => StaticXPath.tinyTreeToOrbeonDom(n).getRootElement)
+    ControlSettingsSupport.formatSummaryHtml(controlElem, lang, formResourcesOpt)
+  }
 }
 
 object FormRunnerConfiguration extends FormRunnerConfiguration {
@@ -212,6 +258,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
   private val ResourcePropertyPrefix      = "oxf.fr.resource."
   private val DetailProcessPropertyPrefix = "oxf.fr.detail.process."
+  private val XblPropertyPrefix           = "oxf.xforms.xbl."
   private val HtmlSuffix                  = "html"
 
   private val BuiltinDetailButtonProcessNames: List[String] = List(
@@ -924,15 +971,6 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       xsType       = "xs:boolean",
       hasAppForm   = false,
       defaultValue = "true"
-    ),
-    CuratedPropertyDef(
-      key          = "attachment-upload-error-appearance",
-      category     = "detail",
-      baseName     = "oxf.xforms.xbl.fr.attachment.upload-error-appearance",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "dialog"
     ),
 
     // 4. Wizard
@@ -1822,17 +1860,20 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
   def propertiesDomToConfigurationDom(propertiesDoc: Document): Document = {
     val rootOpt = Option(propertiesDoc.getRootElement)
+    val catalog = ControlSettingsSupport.currentCatalog()
 
-    val globalCuratedValues  = mutable.Map.empty[String, String]
-    val globalResourceValues = mutable.LinkedHashMap.empty[ResourceOverrideKey, String]
-    val globalResourceHtml   = mutable.Map.empty[ResourceOverrideKey, Boolean]
-    val globalProcesses      = mutable.LinkedHashMap.empty[String, String]
-    val appFormOverrides     = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
-    val appFormResources     = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[ResourceOverrideKey, String]]
-    val appFormResourceHtml  = mutable.Map.empty[OverrideScope, mutable.Map[ResourceOverrideKey, Boolean]]
-    val appFormProcesses     = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[String, String]]
-    val customProperties     = mutable.ListBuffer.empty[CustomProperty]
-    val customNamespaces     = mutable.LinkedHashMap.empty[String, String]
+    val globalCuratedValues    = mutable.Map.empty[String, String]
+    val globalResourceValues   = mutable.LinkedHashMap.empty[ResourceOverrideKey, String]
+    val globalResourceHtml     = mutable.Map.empty[ResourceOverrideKey, Boolean]
+    val globalProcesses        = mutable.LinkedHashMap.empty[String, String]
+    val globalControlSettings  = mutable.LinkedHashMap.empty[String, mutable.LinkedHashMap[QName, (String, Boolean)]]
+    val appFormOverrides       = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
+    val appFormResources       = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[ResourceOverrideKey, String]]
+    val appFormResourceHtml    = mutable.Map.empty[OverrideScope, mutable.Map[ResourceOverrideKey, Boolean]]
+    val appFormProcesses       = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[String, String]]
+    val appFormControlSettings = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[String, mutable.LinkedHashMap[QName, String]]]
+    val customProperties       = mutable.ListBuffer.empty[CustomProperty]
+    val customNamespaces       = mutable.LinkedHashMap.empty[String, String]
 
     def collectNamespaces(elem: Element): Unit =
       for {
@@ -1937,6 +1978,66 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         false
       }
 
+    def tryMatchControlSettingProperty(
+      name         : String,
+      asType       : String,
+      value        : String,
+      profiles     : String,
+      processorName: String
+    ): Boolean =
+      if (processorName.isEmpty && ControlSettingsSupport.SupportedPropertyAsTypes(asType) && name.startsWith(XblPropertyPrefix)) {
+        val suffix = name.substring(XblPropertyPrefix.length)
+        suffix.splitTo[List](".") match {
+          case List(prefix, comp, param, app, form)
+            if app.nonEmpty && form.nonEmpty &&
+               AppForm(app, form) != AppForm.FormBuilder &&
+               AppForm(app, form) != AppForm.FormConfiguration =>
+            catalog.byPrefixAndLocal.get((prefix, comp)).flatMap(d => d.resolveSetting(param).map(d -> _)) match {
+              case Some((descriptor, settingDef)) =>
+                if (app == "*" && form == "*" && profiles.isEmpty) {
+                  val attMap = globalControlSettings.getOrElseUpdate(descriptor.qNameString, mutable.LinkedHashMap.empty)
+                  attMap.get(settingDef.attrQName) match {
+                    case Some((_, true)) =>
+                      false
+                    case _ =>
+                      attMap.put(settingDef.attrQName, (value, true))
+                      true
+                  }
+                } else {
+                  val scope = OverrideScope(app, form, profiles)
+                  appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
+                  val compMap = appFormControlSettings.getOrElseUpdate(scope, mutable.LinkedHashMap.empty)
+                  val attMap  = compMap.getOrElseUpdate(descriptor.qNameString, mutable.LinkedHashMap.empty)
+                  if (! attMap.contains(settingDef.attrQName)) {
+                    attMap.put(settingDef.attrQName, value)
+                    true
+                  } else {
+                    false
+                  }
+                }
+              case None =>
+                false
+            }
+          case List(prefix, comp, param) if profiles.isEmpty =>
+            catalog.byPrefixAndLocal.get((prefix, comp)).flatMap(d => d.resolveSetting(param).map(d -> _)) match {
+              case Some((descriptor, settingDef)) =>
+                val attMap = globalControlSettings.getOrElseUpdate(descriptor.qNameString, mutable.LinkedHashMap.empty)
+                if (! attMap.contains(settingDef.attrQName)) {
+                  attMap.put(settingDef.attrQName, (value, false))
+                  true
+                } else {
+                  false
+                }
+              case None =>
+                false
+            }
+          case _ =>
+            false
+        }
+      } else {
+        false
+      }
+
     rootOpt.foreach { root =>
       collectNamespaces(root)
 
@@ -1949,7 +2050,9 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         val profiles      = propElem.attributeValueOpt("profiles").orElse(propElem.attributeValueOpt("profile")).map(_.splitTo[List]().mkString(" ")).getOrElse("")
         val processorName = propElem.attributeValueOpt("processor-name").flatMap(_.trimAllToOpt).getOrElse("")
 
-        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName) && ! tryMatchProcessProperty(name, asType, value, profiles, processorName)) {
+        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName) &&
+            ! tryMatchProcessProperty(name, asType, value, profiles, processorName)  &&
+            ! tryMatchControlSettingProperty(name, asType, value, profiles, processorName)) {
           val matchedGlobal =
             if (profiles.isEmpty && processorName.isEmpty)
               CuratedByGlobalName.get(name).filter(c => c.xsType == asType && ! globalCuratedValues.contains(c.key))
@@ -2009,14 +2112,28 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     val configDoc  = Document("configuration")
     val configRoot = configDoc.getRootElement
 
-    val allConfigNamespaces = mutable.LinkedHashMap.from(StandardPropertyNamespaces) ++ customNamespaces
+    val catalogNamespaces =
+      for {
+        d <- catalog.descriptors
+        p  = d.directQName.namespace.prefix
+        u  = d.directQName.namespace.uri
+        if p.nonEmpty && u.nonEmpty && ! StandardNamespacePrefixes(p)
+      } yield p -> u
+
+    val allConfigNamespaces = mutable.LinkedHashMap.from(StandardPropertyNamespaces) ++ catalogNamespaces ++ customNamespaces
     for ((prefix, uri) <- allConfigNamespaces)
       configRoot.add(Namespace(prefix, uri))
 
-    // 1. Global curated properties, resource overrides & processes
+    val globalControlSettingsPlain =
+      globalControlSettings.map { case (qNameStr, attMap) =>
+        qNameStr -> attMap.map { case (k, (v, _)) => k -> v }
+      }
+
+    // 1. Global curated properties, resource overrides, processes & control settings
     appendCuratedBlock(configRoot, globalCuratedValues, appFormOnly = false)
     appendResourcesBlock(configRoot, globalResourceValues, globalResourceHtml)
     appendProcessesBlock(configRoot, globalProcesses)
+    appendControlSettingsBlock(configRoot, globalControlSettingsPlain, catalog)
 
     // 2. Application / Form / Profile overrides
     val overridesElem = configRoot.addElement("app-form-overrides")
@@ -2035,6 +2152,11 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       appendProcessesBlock(
         overrideElem,
         appFormProcesses.getOrElse(scope, Map.empty)
+      )
+      appendControlSettingsBlock(
+        overrideElem,
+        appFormControlSettings.getOrElse(scope, Map.empty),
+        catalog
       )
     }
 
@@ -2080,6 +2202,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     appendCuratedBlock(templateOverride, Map.empty, appFormOnly = true)
     appendResourcesBlock(templateOverride, Map.empty, Map.empty)
     appendProcessesBlock(templateOverride, Map.empty)
+    appendControlSettingsBlock(templateOverride, Map.empty, catalog)
 
     appendEmptyCustomProperty(templatesElem)
 
@@ -2257,6 +2380,23 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     }
   }
 
+  private def appendControlSettingsBlock(
+    parent         : Element,
+    controlSettings: scala.collection.Map[String, scala.collection.Map[QName, String]],
+    catalog        : ControlSettingsSupport.Catalog
+  ): Unit = {
+    val containerElem = parent.addElement("control-settings")
+    for {
+      descriptor <- catalog.descriptors.sortBy(_.displayName("en").toLowerCase)
+      attMap     <- controlSettings.get(descriptor.qNameString)
+      if attMap.nonEmpty
+    } {
+      val compElem = containerElem.addElement(descriptor.directQName)
+      for ((attrQName, v) <- attMap)
+        compElem.addAttribute(attrQName, v)
+    }
+  }
+
   def normalizeOverridesDom(configDoc: Document): Unit =
     for {
       configRoot    <- Option(configDoc.getRootElement)
@@ -2301,6 +2441,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
           appendProcessesBlock(parentElem, Map.empty)
+          parentElem.addElement("control-settings")
           seenScopes += parentScope
           keptElems  += parentElem
         }
@@ -2326,6 +2467,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
           appendProcessesBlock(parentElem, Map.empty)
+          parentElem.addElement("control-settings")
           seenScopes += parentScope
           keptElems  += parentElem
         }
@@ -2463,8 +2605,47 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         )
       }
 
+    val catalog = ControlSettingsSupport.currentCatalog()
+
+    def appendControlSettingsProperties(controlSettingsElemOpt: Option[Element], app: String, form: String, profiles: String = ""): Unit =
+      for {
+        controlSettingsElem <- controlSettingsElemOpt.toList
+        compElem            <- controlSettingsElem.elements
+        localName            = compElem.getName
+        if localName.nonEmpty
+        descriptorOpt        =
+          catalog.byUriAndLocal
+            .get((compElem.getNamespaceURI, localName))
+            .orElse(catalog.byPrefixAndLocal.get((compElem.getNamespacePrefix, localName)))
+        prefix               =
+          descriptorOpt
+            .map(_.directQName.namespace.prefix)
+            .orElse(Option(compElem.getNamespacePrefix).filter(_.nonEmpty))
+            .orElse(allPropsNamespaces.collectFirst { case (p, u) if u == compElem.getNamespaceURI && p.nonEmpty => p })
+            .getOrElse("")
+        if prefix.nonEmpty
+      } {
+        for (att <- compElem.attributes) {
+          val (paramName, declaredType) =
+            descriptorOpt
+              .flatMap(_.findSettingByAttr(att.getQName))
+              .map(s => (s.paramName, s.xsType))
+              .getOrElse((att.getName, "xs:string"))
+          val rawVal       = att.getValue
+          val xsTypeToEmit =
+            if (declaredType == "xs:boolean" && (rawVal == "true" || rawVal == "false")) "xs:boolean"
+            else "xs:string"
+          appendProperty(
+            name     = s"$XblPropertyPrefix$prefix.$localName.$paramName.$app.$form",
+            xsType   = xsTypeToEmit,
+            value    = rawVal,
+            profiles = profiles
+          )
+        }
+      }
+
     configRootOpt.foreach { configRoot =>
-      // 1. Global curated properties, resource overrides & processes
+      // 1. Global curated properties, resource overrides, processes & control settings
       for {
         curatedElem <- Option(configRoot.element("curated")).toList
         c           <- CuratedProperties
@@ -2479,6 +2660,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
       appendResourceProperties(Option(configRoot.element("resources")), "*", "*")
       appendProcessProperties(Option(configRoot.element("processes")), "*", "*")
+      appendControlSettingsProperties(Option(configRoot.element("control-settings")), "*", "*")
 
       // 2. Application / Form / Profile overrides
       for {
@@ -2505,6 +2687,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         if (profiles.isEmpty)
           appendResourceProperties(Option(overrideElem.element("resources")), app, form)
         appendProcessProperties(Option(overrideElem.element("processes")), app, form, profiles)
+        appendControlSettingsProperties(Option(overrideElem.element("control-settings")), app, form, profiles)
       }
 
       // 3. Custom properties
@@ -2529,5 +2712,490 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     }
 
     propertiesDoc
+  }
+
+  private[fr] object ControlSettingsSupport {
+
+    val SupportedPropertyAsTypes: Set[String] =
+      Set("xs:string", "xs:boolean", "xs:integer")
+
+    private val ReservedControlAttLocalNames: Set[String] =
+      Set("id", "bind", "ref", "appearance", "class", "autocomplete", "selection")
+
+    private val LhhaLocalNames: Set[String] =
+      Set("label", "hint", "help", "alert")
+
+    private val FbNamespaceUri = "http://orbeon.org/oxf/xml/form-builder"
+    private val XfNamespace    = Namespace("xf", "http://www.w3.org/2002/xforms")
+    private val XhNamespace    = Namespace("xh", XMLConstants.XHTML_NAMESPACE_URI)
+
+    case class ControlSettingDef(
+      paramName: String,
+      attrQName: QName,
+      xsType   : String
+    )
+
+    case class XblControlDescriptor(
+      directQName              : QName,
+      displayNames             : Map[String, String],
+      iconClass                : String,
+      templateDefaultAtts      : Map[QName, String],
+      hasExplicitCustomSettings: Boolean,
+      settingsByParam          : Map[String, ControlSettingDef],
+      settingsByAttr           : Map[QName, ControlSettingDef],
+      settingLabels            : Map[String, Map[String, String]],
+      inScopeNamespaces        : Map[String, String],
+      controlDetailsElem       : Element
+    ) {
+      val qNameString: String =
+        s"${directQName.namespace.prefix}:${directQName.localName}"
+
+      def displayName(lang: String): String =
+        Option(lang)
+          .flatMap(_.trimAllToOpt)
+          .flatMap(displayNames.get)
+          .orElse(displayNames.get("en"))
+          .orElse(displayNames.values.headOption)
+          .getOrElse(directQName.localName)
+
+      def resolveSetting(paramName: String): Option[ControlSettingDef] =
+        if (hasExplicitCustomSettings)
+          settingsByParam.get(paramName)
+        else
+          Option.when(! ReservedControlAttLocalNames(paramName))(
+            ControlSettingDef(paramName, QName(paramName), "xs:string")
+          )
+
+      def findSettingByAttr(attrQName: QName): Option[ControlSettingDef] =
+        settingsByAttr.get(attrQName)
+    }
+
+    case class Catalog(
+      descriptors     : List[XblControlDescriptor],
+      byQName         : Map[String, XblControlDescriptor],
+      byPrefixAndLocal: Map[(String, String), XblControlDescriptor],
+      byUriAndLocal   : Map[(String, String), XblControlDescriptor]
+    )
+
+    @volatile private var cachedCatalogOpt: Option[(List[String], Catalog)] = None
+
+    def currentCatalog(): Catalog = {
+      val uris = configuredToolboxXblUris()
+      cachedCatalogOpt match {
+        case Some((cachedUris, catalog)) if cachedUris == uris =>
+          catalog
+        case _ =>
+          val built = buildCatalog(uris)
+          cachedCatalogOpt = Some((uris, built))
+          built
+      }
+    }
+
+    private def configuredToolboxXblUris(): List[String] = {
+      val propertySet = Properties.instance.getPropertySet
+      val groupNames =
+        propertySet
+          .propertiesStartsWith("oxf.fb.toolbox.group")
+          .flatMap(_.splitTo[List](".").lift(4))
+          .distinct
+
+      groupNames.flatMap { g =>
+        propertySet
+          .getStringOrURIAsStringOpt(s"oxf.fb.toolbox.group.$g.uri.*.*")
+          .toList
+          .flatMap(_.splitTo[List]())
+      }.distinct
+    }
+
+    private def buildCatalog(uris: List[String]): Catalog = {
+      val rm          = ResourceManagerWrapper.instance
+      val seenQNames  = mutable.Set.empty[String]
+      val descriptors = mutable.ListBuffer.empty[XblControlDescriptor]
+
+      for {
+        uri <- uris
+        key  = uri.stripPrefix("oxf:")
+        if key.nonEmpty
+        doc <- Try(rm.getContentAsOrbeonDom(key, ParserConfiguration.XIncludeOnly, false)).toOption.toList
+        root <- Option(doc.getRootElement).toList
+        bindingElem <- root.elements(XFormsNames.XBL_BINDING_QNAME)
+        if Option(bindingElem.element(XFormsNames.XBL_TEMPLATE_QNAME)).isDefined
+        metadataElem       <- bindingElem.elements.find(_.getName == "metadata").toList
+        controlDetailsElem <- metadataElem.elements.find(_.getName == "control-details").toList
+        if ! metadataElem.elements.find(_.getName == "form-settings").exists(_.attributeValueOpt("show").contains("false"))
+      } {
+        val inScopeNs       = bindingElem.allInScopeNamespacesAsStrings
+        val nsMapping       = NamespaceMapping(inScopeNs)
+        val rawElemSelector = bindingElem.attributeValueOpt("element").getOrElse("")
+
+        val directQNameOpt =
+          for {
+            rawDirect <- Try(CSSSelectorParser.parseSelectors(rawElemSelector)).toOption.toList.flatten
+              .collectFirst(BindingDescriptor.directBindingPF(nsMapping, None))
+              .flatMap(_.elementName)
+            nsUri  = rawDirect.namespace.uri
+            prefix <- inScopeNs.collectFirst { case (p, `nsUri`) if p.nonEmpty => p }
+          } yield QName(rawDirect.localName, Namespace(prefix, nsUri))
+
+        for {
+          directQName <- directQNameOpt
+          qNameStr     = s"${directQName.namespace.prefix}:${directQName.localName}"
+          if ! seenQNames.contains(qNameStr)
+        } {
+          seenQNames += qNameStr
+
+          val displayNames =
+            (for {
+              dn   <- metadataElem.elements.filter(_.getName == "display-name")
+              lang <- dn.attributeValueOpt("lang").orElse(dn.attributeValueOpt(XMLConstants.XML_LANG_QNAME)).flatMap(_.trimAllToOpt)
+              text <- dn.getTextTrim.trimAllToOpt
+            } yield lang -> text).toMap
+
+          val iconClass =
+            metadataElem.elements
+              .find(_.getName == "icon")
+              .flatMap(_.elements.find(_.getName == "icon-class"))
+              .flatMap(_.getTextTrim.trimAllToOpt)
+              .getOrElse("fa fa-fw fa-sliders")
+
+          val viewElemOpt =
+            metadataElem.elements
+              .find(_.getName == "templates")
+              .flatMap(_.elements.find(_.getName == "view"))
+              .flatMap(_.elements.headOption)
+              .orElse(metadataElem.elements.find(_.getName == "template").flatMap(_.elements.headOption))
+
+          val templateDefaultAtts =
+            viewElemOpt.toList.flatMap(_.attributes).collect {
+              case att
+                if ! ReservedControlAttLocalNames(att.getName) &&
+                   att.getNamespaceURI != FbNamespaceUri =>
+                att.getQName -> att.getValue
+            }.toMap
+
+          val customSettingsElemOpt = metadataElem.elements.find(_.getName == "custom-settings")
+          val parsedSettings =
+            for {
+              csElem      <- customSettingsElemOpt.toList
+              settingElem <- csElem.elements.filter(_.getName == "setting")
+              if settingElem.attributeValueOpt("ref").isEmpty
+              rawName     <- settingElem.attributeValueOpt("name").flatMap(_.trimAllToOpt)
+              (pfxOpt, bareName) =
+                if (rawName.contains(':'))
+                  (Some(rawName.substring(0, rawName.indexOf(':'))), rawName.substring(rawName.indexOf(':') + 1))
+                else
+                  (None, rawName)
+              if ! pfxOpt.contains("fb") && ! ReservedControlAttLocalNames(bareName)
+              attrLocal = settingElem.attributeValueOpt("attribute").flatMap(_.trimAllToOpt).getOrElse(bareName)
+              attrQName = pfxOpt match {
+                case Some(p) =>
+                  inScopeNs.get(p).filter(_.nonEmpty).map(u => QName(attrLocal, Namespace(p, u))).getOrElse(QName(attrLocal))
+                case None =>
+                  QName(attrLocal)
+              }
+              xsType = settingElem.attributeValueOpt("type").map(_.stripPrefix("xs:")) match {
+                case Some("boolean") => "xs:boolean"
+                case _               => "xs:string"
+              }
+            } yield ControlSettingDef(bareName, attrQName, xsType)
+
+          val settingLabels = extractSettingLabels(controlDetailsElem)
+
+          descriptors += XblControlDescriptor(
+            directQName               = directQName,
+            displayNames              = displayNames,
+            iconClass                 = iconClass,
+            templateDefaultAtts       = templateDefaultAtts,
+            hasExplicitCustomSettings = customSettingsElemOpt.isDefined,
+            settingsByParam           = parsedSettings.map(s => s.paramName -> s).toMap,
+            settingsByAttr            = parsedSettings.map(s => s.attrQName -> s).toMap,
+            settingLabels             = settingLabels,
+            inScopeNamespaces         = inScopeNs,
+            controlDetailsElem        = controlDetailsElem.createCopy
+          )
+        }
+      }
+
+      val list = descriptors.toList
+      Catalog(
+        descriptors      = list,
+        byQName          = list.map(d => d.qNameString -> d).toMap,
+        byPrefixAndLocal = list.map(d => (d.directQName.namespace.prefix, d.directQName.localName) -> d).toMap,
+        byUriAndLocal    = list.map(d => (d.directQName.namespace.uri, d.directQName.localName) -> d).toMap
+      )
+    }
+
+    def canonicalQNameForNode(uri: String, prefix: String, localName: String): String = {
+      val catalog = currentCatalog()
+      catalog.byUriAndLocal
+        .get((Option(uri).getOrElse(""), Option(localName).getOrElse("")))
+        .orElse(catalog.byPrefixAndLocal.get((Option(prefix).getOrElse(""), Option(localName).getOrElse(""))))
+        .map(_.qNameString)
+        .getOrElse {
+          val p =
+            Option(prefix)
+              .filter(_.nonEmpty)
+              .orElse(StandardPropertyNamespaces.collectFirst { case (sp, su) if su == uri && sp.nonEmpty => sp })
+          p.fold(Option(localName).getOrElse(""))(pfx => s"$pfx:${Option(localName).getOrElse("")}")
+        }
+    }
+
+    private def extractSettingLabels(controlDetailsElem: Element): Map[String, Map[String, String]] = {
+      val result = mutable.Map.empty[String, mutable.Map[String, String]]
+
+      def findResourcesInstances(elem: Element): List[Element] = {
+        val selfMatch =
+          if (elem.getName == "instance" && elem.attributeValueOpt("id").contains("fr-form-resources")) List(elem)
+          else Nil
+        selfMatch ++ elem.elements.flatMap(findResourcesInstances)
+      }
+
+      for {
+        instElem <- findResourcesInstances(controlDetailsElem)
+        rootElem <- instElem.elements
+        resElem  <- rootElem.elements.filter(_.getName == "resource")
+        lang     <- resElem.attributeValueOpt(XMLConstants.XML_LANG_QNAME).orElse(resElem.attributeValueOpt("lang")).flatMap(_.trimAllToOpt)
+        child    <- resElem.elements
+      } {
+        val labelOpt =
+          Option(child.element("label"))
+            .flatMap(_.getTextTrim.trimAllToOpt)
+            .orElse(Option.when(child.elements.isEmpty)(child.getTextTrim).flatMap(_.trimAllToOpt))
+
+        for (lbl <- labelOpt) {
+          val key = if (child.getName == "automatic-pdf") "pdf-appearance" else child.getName
+          result.getOrElseUpdate(key, mutable.Map.empty).put(lang, lbl)
+        }
+      }
+
+      result.view.mapValues(_.toMap).toMap
+    }
+
+    def availableControlSettingsDom(lang: String): Document = {
+      val catalog = currentCatalog()
+      val doc     = Document("components")
+      val root    = doc.getRootElement
+      val sorted  = catalog.descriptors.sortBy(d => (d.displayName(lang).toLowerCase, d.qNameString))
+
+      for (d <- sorted) {
+        val elem  = root.addElement("component")
+        val label = d.displayName(lang)
+        val enLbl = d.displayName("en")
+        elem.addAttribute("qname", d.qNameString)
+        elem.addAttribute("prefix", d.directQName.namespace.prefix)
+        elem.addAttribute("local-name", d.directQName.localName)
+        elem.addAttribute("label", label)
+        elem.addAttribute("icon-class", d.iconClass)
+        val searchTokens =
+          (List(label, enLbl, d.qNameString, s"${XblPropertyPrefix}${d.directQName.namespace.prefix}.${d.directQName.localName}") ++
+            d.settingsByParam.keys.toList)
+            .map(_.toLowerCase)
+            .distinct
+            .mkString(" ")
+        elem.addAttribute("search-text", searchTokens)
+      }
+
+      doc
+    }
+
+    def displayNameForQName(qName: String, lang: String): String =
+      Option(qName)
+        .flatMap(_.trimAllToOpt)
+        .flatMap(currentCatalog().byQName.get)
+        .map(_.displayName(lang))
+        .getOrElse(Option(qName).getOrElse(""))
+
+    def iconClassForQName(qName: String): String =
+      Option(qName)
+        .flatMap(_.trimAllToOpt)
+        .flatMap(currentCatalog().byQName.get)
+        .map(_.iconClass)
+        .getOrElse("fa fa-fw fa-sliders")
+
+    def buildSubformDom(qName: String, existingOpt: Option[Element], lang: String): Document = {
+      val effLang = Option(lang).flatMap(_.trimAllToOpt).getOrElse("en")
+      currentCatalog().byQName.get(Option(qName).map(_.trimAllToEmpty).getOrElse("")) match {
+        case None =>
+          Document(Element(QName("html", XhNamespace)))
+        case Some(descriptor) =>
+          val htmlElem = Element(QName("html", XhNamespace))
+          val subformDoc = Document(htmlElem)
+
+          val mergedNamespaces =
+            mutable.LinkedHashMap.from(StandardPropertyNamespaces) ++
+              descriptor.inScopeNamespaces.filter { case (p, u) => p.nonEmpty && u.nonEmpty && ! StandardNamespacePrefixes(p) }
+          for ((prefix, uri) <- mergedNamespaces if prefix != "xh")
+            htmlElem.add(Namespace(prefix, uri))
+
+          val headElem       = htmlElem.addElement(QName("head", XhNamespace))
+          val customModel    = headElem.addElement(QName("model", XfNamespace))
+          customModel.addAttribute("id", "custom-model")
+          val customInstance = customModel.addElement(QName("instance", XfNamespace))
+          customInstance.addAttribute("id", "custom-instance")
+
+          val controlElem = customInstance.addElement(descriptor.directQName)
+          for ((k, v) <- descriptor.templateDefaultAtts)
+            controlElem.addAttribute(k, v)
+          for {
+            existing <- existingOpt.toList
+            att      <- existing.attributes
+            if ! ReservedControlAttLocalNames(att.getName) && att.getNamespaceURI != FbNamespaceUri
+          } controlElem.addAttribute(att.getQName, att.getValue)
+
+          val detailsCopy = descriptor.controlDetailsElem.createCopy
+          filterInlineLhhaLangs(detailsCopy, effLang)
+
+          for {
+            innerModel <- detailsCopy.elements.filter(e => e.getNamespaceURI == XfNamespace.uri && e.getName == "model")
+            child      <- innerModel.elements.toList
+          } {
+            child.detach()
+            customModel.add(child)
+          }
+
+          val bodyElem = htmlElem.addElement(QName("body", XhNamespace))
+          for (child <- detailsCopy.elements.toList if ! (child.getNamespaceURI == XfNamespace.uri && child.getName == "model")) {
+            child.detach()
+            bodyElem.add(child)
+          }
+
+          subformDoc
+      }
+    }
+
+    private def filterInlineLhhaLangs(elem: Element, requestedLang: String): Unit = {
+      for (lhhaName <- LhhaLocalNames) {
+        val withLang =
+          elem.elements.filter { c =>
+            c.getNamespaceURI == XfNamespace.uri &&
+              c.getName == lhhaName &&
+              c.attributeValueOpt("lang").isDefined
+          }
+        if (withLang.nonEmpty) {
+          val targetLang =
+            if (withLang.exists(_.attributeValueOpt("lang").contains(requestedLang))) requestedLang
+            else "en"
+          for (c <- withLang if ! c.attributeValueOpt("lang").contains(targetLang))
+            c.detach()
+        }
+      }
+      for (child <- elem.elements.toList)
+        filterInlineLhhaLangs(child, requestedLang)
+    }
+
+    def extractNormalizedControlSettingsDom(qName: String, elemOpt: Option[Element]): Document = {
+      val resultDoc  = Document("result")
+      val resultRoot = resultDoc.getRootElement
+      val catalog    = currentCatalog()
+
+      def unwrapCustomInstanceElem(el: Element): Option[Element] =
+        if (el.getNamespaceURI == XhNamespace.uri && el.getName == "html") {
+          el.elements
+            .find(_.getName == "head")
+            .flatMap(_.elements.find(m => m.getName == "model" && m.attributeValueOpt("id").contains("custom-model")))
+            .flatMap(_.elements.find(i => i.getName == "instance" && i.attributeValueOpt("id").contains("custom-instance")))
+            .flatMap(_.elements.headOption)
+        } else {
+          Some(el)
+        }
+
+      for {
+        rawElem    <- elemOpt
+        sourceElem <- unwrapCustomInstanceElem(rawElem)
+        descriptor <- catalog.byQName.get(Option(qName).map(_.trimAllToEmpty).getOrElse(""))
+      } {
+        val keptAtts =
+          sourceElem.attributes.filter { att =>
+            ! ReservedControlAttLocalNames(att.getName) &&
+              att.getNamespaceURI != FbNamespaceUri &&
+              ! descriptor.templateDefaultAtts.get(att.getQName).contains(att.getValue) &&
+              (! descriptor.hasExplicitCustomSettings || descriptor.settingsByAttr.contains(att.getQName))
+          }
+
+        if (keptAtts.nonEmpty) {
+          if (descriptor.directQName.namespace.prefix.nonEmpty && descriptor.directQName.namespace.uri.nonEmpty)
+            resultRoot.add(descriptor.directQName.namespace)
+          val cleanElem = resultRoot.addElement(descriptor.directQName)
+          if (descriptor.directQName.namespace.prefix.nonEmpty && descriptor.directQName.namespace.uri.nonEmpty)
+            cleanElem.add(descriptor.directQName.namespace)
+          for (att <- keptAtts) {
+            if (att.getNamespacePrefix.nonEmpty && att.getNamespaceURI.nonEmpty)
+              cleanElem.add(att.getNamespace)
+            cleanElem.addAttribute(att.getQName, att.getValue)
+          }
+        }
+      }
+
+      resultDoc
+    }
+
+    def formatSummaryHtml(controlElem: Element, lang: String, formResourcesOpt: Option[Element]): String = {
+      val effLang       = Option(lang).flatMap(_.trimAllToOpt).getOrElse("en")
+      val catalog       = currentCatalog()
+      val descriptorOpt =
+        catalog.byUriAndLocal
+          .get((controlElem.getNamespaceURI, controlElem.getName))
+          .orElse(catalog.byPrefixAndLocal.get((controlElem.getNamespacePrefix, controlElem.getName)))
+
+      val noneLabel =
+        formResourcesOpt
+          .flatMap(r => Option(r.element("control-settings-section")))
+          .flatMap(s => Option(s.element("none-value")))
+          .flatMap(_.getTextTrim.trimAllToOpt)
+          .getOrElse("(none)")
+
+      def fallbackResourceLabel(paramName: String): Option[String] =
+        paramName match {
+          case "field-width" | "field-align" =>
+            formResourcesOpt
+              .flatMap(r => Option(r.element("xbl-control-settings")))
+              .flatMap(s => Option(s.element(paramName)))
+              .flatMap(_.getTextTrim.trimAllToOpt)
+          case "edit-format" =>
+            formResourcesOpt.flatMap(r => Option(r.element("modes"))).flatMap(m => Option(m.element("editable"))).flatMap(_.getTextTrim.trimAllToOpt)
+          case "view-format" =>
+            formResourcesOpt.flatMap(r => Option(r.element("modes"))).flatMap(m => Option(m.element("review"))).flatMap(_.getTextTrim.trimAllToOpt)
+          case "pdf-format" =>
+            formResourcesOpt.flatMap(r => Option(r.element("modes"))).flatMap(m => Option(m.element("pdf-automatic"))).flatMap(_.getTextTrim.trimAllToOpt)
+          case "pdf-template-format" =>
+            formResourcesOpt.flatMap(r => Option(r.element("modes"))).flatMap(m => Option(m.element("pdf-template"))).flatMap(_.getTextTrim.trimAllToOpt)
+          case "open-selection" =>
+            formResourcesOpt
+              .flatMap(r => Option(r.element("dialog-control-settings")))
+              .flatMap(d => Option(d.element("open-selection")))
+              .flatMap(o => Option(o.element("label")))
+              .flatMap(_.getTextTrim.trimAllToOpt)
+          case _ =>
+            None
+        }
+
+      val pills =
+        controlElem.attributes.map { att =>
+          val paramName =
+            descriptorOpt
+              .flatMap(_.findSettingByAttr(att.getQName))
+              .map(_.paramName)
+              .getOrElse(att.getName)
+
+          val label =
+            descriptorOpt
+              .flatMap(_.settingLabels.get(paramName))
+              .flatMap(m => m.get(effLang).orElse(m.get("en")).orElse(m.values.headOption))
+              .orElse(fallbackResourceLabel(paramName))
+              .getOrElse(paramName)
+
+          val valueHtml =
+            if (att.getValue.isEmpty)
+              s"""<em class="fr-config-control-prop-empty">${noneLabel.escapeXmlMinimal}</em>"""
+            else if (att.getValue.forall(_ == ' '))
+              s"""<code class="fr-config-control-prop-value">${("\u2423" * att.getValue.length).escapeXmlMinimal}</code>"""
+            else
+              s"""<code class="fr-config-control-prop-value">${att.getValue.escapeXmlMinimal}</code>"""
+
+          s"""<span class="fr-config-control-prop-pill"><span class="fr-config-control-prop-label">${label.escapeXmlMinimal}:</span> $valueHtml</span>"""
+        }
+
+      pills.mkString(" ")
+    }
   }
 }

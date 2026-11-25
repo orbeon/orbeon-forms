@@ -141,6 +141,18 @@
         <dialog-title-add>Добавить пользовательский процесс</dialog-title-add>
         <dialog-title-edit>Редактирование процесса</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Настройки элементов</label>
+        <select-placeholder>Выберите элемент управления для настройки…</select-placeholder>
+        <configure-button>Настроить</configure-button>
+        <edit>Править</edit>
+        <revert>Сбросить</revert>
+        <apply>Применить</apply>
+        <cancel>Отмена</cancel>
+        <dialog-title>Настройки элемента</dialog-title>
+        <empty>Для этой области не заданы пользовательские настройки элементов управления. Выберите элемент выше, чтобы переопределить его параметры по умолчанию.</empty>
+        <none-value>(нет)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Переопределения для приложений / форм</label>
         <add-override>Добавить переопределение для приложения / формы</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Отображение ошибок загрузки файлов</label>
-        <hint>Способ отображения ошибок загрузки файлов &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>По умолчанию (Модальное окно)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Модальное окно</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Встроенное предупреждение</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Режим мастера</label>
         <hint>Показывать разделы верхнего уровня на одной странице или как отдельные страницы мастера &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Срок действия токена состояния (минуты)</label>
         <hint>Срок действия в минутах для токенов состояния &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Редактируемые режимы</editable>
+        <review>Режим просмотра</review>
+        <pdf-automatic>Автоматический PDF</pdf-automatic>
+        <pdf-template>Шаблон PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Ширина поля</field-width>
+        <default>Использовать по умолчанию</default>
+        <full>Полная</full>
+        <natural>Естественная</natural>
+        <field-align>Выравнивание поля</field-align>
+        <left>Слева</left>
+        <right>Справа</right>
+        <learn-settings-below>Узнать больше о настройках ниже</learn-settings-below>
+        <field-value-visibility>
+            <label>Видимость значения поля</label>
+            <hint>Управляет тем, как отображается значение поля</hint>
+            <item id="visible">Видимое</item>
+            <item id="obscured">Скрытое</item>
+            <item id="partial">Частичное</item>
+            <item id="reveal">Разрешить пользователю показать</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Открытый выбор</label>
+            <help>Когда включена опция «Открытый выбор», пользователи могут вводить собственное значение в это поле при заполнении формы. Это значение сохраняется в данных и используется как название, отображаемое в выпадающем списке.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

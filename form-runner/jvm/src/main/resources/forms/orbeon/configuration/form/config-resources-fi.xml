@@ -141,6 +141,18 @@
         <dialog-title-add>Lisää mukautettu prosessi</dialog-title-add>
         <dialog-title-edit>Muokkaa prosessia</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Kontrollien asetukset</label>
+        <select-placeholder>Valitse määritettävä kontrolli…</select-placeholder>
+        <configure-button>Määritä</configure-button>
+        <edit>Muokkaa</edit>
+        <revert>Palauta</revert>
+        <apply>Käytä</apply>
+        <cancel>Peruuta</cancel>
+        <dialog-title>Kontrollin asetukset</dialog-title>
+        <empty>Tälle laajuudelle ei ole määritetty mukautettuja kontrolliasetuksia. Valitse yllä oleva kontrolli korvataksesi sen oletusasetukset.</empty>
+        <none-value>(ei mitään)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Sovellus- ja lomakekohtaiset korvaukset</label>
         <add-override>Lisää sovellus- tai lomakekorvaus</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Lähetysvirheiden ulkoasu</label>
-        <hint>Miten tiedoston lähetysvirheet näytetään &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Oletus (Modaalinen valintaikkuna)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modaalinen valintaikkuna</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Rivinsisäinen ilmoitus</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Ohjattu toiminto -näkymä</label>
         <hint>Näytä ylätason osiot kokonaisena sivuna tai erillisinä ohjatun toiminnon sivuina &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Tilatunnuksen voimassaoloaika (minuuttia)</label>
         <hint>Tilatunnusten voimassaoloaika minuutteina &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Muokattavat tilat</editable>
+        <review>Katselutila</review>
+        <pdf-automatic>Automaattinen PDF</pdf-automatic>
+        <pdf-template>PDF-malli</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Kentän leveys</field-width>
+        <default>Käytä oletusta</default>
+        <full>Täysi</full>
+        <natural>Luonnollinen</natural>
+        <field-align>Kentän tasaus</field-align>
+        <left>Vasen</left>
+        <right>Oikea</right>
+        <learn-settings-below>Lue lisää alla olevista asetuksista</learn-settings-below>
+        <field-value-visibility>
+            <label>Kentän arvon näkyvyys</label>
+            <hint>Hallitsee, miten kentän arvo näytetään</hint>
+            <item id="visible">Näkyvä</item>
+            <item id="obscured">Peitetty</item>
+            <item id="partial">Osittainen</item>
+            <item id="reveal">Salli käyttäjän paljastaa</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Avoin valinta</label>
+            <help>Kun „Avoin valinta" -asetus on käytössä, käyttäjät voivat syöttää oman arvonsa tähän kenttään lomaketta täyttäessään. Tämä arvo tallennetaan dataan ja näytetään pudotusvalikon nimikkeenä.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

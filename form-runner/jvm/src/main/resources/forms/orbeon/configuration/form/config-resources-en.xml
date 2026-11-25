@@ -141,6 +141,18 @@
         <dialog-title-add>Add Custom Process</dialog-title-add>
         <dialog-title-edit>Edit Process</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Control Settings</label>
+        <select-placeholder>Choose a control to configure…</select-placeholder>
+        <configure-button>Configure</configure-button>
+        <edit>Edit</edit>
+        <revert>Revert</revert>
+        <apply>Apply</apply>
+        <cancel>Cancel</cancel>
+        <dialog-title>Control Settings</dialog-title>
+        <empty>No custom control settings configured for this scope. Choose a control above to override its default settings.</empty>
+        <none-value>(none)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Application / Form Overrides</label>
         <add-override>Add Application / Form Override</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Upload Error Appearance</label>
-        <hint>How file upload errors are shown &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Default (Modal Dialog)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modal Dialog</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Inline Alert</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Wizard View</label>
         <hint>Show top-level sections as a full page or separate wizard pages &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>State Token Validity (Minutes)</label>
         <hint>Validity duration in minutes for state tokens &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Editable modes</editable>
+        <review>Review mode</review>
+        <pdf-automatic>Automatic PDF</pdf-automatic>
+        <pdf-template>PDF template</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Field width</field-width>
+        <default>Use default</default>
+        <full>Full</full>
+        <natural>Natural</natural>
+        <field-align>Field alignment</field-align>
+        <left>Left</left>
+        <right>Right</right>
+        <learn-settings-below>Learn more about the settings below</learn-settings-below>
+        <field-value-visibility>
+            <label>Field Value Visibility</label>
+            <hint>Controls how the value of the field is displayed</hint>
+            <item id="visible">Visible</item>
+            <item id="obscured">Obscured</item>
+            <item id="partial">Partial</item>
+            <item id="reveal">Allow user to reveal</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Open selection</label>
+            <help>When the "Open selection" option is enabled, users can enter their own value in this control when filling out the form. This value is stored in the data and used as the label shown in the drop-down list.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

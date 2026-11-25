@@ -86,6 +86,7 @@
                     <xf:bind ref="instance('local')">
                         <xf:bind
                             ref="content"
+                            relevant="exists(instance()/@id)"
                             xxf:whitespace="trim"
                             type="xxf:XPath2ValueTemplate"/>
                         <xf:bind

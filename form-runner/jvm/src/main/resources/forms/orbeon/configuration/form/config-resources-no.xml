@@ -141,6 +141,18 @@
         <dialog-title-add>Legg til tilpasset prosess</dialog-title-add>
         <dialog-title-edit>Rediger prosess</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Kontrollinnstillinger</label>
+        <select-placeholder>Velg en kontroll å konfigurere…</select-placeholder>
+        <configure-button>Konfigurer</configure-button>
+        <edit>Rediger</edit>
+        <revert>Tilbakestill</revert>
+        <apply>Bruk</apply>
+        <cancel>Avbryt</cancel>
+        <dialog-title>Kontrollinnstillinger</dialog-title>
+        <empty>Ingen egendefinerte kontrollinnstillinger er konfigurert for dette omfanget. Velg en kontroll ovenfor for å overstyre standardinnstillingene.</empty>
+        <none-value>(ingen)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Overstyringer for applikasjon / skjema</label>
         <add-override>Legg til overstyring for applikasjon / skjema</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Utseende for opplastingsfeil</label>
-        <hint>Hvordan filopplastingsfeil vises &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Modal dialogboks)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modal dialogboks</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Innebygd varsel</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Veiviservisning</label>
         <hint>Vis toppnivåseksjoner som en hel side eller separate veivisersider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Gyldighet for tilstandspollett (minutter)</label>
         <hint>Gyldighetstid i minutter for tilstandspolletter &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Redigerbare moduser</editable>
+        <review>Gjennomgangsmodus</review>
+        <pdf-automatic>Automatisk PDF</pdf-automatic>
+        <pdf-template>PDF-mal</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Feltbredde</field-width>
+        <default>Bruk standard</default>
+        <full>Full</full>
+        <natural>Naturlig</natural>
+        <field-align>Feltjustering</field-align>
+        <left>Venstre</left>
+        <right>Høyre</right>
+        <learn-settings-below>Lær mer om innstillingene nedenfor</learn-settings-below>
+        <field-value-visibility>
+            <label>Feltverdisynlighet</label>
+            <hint>Styrer hvordan feltverdien vises</hint>
+            <item id="visible">Synlig</item>
+            <item id="obscured">Skjult</item>
+            <item id="partial">Delvis</item>
+            <item id="reveal">Tillat bruker å vise</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Åpent valg</label>
+            <help>Når alternativet «Åpent valg» er aktivert, kan brukere skrive inn sin egen verdi i dette feltet når de fyller ut skjemaet. Denne verdien lagres i dataene og brukes som etikett vist i rullegardinlisten.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

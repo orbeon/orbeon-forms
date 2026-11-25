@@ -141,6 +141,18 @@
         <dialog-title-add>Tilføj brugerdefineret proces</dialog-title-add>
         <dialog-title-edit>Rediger proces</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Kontrolindstillinger</label>
+        <select-placeholder>Vælg et kontrolelement at konfigurere…</select-placeholder>
+        <configure-button>Konfigurer</configure-button>
+        <edit>Rediger</edit>
+        <revert>Gendan</revert>
+        <apply>Anvend</apply>
+        <cancel>Annuller</cancel>
+        <dialog-title>Kontrolindstillinger</dialog-title>
+        <empty>Ingen brugerdefinerede kontrolindstillinger konfigureret for dette område. Vælg et kontrolelement ovenfor for at tilsidesætte dets standardindstillinger.</empty>
+        <none-value>(ingen)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Tilsidesættelser for applikation / blanket</label>
         <add-override>Tilføj tilsidesættelse for applikation / blanket</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Udseende af overførselsfejl</label>
-        <hint>Hvordan fejl ved filoverførsel vises &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Modal dialogboks)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modal dialogboks</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Indlejret advarsel</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Guidevisning</label>
         <hint>Vis sektioner på øverste niveau som en hel side eller som separate guidesider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Gyldighed af tilstandsnøgle (minutter)</label>
         <hint>Gyldighedsperiode i minutter for tilstandsnøgler &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Redigerbare tilstande</editable>
+        <review>Gennemsynstilstand</review>
+        <pdf-automatic>Automatisk PDF</pdf-automatic>
+        <pdf-template>PDF-skabelon</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Feltbredde</field-width>
+        <default>Brug standard</default>
+        <full>Fuld</full>
+        <natural>Naturlig</natural>
+        <field-align>Feltjustering</field-align>
+        <left>Venstre</left>
+        <right>Højre</right>
+        <learn-settings-below>Læs mere om indstillingerne nedenfor</learn-settings-below>
+        <field-value-visibility>
+            <label>Synlighed af feltværdi</label>
+            <hint>Styrer hvordan feltets værdi vises</hint>
+            <item id="visible">Synlig</item>
+            <item id="obscured">Skjult</item>
+            <item id="partial">Delvis</item>
+            <item id="reveal">Tillad bruger at vise</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Åbent valg</label>
+            <help>Når indstillingen "Åbent valg" er aktiveret, kan brugere indtaste deres egen værdi i dette felt, når de udfylder formularen. Værdien gemmes i dataene og bruges som etiketten i rullelisten.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

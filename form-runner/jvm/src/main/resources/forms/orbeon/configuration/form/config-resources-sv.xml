@@ -141,6 +141,18 @@
         <dialog-title-add>Lägg till anpassad process</dialog-title-add>
         <dialog-title-edit>Redigera process</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Kontrollinställningar</label>
+        <select-placeholder>Välj en kontroll att konfigurera…</select-placeholder>
+        <configure-button>Konfigurera</configure-button>
+        <edit>Redigera</edit>
+        <revert>Återställ</revert>
+        <apply>Verkställ</apply>
+        <cancel>Avbryt</cancel>
+        <dialog-title>Kontrollinställningar</dialog-title>
+        <empty>Inga anpassade kontrollinställningar konfigurerade för detta omfång. Välj en kontroll ovan för att åsidosätta dess standardinställningar.</empty>
+        <none-value>(ingen)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Åsidosättningar för applikation / formulär</label>
         <add-override>Lägg till åsidosättning för applikation / formulär</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Utseende på uppladdningsfel</label>
-        <hint>Hur filuppladdningsfel visas &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Modal dialogruta)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modal dialogruta</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Inbäddad varning</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Guideläge</label>
         <hint>Visa toppnivåsektioner som en hel sida eller som separata guidesidor &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Giltighetstid för tillståndsnyckel (minuter)</label>
         <hint>Giltighetstid i minuter för tillståndsnycklar &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Redigerbara lägen</editable>
+        <review>Granskningsläge</review>
+        <pdf-automatic>Automatisk PDF</pdf-automatic>
+        <pdf-template>PDF-mall</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Fältbredd</field-width>
+        <default>Använd standard</default>
+        <full>Full</full>
+        <natural>Naturlig</natural>
+        <field-align>Fältjustering</field-align>
+        <left>Vänster</left>
+        <right>Höger</right>
+        <learn-settings-below>Läs mer om inställningarna nedan</learn-settings-below>
+        <field-value-visibility>
+            <label>Fältvärdesynlighet</label>
+            <hint>Styr hur fältets värde visas</hint>
+            <item id="visible">Synligt</item>
+            <item id="obscured">Dolt</item>
+            <item id="partial">Delvis</item>
+            <item id="reveal">Tillåt användare att visa</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Öppet val</label>
+            <help>När alternativet "Öppet val" är aktiverat kan användare ange ett eget värde i denna kontroll när de fyller i formuläret. Det här värdet lagras i data och används som etiketten som visas i rullgardinsmenyn.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

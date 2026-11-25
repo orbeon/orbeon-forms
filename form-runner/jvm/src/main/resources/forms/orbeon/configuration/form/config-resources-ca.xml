@@ -141,6 +141,18 @@
         <dialog-title-add>Afegir un procés personalitzat</dialog-title-add>
         <dialog-title-edit>Editar el procés</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Configuració de controls</label>
+        <select-placeholder>Trieu un control per configurar…</select-placeholder>
+        <configure-button>Configura</configure-button>
+        <edit>Editar</edit>
+        <revert>Restablir</revert>
+        <apply>Aplica</apply>
+        <cancel>Cancel·la</cancel>
+        <dialog-title>Configuració del control</dialog-title>
+        <empty>No hi ha cap configuració de control personalitzada per a aquest àmbit. Trieu un control més amunt per sobreescriure la seva configuració predeterminada.</empty>
+        <none-value>(cap)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Redefinicions per aplicació / formulari</label>
         <add-override>Afegir una redefinició per aplicació / formulari</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Aparença dels errors de pujada</label>
-        <hint>Mode de presentació dels errors en pujar fitxers &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Per defecte (Diàleg modal)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Diàleg modal</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Alerta en línia</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Vista d'assistent</label>
         <hint>Mostrar les seccions de primer nivell en una sola pàgina o en pàgines separades de l'assistent &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Validesa del token d'estat (minuts)</label>
         <hint>Durada de validesa en minuts per als tokens d'estat &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Modes editables</editable>
+        <review>Mode de revisió</review>
+        <pdf-automatic>PDF automàtic</pdf-automatic>
+        <pdf-template>Plantilla PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Amplada del camp</field-width>
+        <default>Usa el predeterminat</default>
+        <full>Completa</full>
+        <natural>Natural</natural>
+        <field-align>Alineació del camp</field-align>
+        <left>Esquerra</left>
+        <right>Dreta</right>
+        <learn-settings-below>Més informació sobre la configuració següent</learn-settings-below>
+        <field-value-visibility>
+            <label>Visibilitat del valor del camp</label>
+            <hint>Controla com es mostra el valor del camp</hint>
+            <item id="visible">Visible</item>
+            <item id="obscured">Ocult</item>
+            <item id="partial">Parcial</item>
+            <item id="reveal">Permet que l'usuari ho mostri</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Selecció oberta</label>
+            <help>Quan l'opció "Selecció oberta" està activada, els usuaris poden introduir el seu propi valor en aquest control en emplenar el formulari. Aquest valor s'emmagatzema a les dades i s'utilitza com a etiqueta mostrada a la llista desplegable.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

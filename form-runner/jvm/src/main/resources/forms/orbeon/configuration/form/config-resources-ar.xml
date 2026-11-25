@@ -141,6 +141,18 @@
         <dialog-title-add>إضافة عملية مخصصة</dialog-title-add>
         <dialog-title-edit>تعديل العملية</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>إعدادات عناصر التحكم</label>
+        <select-placeholder>اختر عنصر تحكم لتهيئته…</select-placeholder>
+        <configure-button>تهيئة</configure-button>
+        <edit>تعديل</edit>
+        <revert>استعادة</revert>
+        <apply>تطبيق</apply>
+        <cancel>إلغاء</cancel>
+        <dialog-title>إعدادات عنصر التحكم</dialog-title>
+        <empty>لا توجد إعدادات مخصصة لعناصر التحكم في هذا النطاق. اختر عنصر تحكم أعلاه لتجاوز إعداداته الافتراضية.</empty>
+        <none-value>(بلا)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>تجاوزات التطبيقات / النماذج</label>
         <add-override>إضافة تجاوز تطبيق / نموذج</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>مظهر أخطاء رفع الملفات</label>
-        <hint>كيفية إظهار أخطاء رفع الملفات &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>الافتراضي (مربع حوار مشروط)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>مربع حوار مشروط</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>تنبيه سطري</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>عرض المعالج</label>
         <hint>عرض الأقسام ذات المستوى الأعلى كصفحة كاملة أو كصفحات معالج منفصلة &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>صلاحية رمز الحالة (دقائق)</label>
         <hint>مدة الصلاحية بالدقائق لرموز الحالة &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>أوضاع قابلة للتحرير</editable>
+        <review>وضع المراجعة</review>
+        <pdf-automatic>ملف PDF تلقائي</pdf-automatic>
+        <pdf-template>قالب PDF</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>عرض الحقل</field-width>
+        <default>استخدام الافتراضي</default>
+        <full>كامل</full>
+        <natural>طبيعي</natural>
+        <field-align>محاذاة الحقل</field-align>
+        <left>يسار</left>
+        <right>يمين</right>
+        <learn-settings-below>تعرف على المزيد حول الإعدادات أدناه</learn-settings-below>
+        <field-value-visibility>
+            <label>رؤية قيمة الحقل</label>
+            <hint>يتحكم في كيفية عرض قيمة الحقل</hint>
+            <item id="visible">مرئي</item>
+            <item id="obscured">مخفي</item>
+            <item id="partial">جزئي</item>
+            <item id="reveal">السماح للمستخدم بالكشف</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>اختيار مفتوح</label>
+            <help>عند تفعيل خيار «الاختيار المفتوح»، يمكن للمستخدمين إدخال قيمتهم الخاصة في هذا الحقل عند ملء النموذج. تُخزَّن هذه القيمة في البيانات وتُستخدم كتسمية تظهر في القائمة المنسدلة.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

@@ -497,30 +497,32 @@
                 width: 100%;
                 gap: 8px;
             }
-            /* Group dividers between General/Shell (1-4), Pages (5-11), Documents/Messaging (12-14), Authoring/Security/Ops (15-18), and Custom Properties (19) */
+            /* Group dividers between General/Shell (1-4), Pages (5-12), Documents/Messaging (13-15), Authoring/Security/Ops (16-19), and Custom Properties (20) */
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6).xforms-hidden + li:nth-child(7):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(12):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(15):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(15).xforms-hidden + li:nth-child(16):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(19):not(.xforms-hidden)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(13):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(16):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(16).xforms-hidden + li:nth-child(17):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(20):not(.xforms-hidden)::before {
                 content: "";
                 display: block;
                 height: 1px;
                 margin: 5px 10px;
                 background-color: var(--orbeon-base-border-color);
             }
-            /* Sub-categories nested under Detail Page (Wizard = 8, Formulas = 9, Processes = 10), matching Scopes tree guides */
+            /* Sub-categories nested under Detail Page (Wizard = 8, Formulas = 9, Processes = 10, Control Settings = 11), matching Scopes tree guides */
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8),
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9),
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10) {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10),
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11) {
                 position: relative;
                 margin-left: 18px;
             }
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::before {
                 content: "";
                 position: absolute;
                 left: -9px;
@@ -529,12 +531,13 @@
                 border-left: 1px solid var(--orbeon-base-border-color);
                 pointer-events: none;
             }
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::before {
                 bottom: 50%;
             }
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8)::after,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9)::after,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::after {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::after,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::after {
                 content: "";
                 position: absolute;
                 left: -9px;
@@ -839,6 +842,82 @@
                 border: 1px dashed var(--orbeon-base-border-color);
                 border-radius: 6px;
             }
+            /* Control Settings Tab &amp; Dialog */
+            .orbeon .fr-config-controls-picker {
+                min-width: 260px;
+                margin-bottom: 0;
+            }
+            .orbeon .fr-config-controls-picker &gt; .xforms-label {
+                display: none;
+            }
+            .orbeon .fr-config-control-display-name {
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--orbeon-base-color);
+            }
+            .orbeon .fr-config-control-icon {
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-control-summary .xforms-output,
+            .orbeon .fr-config-control-summary .xforms-output-output {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .orbeon .fr-config-control-prop-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 3px 8px;
+                border-radius: 4px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                font-size: 12px;
+                color: var(--orbeon-base-color);
+            }
+            .orbeon .fr-config-control-prop-label {
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-control-prop-value {
+                font-family: var(--orbeon-code-font-family);
+                font-size: 12px;
+                color: var(--orbeon-code-color);
+                background: none;
+                border: 0;
+                padding: 0;
+            }
+            .orbeon .fr-config-control-prop-empty {
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-control-dialog {
+                width: min(760px, 92vw);
+            }
+            .orbeon .fr-config-control-dialog-meta {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 8px 12px;
+                margin-bottom: 12px;
+                border-radius: 6px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                font-size: 12px;
+            }
+            .orbeon .fr-config-control-dialog-prefix {
+                font-family: var(--orbeon-code-font-family);
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-control-dialog-buttons {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 8px;
+                margin-top: 16px;
+                padding-top: 12px;
+                border-top: 1px solid var(--orbeon-base-border-color);
+            }
             /* Unified Cross-Category View When Filtering */
             .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs {
                 display: none;
@@ -847,7 +926,7 @@
                 display: block;
                 margin-bottom: 24px;
             }
-            .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .tab-content &gt; .tab-pane:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
+            .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .tab-content &gt; .tab-pane:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled):not(.xforms-disabled *))):not(:has(.fr-config-filter-match:not(.xforms-hidden))) {
                 display: none !important;
             }
             .orbeon .fr-config-filtering .fr-config-subgroup:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
@@ -957,7 +1036,16 @@
                         <override-selection/>
                         <editing-name/>
                     </process-editor>
+                    <control-editor valid="true">
+                        <selection/>
+                        <editing-qname/>
+                    </control-editor>
                 </ui>
+            </xf:instance>
+
+            <!-- Dynamic XForms subform container for the active XBL <control-details> editor -->
+            <xf:instance id="fr-config-control-editor-instance" xxf:exclude-result-prefixes="#all">
+                <_/>
             </xf:instance>
 
             <!-- Published forms metadata for Application / Form autocomplete in Add/Edit Override dialog -->
@@ -1230,6 +1318,7 @@
                 </resources>
             </xf:instance>
         </xf:model>
+        <xf:model id="fr-config-xbl-assets-model" xxf:assets.baseline.updates="+fr:country"/>
     </xh:head>
     <xh:body>
         <fr:view>
@@ -1364,6 +1453,7 @@
                                                 count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
                                                 count(instance('fr-configuration-instance')/resources/message) +
                                                 count(instance('fr-configuration-instance')/processes/process) +
+                                                count(instance('fr-configuration-instance')/control-settings/*) +
                                                 count(
                                                     instance('fr-configuration-instance')/custom-properties/property[
                                                         xxf:non-blank(@name) or
@@ -1454,7 +1544,8 @@
                                                 value="
                                                     count(curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]) +
                                                     count(resources/message[xxf:is-blank($ov/@profiles)]) +
-                                                    count(processes/process)
+                                                    count(processes/process) +
+                                                    count(control-settings/*)
                                                 "/>
                                             <xf:var
                                                 name="row-has-error"
@@ -1571,6 +1662,7 @@
                                                                 </xf:action>
                                                                 <xf:delete ref="$ov/resources/message"/>
                                                                 <xf:delete ref="$ov/processes/process"/>
+                                                                <xf:delete ref="$ov/control-settings/*"/>
                                                             </xf:action>
                                                             <xf:action if="not($has-child-scopes)">
                                                                 <xf:var
@@ -3000,21 +3092,6 @@
                                             </xf:action>
                                         </xf:select1>
                                     </fr:c>
-
-                                    <fr:c x="1" y="35" w="12">
-                                        <xf:select1 id="attachment-upload-error-appearance-value-control" appearance="minimal" ref="attachment-upload-error-appearance/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/attachment-upload-error-appearance/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-upload-error-appearance/hint else replace($form-resources/attachment-upload-error-appearance/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/attachment-upload-error-appearance/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
                                 </fr:grid>
                             </fr:tab>
 
@@ -3438,6 +3515,162 @@
                                         <xf:output ref="$form-resources/processes-section/empty"/>
                                     </xh:div>
                                 </xf:group>
+                            </fr:tab>
+
+                            <!-- Control Settings (XBL custom control editors) -->
+                            <fr:tab id="control-settings-tab">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count($active-scope/control-settings/*)
+                                        return concat(
+                                            $form-resources/control-settings-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xf:var
+                                    name="current-ui-lang"
+                                    value="(string($form-resources/@xml:lang)[xxf:non-blank()], 'en')[1]"/>
+                                <xf:var
+                                    name="all-control-components"
+                                    value="frf:availableControlSettingsXml($current-ui-lang)/*/component"/>
+                                <xf:var
+                                    name="configured-qnames"
+                                    value="for $e in $active-scope/control-settings/* return frf:controlSettingsQName($e)"/>
+                                <xf:var
+                                    name="available-control-components"
+                                    value="$all-control-components[not(@qname = $configured-qnames)]"/>
+                                <xf:var
+                                    name="filter-query"
+                                    value="lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))"/>
+                                <xf:var
+                                    name="control-settings-matches-filter"
+                                    value="
+                                        $filter-query != '' and (
+                                            contains(lower-case(string($form-resources/control-settings-section/label)), $filter-query) or
+                                            contains('oxf.xforms.xbl control settings', $filter-query) or
+                                            exists($all-control-components[contains(@search-text, $filter-query)]) or
+                                            exists($active-scope/control-settings/*/@*[contains(lower-case(concat(name(), ' ', .)), $filter-query)])
+                                        )"/>
+
+                                <xh:div class="fr-config-control-settings-pane {'fr-config-filter-match'[$control-settings-matches-filter]}">
+                                    <xh:div class="fr-config-category-header">
+                                        <xh:h3 class="fr-config-category-title">
+                                            <xf:output ref="$form-resources/control-settings-section/label"/>
+                                        </xh:h3>
+                                        <xh:span class="fr-config-scope-context-pill">
+                                            <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
+                                            <xf:output value="$active-scope-display"/>
+                                            <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
+                                                <xf:output value="$active-scope-profiles"/>
+                                            </xh:span>
+                                        </xh:span>
+                                    </xh:div>
+
+                                    <!-- Toolbar: Searchable Control Picker + Configure Button -->
+                                    <xh:div class="fr-config-processes-toolbar">
+                                        <xh:div class="fr-config-processes-override-group">
+                                            <fr:dropdown-select1-search
+                                                id="add-control-settings-select"
+                                                ref="instance('fr-configuration-ui-instance')/control-editor/selection"
+                                                show-value="true"
+                                                class="fr-config-controls-picker">
+                                                <xf:label appearance="minimal" ref="$form-resources/control-settings-section/select-placeholder"/>
+                                                <xf:itemset ref="$available-control-components">
+                                                    <xf:label ref="@label"/>
+                                                    <xf:value ref="@qname"/>
+                                                </xf:itemset>
+                                            </fr:dropdown-select1-search>
+                                            <xf:trigger
+                                                id="configure-control-settings-button"
+                                                appearance="xxf:primary"
+                                                ref="instance('fr-configuration-ui-instance')/control-editor/selection[xxf:non-blank()]">
+                                                <xf:label>
+                                                    <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                                    <xf:output value="concat(' ', $form-resources/control-settings-section/configure-button)"/>
+                                                </xf:label>
+                                                <xf:action event="DOMActivate">
+                                                    <xf:var name="chosen" value="string(instance('fr-configuration-ui-instance')/control-editor/selection)"/>
+                                                    <xf:var name="existing" value="$active-scope/control-settings/*[frf:controlSettingsQName(.) = $chosen][1]"/>
+                                                    <xf:setvalue ref="instance('fr-configuration-ui-instance')/control-editor/editing-qname" value="$chosen"/>
+                                                    <xf:setvalue ref="instance('fr-configuration-ui-instance')/control-editor/@valid" value="'true'"/>
+                                                    <xf:setvalue ref="instance('fr-configuration-ui-instance')/control-editor/selection" value="''"/>
+                                                    <xf:delete ref="instance('fr-config-control-editor-instance')/*"/>
+                                                    <xf:insert
+                                                        context="instance('fr-config-control-editor-instance')"
+                                                        origin="frf:buildControlSettingsSubform($chosen, ($existing, ())[1], $current-ui-lang)/*"/>
+                                                    <xxf:show dialog="fr-config-control-settings-dialog"/>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:div>
+                                    </xh:div>
+
+                                    <!-- Configured Controls List -->
+                                    <xf:group ref=".[exists($active-scope/control-settings/*)]">
+                                        <xh:div class="fr-config-processes-list">
+                                            <xf:repeat id="configured-control-settings-repeat" ref="$active-scope/control-settings/*">
+                                                <xf:var name="ctrl-elem"  value="."/>
+                                                <xf:var name="ctrl-qname" value="frf:controlSettingsQName(.)"/>
+                                                <xf:var name="ctrl-label" value="frf:controlSettingsDisplayName($ctrl-qname, $current-ui-lang)"/>
+                                                <xf:var name="ctrl-icon"  value="frf:controlSettingsIconClass($ctrl-qname)"/>
+                                                <xf:var
+                                                    name="card-visible"
+                                                    value="
+                                                        $filter-query = '' or
+                                                        contains(lower-case(string($form-resources/control-settings-section/label)), $filter-query) or
+                                                        contains(lower-case(concat($ctrl-label, ' ', $ctrl-qname)), $filter-query) or
+                                                        exists($all-control-components[@qname = $ctrl-qname and contains(@search-text, $filter-query)]) or
+                                                        exists(@*[contains(lower-case(concat(name(), ' ', .)), $filter-query)])"/>
+                                                <xh:div class="fr-config-process-card {'xforms-hidden'[not($card-visible)]}">
+                                                    <xh:div class="fr-config-process-card-header">
+                                                        <xh:div class="fr-config-process-card-title">
+                                                            <xh:i class="{$ctrl-icon} fr-config-control-icon" aria-hidden="true"/>
+                                                            <xh:span class="fr-config-control-display-name">
+                                                                <xf:output value="$ctrl-label"/>
+                                                            </xh:span>
+                                                            <xh:span class="fr-config-process-kind-badge">
+                                                                <xf:output value="$ctrl-qname"/>
+                                                            </xh:span>
+                                                        </xh:div>
+                                                        <xh:div class="fr-config-process-card-actions">
+                                                            <xf:trigger id="edit-configured-control-settings-button" appearance="xxf:mini">
+                                                                <xf:label>
+                                                                    <xh:i class="fa fa-fw fa-pen" aria-hidden="true"/>
+                                                                    <xf:output value="concat(' ', $form-resources/control-settings-section/edit)"/>
+                                                                </xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:setvalue ref="instance('fr-configuration-ui-instance')/control-editor/editing-qname" value="$ctrl-qname"/>
+                                                                    <xf:setvalue ref="instance('fr-configuration-ui-instance')/control-editor/@valid" value="'true'"/>
+                                                                    <xf:delete ref="instance('fr-config-control-editor-instance')/*"/>
+                                                                    <xf:insert
+                                                                        context="instance('fr-config-control-editor-instance')"
+                                                                        origin="frf:buildControlSettingsSubform($ctrl-qname, $ctrl-elem, $current-ui-lang)/*"/>
+                                                                    <xxf:show dialog="fr-config-control-settings-dialog"/>
+                                                                </xf:action>
+                                                            </xf:trigger>
+                                                            <xf:trigger id="delete-configured-control-settings-button" appearance="xxf:mini xxf:danger">
+                                                                <xf:label>
+                                                                    <xh:i class="fa fa-fw fa-rotate-left" aria-hidden="true"/>
+                                                                    <xf:output value="concat(' ', $form-resources/control-settings-section/revert)"/>
+                                                                </xf:label>
+                                                                <xf:delete event="DOMActivate" ref="$ctrl-elem"/>
+                                                            </xf:trigger>
+                                                        </xh:div>
+                                                    </xh:div>
+                                                    <xh:div class="fr-config-control-summary">
+                                                        <xf:output mediatype="text/html" value="frf:formatControlSettingsSummaryHtml($ctrl-elem, $current-ui-lang, $form-resources)"/>
+                                                    </xh:div>
+                                                </xh:div>
+                                            </xf:repeat>
+                                        </xh:div>
+                                    </xf:group>
+
+                                    <!-- Empty state -->
+                                    <xf:group ref=".[empty($active-scope/control-settings/*)]">
+                                        <xh:div class="fr-config-processes-empty">
+                                            <xf:output ref="$form-resources/control-settings-section/empty"/>
+                                        </xh:div>
+                                    </xf:group>
+                                </xh:div>
                             </fr:tab>
 
                             <!-- Admin Page -->
@@ -5114,6 +5347,113 @@
                     </xf:action>
                 </fr:dialog-process-editor>
 
+                <!-- Custom Control Settings Modal Dialog (mounts XBL <control-details> via <xxf:dynamic>) -->
+                <xxf:dialog
+                    id="fr-config-control-settings-dialog"
+                    level="modal"
+                    close="true"
+                    draggable="true"
+                    class="fr-config-control-dialog">
+                    <xf:label
+                        value="
+                            let $qname := string(instance('fr-configuration-ui-instance')/control-editor/editing-qname),
+                                $lang  := (string($form-resources/@xml:lang)[xxf:non-blank()], 'en')[1]
+                            return concat($form-resources/control-settings-section/dialog-title, ': ', frf:controlSettingsDisplayName($qname, $lang))
+                        "/>
+
+                    <xf:action event="xxforms-dialog-close" observer="fr-config-control-settings-dialog" phase="target">
+                        <xf:delete ref="instance('fr-config-control-editor-instance')/*"/>
+                    </xf:action>
+
+                    <xf:group ref="instance('fr-configuration-ui-instance')/control-editor" id="fr-config-control-details-group">
+                        <xf:var name="editing-qname" value="string(editing-qname)"/>
+                        <xf:var name="editing-prefix" value="substring-before($editing-qname, ':')"/>
+                        <xf:var name="editing-local" value="substring-after($editing-qname, ':')"/>
+                        <xf:var
+                            name="editing-prop-pattern"
+                            value="
+                                concat(
+                                    'oxf.xforms.xbl.',
+                                    $editing-prefix,
+                                    '.',
+                                    $editing-local,
+                                    '.*.',
+                                    if ($is-global-scope) then '*.*' else concat($active-override/@app, '.', $active-override/@form)
+                                )"/>
+
+                        <xh:div class="fr-config-control-dialog-meta">
+                            <xh:span class="fr-config-control-dialog-prefix">
+                                <xf:output value="$editing-prop-pattern"/>
+                            </xh:span>
+                            <xh:span class="fr-config-scope-context-pill">
+                                <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
+                                <xf:output value="$active-scope-display"/>
+                                <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
+                                    <xf:output value="$active-scope-profiles"/>
+                                </xh:span>
+                            </xh:span>
+                        </xh:div>
+
+                        <xf:group id="fr-config-control-details-dynamic-wrapper">
+                            <xxf:dynamic
+                                id="fr-config-control-details-dynamic"
+                                ref="instance('fr-config-control-editor-instance')[exists(.//xf:instance/*)]/*[1]"/>
+                        </xf:group>
+
+                        <fr:error-summary
+                            id="fr-config-control-details-error-summary"
+                            observer="fr-config-control-details-dynamic-wrapper"
+                            valid-ref="@valid"
+                            lowest-level-to-show="warning">
+                            <fr:label><xf:output value="xxf:r('detail.labels.errors', '|fr-fr-resources|')"/></fr:label>
+                        </fr:error-summary>
+
+                        <xh:div class="fr-config-control-dialog-buttons">
+                            <xf:trigger id="confirm-control-settings-dialog-button" appearance="xxf:primary">
+                                <xf:label ref="$form-resources/control-settings-section/apply"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:action if="instance('fr-configuration-ui-instance')/control-editor/@valid = 'true'">
+                                        <xf:var
+                                            name="lang"
+                                            value="(string($form-resources/@xml:lang)[xxf:non-blank()], 'en')[1]"/>
+                                        <xf:var
+                                            name="normalized-elem"
+                                            value="frf:extractNormalizedControlSettingsElem($editing-qname, instance('fr-config-control-editor-instance')/*[1])/*/*[1]"/>
+                                        <xf:delete ref="$active-scope/control-settings/*[frf:controlSettingsQName(.) = $editing-qname]"/>
+                                        <xf:action if="exists($normalized-elem)">
+                                            <xf:var
+                                                name="new-label-lc"
+                                                value="lower-case(frf:controlSettingsDisplayName($editing-qname, $lang))"/>
+                                            <xf:var
+                                                name="insert-before-elem"
+                                                value="$active-scope/control-settings/*[compare(lower-case(frf:controlSettingsDisplayName(frf:controlSettingsQName(.), $lang)), $new-label-lc) gt 0][1]"/>
+                                            <xf:insert
+                                                if="exists($insert-before-elem)"
+                                                ref="$insert-before-elem"
+                                                position="before"
+                                                origin="$normalized-elem"/>
+                                            <xf:insert
+                                                if="empty($insert-before-elem)"
+                                                context="$active-scope/control-settings"
+                                                ref="*"
+                                                origin="$normalized-elem"/>
+                                        </xf:action>
+                                        <xxf:hide dialog="fr-config-control-settings-dialog"/>
+                                    </xf:action>
+                                    <xxf:setvisited
+                                        if="not(instance('fr-configuration-ui-instance')/control-editor/@valid = 'true')"
+                                        control="fr-config-control-details-dynamic"
+                                        recurse="true"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger id="cancel-control-settings-dialog-button" appearance="minimal">
+                                <xf:label ref="$form-resources/control-settings-section/cancel"/>
+                                <xxf:hide event="DOMActivate" dialog="fr-config-control-settings-dialog"/>
+                            </xf:trigger>
+                        </xh:div>
+                    </xf:group>
+                </xxf:dialog>
+
                 <!-- Add / Edit Application or Form Override Modal Dialog -->
                 <xxf:dialog
                     id="fr-config-scope-dialog"
@@ -5212,7 +5552,8 @@
                                 $eff-profiles = '' and
                                 empty($existing-match/curated/*/*[string(@override) = 'true']) and
                                 empty($existing-match/resources/message) and
-                                empty($existing-match/processes/process)
+                                empty($existing-match/processes/process) and
+                                empty($existing-match/control-settings/*)
                             "/>
                         <xf:var
                             name="duplicate-error"
@@ -5343,7 +5684,8 @@
                                             $cur-profiles = '' and
                                             empty($cur-existing-match/curated/*/*[string(@override) = 'true']) and
                                             empty($cur-existing-match/resources/message) and
-                                            empty($cur-existing-match/processes/process)
+                                            empty($cur-existing-match/processes/process) and
+                                            empty($cur-existing-match/control-settings/*)
                                         "/>
                                     <xf:var name="cur-duplicate-error" value="exists($cur-existing-match) and not($cur-existing-is-empty-parent)"/>
                                     <xf:var name="cur-dialog-valid" value="$cur-app-valid and $cur-form-valid and $cur-profiles-valid and not($cur-duplicate-error)"/>

@@ -141,6 +141,18 @@
         <dialog-title-add>Egyéni folyamat hozzáadása</dialog-title-add>
         <dialog-title-edit>Folyamat szerkesztése</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>Vezérlőbeállítások</label>
+        <select-placeholder>Válasszon egy beállítandó vezérlőt…</select-placeholder>
+        <configure-button>Beállítás</configure-button>
+        <edit>Szerkesztés</edit>
+        <revert>Visszaállítás</revert>
+        <apply>Alkalmaz</apply>
+        <cancel>Mégse</cancel>
+        <dialog-title>Vezérlőbeállítások</dialog-title>
+        <empty>Ehhez a hatókörhöz nincs egyéni vezérlőbeállítás megadva. Válasszon fent egy vezérlőt az alapértelmezett beállítások felülbírálásához.</empty>
+        <none-value>(nincs)</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>Alkalmazás- / űrlap-felülbírálások</label>
         <add-override>Alkalmazás- / űrlap-felülbírálás hozzáadása</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>Feltöltési hibák megjelenése</label>
-        <hint>A fájlfeltöltési hibák megjelenítési módja &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>Alapértelmezett (Modális párbeszédpanel)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Modális párbeszédpanel</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>Beágyazott figyelmeztetés</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>Varázsló nézet</label>
         <hint>Felső szintű szekciók megjelenítése teljes oldalként vagy külön varázslóoldalakként &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>Állapottoken érvényessége (perc)</label>
         <hint>Állapottokenek érvényességi időtartama percben &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>Szerkeszthető módok</editable>
+        <review>Áttekintő mód</review>
+        <pdf-automatic>Automatikus PDF</pdf-automatic>
+        <pdf-template>PDF-sablon</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>Mező szélessége</field-width>
+        <default>Alapértelmezett használata</default>
+        <full>Teljes</full>
+        <natural>Természetes</natural>
+        <field-align>Mező igazítása</field-align>
+        <left>Balra</left>
+        <right>Jobbra</right>
+        <learn-settings-below>Tudjon meg többet az alábbi beállításokról</learn-settings-below>
+        <field-value-visibility>
+            <label>Mezőérték láthatósága</label>
+            <hint>Meghatározza, hogyan jelenik meg a mező értéke</hint>
+            <item id="visible">Látható</item>
+            <item id="obscured">Elrejtett</item>
+            <item id="partial">Részleges</item>
+            <item id="reveal">Megjelenítés engedélyezése a felhasználónak</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>Nyílt választás</label>
+            <help>Amikor a „Nyílt választás” beállítás be van kapcsolva, a felhasználók saját értéket is megadhatnak ebben a vezérlőben az űrlap kitöltésekor. Ez az érték bekerül az adatokba, és megjelenik a legördülő listában.</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

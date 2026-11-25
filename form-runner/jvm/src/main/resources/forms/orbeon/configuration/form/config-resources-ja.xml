@@ -141,6 +141,18 @@
         <dialog-title-add>カスタムプロセスを追加</dialog-title-add>
         <dialog-title-edit>プロセスを編集</dialog-title-edit>
     </processes-section>
+    <control-settings-section>
+        <label>コントロール設定</label>
+        <select-placeholder>設定するコントロールを選択…</select-placeholder>
+        <configure-button>設定</configure-button>
+        <edit>編集</edit>
+        <revert>元に戻す</revert>
+        <apply>適用</apply>
+        <cancel>キャンセル</cancel>
+        <dialog-title>コントロール設定</dialog-title>
+        <empty>このスコープにはカスタムコントロール設定が構成されていません。上のリストからコントロールを選択して既定の設定を上書きできます。</empty>
+        <none-value>（なし）</none-value>
+    </control-settings-section>
     <app-form-overrides-section>
         <label>アプリケーション / フォームのオーバーライド</label>
         <add-override>アプリケーション / フォームのオーバーライドを追加</add-override>
@@ -1032,22 +1044,6 @@
             <value>false</value>
         </item>
     </upload-reject-empty-files>
-    <attachment-upload-error-appearance>
-        <label>アップロードエラーの外観</label>
-        <hint>ファイルアップロードエラーの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*&lt;/code&gt;</hint>
-        <item>
-            <label>デフォルト (モーダルダイアログ)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>モーダルダイアログ</label>
-            <value>dialog</value>
-        </item>
-        <item>
-            <label>インラインアラート</label>
-            <value>inline</value>
-        </item>
-    </attachment-upload-error-appearance>
     <wizard-view>
         <label>ウィザード表示</label>
         <hint>トップレベルセクションを1ページ全体で表示するか、個別のウィザードページとして表示するか &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.appearance.*.*&lt;/code&gt;</hint>
@@ -2256,4 +2252,34 @@
         <label>状態トークンの有効期間 (分)</label>
         <hint>状態トークンの分単位の有効期間 &lt;code class="fr-config-prop-name"&gt;oxf.fr.state-token.validity.*.*&lt;/code&gt;</hint>
     </state-token-validity>
+    <modes>
+        <editable>編集モード</editable>
+        <review>レビューモード</review>
+        <pdf-automatic>自動PDF</pdf-automatic>
+        <pdf-template>PDFテンプレート</pdf-template>
+    </modes>
+    <xbl-control-settings>
+        <field-width>フィールド幅</field-width>
+        <default>既定を使う</default>
+        <full>全幅</full>
+        <natural>自然</natural>
+        <field-align>フィールド配置</field-align>
+        <left>左</left>
+        <right>右</right>
+        <learn-settings-below>以下の設定について詳しく見る</learn-settings-below>
+        <field-value-visibility>
+            <label>フィールド値の表示</label>
+            <hint>値の見せ方を制御します</hint>
+            <item id="visible">表示</item>
+            <item id="obscured">非表示（マスク）</item>
+            <item id="partial">一部のみ表示</item>
+            <item id="reveal">ユーザーが表示切替可</item>
+        </field-value-visibility>
+    </xbl-control-settings>
+    <dialog-control-settings>
+        <open-selection>
+            <label>自由入力を許可</label>
+            <help>「自由入力を許可」オプションが有効な場合、ユーザーはフォーム入力時にこのフィールドに独自の値を入力できます。この値はデータに保存され、ドロップダウンリストに表示されるラベルとして使用されます。</help>
+        </open-selection>
+    </dialog-control-settings>
 </resource>

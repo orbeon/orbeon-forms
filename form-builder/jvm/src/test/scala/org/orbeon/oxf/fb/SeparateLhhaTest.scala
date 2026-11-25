@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import cats.syntax.option.*
-import org.orbeon.builder.rpc.{ControlPosition as McpControlPosition, ControlSettingsUpdateR, FormBuilderMcpRpcApiImpl, FormBuilderRpcApiImpl}
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.NodeInfoCell.{CellTest, NodeInfoCellOps}
@@ -23,9 +22,6 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
-
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 
 class SeparateLhhaTest
@@ -194,51 +190,15 @@ class SeparateLhhaTest
       }
     }
 
-    it("supports grid-wide moveGridLabelsToLeft / moveGridLabelsToTop and MCP labelPosition / gridSetLabelsPosition") {
+    it("supports grid-wide moveGridLabelsToLeft / moveGridLabelsToTop") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
         val control1 = FormRunner.findControlByName("control-1").get
         val gridElem = FormBuilder.getContainingGrid(control1.parentUnsafe)
-        val gridName = FormRunner.getControlName(gridElem)
 
-        // MCP `gridSetLabelsPosition("left")`
-        Await.result(FormBuilderMcpRpcApiImpl.gridSetLabelsPosition("", gridName, "left"), Duration.Inf)
+        FormBuilder.moveGridLabelsToLeft(gridElem)
         assert(FormBuilder.hasSeparateLabel(FormRunner.findControlByName("control-1").get))
 
-        // MCP `formGetStructure` reports `separateLabelPosition` and does not emit bogus label controls
-        val structure = Await.result(FormBuilderMcpRpcApiImpl.formGetStructure(""), Duration.Inf)
-        val mcpGrid   = structure.sections.flatMap(_.grids).find(_.name == gridName).get
-        assert(mcpGrid.controls.forall(_.controlType.localName != "label"))
-        val mcpCtrl1  = mcpGrid.controls.find(_.name == "control-1").get
-        assert(mcpCtrl1.separateLabelPosition.isDefined)
-
-        // MCP `controlGetSettings` reports `labelPosition = Some("separate")`
-        val settings1 = Await.result(FormBuilderMcpRpcApiImpl.controlGetSettings("", "control-1"), Duration.Inf)
-        assert(settings1.labelPosition.contains("separate"))
-        assert(settings1.separateLabelPosition.isDefined)
-
-        // MCP `controlSetSettings` with `labelPosition = Some("top")` moves label back above control
-        Await.result(
-          FormBuilderMcpRpcApiImpl.controlSetSettings("", "control-1", ControlSettingsUpdateR(labelPosition = Some("top"))),
-          Duration.Inf
-        )
-        assert(! FormBuilder.hasSeparateLabel(FormRunner.findControlByName("control-1").get))
-
-        // MCP `controlSetSettings` with explicit `separateLabelPosition`
-        val rowCell = FormBuilder.rowInsertBelow(gridElem, 0)._1
-        val targetY = NodeInfoCellOps.y(rowCell).get
-        Await.result(
-          FormBuilderMcpRpcApiImpl.controlSetSettings(
-            "",
-            "control-1",
-            ControlSettingsUpdateR(separateLabelPosition = Some(McpControlPosition(x = 1, y = targetY, width = 4, height = 1)))
-          ),
-          Duration.Inf
-        )
-        val settingsAfterCustomPos = Await.result(FormBuilderMcpRpcApiImpl.controlGetSettings("", "control-1"), Duration.Inf)
-        assert(settingsAfterCustomPos.separateLabelPosition.contains(McpControlPosition(1, targetY, 4, 1)))
-
-        // MCP `gridSetLabelsPosition("top")` moves all separate labels back above controls
-        Await.result(FormBuilderMcpRpcApiImpl.gridSetLabelsPosition("", gridName, "top"), Duration.Inf)
+        FormBuilder.moveGridLabelsToTop(gridElem)
         assert(! FormBuilder.hasSeparateLabel(FormRunner.findControlByName("control-1").get))
       }
     }

@@ -13,87 +13,27 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.fr.DropIndicatorDnD.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
-import scala.annotation.tailrec
 import scala.scalajs.js
-import scala.util.Try
 
 
 object ProcessEditorDnD {
 
-  private val DragThresholdPx    = 4.0
-  private val AutoScrollEdgePx   = 40.0
-  private val AutoScrollStepPx   = 8.0
-  private val IndentStepPx       = 20.0
-  private val ClusterGapPx       = 10.0
-  private val ClusterSpreadStep  = 7.0
-  private val GrabHandleSelector = ".fr-process-steps-list .fr-process-iteration.fr-process-can-move .fr-process-grab"
-  private val ContainerStepTypes = Set("group", "condition", "else")
+  import Private.*
 
-  private case class DragContext(
-    editorEl           : html.Element,
-    overlayContainerEl : html.Element,
-    listEl             : html.Element,
-    processIndex       : String,
-    sourceRowIndex     : Int
-  )
-
-  private case class ProcessRow(
-    el               : html.Element,
-    mainEl           : html.Element,
-    contentEl        : html.Element,
-    rowIndex         : Int,
-    stepType         : String,
-    level            : Int,
-    canMove          : Boolean,
-    treeParentRowOpt : Option[Int]
-  )
-
-  private case class ProcessDropTarget(
-    intoOpt            : Option[ProcessRow],
-    afterRowIndexOpt   : Option[Int],
-    level              : Int,
-    boundaryY          : Double,
-    anchorY            : Double,
-    left               : Double,
-    width              : Double,
-    isOriginalPosition : Boolean = false
-  )
-
-  private var _isDragging: Boolean = false
-  def isDragging: Boolean = _isDragging
-
-  private var activePointerId     : Option[Double]            = None
-  private var capturedHandleOpt   : Option[html.Element]      = None
-  private var dragContextOpt      : Option[DragContext]       = None
-  private var startClientX        : Double                    = 0.0
-  private var startClientY        : Double                    = 0.0
-  private var lastClientX         : Double                    = 0.0
-  private var lastClientY         : Double                    = 0.0
-  private var dropTargets         : List[ProcessDropTarget]   = Nil
-  private var activeDropTargetOpt : Option[ProcessDropTarget] = None
-  private var ghostElOpt          : Option[html.Element]      = None
-  private var indicatorElOpt      : Option[html.Element]      = None
-  private var highlightedRowOpt   : Option[html.Element]      = None
-  private var dimmedElements      : List[html.Element]        = Nil
-  private var autoScrollDelta     : Double                    = 0.0
-  private var autoScrollRafOpt    : Option[Int]               = None
-
-  private val onPointerMoveFn        : js.Function1[dom.PointerEvent, Unit]  = onPointerMove(_)
-  private val onPointerUpFn          : js.Function1[dom.PointerEvent, Unit]  = onPointerUp(_)
-  private val onLostPointerCaptureFn : js.Function1[dom.PointerEvent, Unit]  = onLostPointerCapture(_)
-  private val onKeyDownFn            : js.Function1[dom.KeyboardEvent, Unit] = onKeyDown(_)
+  def isDragging: Boolean = controller.isDragging
 
   locally {
     dom.document.addEventListener(
       "pointerdown",
       (event: dom.PointerEvent) => {
-        if (event.button == 0 && activePointerId.isEmpty) {
+        if (event.button == 0 && ! controller.isActiveOrPending) {
           for {
             handleEl     <- event.targetOpt.flatMap(_.closestOpt(GrabHandleSelector))
             rowEl        <- handleEl.closestOpt(".fr-process-iteration")
@@ -105,550 +45,376 @@ object ProcessEditorDnD {
             if canRowLeaveParent(draggedRow, allRows)
           } {
             event.preventDefault()
-
-            val overlayContainerEl = listEl.closestOpt(".xforms-dialog").getOrElse(editorEl)
-
-            activePointerId   = Some(event.pointerId)
-            capturedHandleOpt = Some(handleEl)
-            dragContextOpt    = Some(DragContext(editorEl, overlayContainerEl, listEl, processIndex, draggedRow.rowIndex))
-            startClientX      = event.clientX
-            startClientY      = event.clientY
-            lastClientX       = event.clientX
-            lastClientY       = event.clientY
-
-            Try(handleEl.setPointerCapture(event.pointerId))
-
-            dom.document.addEventListener("pointermove",   onPointerMoveFn)
-            dom.document.addEventListener("pointerup",     onPointerUpFn)
-            dom.document.addEventListener("pointercancel", onPointerUpFn)
-            handleEl.addEventListener("lostpointercapture", onLostPointerCaptureFn)
-            dom.document.addEventListener("keydown", onKeyDownFn, useCapture = true)
-          }
-        }
-      }
-    )
-  }
-
-  private def canRowLeaveParent(row: ProcessRow, allRows: List[ProcessRow]): Boolean =
-    row.stepType != "else" &&
-    row.canMove            &&
-    allRows.count(r => r.stepType != "else" && r.treeParentRowOpt == row.treeParentRowOpt) > 1
-
-  private def rowsInList(listEl: html.Element): List[ProcessRow] = {
-    val rawElems =
-      listEl
-        .querySelectorAllT(".fr-process-iteration")
-        .iterator
-        .filter(_.isVisible)
-        .toList
-
-    var containerHeaderByLevel = Map.empty[Int, Int]
-    var conditionHeaderByLevel = Map.empty[Int, Int]
-
-    rawElems.flatMap { el =>
-      for {
-        rowIndex  <- el.attValueOpt("data-orbeon-row-index").flatMap(_.toIntOption)
-        mainEl    <- el.querySelectorOpt(".fr-process-row-main")
-        contentEl <- mainEl.querySelectorOpt(".fr-process-row-content")
-      } yield {
-        val stepType = el.attValueOpt("data-orbeon-step-type").flatMap(_.trimAllToOpt).getOrElse("action")
-        val level    = el.attValueOpt("data-orbeon-level").flatMap(_.toIntOption).getOrElse(0)
-        val canMove  = el.booleanAttValueOpt("data-orbeon-can-move").getOrElse(false)
-
-        val treeParentRowOpt =
-          if (stepType == "else")
-            conditionHeaderByLevel.get(level)
-          else if (level > 0)
-            containerHeaderByLevel.get(level - 1)
-          else
-            None
-
-        stepType match {
-          case "condition" =>
-            containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
-            conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
-          case "group" =>
-            containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
-            conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
-          case "else" =>
-            containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
-            conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
-          case _ =>
-            containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level }
-            conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
-        }
-
-        ProcessRow(
-          el               = el,
-          mainEl           = mainEl,
-          contentEl        = contentEl,
-          rowIndex         = rowIndex,
-          stepType         = stepType,
-          level            = level,
-          canMove          = canMove,
-          treeParentRowOpt = treeParentRowOpt
-        )
-      }
-    }
-  }
-
-  private def isDescendantOrSelf(
-    candidateRowIndex : Int,
-    ancestorRowIndex  : Int,
-    rowByIndex        : Map[Int, ProcessRow]
-  ): Boolean = {
-    @tailrec
-    def loop(currIdx: Int): Boolean =
-      if (currIdx == ancestorRowIndex)
-        true
-      else
-        rowByIndex.get(currIdx).flatMap(_.treeParentRowOpt) match {
-          case Some(parentIdx) => loop(parentIdx)
-          case None            => false
-        }
-
-    loop(candidateRowIndex)
-  }
-
-  private def computeDropTargets(
-    draggedRow : ProcessRow,
-    allRows    : List[ProcessRow]
-  ): List[ProcessDropTarget] =
-    if (! canRowLeaveParent(draggedRow, allRows)) {
-      Nil
-    } else {
-      val rowByIndex = allRows.map(r => r.rowIndex -> r).toMap
-
-      def lastDescendantOrSelfRow(row: ProcessRow): ProcessRow =
-        allRows
-          .filter(c => isDescendantOrSelf(c.rowIndex, row.rowIndex, rowByIndex))
-          .lastOption
-          .getOrElse(row)
-
-      val eligibleParents: List[Option[ProcessRow]] =
-        None :: allRows.collect {
-          case r
-            if ContainerStepTypes(r.stepType) &&
-               ! isDescendantOrSelf(r.rowIndex, draggedRow.rowIndex, rowByIndex) =>
-            Some(r)
-        }
-
-      val refRowOpt = allRows.headOption
-
-      val rawTargets =
-        eligibleParents.flatMap { intoOpt =>
-          val intoIdxOpt   = intoOpt.map(_.rowIndex)
-          val targetLevel  = intoOpt.map(_.level + 1).getOrElse(0)
-          val children     = allRows.filter(r => r.stepType != "else" && r.treeParentRowOpt == intoIdxOpt)
-          val isSameParent = intoIdxOpt == draggedRow.treeParentRowOpt
-          val draggedIdx   = if (isSameParent) children.indexWhere(_.rowIndex == draggedRow.rowIndex) else -1
-
-          val (slotLeft, slotWidth) =
-            intoOpt.orElse(refRowOpt) match {
-              case Some(refRow) =>
-                val mainRect = refRow.mainEl.getBoundingClientRect()
-                val left     = mainRect.left + targetLevel * IndentStepPx
-                val width    = Math.max(40.0, mainRect.width - 2.0 * targetLevel * IndentStepPx)
-                (left, width)
-              case None =>
-                (0.0, 0.0)
-            }
-
-          val firstSlotOpt = {
-            val firstBoundaryY =
-              intoOpt match {
-                case Some(headerRow) =>
-                  children
-                    .headOption
-                    .map(_.mainEl.getBoundingClientRect().top)
-                    .getOrElse(headerRow.mainEl.getBoundingClientRect().bottom)
-                case None =>
-                  allRows
-                    .headOption
-                    .map(_.mainEl.getBoundingClientRect().top)
-                    .getOrElse(0.0)
-              }
-
-            Some(
-              ProcessDropTarget(
-                intoOpt            = intoOpt,
-                afterRowIndexOpt   = None,
-                level              = targetLevel,
-                boundaryY          = firstBoundaryY,
-                anchorY            = firstBoundaryY,
-                left               = slotLeft,
-                width              = slotWidth,
-                isOriginalPosition = isSameParent && draggedIdx == 0
-              )
+            controller.beginPending(
+              event        = event,
+              captureElOpt = Some(handleEl),
+              state        = DragContext(editorEl, listEl, processIndex, draggedRow.rowIndex)
             )
           }
-
-          val afterSlots =
-            children.indices.map { idx =>
-              val child   = children(idx)
-              val lastRow = lastDescendantOrSelfRow(child)
-              val boundaryY =
-                if (idx + 1 < children.length) {
-                  children(idx + 1).mainEl.getBoundingClientRect().top
-                } else if (targetLevel == 0) {
-                  lastRow.mainEl.getBoundingClientRect().bottom + 2.0
-                } else {
-                  lastRow
-                    .mainEl
-                    .querySelectorOpt(s".fr-process-box-slice[data-orbeon-body-level='$targetLevel']")
-                    .map(_.getBoundingClientRect().bottom)
-                    .getOrElse(lastRow.mainEl.getBoundingClientRect().bottom)
-                }
-
-              ProcessDropTarget(
-                intoOpt            = intoOpt,
-                afterRowIndexOpt   = Some(child.rowIndex),
-                level              = targetLevel,
-                boundaryY          = boundaryY,
-                anchorY            = boundaryY,
-                left               = slotLeft,
-                width              = slotWidth,
-                isOriginalPosition = isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)
-              )
-            }
-
-          firstSlotOpt.toList ++ afterSlots
-        }
-
-      val sorted = rawTargets.sortBy(t => (t.boundaryY, -t.level))
-      spreadClusterAnchors(sorted)
-    }
-
-  private def spreadClusterAnchors(sorted: List[ProcessDropTarget]): List[ProcessDropTarget] =
-    if (sorted.size <= 1) {
-      sorted
-    } else {
-      val clusters = scala.collection.mutable.ListBuffer.empty[List[ProcessDropTarget]]
-      var current  = List(sorted.head)
-
-      sorted.tail.foreach { target =>
-        if (target.boundaryY - current.last.boundaryY < ClusterGapPx)
-          current = current :+ target
-        else {
-          clusters += current
-          current = List(target)
         }
       }
-      clusters += current
-
-      val clusterList = clusters.toList
-      clusterList.zipWithIndex.flatMap { case (cluster, cIdx) =>
-        if (cluster.size <= 1) {
-          cluster
-        } else {
-          val firstY = cluster.head.boundaryY
-          val step =
-            clusterList.lift(cIdx + 1) match {
-              case Some(nextCluster) =>
-                val maxSpan = Math.max(0.0, nextCluster.head.boundaryY - 8.0 - firstY)
-                Math.min(ClusterSpreadStep, maxSpan / (cluster.size - 1))
-              case None =>
-                ClusterSpreadStep
-            }
-
-          cluster.zipWithIndex.map { case (target, idx) =>
-            target.copy(anchorY = firstY + idx * step)
-          }
-        }
-      }
-    }
-
-  private def stepGhostLabel(row: ProcessRow): (String, String) =
-    row.stepType match {
-      case "group" =>
-        ("fa-object-group", "group")
-
-      case "condition" =>
-        val condOpt =
-          row.el
-            .querySelectorOpt(".fr-process-condition-input input")
-            .collect { case inp: html.Input => inp.value }
-            .flatMap(_.trimAllToOpt)
-            .map { s =>
-              if (s.length > 32) s"${s.take(31)}…" else s
-            }
-        val label = condOpt.map(c => s"if ($c)").getOrElse("if")
-        ("fa-code-fork", label)
-
-      case _ =>
-        val actionLabel =
-          row.el
-            .querySelectorOpt(".fr-process-action-select1 select")
-            .collect {
-              case sel: html.Select if sel.selectedIndex >= 0 && sel.selectedIndex < sel.options.length =>
-                sel.options(sel.selectedIndex).text
-            }
-            .flatMap(_.trimAllToOpt)
-            .getOrElse("action")
-        ("fa-cog", actionLabel)
-    }
-
-  private def orbeonRootEl: html.Element =
-    dom.document.querySelectorOpt(".orbeon").getOrElse(dom.document.body)
-
-  private def collectSubtreeDimmedElements(
-    draggedRow : ProcessRow,
-    allRows    : List[ProcessRow]
-  ): List[html.Element] = {
-    val rowByIndex  = allRows.map(r => r.rowIndex -> r).toMap
-    val subtreeRows = allRows.filter(r => isDescendantOrSelf(r.rowIndex, draggedRow.rowIndex, rowByIndex))
-
-    subtreeRows.flatMap { r =>
-      val buttonsOpt  = r.el.querySelectorOpt(".fr-process-row-buttons")
-      val innerSlices =
-        r.mainEl
-          .childrenT(".fr-process-box-slice")
-          .filter(_.attValueOpt("data-orbeon-box-depth").flatMap(_.toIntOption).exists(_ >= draggedRow.level))
-      r.contentEl :: buttonsOpt.toList ++ innerSlices
-    }
-  }
-
-  private def startDragging(ctx: DragContext): Unit = {
-    val allRows = rowsInList(ctx.listEl)
-    allRows.find(_.rowIndex == ctx.sourceRowIndex) match {
-      case Some(draggedRow) =>
-        dropTargets = computeDropTargets(draggedRow, allRows)
-        if (! dropTargets.exists(! _.isOriginalPosition)) {
-          cleanupDrag()
-        } else {
-          _isDragging = true
-          orbeonRootEl.classList.add("fr-process-dragging")
-
-          dimmedElements = collectSubtreeDimmedElements(draggedRow, allRows)
-          dimmedElements.foreach(_.classList.add("fr-process-dnd-source"))
-
-          val (iconClass, labelText) = stepGhostLabel(draggedRow)
-
-          val ghostEl        = dom.document.createDivElement
-          ghostEl.className  = "fr-process-dnd-ghost"
-          val iconEl         = dom.document.createElementT("i")
-          iconEl.className   = s"fa fa-fw $iconClass"
-          val textEl         = dom.document.createElementT("span")
-          textEl.textContent = labelText
-          ghostEl.appendChild(iconEl)
-          ghostEl.appendChild(textEl)
-          ctx.overlayContainerEl.appendChild(ghostEl)
-          ghostElOpt = Some(ghostEl)
-
-          val indicatorEl       = dom.document.createDivElement
-          indicatorEl.className = "fr-process-drop-indicator"
-          indicatorEl.hide()
-          ctx.overlayContainerEl.appendChild(indicatorEl)
-          indicatorElOpt = Some(indicatorEl)
-        }
-
-      case None =>
-        cleanupDrag()
-    }
-  }
-
-  private def updateGhostAndIndicator(clientX: Double, clientY: Double): Unit = {
-    ghostElOpt.foreach { ghostEl =>
-      ghostEl.style.left = s"${clientX + 14.0}px"
-      ghostEl.style.top  = s"${clientY + 14.0}px"
-    }
-
-    activeDropTargetOpt = dropTargets.minByOption(t => Math.abs(clientY - t.anchorY))
-
-    highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
-    highlightedRowOpt = activeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoOpt).map(_.el)
-    highlightedRowOpt.foreach(_.classList.add("fr-process-dnd-drop-into"))
-
-    indicatorElOpt.foreach { indicatorEl =>
-      activeDropTargetOpt match {
-        case Some(target) =>
-          indicatorEl.show()
-          indicatorEl.style.left  = s"${target.left}px"
-          indicatorEl.style.top   = s"${target.boundaryY - 1.5}px"
-          indicatorEl.style.width = s"${target.width}px"
-          indicatorEl.classList.toggle("fr-process-drop-indicator-noop", target.isOriginalPosition)
-        case None =>
-          indicatorEl.hide()
-      }
-    }
-  }
-
-  private def findScrollContainerOpt(ctx: DragContext): Option[html.Element] =
-    ctx.listEl
-      .ancestorOrSelfElem(includeSelf = false)
-      .takeWhile(el => (el ne ctx.overlayContainerEl.parentElement) && (el ne dom.document.body))
-      .find(el => el.scrollHeight > el.clientHeight + 1)
-
-  private def updateAutoScroll(clientY: Double): Unit =
-    dragContextOpt.flatMap(findScrollContainerOpt) match {
-      case Some(scrollEl) =>
-        val rect = scrollEl.getBoundingClientRect()
-        autoScrollDelta =
-          if (clientY < rect.top + AutoScrollEdgePx)
-            -AutoScrollStepPx
-          else if (clientY > rect.bottom - AutoScrollEdgePx)
-            AutoScrollStepPx
-          else
-            0.0
-
-        if (autoScrollDelta != 0.0) {
-          if (autoScrollRafOpt.isEmpty)
-            scheduleAutoScrollStep()
-        } else {
-          stopAutoScroll()
-        }
-
-      case None =>
-        stopAutoScroll()
-    }
-
-  private def scheduleAutoScrollStep(): Unit = {
-    val rafId = dom.window.requestAnimationFrame { _ =>
-      autoScrollRafOpt = None
-      if (_isDragging && autoScrollDelta != 0.0) {
-        dragContextOpt.foreach { ctx =>
-          findScrollContainerOpt(ctx).foreach { scrollEl =>
-            val prevScrollTop = scrollEl.scrollTop
-            scrollEl.scrollTop = prevScrollTop + autoScrollDelta
-            if (scrollEl.scrollTop != prevScrollTop) {
-              val allRows = rowsInList(ctx.listEl)
-              allRows.find(_.rowIndex == ctx.sourceRowIndex).foreach { draggedRow =>
-                dropTargets = computeDropTargets(draggedRow, allRows)
-                updateGhostAndIndicator(lastClientX, lastClientY)
-              }
-            }
-          }
-        }
-        if (_isDragging && autoScrollDelta != 0.0)
-          scheduleAutoScrollStep()
-      }
-    }
-    autoScrollRafOpt = Some(rafId)
-  }
-
-  private def stopAutoScroll(): Unit = {
-    autoScrollDelta = 0.0
-    autoScrollRafOpt.foreach(dom.window.cancelAnimationFrame)
-    autoScrollRafOpt = None
-  }
-
-  private def onPointerMove(event: dom.PointerEvent): Unit =
-    if (activePointerId.contains(event.pointerId)) {
-      dragContextOpt.foreach { ctx =>
-        lastClientX = event.clientX
-        lastClientY = event.clientY
-
-        if (! _isDragging) {
-          val dist = Math.hypot(event.clientX - startClientX, event.clientY - startClientY)
-          if (dist >= DragThresholdPx)
-            startDragging(ctx)
-        }
-
-        if (_isDragging) {
-          event.preventDefault()
-          updateAutoScroll(event.clientY)
-          updateGhostAndIndicator(event.clientX, event.clientY)
-        }
-      }
-    }
-
-  private def suppressFollowingClick(): Unit = {
-    lazy val listener: js.Function1[dom.MouseEvent, Unit] = (e: dom.MouseEvent) => {
-      e.stopPropagation()
-      e.preventDefault()
-      dom.window.removeEventListener("click", listener, useCapture = true)
-    }
-    dom.window.addEventListener("click", listener, useCapture = true)
-    dom.window.setTimeout(
-      () => dom.window.removeEventListener("click", listener, useCapture = true),
-      0
     )
   }
 
-  private def onPointerUp(event: dom.PointerEvent): Unit =
-    if (activePointerId.contains(event.pointerId)) {
-      val wasDragging = _isDragging
-      val ctxOpt      = dragContextOpt
-      val targetOpt   = activeDropTargetOpt
+  private object Private {
 
-      cleanupDrag()
+    val AutoScrollEdgePx   = 40.0
+    val AutoScrollStepPx   = 8.0
+    val IndentStepPx       = 20.0
+    val ClusterGapPx       = 10.0
+    val ClusterSpreadStep  = 7.0
+    val GrabHandleSelector = ".fr-process-steps-list .fr-process-iteration.fr-process-can-move .fr-process-grab"
+    val ContainerStepTypes = Set("group", "condition", "else")
 
-      if (wasDragging && event.`type` == "pointerup") {
-        suppressFollowingClick()
+    case class DragContext(
+      editorEl       : html.Element,
+      listEl         : html.Element,
+      processIndex   : String,
+      sourceRowIndex : Int
+    )
 
+    case class ProcessRow(
+      el               : html.Element,
+      mainEl           : html.Element,
+      contentEl        : html.Element,
+      rowIndex         : Int,
+      stepType         : String,
+      level            : Int,
+      canMove          : Boolean,
+      treeParentRowOpt : Option[Int]
+    )
+
+    case class ProcessDropTarget(
+      intoOpt            : Option[ProcessRow],
+      afterRowIndexOpt   : Option[Int],
+      level              : Int,
+      boundaryY          : Double,
+      anchorY            : Double,
+      left               : Double,
+      width              : Double,
+      isOriginalPosition : Boolean = false
+    ) {
+      def toIndicatorLine: IndicatorLine =
+        IndicatorLine(boundaryY, left, width, isOriginalPosition)
+    }
+
+    var dropTargets         : List[ProcessDropTarget]   = Nil
+    var activeDropTargetOpt : Option[ProcessDropTarget] = None
+    var ghostElOpt          : Option[html.Element]      = None
+    var highlightedRowOpt   : Option[html.Element]      = None
+    var dimmedElements      : List[html.Element]        = Nil
+
+    val controller = new PointerDragController[DragContext](
+      overlayAnchorEl     = _.listEl,
+      scrollContainerOpt  = ctx => findScrollContainerOpt(ctx),
+      autoScrollEdgePx    = _ => AutoScrollEdgePx,
+      autoScrollStepPx    = _ => AutoScrollStepPx,
+      suppressClickOnDrop = true,
+      onStartDrag         = startDragging,
+      onDragMove          = updateGhostAndIndicator,
+      onScrolled          = refreshDropTargets,
+      onDrop              = performDrop,
+      onCleanup           = cleanupDrag
+    )
+
+    def canRowLeaveParent(row: ProcessRow, allRows: List[ProcessRow]): Boolean =
+      row.stepType != "else" &&
+      row.canMove            &&
+      allRows.count(r => r.stepType != "else" && r.treeParentRowOpt == row.treeParentRowOpt) > 1
+
+    def rowsInList(listEl: html.Element): List[ProcessRow] = {
+      val rawElems =
+        listEl
+          .querySelectorAllT(".fr-process-iteration")
+          .iterator
+          .filter(_.isVisible)
+          .toList
+
+      var containerHeaderByLevel = Map.empty[Int, Int]
+      var conditionHeaderByLevel = Map.empty[Int, Int]
+
+      rawElems.flatMap { el =>
         for {
-          ctx    <- ctxOpt
-          target <- targetOpt
-          if ! target.isOriginalPosition
-        } {
-          val targetId = ctx.editorEl.id
+          rowIndex  <- el.attValueOpt("data-orbeon-row-index").flatMap(_.toIntOption)
+          mainEl    <- el.querySelectorOpt(".fr-process-row-main")
+          contentEl <- mainEl.querySelectorOpt(".fr-process-row-content")
+        } yield {
+          val stepType = el.attValueOpt("data-orbeon-step-type").flatMap(_.trimAllToOpt).getOrElse("action")
+          val level    = el.attValueOpt("data-orbeon-level").flatMap(_.toIntOption).getOrElse(0)
+          val canMove  = el.booleanAttValueOpt("data-orbeon-can-move").getOrElse(false)
 
-          val intoIndex  = target.intoOpt.map(_.rowIndex.toString).getOrElse("")
-          val afterIndex = target.afterRowIndexOpt.map(_.toString).getOrElse("")
+          val treeParentRowOpt =
+            if (stepType == "else")
+              conditionHeaderByLevel.get(level)
+            else if (level > 0)
+              containerHeaderByLevel.get(level - 1)
+            else
+              None
 
-          AjaxClient.fireEvent(
-            AjaxEvent(
-              eventName  = "fr-move-process-step",
-              targetId   = targetId,
-              properties = Map[String, js.Any](
-                "process-index" -> ctx.processIndex,
-                "source-index"  -> ctx.sourceRowIndex.toString,
-                "into-index"    -> intoIndex,
-                "after-index"   -> afterIndex
-              )
-            )
+          stepType match {
+            case "condition" =>
+              containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
+              conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
+            case "group" =>
+              containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
+              conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
+            case "else" =>
+              containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowIndex)
+              conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
+            case _ =>
+              containerHeaderByLevel = containerHeaderByLevel.filter { case (lvl, _) => lvl < level }
+              conditionHeaderByLevel = conditionHeaderByLevel.filter { case (lvl, _) => lvl < level }
+          }
+
+          ProcessRow(
+            el               = el,
+            mainEl           = mainEl,
+            contentEl        = contentEl,
+            rowIndex         = rowIndex,
+            stepType         = stepType,
+            level            = level,
+            canMove          = canMove,
+            treeParentRowOpt = treeParentRowOpt
           )
         }
       }
     }
 
-  private def onLostPointerCapture(event: dom.PointerEvent): Unit =
-    if (activePointerId.contains(event.pointerId))
-      cleanupDrag()
+    def computeDropTargets(
+      draggedRow : ProcessRow,
+      allRows    : List[ProcessRow]
+    ): List[ProcessDropTarget] =
+      if (! canRowLeaveParent(draggedRow, allRows)) {
+        Nil
+      } else {
+        val rowByIndex = allRows.map(r => r.rowIndex -> r).toMap
+        val parentOf   = (idx: Int) => rowByIndex.get(idx).flatMap(_.treeParentRowOpt)
 
-  private def onKeyDown(event: dom.KeyboardEvent): Unit =
-    if (event.key == "Escape") {
-      event.preventDefault()
-      event.stopPropagation()
-      cleanupDrag()
-    }
+        val eligibleParents: List[Option[ProcessRow]] =
+          None :: allRows.collect {
+            case r
+              if ContainerStepTypes(r.stepType) &&
+                 ! isDescendantOrSelf(r.rowIndex, draggedRow.rowIndex, parentOf) =>
+              Some(r)
+          }
 
-  private def cleanupDrag(): Unit = {
-    stopAutoScroll()
+        val refRowOpt = allRows.headOption
 
-    dom.document.removeEventListener("pointermove",   onPointerMoveFn)
-    dom.document.removeEventListener("pointerup",     onPointerUpFn)
-    dom.document.removeEventListener("pointercancel", onPointerUpFn)
-    dom.document.removeEventListener("keydown",       onKeyDownFn, useCapture = true)
+        val rawTargets =
+          eligibleParents.flatMap { intoOpt =>
+            val intoIdxOpt   = intoOpt.map(_.rowIndex)
+            val targetLevel  = intoOpt.map(_.level + 1).getOrElse(0)
+            val children     = allRows.filter(r => r.stepType != "else" && r.treeParentRowOpt == intoIdxOpt)
+            val isSameParent = intoIdxOpt == draggedRow.treeParentRowOpt
+            val draggedIdx   = if (isSameParent) children.indexWhere(_.rowIndex == draggedRow.rowIndex) else -1
 
-    for {
-      handleEl  <- capturedHandleOpt
-      pointerId <- activePointerId
-    } {
-      handleEl.removeEventListener("lostpointercapture", onLostPointerCaptureFn)
-      Try {
-        if (handleEl.hasPointerCapture(pointerId))
-          handleEl.releasePointerCapture(pointerId)
+            val (slotLeft, slotWidth) =
+              intoOpt.orElse(refRowOpt) match {
+                case Some(refRow) =>
+                  val mainRect = refRow.mainEl.getBoundingClientRect()
+                  val left     = mainRect.left + targetLevel * IndentStepPx
+                  val width    = Math.max(40.0, mainRect.width - 2.0 * targetLevel * IndentStepPx)
+                  (left, width)
+                case None =>
+                  (0.0, 0.0)
+              }
+
+            val firstSlotOpt = {
+              val firstBoundaryY =
+                intoOpt match {
+                  case Some(headerRow) =>
+                    children
+                      .headOption
+                      .map(_.mainEl.getBoundingClientRect().top)
+                      .getOrElse(headerRow.mainEl.getBoundingClientRect().bottom)
+                  case None =>
+                    allRows
+                      .headOption
+                      .map(_.mainEl.getBoundingClientRect().top)
+                      .getOrElse(0.0)
+                }
+
+              Some(
+                ProcessDropTarget(
+                  intoOpt            = intoOpt,
+                  afterRowIndexOpt   = None,
+                  level              = targetLevel,
+                  boundaryY          = firstBoundaryY,
+                  anchorY            = firstBoundaryY,
+                  left               = slotLeft,
+                  width              = slotWidth,
+                  isOriginalPosition = isSameParent && draggedIdx == 0
+                )
+              )
+            }
+
+            val afterSlots =
+              children.indices.map { idx =>
+                val child   = children(idx)
+                val lastRow = lastDescendantOrSelf(child, allRows, (r: ProcessRow) => r.rowIndex, parentOf)
+                val boundaryY =
+                  if (idx + 1 < children.length) {
+                    children(idx + 1).mainEl.getBoundingClientRect().top
+                  } else if (targetLevel == 0) {
+                    lastRow.mainEl.getBoundingClientRect().bottom + 2.0
+                  } else {
+                    lastRow
+                      .mainEl
+                      .querySelectorOpt(s".fr-process-box-slice[data-orbeon-body-level='$targetLevel']")
+                      .map(_.getBoundingClientRect().bottom)
+                      .getOrElse(lastRow.mainEl.getBoundingClientRect().bottom)
+                  }
+
+                ProcessDropTarget(
+                  intoOpt            = intoOpt,
+                  afterRowIndexOpt   = Some(child.rowIndex),
+                  level              = targetLevel,
+                  boundaryY          = boundaryY,
+                  anchorY            = boundaryY,
+                  left               = slotLeft,
+                  width              = slotWidth,
+                  isOriginalPosition = isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)
+                )
+              }
+
+            firstSlotOpt.toList ++ afterSlots
+          }
+
+        val sorted = rawTargets.sortBy(t => (t.boundaryY, -t.level))
+        spreadClusterAnchors[ProcessDropTarget](
+          sorted       = sorted,
+          boundaryY    = _.boundaryY,
+          withAnchorY  = (t, y) => t.copy(anchorY = y),
+          clusterGapPx = ClusterGapPx,
+          maxStepPx    = ClusterSpreadStep
+        )
+      }
+
+    def stepGhostLabel(row: ProcessRow): (String, String) =
+      row.stepType match {
+        case "group" =>
+          ("fa-object-group", "group")
+
+        case "condition" =>
+          val condOpt =
+            row.el
+              .querySelectorOpt(".fr-process-condition-input input")
+              .collect { case inp: html.Input => inp.value }
+              .flatMap(_.trimAllToOpt)
+              .map(s => if (s.length > 32) s"${s.take(31)}…" else s)
+          val label = condOpt.map(c => s"if ($c)").getOrElse("if")
+          ("fa-code-fork", label)
+
+        case _ =>
+          val actionLabel =
+            row.el
+              .querySelectorOpt(".fr-process-action-select1 select")
+              .collect {
+                case sel: html.Select if sel.selectedIndex >= 0 && sel.selectedIndex < sel.options.length =>
+                  sel.options(sel.selectedIndex).text
+              }
+              .flatMap(_.trimAllToOpt)
+              .getOrElse("action")
+          ("fa-cog", actionLabel)
+      }
+
+    def collectSubtreeDimmedElements(
+      draggedRow : ProcessRow,
+      allRows    : List[ProcessRow]
+    ): List[html.Element] = {
+      val rowByIndex  = allRows.map(r => r.rowIndex -> r).toMap
+      val parentOf    = (idx: Int) => rowByIndex.get(idx).flatMap(_.treeParentRowOpt)
+      val subtreeRows = allRows.filter(r => isDescendantOrSelf(r.rowIndex, draggedRow.rowIndex, parentOf))
+
+      subtreeRows.flatMap { r =>
+        val buttonsOpt  = r.el.querySelectorOpt(".fr-process-row-buttons")
+        val innerSlices =
+          r.mainEl
+            .childrenT(".fr-process-box-slice")
+            .filter(_.attValueOpt("data-orbeon-box-depth").flatMap(_.toIntOption).exists(_ >= draggedRow.level))
+        r.contentEl :: buttonsOpt.toList ++ innerSlices
       }
     }
 
-    _isDragging = false
+    def findScrollContainerOpt(ctx: DragContext): Option[html.Element] = {
+      val hostParent = Option(overlayHostEl(ctx.listEl).parentElement)
+      ctx.listEl
+        .ancestorOrSelfElem(includeSelf = false)
+        .takeWhile(el => ! hostParent.contains(el) && (el ne dom.document.body))
+        .find(el => el.scrollHeight > el.clientHeight + 1)
+    }
 
-    orbeonRootEl.classList.remove("fr-process-dragging")
-    dimmedElements.foreach(_.classList.remove("fr-process-dnd-source"))
-    highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
+    def refreshDropTargets(ctx: DragContext): Unit = {
+      val allRows = rowsInList(ctx.listEl)
+      allRows.find(_.rowIndex == ctx.sourceRowIndex).foreach { draggedRow =>
+        dropTargets = computeDropTargets(draggedRow, allRows)
+      }
+    }
 
-    ghostElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
-    indicatorElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
+    def startDragging(ctx: DragContext): Boolean = {
+      val allRows = rowsInList(ctx.listEl)
+      allRows.find(_.rowIndex == ctx.sourceRowIndex) match {
+        case Some(draggedRow) =>
+          dropTargets = computeDropTargets(draggedRow, allRows)
+          if (! dropTargets.exists(! _.isOriginalPosition)) {
+            false
+          } else {
+            dimmedElements = collectSubtreeDimmedElements(draggedRow, allRows)
+            dimmedElements.foreach(_.classList.add(SourceClass))
 
-    activePointerId     = None
-    capturedHandleOpt   = None
-    dragContextOpt      = None
-    dropTargets         = Nil
-    activeDropTargetOpt = None
-    ghostElOpt          = None
-    indicatorElOpt      = None
-    highlightedRowOpt   = None
-    dimmedElements      = Nil
+            val (iconClass, labelText) = stepGhostLabel(draggedRow)
+            ghostElOpt = Some(createPillGhost(overlayHostEl(ctx.listEl), iconClass, labelText))
+            true
+          }
+        case None =>
+          false
+      }
+    }
+
+    def updateGhostAndIndicator(ctx: DragContext, clientX: Double, clientY: Double): Option[IndicatorLine] = {
+      ghostElOpt.foreach(updatePillGhost(_, clientX, clientY))
+
+      activeDropTargetOpt = dropTargets.minByOption(t => Math.abs(clientY - t.anchorY))
+
+      highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
+      highlightedRowOpt = activeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoOpt).map(_.el)
+      highlightedRowOpt.foreach(_.classList.add("fr-process-dnd-drop-into"))
+
+      activeDropTargetOpt.map(_.toIndicatorLine)
+    }
+
+    def performDrop(ctx: DragContext): Unit =
+      for {
+        target <- activeDropTargetOpt
+        if ! target.isOriginalPosition
+      } {
+        val intoIndex  = target.intoOpt.map(_.rowIndex.toString).getOrElse("")
+        val afterIndex = target.afterRowIndexOpt.map(_.toString).getOrElse("")
+
+        AjaxClient.fireEvent(
+          AjaxEvent(
+            eventName  = "fr-move-process-step",
+            targetId   = ctx.editorEl.id,
+            properties = Map[String, js.Any](
+              "process-index" -> ctx.processIndex,
+              "source-index"  -> ctx.sourceRowIndex.toString,
+              "into-index"    -> intoIndex,
+              "after-index"   -> afterIndex
+            )
+          )
+        )
+      }
+
+    def cleanupDrag(ctx: DragContext, wasDragging: Boolean): Unit = {
+      dimmedElements.foreach(_.classList.remove(SourceClass))
+      highlightedRowOpt.foreach(_.classList.remove("fr-process-dnd-drop-into"))
+      ghostElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
+
+      dropTargets         = Nil
+      activeDropTargetOpt = None
+      ghostElOpt          = None
+      highlightedRowOpt   = None
+      dimmedElements      = Nil
+    }
   }
 }

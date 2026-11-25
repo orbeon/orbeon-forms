@@ -697,6 +697,81 @@
             word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
         }
     }
+
+    // Shared pointer drag-and-drop styles (`DropIndicatorDnD.scala`)
+    @media not print {
+        &.fr-dnd-dragging,
+        &.fr-dnd-dragging * {
+            cursor: grabbing !important;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .fr-dnd-source {
+            opacity: 0.45;
+            transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+        }
+
+        .fr-dnd-mirror {
+            position: fixed;
+            z-index: 9998;
+            margin: 0;
+            pointer-events: none;
+            opacity: 0.85;
+            box-shadow: var(--orbeon-help-box-shadow);
+            cursor: grabbing;
+        }
+
+        .fr-dnd-ghost {
+            position: fixed;
+            z-index: 10000;
+            pointer-events: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            line-height: 16px;
+            font-weight: 500;
+            color: var(--orbeon-base-color);
+            background-color: var(--orbeon-tab-background-color);
+            border: 1px solid var(--orbeon-focus-border-color);
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
+            white-space: nowrap;
+        }
+
+        .fr-dnd-drop-indicator-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--orbeon-focus-border-color);
+            border-radius: 9999px;
+            pointer-events: none;
+            z-index: 9999;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: -4px;
+                top: -3px;
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                background-color: var(--orbeon-focus-border-color);
+                box-shadow: 0 0 0 2px var(--orbeon-form-background-color);
+            }
+
+            &.fr-dnd-drop-indicator-noop {
+                opacity: 0.35;
+            }
+        }
+    }
 }
 
 @media print {

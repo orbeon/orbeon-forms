@@ -11,72 +11,16 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 .orbeon {
+    .xbl-fr-dnd-repeat.fr-dnd-drop-indicator {
+        .xforms-dnd-handle {
+            cursor: grab;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
 
-    &.fr-dnd-dragging,
-    &.fr-dnd-dragging * {
-        cursor: grabbing !important;
-        -webkit-user-select: none;
-        user-select: none;
-    }
-
-    .fr-dnd-drop-indicator-line {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 3px;
-        background-color: var(--orbeon-focus-border-color);
-        border-radius: 9999px;
-        pointer-events: none;
-        z-index: 9999;
-
-        &::before {
-            content: "";
-            position: absolute;
-            left: -4px;
-            top: -3px;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background-color: var(--orbeon-focus-border-color);
-            box-shadow: 0 0 0 2px var(--orbeon-form-background-color);
-        }
-
-        &.fr-dnd-drop-indicator-noop {
-            opacity: 0.35;
-        }
-    }
-
-    .xbl-fr-dnd-repeat {
-        &.fr-dnd-drop-indicator {
-            .xforms-dnd-handle {
-                cursor: grab;
-                touch-action: none;
-                -webkit-user-select: none;
-                user-select: none;
-
-                &:active {
-                    cursor: grabbing;
-                }
+            &:active {
+                cursor: grabbing;
             }
-        }
-
-        .xforms-dnd-item.xforms-dnd-source {
-            opacity: 0.45;
-            transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
-
-            @media (prefers-reduced-motion: reduce) {
-                transition: none;
-            }
-        }
-
-        .xforms-dnd-item.xforms-dnd-mirror {
-            position: fixed;
-            z-index: 9998;
-            margin: 0;
-            pointer-events: none;
-            opacity: 0.85;
-            box-shadow: var(--orbeon-help-box-shadow);
-            cursor: grabbing;
         }
     }
 }

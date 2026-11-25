@@ -273,12 +273,17 @@ object SecureUtils extends SecureUtilsTrait {
       }
     }
 
-    private def encryptV1WithPassword(password: String, plaintext: Array[Byte], iterations: Int): Array[Byte] = {
+    private def encryptV1WithPassword(
+      password  : String,
+      plaintext : Array[Byte],
+      iterations: Int,
+      saltOpt   : Option[Array[Byte]] = None
+    ): Array[Byte] = {
       if (iterations < MinKdfIterations || iterations > MaxKdfIterations)
         throw new ConfigurationException(
           s"Property `$KdfIterationsProperty` must be between $MinKdfIterations and $MaxKdfIterations (got $iterations)"
         )
-      val salt      = currentEncryptionSalt()
+      val salt      = saltOpt.getOrElse(currentEncryptionSalt())
       val iv        = new Array[Byte](AesGcmIvSize)
       secureRandom.nextBytes(iv)
       val secretKey = getOrComputeV1SecretKey(password, salt, iterations)
@@ -325,7 +330,10 @@ object SecureUtils extends SecureUtilsTrait {
     private def decodeBase64(ciphertext: String): Array[Byte] =
       JBase64.getDecoder.decode(ciphertext.filterNot(_.isWhitespace))
 
-    def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
+    def encrypt(plaintext: Array[Byte]): Array[Byte] =
+      encrypt(plaintext, KeyUsage.FieldEncryption)
+
+    def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken | KeyUsage.FieldEncryption =>
           encryptWithPassword(getPassword(keyUsage), plaintext, fipsMode = isFipsMode, iterations = getKdfIterations)
@@ -333,7 +341,10 @@ object SecureUtils extends SecureUtilsTrait {
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM encryption: `$keyUsage`")
       }
 
-    def decrypt(ciphertext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
+    def decrypt(ciphertext: Array[Byte]): Array[Byte] =
+      decrypt(ciphertext, KeyUsage.FieldEncryption)
+
+    def decrypt(ciphertext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken =>
           decryptWithPassword(getPassword(keyUsage), ciphertext)
@@ -372,20 +383,27 @@ object SecureUtils extends SecureUtilsTrait {
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM decryption: `$keyUsage`")
       }
 
-    def encrypt(plaintext : String, keyUsage: KeyUsage = KeyUsage.FieldEncryption): String =
+    def encrypt(plaintext: String): String =
+      encrypt(plaintext, KeyUsage.FieldEncryption)
+
+    def encrypt(plaintext: String, keyUsage: KeyUsage): String =
       JBase64.getEncoder.encodeToString(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))
 
-    def decrypt(ciphertext: String, keyUsage: KeyUsage = KeyUsage.FieldEncryption): String =
+    def decrypt(ciphertext: String): String =
+      decrypt(ciphertext, KeyUsage.FieldEncryption)
+
+    def decrypt(ciphertext: String, keyUsage: KeyUsage): String =
       new String(decrypt(decodeBase64(ciphertext), keyUsage), CharsetNames.Utf8)
 
     private[util] def encryptWithPassword(
       password  : String,
       plaintext : Array[Byte],
-      fipsMode  : Boolean = isFipsMode,
-      iterations: Int     = getKdfIterations
+      fipsMode  : Boolean             = isFipsMode,
+      iterations: Int                 = getKdfIterations,
+      saltOpt   : Option[Array[Byte]] = None
     ): Array[Byte] =
       if (fipsMode)
-        encryptV1WithPassword(password, plaintext, iterations)
+        encryptV1WithPassword(password, plaintext, iterations, saltOpt)
       else
         encryptV0WithPassword(password, plaintext)
 

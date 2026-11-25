@@ -148,5 +148,160 @@ class FieldEncryptionTest
         }
       }
     }
+
+    it("must encrypt each repeated section/grid iteration with a distinct IV and skip XML attachment holder URIs") {
+      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
+        val inputXml =
+          """<form>
+            |  <rep-section>
+            |    <rep-section-iteration><secret>Identical repeated secret</secret></rep-section-iteration>
+            |    <rep-section-iteration><secret>Identical repeated secret</secret></rep-section-iteration>
+            |    <rep-section-iteration><secret>Third repeated secret</secret></rep-section-iteration>
+            |  </rep-section>
+            |  <main-section>
+            |    <rep-grid>
+            |      <rep-grid-iteration><grid-secret>Grid row 1</grid-secret></rep-grid-iteration>
+            |      <rep-grid-iteration><grid-secret>Grid row 2</grid-secret></rep-grid-iteration>
+            |    </rep-grid>
+            |    <file-attachment filename="doc.pdf" mediatype="application/pdf" size="1024">/fr/service/persistence/crud/a/b/data/1/f.bin</file-attachment>
+            |    <empty-attachment filename="" mediatype="" size=""/>
+            |    <attributed-text custom="preserve-me">Confidential note</attributed-text>
+            |  </main-section>
+            |</form>""".stripMargin
+
+        val dom = TransformerUtils.readOrbeonDom(
+          new ByteArrayInputStream(inputXml.getBytes(CharsetNames.Utf8)),
+          null,
+          false,
+          false
+        )
+        val docInfo = new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
+
+        FieldEncryption.encryptMutableFormData(
+          List(
+            List(PathElem("rep-section"), PathElem("rep-section-iteration"), PathElem("secret")),
+            List(PathElem("main-section"), PathElem("rep-grid"), PathElem("rep-grid-iteration"), PathElem("grid-secret")),
+            List(PathElem("main-section"), PathElem("file-attachment")),
+            List(PathElem("main-section"), PathElem("empty-attachment")),
+            List(PathElem("main-section"), PathElem("attributed-text"))
+          ),
+          docInfo
+        )
+
+        val repSecrets = dom.getRootElement.element("rep-section").elements("rep-section-iteration").map(_.element("secret"))
+        assert(repSecrets.size == 3)
+        assert(repSecrets.forall(_.attributeValueOpt("value-encrypted").contains("true")))
+        // Identical cleartext values must produce distinct ciphertexts (fresh random 12-byte GCM IV per field)
+        assert(repSecrets(0).getStringValue != repSecrets(1).getStringValue)
+
+        val mainSec = dom.getRootElement.element("main-section")
+        // Attachment holders must keep their URI/empty text unencrypted in XML
+        assert(mainSec.element("file-attachment").attributeValueOpt("value-encrypted").isEmpty)
+        assert(mainSec.element("file-attachment").getStringValue == "/fr/service/persistence/crud/a/b/data/1/f.bin")
+        assert(mainSec.element("empty-attachment").attributeValueOpt("value-encrypted").isEmpty)
+
+        // Normal text control with custom attribute must be encrypted while keeping its custom attribute
+        assert(mainSec.element("attributed-text").attributeValueOpt("value-encrypted").contains("true"))
+        assert(mainSec.element("attributed-text").attributeValueOpt("custom").contains("preserve-me"))
+
+        val decryptedDoc = decryptXml(dom.getRootElement.serializeToString())
+        val decRepValues = decryptedDoc.getRootElement.element("rep-section").elements("rep-section-iteration").map(_.element("secret").getStringValue)
+        assert(decRepValues == List("Identical repeated secret", "Identical repeated secret", "Third repeated secret"))
+
+        val decGridValues = decryptedDoc.getRootElement.element("main-section").element("rep-grid").elements("rep-grid-iteration").map(_.element("grid-secret").getStringValue)
+        assert(decGridValues == List("Grid row 1", "Grid row 2"))
+
+        val decAttrText = decryptedDoc.getRootElement.element("main-section").element("attributed-text")
+        assert(decAttrText.getStringValue == "Confidential note")
+        assert(decAttrText.attributeValueOpt("custom").contains("preserve-me"))
+        assert(decAttrText.attributeValueOpt("value-encrypted").isEmpty)
+      }
+    }
+
+    it("must decrypt Version 1 XML and binary attachments (including 0-byte and multi-KB) after oxf.crypto.kdf.iterations changes") {
+      val multiKbBytes = Array.tabulate[Byte](8192)(i => (i * 31 + 7).toByte)
+
+      val (encryptedXml10k, encryptedEmptyAttach10k, encryptedLargeAttach10k) =
+        withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
+          assert(org.orbeon.oxf.util.SecureUtils.getKdfIterations == 10000)
+
+          val dom = TransformerUtils.readOrbeonDom(
+            new ByteArrayInputStream("""<form><section><encrypted>Encrypted at 10k iterations</encrypted></section></form>""".getBytes(CharsetNames.Utf8)),
+            null,
+            false,
+            false
+          )
+          FieldEncryption.encryptMutableFormData(
+            List(List(PathElem("section"), PathElem("encrypted"))),
+            new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
+          )
+
+          (
+            dom.getRootElement.serializeToString(),
+            org.orbeon.oxf.util.SecureUtils.AesGcm.encrypt(Array.emptyByteArray),
+            org.orbeon.oxf.util.SecureUtils.AesGcm.encrypt(multiKbBytes)
+          )
+        }
+
+      // Decrypt under default 310,000 iterations with both primary password and rotated fallback password
+      for (propertiesUrl <- List(
+        "oxf:/ops/unit-tests/properties-encryption-fips-1.xml",
+        "oxf:/ops/unit-tests/properties-encryption-fips-2.xml"
+      )) {
+        withProperties(propertiesUrl) {
+          assert(org.orbeon.oxf.util.SecureUtils.getKdfIterations == 310000)
+
+          val decDoc = decryptXml(encryptedXml10k)
+          assert(decDoc.getRootElement.element("section").element("encrypted").getStringValue == "Encrypted at 10k iterations")
+          assert(decryptAttachment(encryptedEmptyAttach10k).isEmpty)
+          assert(decryptAttachment(encryptedLargeAttach10k) sameElements multiKbBytes)
+        }
+      }
+    }
+
+    it("must fail closed when field-encryption password is missing or ciphertext is corrupted") {
+      val encryptedXml =
+        withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
+          val dom = TransformerUtils.readOrbeonDom(
+            new ByteArrayInputStream("""<form><section><encrypted>Must fail closed</encrypted></section></form>""".getBytes(CharsetNames.Utf8)),
+            null,
+            false,
+            false
+          )
+          FieldEncryption.encryptMutableFormData(
+            List(List(PathElem("section"), PathElem("encrypted"))),
+            new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
+          )
+          dom.getRootElement.serializeToString()
+        }
+
+      val encryptedAttach =
+        withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
+          org.orbeon.oxf.util.SecureUtils.AesGcm.encrypt(ExpectedBinaryAttachmentBytes)
+        }
+
+      // Missing `oxf.fr.field-encryption.password` in default unit-test properties must throw ConfigurationException
+      intercept[org.orbeon.oxf.common.ConfigurationException] {
+        decryptXml(encryptedXml)
+      }
+      intercept[org.orbeon.oxf.common.ConfigurationException] {
+        decryptAttachment(encryptedAttach)
+      }
+
+      // Corrupted XML ciphertext and corrupted attachment ciphertext must throw GeneralSecurityException
+      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
+        val corruptedAttach = encryptedAttach.clone()
+        corruptedAttach(corruptedAttach.length - 1) = (corruptedAttach(corruptedAttach.length - 1) ^ 0xff).toByte
+        intercept[java.security.GeneralSecurityException] {
+          decryptAttachment(corruptedAttach)
+        }
+
+        val corruptedXml =
+          """<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner"><section><encrypted fr:value-encrypted="true">AAAA</encrypted></section></form>"""
+        intercept[java.security.GeneralSecurityException] {
+          decryptXml(corruptedXml)
+        }
+      }
+    }
   }
 }

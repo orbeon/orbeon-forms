@@ -249,6 +249,32 @@ class SecureUtilsTest
         }
       }
     }
+
+    it("must reject out-of-range KDF iterations and bound LRU PBKDF2 key cache under concurrent load (> 256 salts)") {
+      intercept[org.orbeon.oxf.common.ConfigurationException] {
+        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), fipsMode = true, iterations = 999)
+      }
+      intercept[org.orbeon.oxf.common.ConfigurationException] {
+        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), fipsMode = true, iterations = 10000001)
+      }
+
+      // 320 distinct 16-byte salts (> Pbkdf2KeyCacheMaxSize = 256) encrypted and decrypted concurrently
+      val distinctSalts = (1 to 320).map(_ => randomBytes(16)).toVector
+      distinctSalts.par.foreach { salt =>
+        val payload   = randomBytes(96)
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(
+          password   = TestPassword,
+          plaintext  = payload,
+          fipsMode   = true,
+          iterations = 1000,
+          saltOpt    = Some(salt)
+        )
+        val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)
+        assert(decrypted sameElements payload)
+      }
+
+      assert(SecureUtils.AesGcm.cachedPbkdf2KeyCount <= 256)
+    }
   }
 
   private def randomBytes(n: Int) = {

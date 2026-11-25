@@ -326,7 +326,7 @@ class VersionTest
 
   describe("KeyPairGenerator, SignatureProcessor, and SignatureVerifierProcessor (DSA and SHA256withRSA)") {
 
-    import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+    import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
     import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_CONFIG, INPUT_DATA, OUTPUT_DATA}
     import org.orbeon.oxf.processor.generator.{DOMGenerator, KeyPairGenerator}
     import org.orbeon.oxf.processor.{DOMSerializer, SignatureProcessor, SignatureVerifierProcessor}
@@ -341,7 +341,7 @@ class VersionTest
       }
       val serializer = new DOMSerializer
       connect(keyPairGen, OUTPUT_DATA, serializer, INPUT_DATA)
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("VersionTest.generateKeyPair") { pipelineContext =>
         serializer.reset(pipelineContext)
         serializer.runGetDocument(pipelineContext)
       }
@@ -355,7 +355,7 @@ class VersionTest
       connect(privKeyGen, OUTPUT_DATA, sigProcessor, "private-key")
       val serializer = new DOMSerializer
       connect(sigProcessor, OUTPUT_DATA, serializer, INPUT_DATA)
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("VersionTest.signDocument") { pipelineContext =>
         serializer.reset(pipelineContext)
         serializer.runGetDocument(pipelineContext)
       }
@@ -369,7 +369,7 @@ class VersionTest
       connect(pubKeyGen, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
       val serializer = new DOMSerializer
       connect(verifierProcessor, OUTPUT_DATA, serializer, INPUT_DATA)
-      withPipelineContext { pipelineContext =>
+      withNewPipelineContext("VersionTest.verifyDocument") { pipelineContext =>
         serializer.reset(pipelineContext)
         serializer.runGetDocument(pipelineContext)
       }

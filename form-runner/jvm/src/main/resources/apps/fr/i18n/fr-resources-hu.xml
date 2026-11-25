@@ -822,6 +822,7 @@
             <summary>Összegzés</summary>
             <sort-by-title>Rendezés cím szerint</sort-by-title>
             <sort-by-last-modified>Rendezés módosítás dátuma szerint</sort-by-last-modified>
+            <new-form>Új űrlap</new-form>
             <clear-filter>Szűrő törlése</clear-filter>
         </buttons>
         <messages>

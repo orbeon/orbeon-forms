@@ -822,6 +822,7 @@
             <summary>Summary</summary>
             <sort-by-title>Sort by title</sort-by-title>
             <sort-by-last-modified>Sort by modification date</sort-by-last-modified>
+            <new-form>New Form</new-form>
             <clear-filter>Clear filter</clear-filter>
         </buttons>
         <messages>

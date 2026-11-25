@@ -815,6 +815,7 @@
             <summary>Сводка</summary>
             <sort-by-title>Сортировать по названию</sort-by-title>
             <sort-by-last-modified>Сортировать по дате изменения</sort-by-last-modified>
+            <new-form>Новая форма</new-form>
             <clear-filter>Очистить фильтр</clear-filter>
         </buttons>
         <messages>

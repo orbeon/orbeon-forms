@@ -820,6 +820,7 @@
             <summary>Özet</summary>
             <sort-by-title>Başlığa göre sırala</sort-by-title>
             <sort-by-last-modified>Değiştirilme tarihine göre sırala</sort-by-last-modified>
+            <new-form>Yeni Form</new-form>
             <clear-filter>Filtreyi temizle</clear-filter>
         </buttons>
         <messages>

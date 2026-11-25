@@ -259,6 +259,66 @@
                     }
                 }
             }
+
+            a.fr-landing-new-form-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.4em;
+                min-block-size: var(--orbeon-control-height);
+                padding: 0 1.05em;
+                margin: 0;
+                font: inherit;
+                font-weight: 500;
+                line-height: 1;
+                white-space: nowrap;
+                text-decoration: none;
+                color: var(--orbeon-button-primary-color);
+                background-color: var(--orbeon-button-primary-background-color);
+                border: 1px solid var(--orbeon-button-primary-background-color);
+                border-radius: var(--orbeon-button-border-radius);
+                box-shadow: none;
+                transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+
+                &.xforms-hidden {
+                    display: none !important;
+                }
+
+                @media (pointer: coarse) {
+                    min-block-size: 40px;
+                }
+
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-button-primary-color);
+                        background-color: var(--orbeon-button-primary-highlight-background-color);
+                        border-color: var(--orbeon-button-primary-highlight-background-color);
+                        text-decoration: none;
+                    }
+                }
+
+                &:focus-visible {
+                    color: var(--orbeon-button-primary-color);
+                    box-shadow: var(--orbeon-button-focus-ring);
+                    outline: none;
+                }
+
+                @media (forced-colors: active) {
+                    background-color: Highlight;
+                    border-color: Highlight;
+                    color: HighlightText;
+                }
+
+                .xforms-output,
+                .xforms-output-output {
+                    display: inline;
+                }
+            }
         }
 
         &:has(~ .fr-landing-grid .fr-card-is-refreshing) .fr-landing-refresh-trigger button.btn i.fa {

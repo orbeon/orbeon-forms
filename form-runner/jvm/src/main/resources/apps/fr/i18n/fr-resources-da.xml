@@ -816,6 +816,7 @@
             <summary>Oversigt</summary>
             <sort-by-title>Sortér efter titel</sort-by-title>
             <sort-by-last-modified>Sortér efter ændringsdato</sort-by-last-modified>
+            <new-form>Ny formular</new-form>
             <clear-filter>Ryd filter</clear-filter>
         </buttons>
         <messages>

@@ -823,6 +823,7 @@
             <summary>Podsumowanie</summary>
             <sort-by-title>Sortuj według tytułu</sort-by-title>
             <sort-by-last-modified>Sortuj według daty modyfikacji</sort-by-last-modified>
+            <new-form>Nowy formularz</new-form>
             <clear-filter>Wyczyść filtr</clear-filter>
         </buttons>
         <messages>

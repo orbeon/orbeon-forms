@@ -847,6 +847,7 @@
             <summary>Resumen</summary>
             <sort-by-title>Ordenar por título</sort-by-title>
             <sort-by-last-modified>Ordenar por fecha de modificación</sort-by-last-modified>
+            <new-form>Nuevo formulario</new-form>
             <clear-filter>Borrar filtro</clear-filter>
         </buttons>
         <messages>

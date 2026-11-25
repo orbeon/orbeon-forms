@@ -341,10 +341,11 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       assert(roundTrip == cards)
     }
 
-    it("must omit the Admin card from DefaultCards") {
-      assert(LandingCardsJSON.DefaultCards.size == 6)
+    it("must omit the Quick Links and Admin cards from DefaultCards") {
+      assert(LandingCardsJSON.DefaultCards.size == 5)
+      assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.QuickLinksCard))
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.AdminCard))
-      assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.QuickLinksCard)
+      assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.DemoFormsCard)
     }
   }
 }

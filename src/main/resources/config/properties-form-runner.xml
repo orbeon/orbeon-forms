@@ -829,10 +829,6 @@
     <property as="xs:string"  name="oxf.fr.landing.cards">
       [
         {
-          "card-type": "quick-links",
-          "links": "main"
-        },
-        {
           "card-type": "published-forms",
           "title": "landing.titles.demo-forms",
           "description": "landing.descriptions.demo-forms",

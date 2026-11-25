@@ -822,6 +822,7 @@
             <summary>ملخص</summary>
             <sort-by-title>ترتيب حسب العنوان</sort-by-title>
             <sort-by-last-modified>ترتيب حسب تاريخ التعديل</sort-by-last-modified>
+            <new-form>نموذج جديد</new-form>
             <clear-filter>مسح عامل التصفية</clear-filter>
         </buttons>
         <messages>

@@ -180,6 +180,9 @@
             <xf:var
                 name="refresh-label"
                 value="xxf:r('landing.buttons.refresh', '|fr-fr-resources|')"/>
+            <xf:var
+                name="new-form-label"
+                value="xxf:r('landing.buttons.new-form', '|fr-fr-resources|')"/>
 
             <xh:p class="fr-sr-status" role="status">
                 <xf:output value="instance('fr-landing-ui-instance')/@refresh-announcement"/>
@@ -219,9 +222,10 @@
                     <xh:span class="fr-landing-filter-count xforms-hidden" role="status"/>
                 </xh:search>
 
-                <xf:group ref=".[$has-data-cards]" class="fr-landing-toolbar-actions">
+                <xf:group ref=".[$has-data-cards or $is-allow-form-builder]" class="fr-landing-toolbar-actions">
                     <xf:trigger
                         id="fr-landing-refresh-button"
+                        ref=".[$has-data-cards]"
                         appearance="minimal"
                         class="fr-landing-refresh-trigger"
                         xxf:title="{$refresh-label}"
@@ -234,6 +238,15 @@
                             <xf:property name="announce" value="'true'"/>
                         </xf:dispatch>
                     </xf:trigger>
+
+                    <xh:a
+                        id="fr-landing-new-form-button"
+                        href="/fr/orbeon/builder/new"
+                        class="btn btn-primary fr-landing-new-form-button {'xforms-hidden'[not($is-allow-form-builder)]}"
+                    >
+                        <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                        <xh:span><xf:output value="$new-form-label"/></xh:span>
+                    </xh:a>
                 </xf:group>
             </xh:div>
             <xh:div class="fr-landing-grid">

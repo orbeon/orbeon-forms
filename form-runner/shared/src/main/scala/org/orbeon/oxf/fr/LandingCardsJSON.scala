@@ -162,7 +162,6 @@ object LandingCardsJSON {
     )
 
   val DefaultCards: List[LandingCard] = List(
-    QuickLinksCard,
     DemoFormsCard,
     DemoFeaturesCard,
     PublishedFormsCard,

@@ -835,6 +835,7 @@
             <summary>Resum</summary>
             <sort-by-title>Ordenar per títol</sort-by-title>
             <sort-by-last-modified>Ordenar per data de modificació</sort-by-last-modified>
+            <new-form>Formulari nou</new-form>
             <clear-filter>Esborra el filtre</clear-filter>
         </buttons>
         <messages>

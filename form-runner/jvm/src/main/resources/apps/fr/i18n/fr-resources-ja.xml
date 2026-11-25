@@ -809,6 +809,7 @@
             <summary>サマリー</summary>
             <sort-by-title>タイトル順に並べ替え</sort-by-title>
             <sort-by-last-modified>更新日時順に並べ替え</sort-by-last-modified>
+            <new-form>新規フォーム</new-form>
             <clear-filter>フィルターをクリア</clear-filter>
         </buttons>
         <messages>

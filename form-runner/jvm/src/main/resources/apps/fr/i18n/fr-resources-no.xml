@@ -822,6 +822,7 @@
             <summary>Oversikt</summary>
             <sort-by-title>Sorter etter tittel</sort-by-title>
             <sort-by-last-modified>Sorter etter endringsdato</sort-by-last-modified>
+            <new-form>Nytt skjema</new-form>
             <clear-filter>Tøm filter</clear-filter>
         </buttons>
         <messages>

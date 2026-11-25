@@ -822,6 +822,7 @@
             <summary>Yhteenveto</summary>
             <sort-by-title>Järjestä otsikon mukaan</sort-by-title>
             <sort-by-last-modified>Järjestä muokkauspäivän mukaan</sort-by-last-modified>
+            <new-form>Uusi lomake</new-form>
             <clear-filter>Tyhjennä suodatin</clear-filter>
         </buttons>
         <messages>

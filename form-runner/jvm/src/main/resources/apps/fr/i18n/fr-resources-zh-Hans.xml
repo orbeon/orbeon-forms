@@ -817,6 +817,7 @@
             <summary>汇总</summary>
             <sort-by-title>按标题排序</sort-by-title>
             <sort-by-last-modified>按修改日期排序</sort-by-last-modified>
+            <new-form>新建表单</new-form>
             <clear-filter>清除筛选</clear-filter>
         </buttons>
         <messages>

@@ -822,6 +822,7 @@
             <summary>Riepilogo</summary>
             <sort-by-title>Ordina per titolo</sort-by-title>
             <sort-by-last-modified>Ordina per data di modifica</sort-by-last-modified>
+            <new-form>Nuovo modulo</new-form>
             <clear-filter>Cancella filtro</clear-filter>
         </buttons>
         <messages>

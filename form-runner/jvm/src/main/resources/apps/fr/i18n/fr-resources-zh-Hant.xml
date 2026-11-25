@@ -822,6 +822,7 @@
             <summary>摘要</summary>
             <sort-by-title>依標題排序</sort-by-title>
             <sort-by-last-modified>依修改日期排序</sort-by-last-modified>
+            <new-form>新增表單</new-form>
             <clear-filter>清除篩選</clear-filter>
         </buttons>
         <messages>

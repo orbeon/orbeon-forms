@@ -1043,7 +1043,7 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(landingCardsOverrideSelect.effectiveId, encodedTrue)
             assert(! landingCardsEditor.asInstanceOf[XFormsSingleNodeControl].isReadonly)
 
-            // Reorder card 2 (Demo Forms) to position 1 via XXFormsDndEvent on the inner dnd-repeat
+            // Reorder card 2 (Demo Features) to position 1 via XXFormsDndEvent on the inner dnd-repeat
             val dndRepeatControl =
               ControlsIterator(landingCardsEditor, includeSelf = false)
                 .collectFirst { case r: org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl if r.effectiveId.contains("cards-dnd-repeat") => r }
@@ -1060,7 +1060,7 @@ class ConfigurationPropertiesTest
 
             val reorderedJson  = landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)
             val reorderedCards = LandingCardsJSON.parseString(reorderedJson).get.get._1
-            assert(reorderedCards.head == LandingCardsJSON.DemoFormsCard)
+            assert(reorderedCards.head == LandingCardsJSON.DemoFeaturesCard)
 
             // Also verify Move Down / Move Up buttons and Add / Remove card triggers inside <fr:landing-cards-editor>
             def findCardTrigger(subId: String, iterationIndex: Int): org.orbeon.oxf.xforms.control.XFormsControl =
@@ -1068,15 +1068,15 @@ class ConfigurationPropertiesTest
                 .find(c => c.effectiveId.contains(s"$subId⊙$iterationIndex"))
                 .get
 
-            // Move card 1 (Demo Forms) down to position 2 -> Quick Links returns to position 1
+            // Move card 1 (Demo Features) down to position 2 -> Demo Forms returns to position 1
             activateControlWithEvent(findCardTrigger("fr-lce-move-down-btn", 1).effectiveId)(ec)
             val afterMoveDownCards = LandingCardsJSON.parseString(landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)).get.get._1
-            assert(afterMoveDownCards.head == LandingCardsJSON.QuickLinksCard)
+            assert(afterMoveDownCards.head == LandingCardsJSON.DemoFormsCard)
 
-            // Move card 2 (Demo Forms) back up to position 1 -> Demo Forms returns to position 1
+            // Move card 2 (Demo Features) back up to position 1 -> Demo Features returns to position 1
             activateControlWithEvent(findCardTrigger("fr-lce-move-up-btn", 2).effectiveId)(ec)
             val afterMoveUpCards = LandingCardsJSON.parseString(landingCardsEditor.asInstanceOf[XFormsValueControl].getValue(EventCollector.Throw)).get.get._1
-            assert(afterMoveUpCards.head == LandingCardsJSON.DemoFormsCard)
+            assert(afterMoveUpCards.head == LandingCardsJSON.DemoFeaturesCard)
 
             // Add a new Published Forms card via toolbar button ( requires setting title to be valid ), then remove it
             val addPfBtn = ControlsIterator(landingCardsEditor, includeSelf = false)
@@ -1448,7 +1448,7 @@ class ConfigurationPropertiesTest
             assert(store.globalPropertySet.getIntOpt("oxf.core.cache.xpath.size").contains(25000))
             assert(store.globalPropertySet.getString("oxf.core.cache.xpath.max-size-bytes").contains("8%"))
             val savedLandingCards = LandingCardsJSON.parseString(store.globalPropertySet.getString("oxf.fr.landing.cards")).get.get._1
-            assert(savedLandingCards.head == LandingCardsJSON.DemoFormsCard)
+            assert(savedLandingCards.head == LandingCardsJSON.DemoFeaturesCard)
 
             // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
             val xpathCache = ObjectCache.instance("core.cache.xpath", 20000)
@@ -1505,7 +1505,7 @@ class ConfigurationPropertiesTest
             assert((reloadedPerCtrlNode / "quantity" /@ "unit").stringValue == "KB")
 
             val reloadedLandingCardsJson = resolveObject[XFormsValueControl]("landing-cards-value-control").get.getValue(EventCollector.Throw)
-            assert(LandingCardsJSON.parseString(reloadedLandingCardsJson).get.get._1.head == LandingCardsJSON.DemoFormsCard)
+            assert(LandingCardsJSON.parseString(reloadedLandingCardsJson).get.get._1.head == LandingCardsJSON.DemoFeaturesCard)
 
             val reloadedOverrides = (configRoot / "app-form-overrides" / "override").toList
             assert(reloadedOverrides.size == 2)

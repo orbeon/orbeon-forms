@@ -2648,7 +2648,6 @@ body.orbeon {
                 }
 
                 .xforms-trigger button {
-                    position: relative;
                     display: block;
                     width: 100%;
                     box-sizing: border-box;
@@ -2678,15 +2677,6 @@ body.orbeon {
                     border: none;
                     box-shadow: 0 1px 2px color-mix(in oklab, var(--orbeon-base-color) 8%, transparent), 0 0 0 1px color-mix(in oklab, var(--orbeon-base-color) 4%, transparent);
                     cursor: default;
-
-                    &::after {
-                        content: "";
-                        position: absolute;
-                        left: 14px;
-                        right: 14px;
-                        bottom: 2px;
-                        border-bottom: 2px solid var(--orbeon-accent-color);
-                    }
                 }
             }
         }

@@ -1731,6 +1731,13 @@
         <step-label>Step</step-label>
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
+        <visual-editor>Visueel</visual-editor>
+        <xml-editor>XML</xml-editor>
+        <format>Formatteren</format>
+        <xml-definition>
+            <label>Stappen (XML)</label>
+            <hint>Actiestappen in XML-indeling</hint>
+        </xml-definition>
         <categories>
             <services-and-processes>Services and Processes</services-and-processes>
             <controls>Control Values and State</controls>
@@ -1750,6 +1757,7 @@
             <invalid-avt>Incorrect XPath value template</invalid-avt>
             <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
             <invalid-positive-integer>Must be a positive integer</invalid-positive-integer>
+            <invalid-xml>Actie-XML is ongeldig</invalid-xml>
         </alerts>
     </dialog-actions>
     <dialog-test>

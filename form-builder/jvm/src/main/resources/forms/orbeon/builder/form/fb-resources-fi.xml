@@ -1744,6 +1744,13 @@
         <step-label>Step</step-label>
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
+        <visual-editor>Visuaalinen</visual-editor>
+        <xml-editor>XML</xml-editor>
+        <format>Muotoile</format>
+        <xml-definition>
+            <label>Vaiheet (XML)</label>
+            <hint>Toiminnon vaiheet XML-muodossa</hint>
+        </xml-definition>
         <categories>
             <services-and-processes>Services and Processes</services-and-processes>
             <controls>Control Values and State</controls>
@@ -1763,6 +1770,7 @@
             <invalid-avt>Incorrect XPath value template</invalid-avt>
             <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
             <invalid-positive-integer>Must be a positive integer</invalid-positive-integer>
+            <invalid-xml>Toiminnon XML on virheellinen</invalid-xml>
         </alerts>
     </dialog-actions>
     <dialog-test>

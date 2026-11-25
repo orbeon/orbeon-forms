@@ -1769,6 +1769,13 @@
         <step-label>Étape</step-label>
         <no-steps>Aucune étape définie pour cette action.</no-steps>
         <add-step>Ajouter une étape</add-step>
+        <visual-editor>Visuel</visual-editor>
+        <xml-editor>XML</xml-editor>
+        <format>Formater</format>
+        <xml-definition>
+            <label>Étapes XML</label>
+            <hint>Étapes de l’action au format XML</hint>
+        </xml-definition>
         <categories>
             <services-and-processes>Services et processus</services-and-processes>
             <controls>Valeurs et état des contrôles</controls>
@@ -1788,6 +1795,7 @@
             <invalid-avt>Modèle de valeur XPath incorrect</invalid-avt>
             <invalid-ncname>Doit être un identifiant XML valide</invalid-ncname>
             <invalid-positive-integer>Doit être un entier positif</invalid-positive-integer>
+            <invalid-xml>Le XML de l’action est invalide</invalid-xml>
         </alerts>
     </dialog-actions>
     <dialog-test>

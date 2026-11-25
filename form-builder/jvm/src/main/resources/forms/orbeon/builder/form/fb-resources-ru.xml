@@ -1730,6 +1730,13 @@
         <step-label>Step</step-label>
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
+        <visual-editor>Визуальный</visual-editor>
+        <xml-editor>XML</xml-editor>
+        <format>Форматировать</format>
+        <xml-definition>
+            <label>Шаги (XML)</label>
+            <hint>Шаги действия в формате XML</hint>
+        </xml-definition>
         <categories>
             <services-and-processes>Services and Processes</services-and-processes>
             <controls>Control Values and State</controls>
@@ -1749,6 +1756,7 @@
             <invalid-avt>Incorrect XPath value template</invalid-avt>
             <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
             <invalid-positive-integer>Must be a positive integer</invalid-positive-integer>
+            <invalid-xml>XML действия некорректен</invalid-xml>
         </alerts>
     </dialog-actions>
     <dialog-test>

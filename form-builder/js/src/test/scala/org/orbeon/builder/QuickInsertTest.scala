@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.ToolboxSearch.ToolboxItem
+import org.orbeon.builder.ToolboxSearch.{InsertAction, ToolboxItem}
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -24,17 +24,24 @@ class QuickInsertTest extends AnyFunSpecLike {
 
   describe("ToolboxSearch.filterAndRankItems") {
 
-    def mkItem(id: String, label: String, category: String, enabled: Boolean = true): ToolboxItem =
+    def mkItem(
+      id            : String,
+      label         : String,
+      category      : String,
+      enabled       : Boolean = true,
+      shownInToolbox: Boolean = true
+    ): ToolboxItem =
       ToolboxItem(
-        id         = id,
-        label      = label,
-        category   = category,
-        extraTerms = "",
-        iconHtml   = "",
-        shortcut   = None,
-        isControl  = true,
-        enabled    = enabled,
-        button     = dom.document.createElement("button").asInstanceOf[html.Button]
+        id             = id,
+        label          = label,
+        category       = category,
+        extraTerms     = "",
+        iconHtml       = "",
+        shortcut       = None,
+        isControl      = true,
+        enabled        = enabled,
+        shownInToolbox = shownInToolbox,
+        action         = InsertAction.ClickButton(dom.document.createElement("button").asInstanceOf[html.Button])
       )
 
     it("breaks ties among equal match scores using recentIds") {
@@ -46,6 +53,19 @@ class QuickInsertTest extends AnyFunSpecLike {
 
       val ranked = ToolboxSearch.filterAndRankItems(items, "date", recentIds = List("date-range"))
       assert(ranked.map(_.id) == List("date-range", "date", "date-time"))
+    }
+
+    it("omits hidden appearances when query is empty, finds them when searching, and ranks primary toolbox items first on ties") {
+      val items = List(
+        mkItem("number",         "Number",            "Number Controls", shownInToolbox = true),
+        mkItem("number-stepper", "Numeric Stepper",   "Number Controls", shownInToolbox = false),
+        mkItem("button-primary", "Button (Primary)",  "Buttons",         shownInToolbox = false),
+        mkItem("button",         "Button",            "Buttons",         shownInToolbox = true)
+      )
+
+      assert(ToolboxSearch.filterAndRankItems(items, "", Nil).map(_.id) == List("number", "button"))
+      assert(ToolboxSearch.filterAndRankItems(items, "stepper", Nil).map(_.id) == List("number-stepper"))
+      assert(ToolboxSearch.filterAndRankItems(items, "button", Nil).map(_.id) == List("button", "button-primary"))
     }
   }
 
@@ -124,6 +144,19 @@ class QuickInsertTest extends AnyFunSpecLike {
           |        </div>
           |      </div>
           |      <div class="fb-tools">
+          |        <div class="fb-tools-title">Number Controls</div>
+          |        <div class="fb-tool" data-fb-search-terms="Number fr number">
+          |          <span class="fb-insert-control fb-insert-control-fr-number">
+          |            <button class="btn"><i class="fa fa-hashtag"></i>Number</button>
+          |          </span>
+          |        </div>
+          |        <span class="fb-hidden-tool xforms-hidden"
+          |              data-fb-binding-class-name="xf-input-decimal-appearance-stepper"
+          |              data-fb-label="Numeric Stepper"
+          |              data-fb-icon-html="&lt;i class=&quot;fa fa-fw fa-plus-square-o&quot;&gt;&lt;/i&gt;"
+          |              data-fb-search-terms="Numeric Stepper xf input decimal appearance stepper"></span>
+          |      </div>
+          |      <div class="fb-tools">
           |        <div class="fb-tools-title">Date and Time</div>
           |        <div class="fb-tool" data-fb-search-terms="Date fr date">
           |          <span class="fb-insert-control fb-insert-control-fr-date">
@@ -165,11 +198,52 @@ class QuickInsertTest extends AnyFunSpecLike {
         assert(QuickInsert.activePaletteTabOpt.contains(QuickInsert.TabInsert))
         val groupTitles = dom.document.querySelectorAllT(".fb-quick-insert-group-title").map(_.textContent)
         assert(groupTitles.headOption.contains("Recent"))
-        assert(dom.document.querySelectorAllT(".fb-quick-insert-item").length == 3) // 1 recent + 2 categorized
+        // 1 recent + 3 visible toolbox items (Numeric Stepper is hidden from unfiltered browse list)
+        assert(dom.document.querySelectorAllT(".fb-quick-insert-item").length == 4)
 
         QuickInsert.close()
         assert(! QuickInsert.isOpen)
         assert(dom.document.querySelectorOpt(".fb-quick-insert-panel").isEmpty)
+      }
+    }
+
+    it("finds special appearances hidden from the toolbox (e.g. Numeric Stepper) in Cmd+K, '+' popover, and Recent") {
+      withFormBuilderDom {
+        // Hidden from unfiltered All / Insert browse list initially
+        QuickInsert.openPalette(QuickInsert.TabAll)
+        val initialLabels = dom.document.querySelectorAllT(".fb-quick-insert-item-label").map(_.textContent)
+        assert(! initialLabels.contains("Numeric Stepper"))
+
+        // Searching "stepper" in Cmd+K finds Numeric Stepper with its category
+        val input = dom.document.querySelectorT(".fb-quick-insert-input").asInstanceOf[html.Input]
+        input.value = "stepper"
+        input.dispatchEvent(new dom.Event("input"))
+
+        val searchLabels     = dom.document.querySelectorAllT(".fb-quick-insert-item-label").map(_.textContent)
+        val searchCategories = dom.document.querySelectorAllT(".fb-quick-insert-item-category").map(_.textContent)
+        assert(searchLabels == Seq("Numeric Stepper"))
+        assert(searchCategories == Seq("Number Controls"))
+
+        // Clicking Numeric Stepper records it in Recent and closes the palette
+        dom.document.querySelectorT(".fb-quick-insert-item").asInstanceOf[html.Element].click()
+        assert(! QuickInsert.isOpen)
+        assert(ToolboxSearch.recentItemIds.contains("fb-insert-control-xf-input-decimal-appearance-stepper"))
+
+        // Reopening Insert tab with empty query shows Numeric Stepper under Recent, but not duplicated in Number Controls
+        QuickInsert.openPalette(QuickInsert.TabInsert)
+        val insertLabels = dom.document.querySelectorAllT(".fb-quick-insert-item-label").map(_.textContent)
+        assert(insertLabels.headOption.contains("Numeric Stepper"))
+        assert(insertLabels.count(_ == "Numeric Stepper") == 1)
+        QuickInsert.close()
+
+        // Empty-cell '+' popover also finds Numeric Stepper when searching "stepper"
+        val emptyCell = dom.document.getElementById("cell-2").asInstanceOf[html.Element]
+        QuickInsert.openCellPopover(emptyCell)
+        val popInput = dom.document.querySelectorT(".fb-quick-insert-input").asInstanceOf[html.Input]
+        popInput.value = "stepper"
+        popInput.dispatchEvent(new dom.Event("input"))
+        val popLabels = dom.document.querySelectorAllT(".fb-quick-insert-item-label").map(_.textContent)
+        assert(popLabels == Seq("Numeric Stepper"))
       }
     }
 

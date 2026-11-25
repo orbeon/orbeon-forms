@@ -97,7 +97,7 @@
             </icon>
             <templates>
                 <view>
-                    <xf:output id="" ref="" xmlns="">
+                    <xf:output id="" appearance="full" ref="" xmlns="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>

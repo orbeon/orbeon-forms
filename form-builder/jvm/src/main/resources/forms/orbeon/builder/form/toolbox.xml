@@ -423,6 +423,8 @@
                                         string-join(
                                             (
                                                 $metadata/fb:display-name[@lang = 'en']/string(),
+                                                $metadata/fb:appearance-display-name[@lang = $lang]/string(),
+                                                $metadata/fb:appearance-display-name[@lang = 'en']/string(),
                                                 $metadata/fb:keywords[@lang = $lang]/string(),
                                                 $metadata/fb:keywords[@lang = 'en']/string(),
                                                 translate($binding/@fb:binding-class-name, '-_', ' ')
@@ -495,6 +497,51 @@
                                         </xf:action>
                                     </fr:trigger>
                                 </xh:div>
+                            </xf:repeat>
+
+                            <!-- Special appearances hidden from the toolbox, exposed to QuickInsert (Cmd/Ctrl+K and '+' cell popover) -->
+                            <xf:repeat
+                                ref="
+                                    xbl:binding[
+                                        fb:metadata/fb:toolbox[@show = 'false' and not(@deprecated = 'true')] and
+                                        not(xxf:has-class('fr-section-component', .))
+                                    ]"
+                                id="fb-hidden-components-repeat">
+                                <xf:var name="binding"  value="." as="element(xbl:binding)"/>
+                                <xf:var name="metadata" value="$binding/fb:metadata"/>
+                                <xh:span
+                                    class="fb-hidden-tool xforms-hidden"
+                                    data-fb-binding-class-name="{$binding/@fb:binding-class-name}"
+                                    data-fb-label="{($metadata/fb:display-name[@lang = $lang], $metadata/fb:display-name[1])[1]}"
+                                    data-fb-icon-html="{
+                                        if (exists($metadata/fb:icon/fb:small-icon)) then
+                                            concat('&lt;img src=&quot;', ($metadata/fb:icon/fb:small-icon)[1], '&quot; alt=&quot;&quot;/>')
+                                        else if (exists($metadata/fb:icon/fb:icon-class)) then
+                                            concat('&lt;i class=&quot;', ($metadata/fb:icon/fb:icon-class)[1], '&quot;>&lt;/i>')
+                                        else
+                                            '&lt;i class=&quot;fa fa-fw fa-puzzle-piece&quot;>&lt;/i>'
+                                    }"
+                                    data-fb-shortcut="{
+                                        xxf:property(
+                                            concat(
+                                                'oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-',
+                                                $binding/@fb:binding-class-name
+                                            )
+                                        )
+                                    }"
+                                    data-fb-search-terms="{
+                                        string-join(
+                                            (
+                                                $metadata/fb:display-name[@lang = 'en']/string(),
+                                                $metadata/fb:appearance-display-name[@lang = $lang]/string(),
+                                                $metadata/fb:appearance-display-name[@lang = 'en']/string(),
+                                                $metadata/fb:keywords[@lang = $lang]/string(),
+                                                $metadata/fb:keywords[@lang = 'en']/string(),
+                                                translate($binding/@fb:binding-class-name, '-_', ' ')
+                                            )[xxf:non-blank(.)],
+                                            ' '
+                                        )
+                                    }"/>
                             </xf:repeat>
 
                             <xf:group ref=".[exists($library-app) and empty(xbl:binding[not(fb:metadata/fb:toolbox[@show = 'false'])])]">

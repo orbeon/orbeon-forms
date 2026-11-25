@@ -1124,4 +1124,94 @@ class FormBuilderFunctionsTest
       }
     }
   }
+
+  describe("Special appearances hidden from toolbox (`insertControlByBindingClassName` and metadata)") {
+
+    import scala.concurrent.Await
+    import scala.concurrent.duration.*
+    import org.orbeon.oxf.fb.{XMLNames as FBXMLNames}
+
+    it("must insert Numeric Stepper and other hidden appearances by binding class name and reject deprecated bindings") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+
+        // Select the existing cell so `ensureEmptyCell()` creates a new cell below and inserts Numeric Stepper
+        val firstTd = (ctx.bodyElem descendant "*:c").head
+        FormBuilder.selectCell(firstTd)
+
+        val stepperRes =
+          Await.result(
+            org.orbeon.builder.rpc.FormBuilderRpcApiImpl.insertControlByBindingClassName("xf-input-decimal-appearance-stepper"),
+            5.seconds
+          )
+        assert(stepperRes.exists(_.nonEmpty))
+
+        val stepperElemOpt = (ctx.bodyElem descendant "*:number-stepper").headOption
+        assert(stepperElemOpt.isDefined)
+        val stepperName = FormRunner.controlNameFromId(stepperElemOpt.get.id)
+        val stepperBind = FormRunner.findBindByName(stepperName).get
+        assert(stepperBind.attValueOpt("type").contains("xf:decimal"))
+        assert(FormBuilder.findStartingCell.map(_.id) == FormBuilder.findSelectedCell.map(_.id))
+
+        // Insert Calculated Value With Border (`fb-output-full`) and Link Button (`fb-trigger-minimal`)
+        val outputFullRes =
+          Await.result(
+            org.orbeon.builder.rpc.FormBuilderRpcApiImpl.insertControlByBindingClassName("xf-output-appearance-full"),
+            5.seconds
+          )
+        assert(outputFullRes.exists(_.nonEmpty))
+        assert((ctx.bodyElem descendant "*:output").exists(_.attValueOpt("appearance").contains("full")))
+
+        val linkButtonRes =
+          Await.result(
+            org.orbeon.builder.rpc.FormBuilderRpcApiImpl.insertControlByBindingClassName("xf-trigger-appearance-minimal"),
+            5.seconds
+          )
+        assert(linkButtonRes.exists(_.nonEmpty))
+        val linkTriggerElem = (ctx.bodyElem descendant "*:trigger").find(_.attValueOpt("appearance").contains("minimal")).get
+        val linkTriggerBind = FormRunner.findBindByName(FormRunner.controlNameFromId(linkTriggerElem.id)).get
+        assert(linkTriggerBind.attValueOpt(FBXMLNames.FB -> "persist").contains("false()"))
+
+        // Deprecated `Legacy Dropdown` (`selection-select1-minimal.xbl`) must not be insertable
+        val deprecatedRes =
+          Await.result(
+            org.orbeon.builder.rpc.FormBuilderRpcApiImpl.insertControlByBindingClassName("xf-select1-appearance-minimal"),
+            5.seconds
+          )
+        assert(deprecatedRes.isEmpty)
+      }
+    }
+
+    it("must have distinct English display names and complete 14-language translations on all non-deprecated hidden appearances") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+
+        val expectedLangs = Set("en", "fr", "no", "ru", "it", "de", "fi", "es", "nl", "pt", "sv", "ar", "pl", "ja")
+
+        val hiddenBindings =
+          ctx.componentBindings.filter { b =>
+            (b / FBXMLNames.FBMetadataTest / FBXMLNames.FBToolboxTest).exists { tb =>
+              tb.attValueOpt("show").contains("false") && ! tb.attValueOpt("deprecated").contains("true")
+            }
+          }
+
+        assert(hiddenBindings.nonEmpty)
+
+        val enNames = hiddenBindings.map { b =>
+          val displayNames = b / FBXMLNames.FBMetadataTest / FBXMLNames.FBDisplayNameTest
+          val langs        = displayNames.map(_.attValue("lang")).toSet
+          assert(expectedLangs.subsetOf(langs), s"Missing languages on ${b.attValueOpt("id")}: ${expectedLangs -- langs}")
+          displayNames.find(_.attValue("lang") == "en").get.stringValue
+        }
+
+        assert(enNames.contains("Numeric Stepper"))
+        assert(enNames.contains("Choice Cards (Single Selection)"))
+        assert(enNames.contains("Choice Cards (Multiple Selection)"))
+        assert(enNames.contains("Dynamic Dropdown with Search"))
+        assert(enNames.contains("Plain Text Area with Resizing"))
+        assert(enNames.contains("Character Counter"))
+        assert(enNames.contains("Clipboard Copy"))
+        assert(enNames.contains("Content Filter"))
+        assert(enNames.distinct.size == enNames.size, s"Duplicate English display names: ${enNames.diff(enNames.distinct)}")
+      }
+    }
+  }
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.ToolboxSearch.{SearchEntry, ToolboxItem}
+import org.orbeon.builder.ToolboxSearch.{InsertAction, SearchEntry, ToolboxItem}
 import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.fr.ControlOps
@@ -882,25 +882,24 @@ object QuickInsert {
         }
 
         def renderInsertOnlyList(): Unit = {
-          val filtered = ToolboxSearch.filterAndRankItems(toolboxItems, trimmed, recent)
-          if (filtered.nonEmpty) {
-            if (trimmed.isEmpty) {
-              val recentItems = recent.flatMap(id => filtered.find(_.id == id))
-              if (recentItems.nonEmpty) {
-                appendGroupHeader(labels.recent)
-                recentItems.foreach(item => appendInsertRow(item, showCategory = false))
-              }
-              var lastCategory = ""
-              filtered.foreach { item =>
-                if (item.category != lastCategory) {
-                  lastCategory = item.category
-                  appendGroupHeader(item.category)
-                }
-                appendInsertRow(item, showCategory = false)
-              }
-            } else {
-              filtered.foreach(item => appendInsertRow(item, showCategory = true))
+          if (trimmed.isEmpty) {
+            val recentItems = recent.flatMap(id => toolboxItems.find(_.id == id))
+            val browseItems = ToolboxSearch.filterAndRankItems(toolboxItems, "", recent)
+            if (recentItems.nonEmpty) {
+              appendGroupHeader(labels.recent)
+              recentItems.foreach(item => appendInsertRow(item, showCategory = false))
             }
+            var lastCategory = ""
+            browseItems.foreach { item =>
+              if (item.category != lastCategory) {
+                lastCategory = item.category
+                appendGroupHeader(item.category)
+              }
+              appendInsertRow(item, showCategory = false)
+            }
+          } else {
+            val filtered = ToolboxSearch.filterAndRankItems(toolboxItems, trimmed, recent)
+            filtered.foreach(item => appendInsertRow(item, showCategory = true))
           }
         }
 
@@ -934,7 +933,7 @@ object QuickInsert {
 
             val insertToShow =
               if (trimmed.isEmpty) {
-                val recentItems = recent.flatMap(id => matchedInsert.find(_.id == id))
+                val recentItems = recent.flatMap(id => toolboxItems.find(_.id == id))
                 val rest        = matchedInsert.filterNot(i => recentItems.exists(_.id == i.id))
                 (recentItems ++ rest).take(AllTabSectionLimit)
               } else {
@@ -1050,13 +1049,27 @@ object QuickInsert {
       ToolboxSearch.recordRecentItem(item.id)
       close(refreshCellButton = false)
 
+      def performInsert(): Unit =
+        item.action match {
+          case InsertAction.ClickButton(button) =>
+            button.click()
+          case InsertAction.ByBindingClassName(bindingClassName) =>
+            scala.util.Try(FormBuilderRpcClient.api.insertControlByBindingClassName(bindingClassName)).foreach { future =>
+              future.foreach {
+                case Some(namespacedId) if namespacedId.nonEmpty =>
+                  ControlLabelHintTextEditor.controlAdded.fire(namespacedId)
+                case _ =>
+              }
+            }
+        }
+
       modeOpt match {
         case Some(CellPopover(_, needsSelect)) if needsSelect =>
           AjaxClient.allEventsProcessedF("quickInsertCell").foreach { _ =>
-            item.button.click()
+            performInsert()
           }
         case _ =>
-          item.button.click()
+          performInsert()
       }
     }
   }

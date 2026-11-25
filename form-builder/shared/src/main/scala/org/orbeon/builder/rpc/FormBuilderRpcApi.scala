@@ -65,4 +65,5 @@ trait FormBuilderRpcApi {
 
   def listFormControls(): Future[List[FormControlSummary]]
   def selectControlByName(controlName: String, openSettings: Boolean): Future[Unit]
+  def insertControlByBindingClassName(bindingClassName: String): Future[Option[String]]
 }

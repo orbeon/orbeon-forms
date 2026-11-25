@@ -465,4 +465,33 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       }
     }
   }
+
+  def insertControlByBindingClassName(bindingClassName: String): Future[Option[String]] = Future.successful {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val isReadonly = scala.util.Try(FormRunner.isReadonlyMode(FormRunnerParams())).getOrElse(false)
+    val canInsert  =
+      ! isReadonly &&
+      ! FormBuilder.findSelectedCell.exists(FormRunner.isSectionTemplateContent) &&
+      ToolboxOps.canInsertControl(ctx.bodyElem)
+
+    if (canInsert) {
+      val bindingOpt =
+        ctx.componentBindings.find { b =>
+          b.attValueOpt(XMLNames.FB -> "binding-class-name").contains(bindingClassName) &&
+          ! (b / XMLNames.FBMetadataTest / XMLNames.FBToolboxTest).exists(_.attValueOpt("deprecated").contains("true"))
+        }
+
+      for {
+        bindingElem <- bindingOpt
+        _           <- ToolboxOps.insertNewControl(bindingElem)
+        selectedTd  <- FormBuilder.findSelectedCell
+      } yield {
+        FormBuilder.selectStartCell(selectedTd)
+        Option(FormBuilder.buildFormBuilderControlNamespacedIdOrEmpty(selectedTd.id)).getOrElse("")
+      }
+    } else {
+      None
+    }
+  }
 }

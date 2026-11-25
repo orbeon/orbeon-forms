@@ -34,16 +34,23 @@ object ToolboxSearch {
     enabled   : Boolean
   )
 
+  sealed trait InsertAction
+  object InsertAction {
+    case class ClickButton(button: html.Element)            extends InsertAction
+    case class ByBindingClassName(bindingClassName: String) extends InsertAction
+  }
+
   case class ToolboxItem(
-    id        : String,
-    label     : String,
-    category  : String,
-    extraTerms: String,
-    iconHtml  : String,
-    shortcut  : Option[String],
-    isControl : Boolean,
-    enabled   : Boolean,
-    button    : html.Element
+    id            : String,
+    label         : String,
+    category      : String,
+    extraTerms    : String,
+    iconHtml      : String,
+    shortcut      : Option[String],
+    isControl     : Boolean,
+    enabled       : Boolean,
+    shownInToolbox: Boolean,
+    action        : InsertAction
   ) {
     def toSearchEntry: SearchEntry =
       SearchEntry(
@@ -120,10 +127,14 @@ object ToolboxSearch {
   }
 
   /**
-   * Collects all toolbox items currently rendered in the Controls tab.
+   * Collects all toolbox items rendered in the Controls tab, including special appearances
+   * hidden from the toolbox (`shownInToolbox = false`) for search in QuickInsert.
    */
   def collectItems(): List[ToolboxItem] =
     findControlsTab().map { controlsTab =>
+      val canInsertControls =
+        controlsTab.querySelectorOpt(".fb-insert-control button").forall(isButtonEnabled)
+
       val groups = controlsTab.querySelectorAllT(".fb-tools")
       groups.flatMap { group =>
         val categoryLabel =
@@ -131,32 +142,61 @@ object ToolboxSearch {
             .map(cleanLabelText)
             .getOrElse("")
 
-        group.querySelectorAllT(".fb-tool").flatMap { tool =>
-          tool.querySelectorOpt("button").map { btn =>
-            val entry      = extractEntry(tool, categoryLabel)
-            val id         = extractItemId(tool, entry.label)
-            val iconHtml   = btn.querySelectorOpt("i, img").map(_.outerHTML).getOrElse("")
-            val shortcut   = btn.querySelectorOpt("kbd").flatMap(k => Option(k.textContent)).flatMap(_.trimAllToOpt)
-            val isControl  = tool.querySelectorOpt(".fb-insert-control").isDefined
-            ToolboxItem(
-              id         = id,
-              label      = entry.label,
-              category   = entry.category,
-              extraTerms = entry.extraTerms,
-              iconHtml   = iconHtml,
-              shortcut   = shortcut,
-              isControl  = isControl,
-              enabled    = entry.enabled,
-              button     = btn
-            )
+        val visibleItems =
+          group.querySelectorAllT(".fb-tool").flatMap { tool =>
+            tool.querySelectorOpt("button").map { btn =>
+              val entry      = extractEntry(tool, categoryLabel)
+              val id         = extractItemId(tool, entry.label)
+              val iconHtml   = btn.querySelectorOpt("i, img").map(_.outerHTML).getOrElse("")
+              val shortcut   = btn.querySelectorOpt("kbd").flatMap(k => Option(k.textContent)).flatMap(_.trimAllToOpt)
+              val isControl  = tool.querySelectorOpt(".fb-insert-control").isDefined
+              ToolboxItem(
+                id             = id,
+                label          = entry.label,
+                category       = entry.category,
+                extraTerms     = entry.extraTerms,
+                iconHtml       = iconHtml,
+                shortcut       = shortcut,
+                isControl      = isControl,
+                enabled        = entry.enabled,
+                shownInToolbox = true,
+                action         = InsertAction.ClickButton(btn)
+              )
+            }
           }
-        }
+
+        val hiddenAppearanceItems =
+          group.querySelectorAllT(".fb-hidden-tool").flatMap { hiddenEl =>
+            for {
+              bindingClassName <- Option(hiddenEl.getAttribute("data-fb-binding-class-name")).flatMap(_.trimAllToOpt)
+              label            <- Option(hiddenEl.getAttribute("data-fb-label")).flatMap(_.trimAllToOpt)
+            } yield {
+              val iconHtml   = Option(hiddenEl.getAttribute("data-fb-icon-html")).getOrElse("")
+              val shortcut   = Option(hiddenEl.getAttribute("data-fb-shortcut")).flatMap(_.trimAllToOpt)
+              val extraTerms = Option(hiddenEl.getAttribute("data-fb-search-terms")).getOrElse("")
+              ToolboxItem(
+                id             = s"fb-insert-control-$bindingClassName",
+                label          = label,
+                category       = categoryLabel,
+                extraTerms     = extraTerms,
+                iconHtml       = iconHtml,
+                shortcut       = shortcut,
+                isControl      = true,
+                enabled        = canInsertControls,
+                shownInToolbox = false,
+                action         = InsertAction.ByBindingClassName(bindingClassName)
+              )
+            }
+          }
+
+        visibleItems ++ hiddenAppearanceItems
       }.toList
     }.getOrElse(Nil)
 
   /**
-   * Filters and ranks items for a given query, breaking ties using `recentIds`
-   * and original DOM order.
+   * Filters and ranks items for a given query, breaking ties using `recentIds`,
+   * whether the item is primary in the toolbox, and original DOM order.
+   * When the query is blank, only items shown in the toolbox (`shownInToolbox`) are returned.
    */
   def filterAndRankItems(
     items    : List[ToolboxItem],
@@ -165,14 +205,15 @@ object ToolboxSearch {
   ): List[ToolboxItem] = {
     val trimmed = query.trimAllToEmpty
     if (trimmed.isEmpty) {
-      items
+      items.filter(_.shownInToolbox)
     } else {
       val recentRankMap = recentIds.zipWithIndex.toMap
       items.zipWithIndex
         .flatMap { case (item, domIdx) =>
           matchScore(item.toSearchEntry, trimmed).map { score =>
-            val recentRank = recentRankMap.getOrElse(item.id, Int.MaxValue)
-            (item, (score, recentRank, domIdx))
+            val recentRank  = recentRankMap.getOrElse(item.id, Int.MaxValue)
+            val toolboxRank = if (item.shownInToolbox) 0 else 1
+            (item, (score, recentRank, toolboxRank, domIdx))
           }
         }
         .sortBy(_._2)

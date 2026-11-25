@@ -12,7 +12,8 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding id="fb-trigger-minimal" element="xf|trigger[appearance='minimal']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -34,14 +35,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-link</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="minimal">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="minimal">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 

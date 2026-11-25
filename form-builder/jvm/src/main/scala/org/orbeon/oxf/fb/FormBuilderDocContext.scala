@@ -55,7 +55,7 @@ case class FormBuilderDocContext(
         result
       }
 
-  private def componentBindings: Seq[NodeInfo] =
+  def componentBindings: Seq[NodeInfo] =
     asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 }
 

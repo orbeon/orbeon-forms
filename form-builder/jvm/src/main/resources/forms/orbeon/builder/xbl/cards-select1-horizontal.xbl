@@ -17,20 +17,34 @@
 
     <xbl:binding id="fb-cards-select1-horizontal" element="xf|select1[appearance ~= cards][appearance ~= 'xxf:horizontal']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Horizontal Choice Cards</display-name>
-            <display-name lang="fr">Cartes de choix horizontales</display-name>
-            <display-name lang="no">Horisontale valgkort</display-name>
-            <display-name lang="ru">Горизонтальные карточки выбора</display-name>
-            <display-name lang="it">Schede di scelta orizzontali</display-name>
-            <display-name lang="de">Horizontale Auswahlkarten</display-name>
-            <display-name lang="fi">Vaakasuuntaiset valintakortit</display-name>
-            <display-name lang="es">Tarjetas de opción horizontales</display-name>
-            <display-name lang="nl">Horizontale keuzekaarten</display-name>
-            <display-name lang="pt">Cartões de opção horizontais</display-name>
-            <display-name lang="sv">Horisontella valkort</display-name>
-            <display-name lang="ar">بطاقات اختيار أفقية</display-name>
-            <display-name lang="pl">Poziome karty wyboru</display-name>
-            <display-name lang="ja">水平選択カード</display-name>
+            <display-name lang="en">Horizontal Choice Cards (Single Selection)</display-name>
+            <display-name lang="fr">Cartes de choix horizontales (sélection unique)</display-name>
+            <display-name lang="no">Horisontale valgkort (enkeltvalg)</display-name>
+            <display-name lang="ru">Горизонтальные карточки выбора (одиночный выбор)</display-name>
+            <display-name lang="it">Schede di scelta orizzontali (scelta singola)</display-name>
+            <display-name lang="de">Horizontale Auswahlkarten (Einzelauswahl)</display-name>
+            <display-name lang="fi">Vaakasuuntaiset valintakortit (yksittäisvalinta)</display-name>
+            <display-name lang="es">Tarjetas de opción horizontales (selección única)</display-name>
+            <display-name lang="nl">Horizontale keuzekaarten (enkelvoudige selectie)</display-name>
+            <display-name lang="pt">Cartões de opção horizontais (seleção única)</display-name>
+            <display-name lang="sv">Horisontella valkort (enkelval)</display-name>
+            <display-name lang="ar">بطاقات اختيار أفقية (تحديد مفرد)</display-name>
+            <display-name lang="pl">Poziome karty wyboru (wybór pojedynczy)</display-name>
+            <display-name lang="ja">水平選択カード（単一選択）</display-name>
+            <appearance-display-name lang="en">Horizontal Choice Cards</appearance-display-name>
+            <appearance-display-name lang="fr">Cartes de choix horizontales</appearance-display-name>
+            <appearance-display-name lang="no">Horisontale valgkort</appearance-display-name>
+            <appearance-display-name lang="ru">Горизонтальные карточки выбора</appearance-display-name>
+            <appearance-display-name lang="it">Schede di scelta orizzontali</appearance-display-name>
+            <appearance-display-name lang="de">Horizontale Auswahlkarten</appearance-display-name>
+            <appearance-display-name lang="fi">Vaakasuuntaiset valintakortit</appearance-display-name>
+            <appearance-display-name lang="es">Tarjetas de opción horizontales</appearance-display-name>
+            <appearance-display-name lang="nl">Horizontale keuzekaarten</appearance-display-name>
+            <appearance-display-name lang="pt">Cartões de opção horizontais</appearance-display-name>
+            <appearance-display-name lang="sv">Horisontella valkort</appearance-display-name>
+            <appearance-display-name lang="ar">بطاقات اختيار أفقية</appearance-display-name>
+            <appearance-display-name lang="pl">Poziome karty wyboru</appearance-display-name>
+            <appearance-display-name lang="ja">水平選択カード</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-th-large</icon-class>

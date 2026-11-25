@@ -32,13 +32,34 @@
             xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">With Content Filter</display-name>
-            <display-name lang="fr">Avec filtre de contenu</display-name>
-            <display-name lang="no">Med innholdsfilter</display-name>
-            <display-name lang="ru">С фильтром содержимого</display-name>
-            <display-name lang="it">Con filtro contenuti</display-name>
-            <display-name lang="de">Mit Inhaltsfilter</display-name>
-            <display-name lang="es">Con filtro de contenido</display-name>
+            <display-name lang="en">Content Filter</display-name>
+            <display-name lang="fr">Filtre de contenu</display-name>
+            <display-name lang="no">Innholdsfilter</display-name>
+            <display-name lang="ru">Фильтр содержимого</display-name>
+            <display-name lang="it">Filtro contenuti</display-name>
+            <display-name lang="de">Inhaltsfilter</display-name>
+            <display-name lang="fi">Sisältösuodatin</display-name>
+            <display-name lang="es">Filtro de contenido</display-name>
+            <display-name lang="nl">Inhoudsfilter</display-name>
+            <display-name lang="pt">Filtro de conteúdo</display-name>
+            <display-name lang="sv">Innehållsfilter</display-name>
+            <display-name lang="ar">مرشح المحتوى</display-name>
+            <display-name lang="pl">Filtr treści</display-name>
+            <display-name lang="ja">コンテンツフィルター</display-name>
+            <appearance-display-name lang="en">With Content Filter</appearance-display-name>
+            <appearance-display-name lang="fr">Avec filtre de contenu</appearance-display-name>
+            <appearance-display-name lang="no">Med innholdsfilter</appearance-display-name>
+            <appearance-display-name lang="ru">С фильтром содержимого</appearance-display-name>
+            <appearance-display-name lang="it">Con filtro contenuti</appearance-display-name>
+            <appearance-display-name lang="de">Mit Inhaltsfilter</appearance-display-name>
+            <appearance-display-name lang="fi">Sisältösuodattimella</appearance-display-name>
+            <appearance-display-name lang="es">Con filtro de contenido</appearance-display-name>
+            <appearance-display-name lang="nl">Met inhoudsfilter</appearance-display-name>
+            <appearance-display-name lang="pt">Com filtro de conteúdo</appearance-display-name>
+            <appearance-display-name lang="sv">Med innehållsfilter</appearance-display-name>
+            <appearance-display-name lang="ar">مع مرشح المحتوى</appearance-display-name>
+            <appearance-display-name lang="pl">Z filtrem treści</appearance-display-name>
+            <appearance-display-name lang="ja">コンテンツフィルター付き</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-filter</icon-class>

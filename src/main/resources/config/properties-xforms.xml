@@ -333,6 +333,7 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.scale.allow-clear"                         value="true"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.duration.fields"                           value="hours minutes"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.image-attachment.lightbox"                 value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.markdown.initial-mode"                     value="write"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single

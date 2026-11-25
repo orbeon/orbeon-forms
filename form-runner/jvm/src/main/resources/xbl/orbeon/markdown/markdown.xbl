@@ -56,7 +56,138 @@
                     </xf:textarea>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="initial-mode" type="xs:string" values="write preview" default="write"/>
+            </custom-settings>
             <conversions element="xf|textarea"/>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-markdown-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <initial-mode/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <initial-mode>Initial Mode</initial-mode>
+                                <write>Write</write>
+                                <preview>Preview</preview>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <initial-mode>Mode initial</initial-mode>
+                                <write>Écrire</write>
+                                <preview>Aperçu</preview>
+                            </resource>
+                            <resource xml:lang="no">
+                                <initial-mode>Startmodus</initial-mode>
+                                <write>Skriv</write>
+                                <preview>Forhåndsvisning</preview>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <initial-mode>Начальный режим</initial-mode>
+                                <write>Редактировать</write>
+                                <preview>Предпросмотр</preview>
+                            </resource>
+                            <resource xml:lang="it">
+                                <initial-mode>Modalità iniziale</initial-mode>
+                                <write>Scrivi</write>
+                                <preview>Anteprima</preview>
+                            </resource>
+                            <resource xml:lang="de">
+                                <initial-mode>Anfangsmodus</initial-mode>
+                                <write>Schreiben</write>
+                                <preview>Vorschau</preview>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <initial-mode>Aloitustila</initial-mode>
+                                <write>Kirjoita</write>
+                                <preview>Esikatselu</preview>
+                            </resource>
+                            <resource xml:lang="es">
+                                <initial-mode>Modo inicial</initial-mode>
+                                <write>Escribir</write>
+                                <preview>Vista previa</preview>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <initial-mode>Beginmodus</initial-mode>
+                                <write>Schrijven</write>
+                                <preview>Voorbeeld</preview>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <initial-mode>Modo inicial</initial-mode>
+                                <write>Escrever</write>
+                                <preview>Pré-visualizar</preview>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <initial-mode>Startläge</initial-mode>
+                                <write>Skriv</write>
+                                <preview>Förhandsgranska</preview>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <initial-mode>الوضع الأولي</initial-mode>
+                                <write>كتابة</write>
+                                <preview>معاينة</preview>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <initial-mode>Tryb początkowy</initial-mode>
+                                <write>Edytuj</write>
+                                <preview>Podgląd</preview>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <initial-mode>初期モード</initial-mode>
+                                <write>編集</write>
+                                <preview>プレビュー</preview>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-markdown-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/initial-mode" appearance="full xxf:horizontal" id="initial-mode-control">
+                                <xf:label ref="xxf:r('initial-mode')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('write')"/>
+                                    <xf:value>write</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('preview')"/>
+                                    <xf:value>preview</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-markdown-action"
+                    event="xforms-value-changed"
+                    observer="initial-mode-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>
@@ -67,9 +198,12 @@
             <xf:model>
                 <xf:instance id="orbeon-state">
                     <state>
-                        <mode>write</mode>
+                        <mode/>
                     </state>
                 </xf:instance>
+                <xf:bind
+                    ref="instance('orbeon-state')/mode"
+                    xxf:default="if (fr:component-param-value('initial-mode') = 'preview') then 'preview' else 'write'"/>
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <resource xml:lang="en">

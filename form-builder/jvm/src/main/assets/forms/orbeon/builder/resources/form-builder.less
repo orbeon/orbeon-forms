@@ -4644,6 +4644,10 @@ body.orbeon {
                         // Keep labels, etc. aligned with fields in repetitions
                         margin-left: @densityMarginLeftRight;
                     }
+                    .xforms-help {
+                        margin-top: ~"calc(@{densityMarginTopBottom} + 3px)";
+                        margin-right: var(--orbeon-help-icon-gap);
+                    }
                     .xforms-label, .xforms-hint {
                         margin-right: @densityMarginLeftRight;
                     }

@@ -81,13 +81,13 @@
 
 @frGridDensityMarginCompactTopBottom:     4px;
 @frGridDensityMarginCompactLeftRight:     4px;
-@frGridDensityMarginCompactHelpTop:       6px;
+@frGridDensityMarginCompactHelpTop:       ~"calc(@{frGridDensityMarginCompactTopBottom} + 3px)";
 @frGridDensityMarginComfortableTopBottom: 0.5em;
 @frGridDensityMarginComfortableLeftRight: 13px;
-@frGridDensityMarginComfortableHelpTop:   0.6em;
+@frGridDensityMarginComfortableHelpTop:   ~"calc(@{frGridDensityMarginComfortableTopBottom} + 3px)";
 @frGridDensityMarginRoomyTopBottom:       1em;
 @frGridDensityMarginRoomyLeftRight:       26px;
-@frGridDensityMarginRoomyHelpTop:         1.05em;
+@frGridDensityMarginRoomyHelpTop:         ~"calc(@{frGridDensityMarginRoomyTopBottom} + 3px)";
 
 // At design time, editable grid cells already have horizontal padding for the left/right control icons, so we don't add
 // extra horizontal density margins.

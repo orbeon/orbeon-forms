@@ -101,17 +101,17 @@
                     }
                 }
 
-                & > .xforms-label {
-                    padding-top: var(--orbeon-cell-label-padding-top);
-
-                    &.xforms-disabled {
-                        display: none;
-                    }
+                & > .xforms-label.xforms-disabled {
+                    display: none;
                 }
                 // https://github.com/orbeon/orbeon-forms/issues/4213
                 .input-prepend, .input-append {
                     display: flex;
                 }
+            }
+
+            .fr-grid-td > .xforms-label {
+                padding-top: var(--orbeon-cell-label-padding-top);
             }
 
             .fr-table {

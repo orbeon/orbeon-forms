@@ -355,6 +355,7 @@ private object FormRunnerConfigProcessor {
     disableRelevantOpt              : Option[Boolean],
     disableDefaultOpt               : Option[Boolean],
     disableCalculateOpt             : Option[Boolean],
+    propertiesETag                  : String,
   ) {
     lazy val digest: String =
       SecureUtils.defaultMessageDigest
@@ -364,6 +365,7 @@ private object FormRunnerConfigProcessor {
         .tap(_.update(majorMode.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(viewAppearanceOpt.map(_.namespace.uri).getOrElse("").getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(viewAppearanceOpt.map(_.localName).getOrElse("").getBytes(StandardCharsets.UTF_8)))
+        .tap(_.update(useWizardInNewEdit.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isPdf.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isReadonlyMode.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(usePdfTemplate.toString.getBytes(StandardCharsets.UTF_8)))
@@ -376,6 +378,7 @@ private object FormRunnerConfigProcessor {
         .tap(_.update(disableRelevantOpt.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(disableDefaultOpt.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(disableCalculateOpt.toString.getBytes(StandardCharsets.UTF_8)))
+        .tap(_.update(propertiesETag.getBytes(StandardCharsets.UTF_8)))
         .pipe(md => NumberUtils.toHexString(md.digest()))
   }
 
@@ -614,6 +617,7 @@ private object FormRunnerConfigProcessor {
       disableRelevantOpt               = disableParams._1,
       disableDefaultOpt                = disableParams._2,
       disableCalculateOpt              = disableParams._3,
+      propertiesETag                   = CoreCrossPlatformSupport.properties.eTag,
     )
   }
 }

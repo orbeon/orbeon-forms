@@ -1544,5 +1544,100 @@ class ConfigurationPropertiesTest
       PersistencePropertyProvider.invalidateCache()
       ObjectCache.configureAllIfNeeded(org.orbeon.oxf.properties.Properties.instance.getPropertySet)
     }
+
+    it("must re-unroll cached pages when theme changes via orbeon/configuration and hit cache thereafter") {
+      withTempSQLite { _ =>
+
+        def fetchHtmlAndEvents(url: String): (String, List[org.orbeon.oxf.test.TestHttpClient.CacheEvent]) = {
+          val (_, response, _, events) =
+            org.orbeon.oxf.test.TestHttpClient.connect(
+              url     = url,
+              method  = org.orbeon.oxf.http.HttpMethod.GET,
+              headers = Map.empty,
+              content = None
+            )
+          val html =
+            try {
+              useAndClose(response.content.stream) { is =>
+                new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)
+              }
+            } finally {
+              response.disconnect()
+            }
+          (html, events)
+        }
+
+        def staticStateEventOpt(events: List[org.orbeon.oxf.test.TestHttpClient.CacheEvent]): Option[org.orbeon.oxf.test.TestHttpClient.StaticState] =
+          events.collectFirst { case ss: org.orbeon.oxf.test.TestHttpClient.StaticState => ss }
+
+        val BundledCssHashRegex = """/orbeon-([0-9a-f]+)\.css""".r
+
+        def resolvedCssPaths(html: String): Set[String] =
+          BundledCssHashRegex
+            .findAllMatchIn(html)
+            .map(_.group(1))
+            .flatMap(hash => org.orbeon.oxf.xforms.XFormsStores.assetBundlesStore.get(hash).toList.flatMap(_.asInstanceOf[Array[String]]))
+            .toSet
+
+        val LandingUrl = "/fr/"
+        val FormUrl    = "/fr/issue/6707/new"
+
+        // 1. Prime caches for Landing page (global `oxf.fr.style.theme`) and Detail page (`oxf.fr.style.theme.*.*`)
+        val (initialLandingHtml, _) = fetchHtmlAndEvents(LandingUrl)
+        val (initialFormHtml, _)    = fetchHtmlAndEvents(FormUrl)
+        assert(resolvedCssPaths(initialLandingHtml).contains("/apps/fr/themes/2026/theme.css"))
+        assert(! resolvedCssPaths(initialLandingHtml).contains("/apps/fr/themes/2025/theme.css"))
+        assert(resolvedCssPaths(initialFormHtml).contains("/apps/fr/themes/2026/theme.css"))
+        assert(! resolvedCssPaths(initialFormHtml).contains("/apps/fr/themes/2025/theme.css"))
+
+        // 2. Repeat loads without property changes must hit both pipeline and static-state caches (`read = false, found = true`)
+        val (_, warmLandingEvents1) = fetchHtmlAndEvents(LandingUrl)
+        val (_, warmFormEvents1)    = fetchHtmlAndEvents(FormUrl)
+        assert(staticStateEventOpt(warmLandingEvents1).exists(ss => ! ss.read && ss.found))
+        assert(staticStateEventOpt(warmFormEvents1).exists(ss => ! ss.read && ss.found))
+
+        // 3. Open `/fr/orbeon/configuration/new`, change both global and form theme to `2025`, and save
+        val (processorService, docOpt, _) =
+          runFormRunner(
+            app  = "orbeon",
+            form = "configuration",
+            mode = "new"
+          )
+
+        assert(docOpt.isDefined)
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, docOpt.get) {
+            val globalStyleThemeSelect = resolveObject[XFormsSelect1Control]("global-style-theme-value-control").get
+            val globalTheme2025Item    = globalStyleThemeSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("2025")).get._1
+            setControlValueWithEventSearchNested(globalStyleThemeSelect.effectiveId, globalTheme2025Item.externalValue(globalStyleThemeSelect.mustEncodeValues))
+
+            val formStyleThemeSelect = resolveObject[XFormsSelect1Control]("style-theme-value-control").get
+            val formTheme2025Item    = formStyleThemeSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("2025")).get._1
+            setControlValueWithEventSearchNested(formStyleThemeSelect.effectiveId, formTheme2025Item.externalValue(formStyleThemeSelect.mustEncodeValues))
+
+            SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
+          }
+        }
+
+        // 4. Next loads must re-unroll (`read = true`) and serve the `2025` theme CSS immediately
+        val (updatedLandingHtml, reloadLandingEvents) = fetchHtmlAndEvents(LandingUrl)
+        val (updatedFormHtml,    reloadFormEvents)    = fetchHtmlAndEvents(FormUrl)
+        assert(staticStateEventOpt(reloadLandingEvents).exists(_.read))
+        assert(staticStateEventOpt(reloadFormEvents).exists(_.read))
+        assert(resolvedCssPaths(updatedLandingHtml).contains("/apps/fr/themes/2025/theme.css"))
+        assert(! resolvedCssPaths(updatedLandingHtml).contains("/apps/fr/themes/2026/theme.css"))
+        assert(resolvedCssPaths(updatedFormHtml).contains("/apps/fr/themes/2025/theme.css"))
+        assert(! resolvedCssPaths(updatedFormHtml).contains("/apps/fr/themes/2026/theme.css"))
+
+        // 5. Subsequent loads without further database changes must hit pipeline and static-state caches again
+        val (cachedLandingHtml, warmLandingEvents2) = fetchHtmlAndEvents(LandingUrl)
+        val (cachedFormHtml,    warmFormEvents2)    = fetchHtmlAndEvents(FormUrl)
+        assert(staticStateEventOpt(warmLandingEvents2).exists(ss => ! ss.read && ss.found))
+        assert(staticStateEventOpt(warmFormEvents2).exists(ss => ! ss.read && ss.found))
+        assert(resolvedCssPaths(cachedLandingHtml).contains("/apps/fr/themes/2025/theme.css"))
+        assert(resolvedCssPaths(cachedFormHtml).contains("/apps/fr/themes/2025/theme.css"))
+      }
+      PersistencePropertyProvider.invalidateCache()
+    }
   }
 }

@@ -167,7 +167,14 @@ object PropertySet {
   )
 
   def forTests(globalProperties: Iterable[PropertyParams]): PropertySet =
-    apply(globalProperties, eTag = "") // prefer to keep a non-default parameter and use a special method for tests
+    apply(
+      globalProperties,
+      eTag =
+        if (globalProperties.isEmpty)
+          ""
+        else
+          scala.util.hashing.MurmurHash3.seqHash(globalProperties.toSeq).toHexString
+    ) // prefer to keep a non-default parameter and use a special method for tests
 
   def apply(globalProperties: Iterable[PropertyParams], eTag: api.ETag): PropertySet = {
 

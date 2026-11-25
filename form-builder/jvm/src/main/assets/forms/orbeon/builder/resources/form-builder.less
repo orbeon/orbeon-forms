@@ -881,10 +881,66 @@ body.orbeon {
         border-radius: var(--orbeon-body-decorations-border-radius);
     }
 
-    .fr-section-container.fb-dnd-drop-into,
-    .fb-action-step-iteration.fb-dnd-drop-into > .fb-action-step-row-main > .fb-action-step-row-content {
+    .fr-section-container.fb-dnd-drop-into {
         outline: 1px dashed var(--orbeon-focus-border-color);
         outline-offset: -1px;
+    }
+
+    &.fb-action-dragging,
+    .fb-action-dragging {
+        cursor: grabbing !important;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .fb-action-dnd-source {
+        opacity: 0.35;
+    }
+
+    .fb-action-dnd-ghost {
+        position: fixed;
+        z-index: 10000;
+        pointer-events: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 500;
+        color: var(--orbeon-base-color);
+        background-color: var(--orbeon-tab-background-color);
+        border: 1px solid var(--orbeon-focus-border-color);
+        border-radius: 9999px;
+        box-shadow: 0 4px 12px color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
+        white-space: nowrap;
+    }
+
+    .fb-action-drop-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background-color: var(--orbeon-focus-border-color);
+        border-radius: 9999px;
+        pointer-events: none;
+        z-index: 9999;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: -3px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--orbeon-focus-border-color);
+            box-shadow: 0 0 0 2px var(--orbeon-form-background-color);
+        }
+
+        &.fb-action-drop-indicator-noop {
+            opacity: 0.35;
+        }
     }
 
     .fb-container-dnd-ghost {
@@ -2423,6 +2479,31 @@ body.orbeon {
             flex-shrink: 0;
             white-space: nowrap;
         }
+
+        &.fb-action-dnd-drop-into > .fb-action-step-row-main > .fb-action-step-row-content {
+            outline: 1px dashed var(--orbeon-focus-border-color);
+            outline-offset: -1px;
+            border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+            background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
+        }
+
+        .fb-action-step-grab {
+            display: inline-block;
+            visibility: hidden;
+        }
+
+        &.fb-action-can-move .fb-action-step-grab {
+            visibility: visible;
+            cursor: grab;
+            opacity: 0.5;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        &.fb-action-can-move:hover .fb-action-step-grab {
+            opacity: 0.8;
+        }
     }
 
     .fb-dialog-messages {
@@ -2911,20 +2992,15 @@ body.orbeon {
         }
     }
 
-    .fb-action-dialog,
-    .fb-action-step-iteration,
-    .fb-action-step-repeat,
     .xbl-fr-dnd-repeat {
 
         // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
         .gu-mirror {
-            .fb-action-step-buttons,
             .fb-action-buttons {
                 display: none;
             }
         }
 
-        .fb-action-step-grab,
         .fb-action-grab {
             display: inline-block;
             cursor: grab;
@@ -2938,7 +3014,6 @@ body.orbeon {
             }
         }
 
-        .xforms-dnd-moves .fb-action-step-grab,
         .xforms-dnd-moves .fb-action-grab {
             cursor: grab;
             opacity: 0.5;

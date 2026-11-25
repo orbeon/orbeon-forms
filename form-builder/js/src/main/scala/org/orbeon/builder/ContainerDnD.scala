@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId, XFormsUI}
+import org.orbeon.xforms.{XFormsId, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -34,13 +34,11 @@ object ContainerDnD {
   private val OutlineAutoScrollEdgePx  = 36.0
   private val OutlineAutoScrollStepPx  = 8.0
   private val OutlineIndentStepPx      = 14.0
-  private val ActionStepIndentStepPx   = 18.0
 
   private sealed trait DragSource
   private object DragSource {
-    case class Canvas(block: Block)     extends DragSource
-    case class Outline(row: TreeRow)    extends DragSource
-    case class ActionStep(row: TreeRow) extends DragSource
+    case class Canvas(block: Block)  extends DragSource
+    case class Outline(row: TreeRow) extends DragSource
   }
 
   private case class DropTarget(
@@ -147,23 +145,7 @@ object ContainerDnD {
             else
               None
 
-          val actionStepSourceOpt =
-            if (canvasSourceOpt.isEmpty && outlineSourceOpt.isEmpty)
-              event.targetOpt
-                .flatMap(_.closestOpt(".fb-action-dialog .fb-action-step-grab, #fb-action-dialog .fb-action-step-grab"))
-                .flatMap { grabEl =>
-                  event.preventDefault()
-                  val rowElOpt = grabEl.closestOpt(".fb-action-step-iteration")
-                  val allRows  = actionStepRowsInDialog()
-                  rowElOpt.flatMap(rowEl => allRows.find(_.el == rowEl)).filter { _ =>
-                    allRows.length > 1
-                  }
-                }
-                .map(DragSource.ActionStep.apply)
-            else
-              None
-
-          canvasSourceOpt.orElse(outlineSourceOpt).orElse(actionStepSourceOpt).foreach { source =>
+          canvasSourceOpt.orElse(outlineSourceOpt).foreach { source =>
             dragSourceOpt = Some(source)
             startClientX  = event.clientX
             startClientY  = event.clientY
@@ -359,62 +341,6 @@ object ContainerDnD {
     }
   }
 
-  private def actionStepRowsInDialog(): List[TreeRow] = {
-    val rawElems =
-      dom.document
-        .querySelectorAllT(".fb-action-dialog .fb-action-step-iteration, #fb-action-dialog .fb-action-step-iteration")
-        .iterator
-        .filter(el => el.isVisible && ! FormRunnerUtils.isViewMode(el))
-        .toList
-
-    var containerByLevel = Map.empty[Int, String]
-
-    rawElems.zipWithIndex.flatMap { case (el, idx) =>
-      val rowId =
-        Option(el.getAttribute("data-orbeon-index"))
-          .flatMap(_.trimAllToOpt)
-          .getOrElse((idx + 1).toString)
-
-      val level =
-        Option(el.getAttribute("data-orbeon-level"))
-          .flatMap(_.toIntOption)
-          .orElse {
-            Option(el.getAttribute("class"))
-              .toList
-              .flatMap(_.splitTo[List]())
-              .collectFirst { case s if s.startsWith("xforms-dnd-level-") => s.stripPrefix("xforms-dnd-level-").toIntOption.map(_ + 1) }
-              .flatten
-          }
-          .getOrElse(1)
-
-      val isContainer =
-        el.getAttribute("data-orbeon-can-move-into") == "true" ||
-        el.getAttribute("data-orbeon-is-container") == "true" ||
-        Option(el.getAttribute("data-orbeon-step-type")).exists(t => t == "if" || t == "data-iterate") ||
-        el.querySelectorOpt(".fb-action-step-options select option[value='if']:checked, .fb-action-step-options select option[value='data-iterate']:checked").isDefined
-
-      val parentIdOpt =
-        if (level > 1)
-          containerByLevel.get(level - 1)
-        else
-          None
-
-      if (isContainer)
-        containerByLevel = containerByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowId)
-
-      Some(
-        TreeRow(
-          el          = el,
-          id          = rowId,
-          parentIdOpt = parentIdOpt,
-          isContainer = isContainer,
-          canMoveInto = isContainer,
-          level       = level
-        )
-      )
-    }
-  }
-
   private def isTreeDescendantOrSelf(
     candidateId : String,
     ancestorId  : String,
@@ -592,37 +518,6 @@ object ContainerDnD {
     (iconClass, labelText)
   }
 
-  private def actionStepGhostLabel(rowEl: html.Element): (String, String) = {
-    val (iconClass, fallbackLabel) = Option(rowEl.getAttribute("data-orbeon-step-type")) match {
-      case Some("service-call")            => ("fa-exchange", "Call Service")
-      case Some("if")                      => ("fa-code-fork", "Condition")
-      case Some("data-iterate")           => ("fa-repeat", "Repeat for Each Item")
-      case Some("control-setvalue")        => ("fa-pencil", "Set Control Value")
-      case Some("control-clear")           => ("fa-eraser", "Clear Control Value")
-      case Some("control-setitems")        => ("fa-list", "Set Control Items")
-      case Some("control-setfocus")        => ("fa-crosshairs", "Set Control Focus")
-      case Some("control-setvisited")      => ("fa-check-square-o", "Set Control Visited")
-      case Some("alert")                   => ("fa-exclamation-triangle", "Show Message")
-      case Some("navigate")                => ("fa-external-link", "Navigate")
-      case Some("process-call")            => ("fa-cogs", "Call Process")
-      case Some("repeat-add-iteration")    => ("fa-plus-circle", "Add Iteration")
-      case Some("repeat-remove-iteration") => ("fa-minus-circle", "Remove Iteration")
-      case Some("repeat-clear")            => ("fa-trash-o", "Clear Iterations")
-      case _                               => ("fa-bolt", "Step")
-    }
-
-    val labelText =
-      rowEl.querySelectorOpt(".fb-action-step-options select option:checked")
-        .flatMap(el => Option(el.textContent))
-        .orElse(rowEl.querySelectorOpt(".fr-select1-picker-trigger-label").flatMap(el => Option(el.textContent)))
-        .orElse(rowEl.querySelectorOpt(".select2-selection__rendered").flatMap(el => Option(el.textContent)))
-        .orElse(rowEl.querySelectorOpt(".xforms-select1-entry-selected").flatMap(el => Option(el.textContent)))
-        .flatMap(_.trimAllToOpt)
-        .getOrElse(fallbackLabel)
-
-    (iconClass, labelText)
-  }
-
   private def orbeonRootEl: html.Element =
     dom.document.querySelectorOpt(".orbeon").getOrElse(dom.document.body)
 
@@ -653,27 +548,6 @@ object ContainerDnD {
           } else {
             false
           }
-
-        case DragSource.ActionStep(sourceRow) =>
-          val allRows      = actionStepRowsInDialog()
-          val refreshedRow = allRows.find(_.id == sourceRow.id).getOrElse(sourceRow)
-          treeDropTargets  = computeTreeDropTargets(
-            draggedRow     = refreshedRow,
-            allRows        = allRows,
-            indentStepPx   = ActionStepIndentStepPx,
-            canBeTopLevel  = true,
-            canLeaveParent = true
-          )
-          if (treeDropTargets.exists(! _.isOriginalPosition)) {
-            val rowById = allRows.map(r => r.id -> r).toMap
-            dimmedTreeRows =
-              allRows
-                .filter(r => isTreeDescendantOrSelf(r.id, refreshedRow.id, rowById))
-                .map(_.el)
-            true
-          } else {
-            false
-          }
       }
 
     if (! hasValidTargets) {
@@ -686,16 +560,8 @@ object ContainerDnD {
       SectionLabelEditor.cancelHoverAndHint()
       dom.document.querySelectorOpt(".fb-row-editor").foreach(_.hide())
 
-      val targetDialogOpt =
-        source match {
-          case DragSource.ActionStep(_) =>
-            dom.document.querySelectorOpt(".fb-action-dialog, #fb-action-dialog")
-          case _ =>
-            None
-        }
-      val rootEl = targetDialogOpt.getOrElse(orbeonRootEl)
+      val rootEl = orbeonRootEl
       orbeonRootEl.classList.add("fb-dragging-container")
-      targetDialogOpt.foreach(_.classList.add("fb-dragging-container"))
 
       val (iconClass, labelText) =
         source match {
@@ -711,10 +577,6 @@ object ContainerDnD {
           case DragSource.Outline(sourceRow) =>
             dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
             outlineGhostLabel(sourceRow.el)
-
-          case DragSource.ActionStep(sourceRow) =>
-            dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
-            actionStepGhostLabel(sourceRow.el)
         }
 
       val ghostEl        = dom.document.createDivElement
@@ -776,7 +638,7 @@ object ContainerDnD {
           }
         }
 
-      case Some(DragSource.Outline(_) | DragSource.ActionStep(_)) =>
+      case Some(DragSource.Outline(_)) =>
         val pointerDocX = clientX + dom.window.pageXOffset
         val pointerDocY = clientY + dom.window.pageYOffset
 
@@ -887,24 +749,6 @@ object ContainerDnD {
           }
         )
 
-      case Some(DragSource.ActionStep(sourceRow)) =>
-        autoScrollContainer(
-          scrollElemOpt = dom.document.querySelectorOpt(".fb-action-dialog .fb-dialog-body, #fb-action-dialog .fb-dialog-body"),
-          clientY       = clientY,
-          edgePx        = OutlineAutoScrollEdgePx,
-          stepPx        = OutlineAutoScrollStepPx,
-          onScrolled    = () => {
-            treeDropTargets = computeTreeDropTargets(
-              draggedRow     = sourceRow,
-              allRows        = actionStepRowsInDialog(),
-              indentStepPx   = ActionStepIndentStepPx,
-              canBeTopLevel  = true,
-              canLeaveParent = true
-            )
-            updateGhostAndIndicator(lastClientX, lastClientY)
-          }
-        )
-
       case None =>
         stopAutoScroll()
     }
@@ -975,23 +819,6 @@ object ContainerDnD {
             )
           }
 
-        case Some(DragSource.ActionStep(sourceRow)) =>
-          treeDropTargetOpt.filterNot(_.isOriginalPosition).foreach { target =>
-            val intoId  = target.intoContainerOpt.fold("")(_.id)
-            val afterId = target.afterIdOpt.getOrElse("")
-            AjaxClient.fireEvent(
-              AjaxEvent(
-                eventName  = "fb-action-step-move",
-                targetId   = "fb-action-dialog",
-                properties = Map[String, js.Any](
-                  "source-index" -> sourceRow.id,
-                  "into-index"   -> intoId,
-                  "after-index"  -> afterId
-                )
-              )
-            )
-          }
-
         case None =>
       }
     }
@@ -1018,11 +845,9 @@ object ContainerDnD {
     }
 
     orbeonRootEl.classList.remove("fb-dragging-container")
-    dom.document.querySelectorOpt(".fb-action-dialog, #fb-action-dialog").foreach(_.classList.remove("fb-dragging-container"))
     dragSourceOpt.foreach {
       case DragSource.Canvas(sourceBlock) => sourceBlock.el.classList.remove("fb-dnd-source")
       case DragSource.Outline(_)          =>
-      case DragSource.ActionStep(_)       =>
     }
     dimmedTreeRows.foreach(_.classList.remove("fb-dnd-source"))
     highlightedSectionOpt.foreach { sec =>

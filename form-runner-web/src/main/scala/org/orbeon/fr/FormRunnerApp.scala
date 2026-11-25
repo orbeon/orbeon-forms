@@ -72,6 +72,7 @@ object FormRunnerApp extends App {
     xbl.HrefButton
     xbl.LaddaButton
     xbl.Select1Search
+    xbl.PopoverSelectPicker.init()
     xbl.TinyMCE
     xbl.Markdown
     xbl.AttachmentMultiple
@@ -99,6 +100,7 @@ object FormRunnerApp extends App {
     xbl.XPathCompletion
     xbl.ProcessEditorDnD
     xbl.ProcessTextEditor
+    xbl.ProcessActionPicker
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar.fixed-top, .orbeon .navbar-fixed-top", addScrollPadding(_, "scroll-padding-top"))

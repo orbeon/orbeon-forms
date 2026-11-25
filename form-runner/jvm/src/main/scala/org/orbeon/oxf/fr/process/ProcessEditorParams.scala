@@ -51,9 +51,14 @@ object ProcessEditorParams {
   object ActionCategory extends Enum[ActionCategory] {
     val values: immutable.IndexedSeq[ActionCategory] = findValues
 
-    case object FormRunner  extends ActionCategory
-    case object FlowControl extends ActionCategory
-    case object XForms      extends ActionCategory {
+    case object DataPersistence  extends ActionCategory
+    case object ValidationErrors extends ActionCategory
+    case object DialogsMessages  extends ActionCategory
+    case object NavigationModes  extends ActionCategory
+    case object SectionsWizard   extends ActionCategory
+    case object Integrations     extends ActionCategory
+    case object FlowControl      extends ActionCategory
+    case object XForms           extends ActionCategory {
       override val entryName: String = "xforms"
     }
   }
@@ -142,13 +147,14 @@ object ProcessEditorParams {
   case class ActionDef(
     name                    : String,
     label                   : String,
-    category                : ActionCategory     = ActionCategory.FormRunner,
+    category                : ActionCategory       = ActionCategory.DataPersistence,
     params                  : List[ActionParamDef] = Nil,
-    unnamedRule             : UnnamedDefaultRule = UnnamedDefaultRule.NoneAllowed,
-    requiredOneOfGroups     : List[List[String]] = Nil,
-    mutuallyExclusiveGroups : List[List[String]] = Nil,
-    allowsCustomParams      : Boolean            = false,
-    deprecated              : Boolean            = false
+    unnamedRule             : UnnamedDefaultRule   = UnnamedDefaultRule.NoneAllowed,
+    requiredOneOfGroups     : List[List[String]]   = Nil,
+    mutuallyExclusiveGroups : List[List[String]]   = Nil,
+    allowsCustomParams      : Boolean              = false,
+    deprecated              : Boolean              = false,
+    keywords                : String               = ""
   ) {
     val paramsByName: Map[String, ActionParamDef] =
       params.map(p => p.name -> p).toMap
@@ -209,11 +215,13 @@ object ProcessEditorParams {
   import ValueMode.*
 
   val ActionDefinitions: List[ActionDef] = List(
-    // --- Form Runner actions ---
+    // --- Data & Persistence ---
     ActionDef(
-      name   = "save",
-      label  = "Save",
-      params = List(
+      name     = "save",
+      label    = "Save",
+      category = DataPersistence,
+      keywords = "persist store draft database",
+      params   = List(
         ActionParamDef("draft",          Advanced, Avt, BooleanSelect, initialValue = "true"),
         ActionParamDef("overwrite",      Advanced, Avt, BooleanSelect, initialValue = "true"),
         ActionParamDef("prune-metadata", Advanced, Avt, BooleanSelect, initialValue = "true"),
@@ -221,17 +229,65 @@ object ProcessEditorParams {
       )
     ),
     ActionDef(
+      name                    = "control-setvalue",
+      label                   = "Set Control Value",
+      category                = DataPersistence,
+      keywords                = "field value assign",
+      mutuallyExclusiveGroups = List(List("at", "section-name")),
+      params                  = List(
+        ActionParamDef("control-name", Required, Avt,   ControlNameSelect, initialValue = ""),
+        ActionParamDef("value",        Required, XPath, Text,              initialValue = "''", placeholder = "XPath expression (e.g. 'value' or $other + 1)"),
+        ActionParamDef("at",           Advanced, Avt,   RepeatAtInput,     initialValue = "start", placeholder = "start, end, all, or 1-based index"),
+        ActionParamDef("section-name", Advanced, Avt,   SectionNameSelect, initialValue = "")
+      )
+    ),
+    ActionDef(
+      name     = "set-data-status",
+      label    = "Set Data Status",
+      category = DataPersistence,
+      keywords = "safe dirty clean modified",
+      params   = List(
+        ActionParamDef("status", Common,   Avt, EnumSelect(List("safe", "dirty")), initialValue = "safe"),
+        ActionParamDef("draft",  Advanced, Avt, BooleanSelect,                     initialValue = "true")
+      )
+    ),
+    ActionDef(
+      name        = "set-workflow-stage",
+      label       = "Set Workflow Stage",
+      category    = DataPersistence,
+      keywords    = "state status step",
+      unnamedRule = FixedParam("name"),
+      params      = List(
+        ActionParamDef("name", Common, Avt, Text, initialValue = "", placeholder = "Stage name")
+      )
+    ),
+    ActionDef("pending-uploads",  "Check Pending Uploads", category = DataPersistence, keywords = "attachment file"),
+    ActionDef("relinquish-lease", "Relinquish Lease",      category = DataPersistence, keywords = "unlock lock"),
+
+    // --- Validation & Errors ---
+    ActionDef(
       name        = "validate",
       label       = "Validate",
+      category    = ValidationErrors,
+      keywords    = "check constraints warning info",
       unnamedRule = FixedParam("level"),
       params      = List(
         ActionParamDef("level",   Common,   Avt, EnumSelect(List("error", "warning", "info")), initialValue = "error"),
         ActionParamDef("control", Advanced, Avt, Text, initialValue = "fr-view-component")
       )
     ),
+    ActionDef("visit-all",            "Show All Errors",        category = ValidationErrors, keywords = "visited highlight"),
+    ActionDef("show-relevant-errors", "Show Relevant Errors",   category = ValidationErrors, keywords = "visited summary"),
+    ActionDef("unvisit-all",          "Clear Error Highlights", category = ValidationErrors, keywords = "unvisited reset errors"),
+    ActionDef("captcha",              "Verify CAPTCHA",         category = ValidationErrors, keywords = "security challenge"),
+    ActionDef("captcha-reset",        "Reset CAPTCHA",          category = ValidationErrors, keywords = "security challenge"),
+
+    // --- Dialogs & Messages ---
     ActionDef(
       name                = "success-message",
       label               = "Success Message",
+      category            = DialogsMessages,
+      keywords            = "banner notification toast",
       unnamedRule         = FixedParam("resource"),
       requiredOneOfGroups = List(List("message", "resource")),
       params              = List(
@@ -243,6 +299,8 @@ object ProcessEditorParams {
     ActionDef(
       name                = "error-message",
       label               = "Error Message",
+      category            = DialogsMessages,
+      keywords            = "alert failure modal",
       unnamedRule         = FixedParam("resource"),
       requiredOneOfGroups = List(List("message", "resource")),
       params              = List(
@@ -255,6 +313,8 @@ object ProcessEditorParams {
     ActionDef(
       name        = "confirm",
       label       = "Confirmation Dialog",
+      category    = DialogsMessages,
+      keywords    = "prompt yes no modal",
       unnamedRule = FixedParam("resource"),
       params      = List(
         ActionParamDef("message",  Common,   Avt, Text,          initialValue = "Are you sure?"),
@@ -262,9 +322,14 @@ object ProcessEditorParams {
         ActionParamDef("html",     Advanced, Avt, BooleanSelect, initialValue = "true")
       )
     ),
+    ActionDef("result-dialog", "Result Dialog", category = DialogsMessages, keywords = "confirmation thank you"),
+
+    // --- Navigation & Modes ---
     ActionDef(
       name        = "navigate",
       label       = "Navigate",
+      category    = NavigationModes,
+      keywords    = "redirect url link page location",
       unnamedRule = NavigateHeuristic,
       params      = List(
         ActionParamDef("uri",           Common,   Avt,     Text,          initialValue = "/", placeholder = "https://... or /..."),
@@ -274,8 +339,48 @@ object ProcessEditorParams {
       )
     ),
     ActionDef(
+      name     = "change-mode",
+      label    = "Change Mode",
+      category = NavigationModes,
+      keywords = "view edit new custom mode",
+      params   = List(
+        ActionParamDef("mode",                      Required, Avt, DetailModeSelect, initialValue = "edit"),
+        ActionParamDef("preserve-rendered-formats", Advanced, Avt, BooleanSelect,    initialValue = "true")
+      )
+    ),
+    ActionDef(
+      name     = "open-rendered-format",
+      label    = "Open Rendered Format",
+      category = NavigationModes,
+      keywords = "pdf tiff excel xml export download print",
+      params   =
+        ActionParamDef(
+          "format",
+          Common,
+          Avt,
+          EnumSelect(List("pdf", "tiff", "excel-with-named-ranges", "xml-form-structure-and-data")),
+          initialValue = "pdf"
+        ) :: RenderedPdfParams
+    ),
+    ActionDef("review",      "Go to Review",       category = NavigationModes, keywords = "view readonly"),
+    ActionDef("edit",        "Go to Edit",         category = NavigationModes, keywords = "modify form"),
+    ActionDef("new-to-edit", "Switch New to Edit", category = NavigationModes, keywords = "url mode"),
+    ActionDef("edit-to-new", "Switch Edit to New", category = NavigationModes, keywords = "url mode"),
+
+    // --- Sections & Wizard ---
+    ActionDef("expand-all",             "Expand All Sections",     category = SectionsWizard, keywords = "open collapse"),
+    ActionDef("expand-invalid",         "Expand Invalid Sections", category = SectionsWizard, keywords = "open errors"),
+    ActionDef("collapse-all",           "Collapse All Sections",   category = SectionsWizard, keywords = "close fold"),
+    ActionDef("wizard-next",            "Wizard Next",             category = SectionsWizard, keywords = "page step forward"),
+    ActionDef("wizard-prev",            "Wizard Previous",         category = SectionsWizard, keywords = "page step back"),
+    ActionDef("wizard-update-validity", "Wizard Update Validity",  category = SectionsWizard, keywords = "page status"),
+
+    // --- Integrations & Utilities ---
+    ActionDef(
       name                = "send",
       label               = "Send HTTP",
+      category            = Integrations,
+      keywords            = "rest post get put webhook api service",
       unnamedRule         = FixedParam("property"),
       requiredOneOfGroups = List(List("uri", "property")),
       params              = List(
@@ -299,20 +404,11 @@ object ProcessEditorParams {
       ) ++ RenderedPdfParams
     ),
     ActionDef(
-      name   = "send-s3",
-      label  = "Send to S3",
-      params = List(
-        ActionParamDef("s3-path",             Common,   XPath, Text,                                 initialValue = "", placeholder = "XPath expression"),
-        ActionParamDef("s3-config",           Advanced, Avt,   Text,                                 initialValue = "default"),
-        ActionParamDef("content",             Advanced, Avt,   EnumSelect(List("xml")),              initialValue = "xml"),
-        ActionParamDef("data-format-version", Advanced, Avt,   EnumSelect(DataFormatVersionChoices), initialValue = "4.0.0"),
-        ActionParamDef("prune-metadata",      Advanced, Avt,   BooleanSelect,                        initialValue = "true")
-      )
-    ),
-    ActionDef(
-      name   = "email",
-      label  = "Send Email",
-      params = List(
+      name     = "email",
+      label    = "Send Email",
+      category = Integrations,
+      keywords = "mail smtp notification pdf",
+      params   = List(
         ActionParamDef("template",            Advanced, Avt,   EmailTemplateSelect,                    initialValue = ""),
         ActionParamDef("match",               Advanced, Avt,   EnumSelect(List("first", "all")),       initialValue = "first"),
         ActionParamDef("lang",                Advanced, Avt,   Text,                                   initialValue = "", placeholder = "en"),
@@ -331,55 +427,23 @@ object ProcessEditorParams {
       )
     ),
     ActionDef(
-      name   = "open-rendered-format",
-      label  = "Open Rendered Format",
-      params =
-        ActionParamDef(
-          "format",
-          Common,
-          Avt,
-          EnumSelect(List("pdf", "tiff", "excel-with-named-ranges", "xml-form-structure-and-data")),
-          initialValue = "pdf"
-        ) :: RenderedPdfParams
-    ),
-    ActionDef(
-      name                    = "control-setvalue",
-      label                   = "Set Control Value",
-      mutuallyExclusiveGroups = List(List("at", "section-name")),
-      params                  = List(
-        ActionParamDef("control-name", Required, Avt,   ControlNameSelect, initialValue = ""),
-        ActionParamDef("value",        Required, XPath, Text,              initialValue = "''", placeholder = "XPath expression (e.g. 'value' or $other + 1)"),
-        ActionParamDef("at",           Advanced, Avt,   RepeatAtInput,     initialValue = "start", placeholder = "start, end, all, or 1-based index"),
-        ActionParamDef("section-name", Advanced, Avt,   SectionNameSelect, initialValue = "")
-      )
-    ),
-    ActionDef(
-      name        = "set-workflow-stage",
-      label       = "Set Workflow Stage",
-      unnamedRule = FixedParam("name"),
-      params      = List(
-        ActionParamDef("name", Common, Avt, Text, initialValue = "", placeholder = "Stage name")
-      )
-    ),
-    ActionDef(
-      name   = "set-data-status",
-      label  = "Set Data Status",
-      params = List(
-        ActionParamDef("status", Common,   Avt, EnumSelect(List("safe", "dirty")), initialValue = "safe"),
-        ActionParamDef("draft",  Advanced, Avt, BooleanSelect,                     initialValue = "true")
-      )
-    ),
-    ActionDef(
-      name   = "change-mode",
-      label  = "Change Mode",
-      params = List(
-        ActionParamDef("mode",                      Required, Avt, DetailModeSelect, initialValue = "edit"),
-        ActionParamDef("preserve-rendered-formats", Advanced, Avt, BooleanSelect,    initialValue = "true")
+      name     = "send-s3",
+      label    = "Send to S3",
+      category = Integrations,
+      keywords = "aws bucket cloud storage",
+      params   = List(
+        ActionParamDef("s3-path",             Common,   XPath, Text,                                 initialValue = "", placeholder = "XPath expression"),
+        ActionParamDef("s3-config",           Advanced, Avt,   Text,                                 initialValue = "default"),
+        ActionParamDef("content",             Advanced, Avt,   EnumSelect(List("xml")),              initialValue = "xml"),
+        ActionParamDef("data-format-version", Advanced, Avt,   EnumSelect(DataFormatVersionChoices), initialValue = "4.0.0"),
+        ActionParamDef("prune-metadata",      Advanced, Avt,   BooleanSelect,                        initialValue = "true")
       )
     ),
     ActionDef(
       name        = "log",
       label       = "Log Message",
+      category    = Integrations,
+      keywords    = "debug console trace",
       unnamedRule = FixedParam("message"),
       params      = List(
         ActionParamDef("message", Common,   Avt, Text, initialValue = "", allowBlank = true, placeholder = "Message or AVT"),
@@ -387,54 +451,42 @@ object ProcessEditorParams {
       )
     ),
     ActionDef(
-      name   = "sleep",
-      label  = "Sleep",
-      params = List(
+      name     = "sleep",
+      label    = "Sleep",
+      category = Integrations,
+      keywords = "delay wait pause timer",
+      params   = List(
         ActionParamDef("duration", Required, Avt, DurationInput, initialValue = "1000ms", placeholder = "e.g. 1000ms or 5s")
       )
     ),
     ActionDef(
-      name   = "callback",
-      label  = "Run Callback",
-      params = List(
+      name     = "callback",
+      label    = "Run Callback",
+      category = Integrations,
+      keywords = "javascript hook client",
+      params   = List(
         ActionParamDef("name", Required, Literal, Text, initialValue = "", placeholder = "Callback name")
       )
     ),
-    ActionDef("result-dialog",          "Result Dialog"),
-    ActionDef("pending-uploads",        "Check Pending Uploads"),
-    ActionDef("relinquish-lease",       "Relinquish Lease"),
-    ActionDef("visit-all",              "Show All Errors"),
-    ActionDef("show-relevant-errors",   "Show Relevant Errors"),
-    ActionDef("unvisit-all",            "Clear Error Highlights"),
-    ActionDef("expand-all",             "Expand All Sections"),
-    ActionDef("expand-invalid",         "Expand Invalid Sections"),
-    ActionDef("collapse-all",           "Collapse All Sections"),
-    ActionDef("wizard-update-validity", "Wizard Update Validity"),
-    ActionDef("wizard-prev",            "Wizard Previous"),
-    ActionDef("wizard-next",            "Wizard Next"),
-    ActionDef("captcha",                "Verify CAPTCHA"),
-    ActionDef("captcha-reset",          "Reset CAPTCHA"),
-    ActionDef("new-to-edit",            "Switch New to Edit"),
-    ActionDef("edit-to-new",            "Switch Edit to New"),
-    ActionDef("review",                 "Go to Review"),
-    ActionDef("edit",                   "Go to Edit"),
 
     // --- Process flow control actions ---
     ActionDef(
       name        = "process",
       label       = "Call Process",
       category    = FlowControl,
+      keywords    = "subprocess invoke run helper",
       unnamedRule = FixedParam("name"),
       params      = List(
         ActionParamDef("name", Required, Avt, ProcessNameSelect, initialValue = "")
       )
     ),
-    ActionDef("continue-with-success", "Continue with Success", category = FlowControl),
-    ActionDef("continue-with-failure", "Continue with Failure", category = FlowControl),
+    ActionDef("continue-with-success", "Continue with Success", category = FlowControl, keywords = "nop pass"),
+    ActionDef("continue-with-failure", "Continue with Failure", category = FlowControl, keywords = "fail"),
     ActionDef(
       name     = "terminate-with-success",
       label    = "Terminate with Success",
       category = FlowControl,
+      keywords = "stop finish success",
       params   = List(
         ActionParamDef("message", Advanced, Avt, Text, initialValue = "", placeholder = "Optional debug message")
       )
@@ -443,18 +495,20 @@ object ProcessEditorParams {
       name     = "terminate-with-failure",
       label    = "Terminate with Failure",
       category = FlowControl,
+      keywords = "stop fail error",
       params   = List(
         ActionParamDef("message", Advanced, Avt, Text, initialValue = "", placeholder = "Optional debug message")
       )
     ),
-    ActionDef("suspend",             "Suspend Process",     category = FlowControl),
-    ActionDef("resume-with-success", "Resume with Success", category = FlowControl),
-    ActionDef("resume-with-failure", "Resume with Failure", category = FlowControl),
-    ActionDef("abort",               "Abort Process",       category = FlowControl),
+    ActionDef("suspend",             "Suspend Process",     category = FlowControl, keywords = "pause async"),
+    ActionDef("resume-with-success", "Resume with Success", category = FlowControl, keywords = "continue"),
+    ActionDef("resume-with-failure", "Resume with Failure", category = FlowControl, keywords = "fail"),
+    ActionDef("abort",               "Abort Process",       category = FlowControl, keywords = "cancel stop"),
     ActionDef(
       name        = "rollback",
       label       = "Rollback Data",
       category    = FlowControl,
+      keywords    = "revert undo changes",
       unnamedRule = FixedParam("changes"),
       params      = List(
         ActionParamDef("changes", Required, Avt, EnumSelect(List("in-memory-form-data")), initialValue = "in-memory-form-data")

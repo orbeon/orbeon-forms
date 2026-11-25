@@ -614,6 +614,7 @@ object ContainerDnD {
     val labelText =
       rowEl.querySelectorOpt(".fb-action-step-options select option:checked")
         .flatMap(el => Option(el.textContent))
+        .orElse(rowEl.querySelectorOpt(".fr-select1-picker-trigger-label").flatMap(el => Option(el.textContent)))
         .orElse(rowEl.querySelectorOpt(".select2-selection__rendered").flatMap(el => Option(el.textContent)))
         .orElse(rowEl.querySelectorOpt(".xforms-select1-entry-selected").flatMap(el => Option(el.textContent)))
         .flatMap(_.trimAllToOpt)

@@ -10,6 +10,8 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
 .orbeon {
 
     .fr-proc-tok-keyword {
@@ -474,8 +476,127 @@
                 }
             }
 
-            .fr-process-action-select1 select {
-                width: auto;
+            .fr-process-action-picker-field {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: flex-start;
+                min-width: 0;
+                position: relative;
+
+                .fr-process-action-trigger {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    min-height: var(--orbeon-control-height);
+                    min-width: 190px;
+                    max-width: 100%;
+                    padding: 4px 10px;
+                    box-sizing: border-box;
+                    font-size: inherit;
+                    line-height: 20px;
+                    text-align: left;
+                    background-color: var(--orbeon-control-background-color);
+                    color: var(--orbeon-control-color);
+                    border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-control-border-radius);
+                    cursor: pointer;
+                    transition: border-color 120ms ease, box-shadow 120ms ease;
+
+                    .fr-process-action-trigger-label {
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        font-weight: 500;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+
+                        output,
+                        .xforms-output-output {
+                            display: inline;
+                            padding: 0;
+                            margin: 0;
+                            border: 0;
+                            background: transparent;
+                            color: inherit;
+                            font: inherit;
+                        }
+                    }
+
+                    .fr-process-action-trigger-token {
+                        flex: 0 0 auto;
+                        font-family: var(--orbeon-code-font-family);
+                        font-size: 11px;
+                        line-height: 16px;
+                        padding: 1px 6px;
+                        border-radius: 4px;
+                        background-color: color-mix(in oklab, var(--orbeon-base-color) 7%, transparent);
+                        color: var(--orbeon-hint-color);
+
+                        output,
+                        .xforms-output-output {
+                            display: inline;
+                            padding: 0;
+                            margin: 0;
+                            border: 0;
+                            background: transparent;
+                            color: inherit;
+                            font: inherit;
+                        }
+                    }
+
+                    .fr-process-action-trigger-caret {
+                        flex: 0 0 auto;
+                        font-size: 11px;
+                        color: var(--orbeon-hint-color);
+                    }
+
+                    &:hover {
+                        border-color: var(--orbeon-focus-border-color);
+                    }
+
+                    &:focus-visible,
+                    &.fr-process-action-trigger-open {
+                        border-color: var(--orbeon-focus-border-color);
+                        outline: 2px solid color-mix(in oklab, var(--orbeon-focus-border-color) 35%, transparent);
+                        outline-offset: 0;
+                    }
+                }
+
+                &[data-orbeon-action-name=""] .fr-process-action-trigger .fr-process-action-trigger-label {
+                    color: var(--orbeon-hint-color);
+                    font-weight: 400;
+                }
+
+                &[data-orbeon-action-name=""] .fr-process-action-trigger-token,
+                &[data-orbeon-has-def="false"] .fr-process-action-trigger-token {
+                    display: none;
+                }
+
+                &[data-orbeon-readonly="true"] .fr-process-action-trigger {
+                    cursor: default;
+                    background-color: var(--orbeon-control-read-only-background-color);
+                }
+
+                .fr-process-action-hidden-input {
+                    display: block;
+                    margin: 0;
+
+                    input.xforms-input-input {
+                        position: absolute;
+                        clip-path: inset(50%);
+                        overflow: hidden;
+                        width: 1px;
+                        height: 1px;
+                        margin: -1px;
+                        padding: 0;
+                        border: 0;
+                        white-space: nowrap;
+                    }
+                }
+
+                &:has(.fr-process-action-hidden-input.xforms-visited.xforms-invalid) .fr-process-action-trigger {
+                    border-color: var(--orbeon-error-color);
+                }
             }
 
             .fr-process-add-param {
@@ -826,5 +947,10 @@
         .fr-process-delete-container {
             margin-top: 15px;
         }
+    }
+
+    // Shared top-layer Action Picker Popover (`ProcessActionPicker.scala` / `PopoverSelectPicker.scala`)
+    .fr-process-action-popover {
+        .fr-popover-select-picker();
     }
 }

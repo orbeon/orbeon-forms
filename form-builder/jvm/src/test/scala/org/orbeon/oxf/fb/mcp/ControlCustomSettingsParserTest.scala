@@ -336,9 +336,10 @@ class ControlCustomSettingsParserTest
       )
       val dropdownSearchSpec = ControlCustomSettingsParser.fromBinding((dropdownSearchDoc.rootElement / "*:binding").head).get
       assert(dropdownSearchSpec.localName == "dropdown-select1-search")
-      assert(dropdownSearchSpec.settings.map(_.name) == List("pdfAppearance", "selection", "suggestExisting"))
+      assert(dropdownSearchSpec.settings.map(_.name) == List("pdfAppearance", "selection", "suggestExisting", "showValue"))
       assert(dropdownSearchSpec.findSetting("selection").exists(_.allowedValues.contains(Set("closed", "open"))))
       assert(dropdownSearchSpec.findSetting("suggestExisting").exists(_.settingType == BooleanType))
+      assert(dropdownSearchSpec.findSetting("showValue").exists(_.settingType == BooleanType))
 
       val openSearchDoc = new org.orbeon.dom.saxon.DocumentWrapper(
         org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/forms/orbeon/builder/xbl/open-select1-search.xbl"),
@@ -347,7 +348,8 @@ class ControlCustomSettingsParserTest
       )
       val openSearchSpec = ControlCustomSettingsParser.fromBinding((openSearchDoc.rootElement / "*:binding").head).get
       assert(openSearchSpec.localName == "open-select1-search")
-      assert(openSearchSpec.settings.map(_.name) == List("pdfAppearance", "selection", "suggestExisting"))
+      assert(openSearchSpec.settings.map(_.name) == List("pdfAppearance", "selection", "suggestExisting", "showValue"))
+      assert(openSearchSpec.findSetting("showValue").exists(_.settingType == BooleanType))
     }
 
     it("must parse `<fr:image>` and `<fr:image-attachment>` custom settings") {

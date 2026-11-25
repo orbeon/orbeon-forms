@@ -81,6 +81,7 @@
                 <setting name="fr:pdf-appearance" type="xs:string" values="search full"/>
                 <setting name="selection"         type="xs:string" values="closed open"/>
                 <setting name="suggest-existing"  type="xs:boolean"/>
+                <setting name="show-value"        type="xs:boolean"/>
             </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-open-select1-search-model">
@@ -88,17 +89,20 @@
                     <xf:action event="xforms-model-construct-done">
                         <xf:setvalue ref="instance('local')/pdf-appearance"   value="instance()/@fr:pdf-appearance"/>
                         <xf:setvalue ref="instance('local')/suggest-existing" value="instance()/@suggest-existing = 'true'"/>
+                        <xf:setvalue ref="instance('local')/show-value"       value="instance()/@show-value = 'true'"/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
                             <pdf-appearance/>
                             <suggest-existing/>
+                            <show-value/>
                         </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
                         <xf:bind ref="suggest-existing" type="xs:boolean"/>
+                        <xf:bind ref="show-value"       type="xs:boolean"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -108,84 +112,98 @@
                                 <selected-only>Show the selected value only</selected-only>
                                 <show-all>Show all values as radio buttons</show-all>
                                 <suggest-existing>Suggest values from existing records</suggest-existing>
+                                <show-value>Show choice value as badge (and include in search)</show-value>
                             </resource>
                             <resource xml:lang="fr">
                                 <automatic-pdf>PDF automatique</automatic-pdf>
                                 <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
                                 <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
                                 <suggest-existing>Suggérer les valeurs des enregistrements existants</suggest-existing>
+                                <show-value>Afficher la valeur du choix comme badge (et inclure dans la recherche)</show-value>
                             </resource>
                             <resource xml:lang="no">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Vis bare valgt verdi</selected-only>
                                 <show-all>Vis alle verdier som radioknapper</show-all>
                                 <suggest-existing>Foreslå verdier fra eksisterende oppføringer</suggest-existing>
+                                <show-value>Vis valgverdi som merke (og inkluder i søk)</show-value>
                             </resource>
                             <resource xml:lang="ru">
                                 <automatic-pdf>Автоматический PDF</automatic-pdf>
                                 <selected-only>Показывать только выбранное значение</selected-only>
                                 <show-all>Показать все значения как переключатели</show-all>
                                 <suggest-existing>Предлагать значения из существующих записей</suggest-existing>
+                                <show-value>Показывать значение варианта как значок (и включать в поиск)</show-value>
                             </resource>
                             <resource xml:lang="it">
                                 <automatic-pdf>PDF automatico</automatic-pdf>
                                 <selected-only>Mostra solo il valore selezionato</selected-only>
                                 <show-all>Mostra tutti i valori come pulsanti di scelta</show-all>
                                 <suggest-existing>Suggerisci valori dai record esistenti</suggest-existing>
+                                <show-value>Mostra il valore della scelta come badge (e includi nella ricerca)</show-value>
                             </resource>
                             <resource xml:lang="de">
                                 <automatic-pdf>Automatisches PDF</automatic-pdf>
                                 <selected-only>Nur ausgewählten Wert anzeigen</selected-only>
                                 <show-all>Alle Werte als Optionsfelder anzeigen</show-all>
                                 <suggest-existing>Werte aus vorhandenen Einträgen vorschlagen</suggest-existing>
+                                <show-value>Auswahlwert als Abzeichen anzeigen (und in die Suche einbeziehen)</show-value>
                             </resource>
                             <resource xml:lang="fi">
                                 <automatic-pdf>Automaattinen PDF</automatic-pdf>
                                 <selected-only>Näytä vain valittu arvo</selected-only>
                                 <show-all>Näytä kaikki arvot radiopainikkeina</show-all>
                                 <suggest-existing>Ehdota arvoja olemassa olevista tietueista</suggest-existing>
+                                <show-value>Näytä vaihtoehdon arvo merkkinä (ja sisällytä hakuun)</show-value>
                             </resource>
                             <resource xml:lang="es">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar solo el valor seleccionado</selected-only>
                                 <show-all>Mostrar todos los valores como botones de opción</show-all>
                                 <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                                <show-value>Mostrar el valor de la opción como insignia (e incluir en la búsqueda)</show-value>
                             </resource>
                             <resource xml:lang="nl">
                                 <automatic-pdf>Automatische PDF</automatic-pdf>
                                 <selected-only>Alleen geselecteerde waarde tonen</selected-only>
                                 <show-all>Alle waarden als keuzerondjes tonen</show-all>
                                 <suggest-existing>Waarden uit bestaande records voorstellen</suggest-existing>
+                                <show-value>Keuzewaarde als badge tonen (en opnemen in zoekopdracht)</show-value>
                             </resource>
                             <resource xml:lang="pt">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar apenas o valor selecionado</selected-only>
                                 <show-all>Mostrar todos os valores como botões de opção</show-all>
                                 <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                                <show-value>Mostrar o valor da opção como emblema (e incluir na pesquisa)</show-value>
                             </resource>
                             <resource xml:lang="sv">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Visa bara valt värde</selected-only>
                                 <show-all>Visa alla värden som radioknappar</show-all>
                                 <suggest-existing>Föreslå värden från befintliga poster</suggest-existing>
+                                <show-value>Visa valvärde som bricka (och inkludera i sökning)</show-value>
                             </resource>
                             <resource xml:lang="ar">
                                 <automatic-pdf>PDF تلقائي</automatic-pdf>
                                 <selected-only>إظهار القيمة المحددة فقط</selected-only>
                                 <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
                                 <suggest-existing>اقتراح قيم من السجلات الموجودة</suggest-existing>
+                                <show-value>إظهار قيمة الخيار كشارة (وتضمينها في البحث)</show-value>
                             </resource>
                             <resource xml:lang="pl">
                                 <automatic-pdf>Automatyczny PDF</automatic-pdf>
                                 <selected-only>Pokazuj tylko wybraną wartość</selected-only>
                                 <show-all>Pokaż wszystkie wartości jako przyciski opcji</show-all>
                                 <suggest-existing>Podpowiadaj wartości z istniejących rekordów</suggest-existing>
+                                <show-value>Pokazuj wartość opcji jako plakietkę (i uwzględniaj w wyszukiwaniu)</show-value>
                             </resource>
                             <resource xml:lang="ja">
                                 <automatic-pdf>自動PDF</automatic-pdf>
                                 <selected-only>選択値だけ表示</selected-only>
                                 <show-all>すべての値をラジオボタンで表示</show-all>
                                 <suggest-existing>既存のレコードから値を提案する</suggest-existing>
+                                <show-value>選択肢の値をバッジとして表示（検索対象にも含める）</show-value>
                             </resource>
                         </_>
                     </xf:instance>
@@ -212,6 +230,13 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/show-value" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
                             <fr:checkbox-input ref="instance('local')/suggest-existing" id="suggest-existing-control">
                                 <xf:label ref="xxf:r('suggest-existing')"/>
                             </fr:checkbox-input>
@@ -232,6 +257,20 @@
                     <xf:delete
                         if="xxf:is-blank($new-value)"
                         ref="instance()/@*[local-name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-open-select1-search-show-value-action"
+                    event="xforms-value-changed"
+                    observer="show-value-control">
+
+                    <xf:var name="enabled" value="string(event('xxf:binding')) = 'true'"/>
+                    <xf:insert
+                        context="instance()"
+                        if="$enabled"
+                        origin="xf:attribute('show-value', 'true')"/>
+                    <xf:delete
+                        if="not($enabled)"
+                        ref="instance()/@show-value"/>
                 </xf:action>
                 <xf:action
                     id="fb-editor-open-select1-search-suggest-action"

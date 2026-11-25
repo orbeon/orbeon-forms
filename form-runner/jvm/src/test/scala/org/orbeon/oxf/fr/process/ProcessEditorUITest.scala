@@ -378,11 +378,23 @@ class ProcessEditorUITest extends DocumentTestBase with ResourceManagerSupport w
         val serializedStr = TransformerUtils.tinyTreeToString(serialized)
         assert(! serializedStr.contains("xmlns:"))
 
-        // 5. `availableActionsXml` exposes the three UI action categories plus built-in `<sub-process>` entries
+        // 5. `availableActionsXml` exposes the 8 UI action categories plus built-in `<sub-process>` entries
         val actionsDoc = ProcessEditorUI.availableActionsXml()
         val categories = (actionsDoc child "action").flatMap(_.attValueOpt("category")).toSet
-        assert(categories == Set("form-runner", "flow-control", "xforms"))
+        assert(
+          categories == Set(
+            "data-persistence",
+            "validation-errors",
+            "dialogs-messages",
+            "navigation-modes",
+            "sections-wizard",
+            "integrations",
+            "flow-control",
+            "xforms"
+          )
+        )
         assert((actionsDoc child "action").exists(a => (a attValue "name") == "process" && (a attValue "category") == "flow-control"))
+        assert((actionsDoc child "action").exists(a => (a attValue "name") == "open-rendered-format" && (a attValue "keywords").contains("pdf")))
         assert(! (actionsDoc child "action").exists(a => (a attValue "name") == "require-uploads"))
         assert((actionsDoc child "sub-process").exists(sp => (sp attValue "name") == "require-uploads" && (sp attValue "deprecated") == "false"))
       }

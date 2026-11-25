@@ -69,6 +69,7 @@ object ProcessEditorUI {
          | name="${a.name.escapeXmlForAttribute}"
          | label="${a.label.escapeXmlForAttribute}"
          | category="${a.category.entryName}"
+         | keywords="${a.keywords.escapeXmlForAttribute}"
          | allows-custom-params="${a.allowsCustomParams}"
          | deprecated="${a.deprecated}">$paramsXml</action>""".stripMargin.replace('\n', ' ')
     }.mkString

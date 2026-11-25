@@ -12,6 +12,142 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
+    .fr-picker-native-select-hidden {
+        position: absolute !important;
+        clip-path: inset(50%) !important;
+        overflow: hidden !important;
+        width: 1px !important;
+        height: 1px !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    .fr-select1-picker {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+
+        .fr-select1-picker-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            min-height: var(--orbeon-control-height);
+            padding: 3px 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: var(--orbeon-control-font-size);
+            line-height: 20px;
+            text-align: left;
+            background-color: var(--orbeon-control-background-color);
+            color: var(--orbeon-control-color);
+            border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-control-border-color);
+            border-radius: var(--orbeon-control-border-radius);
+            cursor: pointer;
+            transition: border-color 120ms ease, box-shadow 120ms ease;
+
+            &.is-placeholder .fr-select1-picker-trigger-label {
+                color: var(--orbeon-control-placeholder-color);
+            }
+
+            .fr-select1-picker-trigger-label {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .fr-select1-picker-trigger-badge {
+                flex: 0 0 auto;
+                font-family: var(--orbeon-code-font-family);
+                font-size: 11px;
+                line-height: 16px;
+                padding: 1px 6px;
+                border-radius: 4px;
+                background-color: color-mix(in oklab, var(--orbeon-base-color) 7%, transparent);
+                color: var(--orbeon-hint-color);
+            }
+
+            .fr-select1-picker-caret {
+                flex: 0 0 auto;
+                font-size: 11px;
+                color: var(--orbeon-dropdown-search-caret-color);
+                margin-left: 2px;
+            }
+
+            &:hover:not(:disabled) {
+                border-color: var(--orbeon-focus-border-color);
+            }
+
+            &:focus-visible,
+            &.fr-select1-picker-trigger-open {
+                border-color: var(--orbeon-focus-border-color);
+                .focusDecorations();
+                outline: none;
+            }
+
+            &:disabled {
+                background-color: var(--orbeon-control-read-only-background-color);
+                cursor: not-allowed;
+                opacity: 1;
+            }
+        }
+
+        &.has-clear .fr-select1-picker-trigger {
+            padding-right: 46px;
+
+            .fr-select1-picker-caret {
+                position: absolute;
+                right: 9px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-left: 0;
+            }
+        }
+
+        .fr-select1-picker-clear {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            min-height: 20px;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--orbeon-dropdown-search-caret-color);
+            font-size: 11px;
+            cursor: pointer;
+
+            &:hover,
+            &:focus-visible {
+                color: var(--orbeon-base-color);
+                background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+            }
+        }
+    }
+
+    .fr-select1-picker-popover {
+        .fr-popover-select-picker();
+    }
+
+    .xforms-invalid.xforms-visited {
+        .fr-select1-picker .fr-select1-picker-trigger:not(:focus-visible):not(.fr-select1-picker-trigger-open) {
+            border-color: var(--orbeon-invalid-control-border-color);
+            border-width: var(--orbeon-invalid-control-border-width);
+        }
+    }
+
     .select2-results__options {
         padding: 0; // Override Bootstrap 5 padding
     }

@@ -212,11 +212,29 @@
                             <custom-parameter>Custom parameter…</custom-parameter>
                             <remove-parameter>Remove parameter</remove-parameter>
                             <avt-toggle>Toggle dynamic value template ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Search actions (e.g. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>No matching actions</no-results>
+                                <all>All</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner Actions</form-runner>
-                                <sub-process>Built-in Sub-processes</sub-process>
+                                <data-persistence>Data &amp; Persistence</data-persistence>
+                                <data-persistence-short>Data</data-persistence-short>
+                                <validation-errors>Validation &amp; Errors</validation-errors>
+                                <validation-errors-short>Validation</validation-errors-short>
+                                <dialogs-messages>Dialogs &amp; Messages</dialogs-messages>
+                                <dialogs-messages-short>Dialogs</dialogs-messages-short>
+                                <navigation-modes>Navigation &amp; Modes</navigation-modes>
+                                <navigation-modes-short>Navigation</navigation-modes-short>
+                                <sections-wizard>Sections &amp; Wizard</sections-wizard>
+                                <sections-wizard-short>Sections</sections-wizard-short>
+                                <integrations>Integrations &amp; Utilities</integrations>
+                                <integrations-short>Integrations</integrations-short>
                                 <flow-control>Flow Control</flow-control>
+                                <flow-control-short>Flow</flow-control-short>
                                 <xforms>XForms Actions</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Built-in Sub-processes</sub-process>
                                 <form-processes>Custom Processes</form-processes>
                             </categories>
                             <alerts>
@@ -267,11 +285,29 @@
                             <custom-parameter>Paramètre personnalisé…</custom-parameter>
                             <remove-parameter>Supprimer le paramètre</remove-parameter>
                             <avt-toggle>Basculer le modèle de valeur dynamique ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Rechercher une action (ex : save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Aucune action correspondante</no-results>
+                                <all>Toutes</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Actions Form Runner</form-runner>
-                                <sub-process>Sous-processus intégrés</sub-process>
+                                <data-persistence>Données et persistance</data-persistence>
+                                <data-persistence-short>Données</data-persistence-short>
+                                <validation-errors>Validation et erreurs</validation-errors>
+                                <validation-errors-short>Validation</validation-errors-short>
+                                <dialogs-messages>Dialogues et messages</dialogs-messages>
+                                <dialogs-messages-short>Dialogues</dialogs-messages-short>
+                                <navigation-modes>Navigation et modes</navigation-modes>
+                                <navigation-modes-short>Navigation</navigation-modes-short>
+                                <sections-wizard>Sections et assistant</sections-wizard>
+                                <sections-wizard-short>Sections</sections-wizard-short>
+                                <integrations>Intégrations et utilitaires</integrations>
+                                <integrations-short>Intégrations</integrations-short>
                                 <flow-control>Contrôle de flux</flow-control>
+                                <flow-control-short>Flux</flow-control-short>
                                 <xforms>Actions XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Sous-processus intégrés</sub-process>
                                 <form-processes>Processus personnalisés</form-processes>
                             </categories>
                             <alerts>
@@ -322,11 +358,29 @@
                             <custom-parameter>Benutzerdefinierter Parameter…</custom-parameter>
                             <remove-parameter>Parameter entfernen</remove-parameter>
                             <avt-toggle>Dynamische Wertvorlage umschalten ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Aktionen suchen (z. B. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Keine passenden Aktionen</no-results>
+                                <all>Alle</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form-Runner-Aktionen</form-runner>
-                                <sub-process>Integrierte Unterprozesse</sub-process>
+                                <data-persistence>Daten &amp; Speicherung</data-persistence>
+                                <data-persistence-short>Daten</data-persistence-short>
+                                <validation-errors>Validierung &amp; Fehler</validation-errors>
+                                <validation-errors-short>Validierung</validation-errors-short>
+                                <dialogs-messages>Dialoge &amp; Meldungen</dialogs-messages>
+                                <dialogs-messages-short>Dialoge</dialogs-messages-short>
+                                <navigation-modes>Navigation &amp; Modi</navigation-modes>
+                                <navigation-modes-short>Navigation</navigation-modes-short>
+                                <sections-wizard>Abschnitte &amp; Assistent</sections-wizard>
+                                <sections-wizard-short>Abschnitte</sections-wizard-short>
+                                <integrations>Integrationen &amp; Werkzeuge</integrations>
+                                <integrations-short>Integrationen</integrations-short>
                                 <flow-control>Ablaufsteuerung</flow-control>
+                                <flow-control-short>Ablauf</flow-control-short>
                                 <xforms>XForms-Aktionen</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Integrierte Unterprozesse</sub-process>
                                 <form-processes>Benutzerdefinierte Prozesse</form-processes>
                             </categories>
                             <alerts>
@@ -377,11 +431,29 @@
                             <custom-parameter>Parámetro personalizado…</custom-parameter>
                             <remove-parameter>Eliminar parámetro</remove-parameter>
                             <avt-toggle>Alternar plantilla de valor dinámico ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Buscar acciones (p. ej. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>No hay acciones coincidentes</no-results>
+                                <all>Todas</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Acciones de Form Runner</form-runner>
-                                <sub-process>Subprocesos integrados</sub-process>
+                                <data-persistence>Datos y persistencia</data-persistence>
+                                <data-persistence-short>Datos</data-persistence-short>
+                                <validation-errors>Validación y errores</validation-errors>
+                                <validation-errors-short>Validación</validation-errors-short>
+                                <dialogs-messages>Diálogos y mensajes</dialogs-messages>
+                                <dialogs-messages-short>Diálogos</dialogs-messages-short>
+                                <navigation-modes>Navegación y modos</navigation-modes>
+                                <navigation-modes-short>Navegación</navigation-modes-short>
+                                <sections-wizard>Secciones y asistente</sections-wizard>
+                                <sections-wizard-short>Secciones</sections-wizard-short>
+                                <integrations>Integraciones y utilidades</integrations>
+                                <integrations-short>Integraciones</integrations-short>
                                 <flow-control>Control de flujo</flow-control>
+                                <flow-control-short>Flujo</flow-control-short>
                                 <xforms>Acciones XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Subprocesos integrados</sub-process>
                                 <form-processes>Procesos personalizados</form-processes>
                             </categories>
                             <alerts>
@@ -432,11 +504,29 @@
                             <custom-parameter>Parametro personalizzato…</custom-parameter>
                             <remove-parameter>Rimuovi parametro</remove-parameter>
                             <avt-toggle>Attiva/disattiva modello di valore dinamico ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Cerca azioni (es. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Nessuna azione corrispondente</no-results>
+                                <all>Tutte</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Azioni Form Runner</form-runner>
-                                <sub-process>Sottoprocessi integrati</sub-process>
+                                <data-persistence>Dati e persistenza</data-persistence>
+                                <data-persistence-short>Dati</data-persistence-short>
+                                <validation-errors>Validazione ed errori</validation-errors>
+                                <validation-errors-short>Validazione</validation-errors-short>
+                                <dialogs-messages>Finestre e messaggi</dialogs-messages>
+                                <dialogs-messages-short>Finestre</dialogs-messages-short>
+                                <navigation-modes>Navigazione e modalità</navigation-modes>
+                                <navigation-modes-short>Navigazione</navigation-modes-short>
+                                <sections-wizard>Sezioni e procedura guidata</sections-wizard>
+                                <sections-wizard-short>Sezioni</sections-wizard-short>
+                                <integrations>Integrazioni e utilità</integrations>
+                                <integrations-short>Integrazioni</integrations-short>
                                 <flow-control>Controllo del flusso</flow-control>
+                                <flow-control-short>Flusso</flow-control-short>
                                 <xforms>Azioni XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Sottoprocessi integrati</sub-process>
                                 <form-processes>Processi personalizzati</form-processes>
                             </categories>
                             <alerts>
@@ -487,11 +577,29 @@
                             <custom-parameter>Parâmetro personalizado…</custom-parameter>
                             <remove-parameter>Remover parâmetro</remove-parameter>
                             <avt-toggle>Alternar modelo de valor dinâmico ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Pesquisar ações (ex.: save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Nenhuma ação correspondente</no-results>
+                                <all>Todas</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Ações do Form Runner</form-runner>
-                                <sub-process>Subprocessos integrados</sub-process>
+                                <data-persistence>Dados e persistência</data-persistence>
+                                <data-persistence-short>Dados</data-persistence-short>
+                                <validation-errors>Validação e erros</validation-errors>
+                                <validation-errors-short>Validação</validation-errors-short>
+                                <dialogs-messages>Diálogos e mensagens</dialogs-messages>
+                                <dialogs-messages-short>Diálogos</dialogs-messages-short>
+                                <navigation-modes>Navegação e modos</navigation-modes>
+                                <navigation-modes-short>Navegação</navigation-modes-short>
+                                <sections-wizard>Seções e assistente</sections-wizard>
+                                <sections-wizard-short>Seções</sections-wizard-short>
+                                <integrations>Integrações e utilitários</integrations>
+                                <integrations-short>Integrações</integrations-short>
                                 <flow-control>Controle de fluxo</flow-control>
+                                <flow-control-short>Fluxo</flow-control-short>
                                 <xforms>Ações XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Subprocessos integrados</sub-process>
                                 <form-processes>Processos personalizados</form-processes>
                             </categories>
                             <alerts>
@@ -542,11 +650,29 @@
                             <custom-parameter>Anpassad parameter…</custom-parameter>
                             <remove-parameter>Ta bort parameter</remove-parameter>
                             <avt-toggle>Växla dynamisk värdemall ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Sök åtgärder (t.ex. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Inga matchande åtgärder</no-results>
+                                <all>Alla</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner-åtgärder</form-runner>
-                                <sub-process>Inbyggda delprocesser</sub-process>
+                                <data-persistence>Data och lagring</data-persistence>
+                                <data-persistence-short>Data</data-persistence-short>
+                                <validation-errors>Validering och fel</validation-errors>
+                                <validation-errors-short>Validering</validation-errors-short>
+                                <dialogs-messages>Dialoger och meddelanden</dialogs-messages>
+                                <dialogs-messages-short>Dialoger</dialogs-messages-short>
+                                <navigation-modes>Navigering och lägen</navigation-modes>
+                                <navigation-modes-short>Navigering</navigation-modes-short>
+                                <sections-wizard>Sektioner och guide</sections-wizard>
+                                <sections-wizard-short>Sektioner</sections-wizard-short>
+                                <integrations>Integrationer och verktyg</integrations>
+                                <integrations-short>Integrationer</integrations-short>
                                 <flow-control>Flödeskontroll</flow-control>
+                                <flow-control-short>Flöde</flow-control-short>
                                 <xforms>XForms-åtgärder</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Inbyggda delprocesser</sub-process>
                                 <form-processes>Anpassade processer</form-processes>
                             </categories>
                             <alerts>
@@ -597,11 +723,29 @@
                             <custom-parameter>Mukautettu parametri…</custom-parameter>
                             <remove-parameter>Poista parametri</remove-parameter>
                             <avt-toggle>Vaihda dynaaminen arvomalli ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Hae toimintoja (esim. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Ei vastaavia toimintoja</no-results>
+                                <all>Kaikki</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner -toiminnot</form-runner>
-                                <sub-process>Sisäänrakennetut aliprosessit</sub-process>
+                                <data-persistence>Tiedot ja tallennus</data-persistence>
+                                <data-persistence-short>Tiedot</data-persistence-short>
+                                <validation-errors>Validointi ja virheet</validation-errors>
+                                <validation-errors-short>Validointi</validation-errors-short>
+                                <dialogs-messages>Valintaikkunat ja viestit</dialogs-messages>
+                                <dialogs-messages-short>Viestit</dialogs-messages-short>
+                                <navigation-modes>Navigointi ja tilat</navigation-modes>
+                                <navigation-modes-short>Navigointi</navigation-modes-short>
+                                <sections-wizard>Osiot ja ohjattu toiminto</sections-wizard>
+                                <sections-wizard-short>Osiot</sections-wizard-short>
+                                <integrations>Integraatiot ja työkalut</integrations>
+                                <integrations-short>Integraatiot</integrations-short>
                                 <flow-control>Vuonohjaus</flow-control>
+                                <flow-control-short>Vuo</flow-control-short>
                                 <xforms>XForms-toiminnot</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Sisäänrakennetut aliprosessit</sub-process>
                                 <form-processes>Mukautetut prosessit</form-processes>
                             </categories>
                             <alerts>
@@ -652,11 +796,29 @@
                             <custom-parameter>Aangepaste parameter…</custom-parameter>
                             <remove-parameter>Parameter verwijderen</remove-parameter>
                             <avt-toggle>Dynamische waardesjabloon schakelen ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Acties zoeken (bijv. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Geen overeenkomende acties</no-results>
+                                <all>Alle</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner-acties</form-runner>
-                                <sub-process>Ingebouwde subprocessen</sub-process>
+                                <data-persistence>Gegevens en opslag</data-persistence>
+                                <data-persistence-short>Gegevens</data-persistence-short>
+                                <validation-errors>Validatie en fouten</validation-errors>
+                                <validation-errors-short>Validatie</validation-errors-short>
+                                <dialogs-messages>Dialogen en berichten</dialogs-messages>
+                                <dialogs-messages-short>Dialogen</dialogs-messages-short>
+                                <navigation-modes>Navigatie en modi</navigation-modes>
+                                <navigation-modes-short>Navigatie</navigation-modes-short>
+                                <sections-wizard>Secties en wizard</sections-wizard>
+                                <sections-wizard-short>Secties</sections-wizard-short>
+                                <integrations>Integraties en hulpmiddelen</integrations>
+                                <integrations-short>Integraties</integrations-short>
                                 <flow-control>Stroombesturing</flow-control>
+                                <flow-control-short>Stroom</flow-control-short>
                                 <xforms>XForms-acties</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Ingebouwde subprocessen</sub-process>
                                 <form-processes>Aangepaste processen</form-processes>
                             </categories>
                             <alerts>
@@ -707,11 +869,29 @@
                             <custom-parameter>Egendefinert parameter…</custom-parameter>
                             <remove-parameter>Fjern parameter</remove-parameter>
                             <avt-toggle>Veksle dynamisk verdimal ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Søk handlinger (f.eks. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Ingen samsvarende handlinger</no-results>
+                                <all>Alle</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner-handlinger</form-runner>
-                                <sub-process>Innebygde delprosesser</sub-process>
+                                <data-persistence>Data og lagring</data-persistence>
+                                <data-persistence-short>Data</data-persistence-short>
+                                <validation-errors>Validering og feil</validation-errors>
+                                <validation-errors-short>Validering</validation-errors-short>
+                                <dialogs-messages>Dialoger og meldinger</dialogs-messages>
+                                <dialogs-messages-short>Dialoger</dialogs-messages-short>
+                                <navigation-modes>Navigasjon og moduser</navigation-modes>
+                                <navigation-modes-short>Navigasjon</navigation-modes-short>
+                                <sections-wizard>Seksjoner og veiviser</sections-wizard>
+                                <sections-wizard-short>Seksjoner</sections-wizard-short>
+                                <integrations>Integrasjoner og verktøy</integrations>
+                                <integrations-short>Integrasjoner</integrations-short>
                                 <flow-control>Flytkontroll</flow-control>
+                                <flow-control-short>Flyt</flow-control-short>
                                 <xforms>XForms-handlinger</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Innebygde delprosesser</sub-process>
                                 <form-processes>Egendefinerte prosesser</form-processes>
                             </categories>
                             <alerts>
@@ -762,11 +942,29 @@
                             <custom-parameter>Parametr niestandardowy…</custom-parameter>
                             <remove-parameter>Usuń parametr</remove-parameter>
                             <avt-toggle>Przełącz szablon wartości dynamicznej ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Szukaj akcji (np. save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Brak pasujących akcji</no-results>
+                                <all>Wszystkie</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Akcje Form Runner</form-runner>
-                                <sub-process>Wbudowane podprocesy</sub-process>
+                                <data-persistence>Dane i zapisywanie</data-persistence>
+                                <data-persistence-short>Dane</data-persistence-short>
+                                <validation-errors>Walidacja i błędy</validation-errors>
+                                <validation-errors-short>Walidacja</validation-errors-short>
+                                <dialogs-messages>Okna i komunikaty</dialogs-messages>
+                                <dialogs-messages-short>Komunikaty</dialogs-messages-short>
+                                <navigation-modes>Nawigacja i tryby</navigation-modes>
+                                <navigation-modes-short>Nawigacja</navigation-modes-short>
+                                <sections-wizard>Sekcje i kreator</sections-wizard>
+                                <sections-wizard-short>Sekcje</sections-wizard-short>
+                                <integrations>Integracje i narzędzia</integrations>
+                                <integrations-short>Integracje</integrations-short>
                                 <flow-control>Sterowanie przepływem</flow-control>
+                                <flow-control-short>Przepływ</flow-control-short>
                                 <xforms>Akcje XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Wbudowane podprocesy</sub-process>
                                 <form-processes>Procesy niestandardowe</form-processes>
                             </categories>
                             <alerts>
@@ -817,11 +1015,29 @@
                             <custom-parameter>Пользовательский параметр…</custom-parameter>
                             <remove-parameter>Удалить параметр</remove-parameter>
                             <avt-toggle>Переключить шаблон динамического значения ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>Поиск действий (например: save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>Подходящие действия не найдены</no-results>
+                                <all>Все</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Действия Form Runner</form-runner>
-                                <sub-process>Встроенные подпроцессы</sub-process>
+                                <data-persistence>Данные и сохранение</data-persistence>
+                                <data-persistence-short>Данные</data-persistence-short>
+                                <validation-errors>Проверка и ошибки</validation-errors>
+                                <validation-errors-short>Проверка</validation-errors-short>
+                                <dialogs-messages>Диалоги и сообщения</dialogs-messages>
+                                <dialogs-messages-short>Диалоги</dialogs-messages-short>
+                                <navigation-modes>Навигация и режимы</navigation-modes>
+                                <navigation-modes-short>Навигация</navigation-modes-short>
+                                <sections-wizard>Разделы и мастер</sections-wizard>
+                                <sections-wizard-short>Разделы</sections-wizard-short>
+                                <integrations>Интеграции и утилиты</integrations>
+                                <integrations-short>Интеграции</integrations-short>
                                 <flow-control>Управление потоком</flow-control>
+                                <flow-control-short>Поток</flow-control-short>
                                 <xforms>Действия XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>Встроенные подпроцессы</sub-process>
                                 <form-processes>Пользовательские процессы</form-processes>
                             </categories>
                             <alerts>
@@ -872,11 +1088,29 @@
                             <custom-parameter>カスタムパラメータ…</custom-parameter>
                             <remove-parameter>パラメータを削除</remove-parameter>
                             <avt-toggle>動的値テンプレートを切り替え ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>アクションを検索 (例: save, send, xf:setvalue)…</search-placeholder>
+                                <no-results>一致するアクションがありません</no-results>
+                                <all>すべて</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>Form Runner アクション</form-runner>
-                                <sub-process>組み込みサブプロセス</sub-process>
+                                <data-persistence>データと保存</data-persistence>
+                                <data-persistence-short>データ</data-persistence-short>
+                                <validation-errors>検証とエラー</validation-errors>
+                                <validation-errors-short>検証</validation-errors-short>
+                                <dialogs-messages>ダイアログとメッセージ</dialogs-messages>
+                                <dialogs-messages-short>メッセージ</dialogs-messages-short>
+                                <navigation-modes>ナビゲーションとモード</navigation-modes>
+                                <navigation-modes-short>ナビゲーション</navigation-modes-short>
+                                <sections-wizard>セクションとウィザード</sections-wizard>
+                                <sections-wizard-short>セクション</sections-wizard-short>
+                                <integrations>連携とユーティリティ</integrations>
+                                <integrations-short>連携</integrations-short>
                                 <flow-control>フロー制御</flow-control>
+                                <flow-control-short>フロー</flow-control-short>
                                 <xforms>XForms アクション</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>組み込みサブプロセス</sub-process>
                                 <form-processes>カスタムプロセス</form-processes>
                             </categories>
                             <alerts>
@@ -927,11 +1161,29 @@
                             <custom-parameter>معامل مخصص…</custom-parameter>
                             <remove-parameter>إزالة المعامل</remove-parameter>
                             <avt-toggle>تبديل قالب القيمة الديناميكية ({…})</avt-toggle>
+                            <action-picker>
+                                <search-placeholder>البحث عن إجراءات (مثل save أو send أو xf:setvalue)…</search-placeholder>
+                                <no-results>لا توجد إجراءات مطابقة</no-results>
+                                <all>الكل</all>
+                            </action-picker>
                             <categories>
-                                <form-runner>إجراءات Form Runner</form-runner>
-                                <sub-process>العمليات الفرعية المضمنة</sub-process>
+                                <data-persistence>البيانات والحفظ</data-persistence>
+                                <data-persistence-short>البيانات</data-persistence-short>
+                                <validation-errors>التحقق والأخطاء</validation-errors>
+                                <validation-errors-short>التحقق</validation-errors-short>
+                                <dialogs-messages>النوافذ والرسائل</dialogs-messages>
+                                <dialogs-messages-short>الرسائل</dialogs-messages-short>
+                                <navigation-modes>التنقل والأوضاع</navigation-modes>
+                                <navigation-modes-short>التنقل</navigation-modes-short>
+                                <sections-wizard>الأقسام والمعالج</sections-wizard>
+                                <sections-wizard-short>الأقسام</sections-wizard-short>
+                                <integrations>التكامل والأدوات</integrations>
+                                <integrations-short>التكامل</integrations-short>
                                 <flow-control>التحكم في التدفق</flow-control>
+                                <flow-control-short>التدفق</flow-control-short>
                                 <xforms>إجراءات XForms</xforms>
+                                <xforms-short>XForms</xforms-short>
+                                <sub-process>العمليات الفرعية المضمنة</sub-process>
                                 <form-processes>العمليات المخصصة</form-processes>
                             </categories>
                             <alerts>
@@ -1037,6 +1289,30 @@
                 <xxf:dialog id="dialog" class="fr-dialog-process-editor">
                     <xf:label value="if (xxf:non-blank(instance('ui-instance')/title)) then instance('ui-instance')/title else $r/label"/>
 
+                    <!-- Shared localized action catalog consumed by `ProcessActionPicker` -->
+                    <xh:div
+                        class="fr-process-action-catalog xforms-hidden"
+                        hidden="hidden"
+                        data-placeholder="{$r/action-picker/search-placeholder}"
+                        data-empty-message="{$r/action-picker/no-results}"
+                        data-all-label="{$r/action-picker/all}">
+                        <xh:span data-cat-id="data-persistence"  data-cat-short="{$r/categories/data-persistence-short}"  data-cat-label="{$r/categories/data-persistence}"/>
+                        <xh:span data-cat-id="validation-errors" data-cat-short="{$r/categories/validation-errors-short}" data-cat-label="{$r/categories/validation-errors}"/>
+                        <xh:span data-cat-id="dialogs-messages"  data-cat-short="{$r/categories/dialogs-messages-short}"  data-cat-label="{$r/categories/dialogs-messages}"/>
+                        <xh:span data-cat-id="navigation-modes"  data-cat-short="{$r/categories/navigation-modes-short}"  data-cat-label="{$r/categories/navigation-modes}"/>
+                        <xh:span data-cat-id="sections-wizard"   data-cat-short="{$r/categories/sections-wizard-short}"   data-cat-label="{$r/categories/sections-wizard}"/>
+                        <xh:span data-cat-id="integrations"      data-cat-short="{$r/categories/integrations-short}"      data-cat-label="{$r/categories/integrations}"/>
+                        <xh:span data-cat-id="flow-control"      data-cat-short="{$r/categories/flow-control-short}"      data-cat-label="{$r/categories/flow-control}"/>
+                        <xh:span data-cat-id="xforms"            data-cat-short="{$r/categories/xforms-short}"            data-cat-label="{$r/categories/xforms}"/>
+                        <xf:repeat ref="instance('actions-instance')/action[@deprecated = 'false']">
+                            <xh:span
+                                data-action-name="{@name}"
+                                data-action-label="{@label}"
+                                data-action-category="{@category}"
+                                data-action-keywords="{@keywords}"/>
+                        </xf:repeat>
+                    </xh:div>
+
                     <xh:div class="fr-process-editor-body {'fr-process-editor-single'[$is-single-mode]}">
                     <fr:tabbable
                         appearance="left"
@@ -1102,7 +1378,7 @@
                                             <xf:group ref=".[exists(step)]" id="fr-process-steps-group">
                                                 <xf:action event="fr-focus-step">
                                                     <xf:setindex repeat="fr-process-steps-repeat" index="event('index')"/>
-                                                    <xf:setfocus control="fr-process-action-select1"/>
+                                                    <xf:setfocus control="fr-process-action-input"/>
                                                 </xf:action>
                                                 <xf:var name="process-index" value="count(preceding-sibling::process) + 1"/>
                                                 <xh:div class="fr-process-steps-list" data-orbeon-process-index="{$process-index}">
@@ -1213,54 +1489,32 @@
                                                                         <xf:var name="allows-custom-params" value="$action-def/@allows-custom-params = 'true'"/>
 
                                                                         <xh:div class="fr-process-action-bar">
-                                                                            <xf:select1 ref="@name" id="fr-process-action-select1" class="fr-process-action-select1">
-                                                                                <xf:label value="$r/process-definition/label"/>
-                                                                                <xf:alert value="peu:actionStepAlertMessage($current, $r, instance('form-context-instance'))"/>
-
-                                                                                <xf:item>
-                                                                                    <xf:label ref="$r/select-action"/>
-                                                                                    <xf:value/>
-                                                                                </xf:item>
-
-                                                                                <xf:choices>
-                                                                                    <xf:label ref="$r/categories/form-runner"/>
-                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'form-runner' and @deprecated = 'false']">
-                                                                                        <xf:label ref="@label"/>
-                                                                                        <xf:value ref="@name"/>
-                                                                                    </xf:itemset>
-                                                                                </xf:choices>
-
-                                                                                <xf:choices>
-                                                                                    <xf:label ref="$r/categories/flow-control"/>
-                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'flow-control' and @deprecated = 'false']">
-                                                                                        <xf:label ref="@label"/>
-                                                                                        <xf:value ref="@name"/>
-                                                                                    </xf:itemset>
-                                                                                </xf:choices>
-
-                                                                                <xf:choices>
-                                                                                    <xf:label ref="$r/categories/xforms"/>
-                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'xforms' and @deprecated = 'false']">
-                                                                                        <xf:label ref="@label"/>
-                                                                                        <xf:value ref="@name"/>
-                                                                                    </xf:itemset>
-                                                                                </xf:choices>
-
-                                                                                <xf:itemset ref="$action-def[@deprecated = 'true']">
-                                                                                    <xf:label ref="@label"/>
-                                                                                    <xf:value ref="@name"/>
-                                                                                </xf:itemset>
-
-                                                                                <xf:itemset ref="$current/@name[xxf:non-blank(.) and empty($action-def)]">
-                                                                                    <xf:label value="."/>
-                                                                                    <xf:value value="."/>
-                                                                                </xf:itemset>
-
-                                                                                <xf:action event="xforms-value-changed">
-                                                                                    <xf:delete ref="$current/param"/>
-                                                                                    <xf:insert context="$current" origin="peu:actionParamsXml(@name)/*"/>
-                                                                                </xf:action>
-                                                                            </xf:select1>
+                                                                            <xh:div
+                                                                                class="fr-process-action-picker-field"
+                                                                                data-orbeon-action-name="{@name}"
+                                                                                data-orbeon-has-def="{exists($action-def)}"
+                                                                                data-orbeon-readonly="{fr:is-readonly-mode()}">
+                                                                                <xh:button
+                                                                                    type="button"
+                                                                                    class="fr-process-action-trigger"
+                                                                                    aria-expanded="false">
+                                                                                    <xh:span class="fr-process-action-trigger-label">
+                                                                                        <xf:output value="if (xxf:is-blank(@name)) then $r/select-action else ($action-def/@label, @name)[1]"/>
+                                                                                    </xh:span>
+                                                                                    <xh:span class="fr-process-action-trigger-token">
+                                                                                        <xf:output value="@name"/>
+                                                                                    </xh:span>
+                                                                                    <xh:i class="fa fa-fw fa-chevron-down fr-process-action-trigger-caret" aria-hidden="true"/>
+                                                                                </xh:button>
+                                                                                <xf:input ref="@name" id="fr-process-action-input" class="fr-process-action-hidden-input">
+                                                                                    <xf:label value="$r/process-definition/label"/>
+                                                                                    <xf:alert value="peu:actionStepAlertMessage($current, $r, instance('form-context-instance'))"/>
+                                                                                    <xf:action event="xforms-value-changed">
+                                                                                        <xf:delete ref="$current/param"/>
+                                                                                        <xf:insert context="$current" origin="peu:actionParamsXml(@name)/*"/>
+                                                                                    </xf:action>
+                                                                                </xf:input>
+                                                                            </xh:div>
 
                                                                             <!-- + Parameter menu -->
                                                                             <xf:select1

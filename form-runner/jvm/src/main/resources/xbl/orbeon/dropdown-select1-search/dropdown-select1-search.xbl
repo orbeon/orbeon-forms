@@ -86,6 +86,7 @@
                 <setting name="fr:pdf-appearance" type="xs:string" values="search full"/>
                 <setting name="selection"         type="xs:string" values="closed open"/>
                 <setting name="suggest-existing"  type="xs:boolean"/>
+                <setting name="show-value"        type="xs:boolean"/>
             </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-dropdown-select1-model">
@@ -94,6 +95,7 @@
                         <xf:setvalue ref="instance('local')/pdf-appearance"   value="instance()/@fr:pdf-appearance"/>
                         <xf:setvalue ref="instance('local')/open-selection"   value="instance()/@selection = 'open'"/>
                         <xf:setvalue ref="instance('local')/suggest-existing" value="instance()/@suggest-existing = 'true'"/>
+                        <xf:setvalue ref="instance('local')/show-value"       value="instance()/@show-value = 'true'"/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
@@ -101,12 +103,14 @@
                             <pdf-appearance/>
                             <open-selection/>
                             <suggest-existing/>
+                            <show-value/>
                         </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
                         <xf:bind ref="open-selection"   type="xs:boolean"/>
                         <xf:bind ref="suggest-existing" type="xs:boolean" relevant="../open-selection = 'true'"/>
+                        <xf:bind ref="show-value"       type="xs:boolean"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
@@ -116,84 +120,98 @@
                                 <selected-only>Show the selected value only</selected-only>
                                 <show-all>Show all values as radio buttons</show-all>
                                 <suggest-existing>Suggest values from existing records</suggest-existing>
+                                <show-value>Show choice value as badge (and include in search)</show-value>
                             </resource>
                             <resource xml:lang="fr">
                                 <automatic-pdf>PDF automatique</automatic-pdf>
                                 <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
                                 <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
                                 <suggest-existing>Suggérer les valeurs des enregistrements existants</suggest-existing>
+                                <show-value>Afficher la valeur du choix comme badge (et inclure dans la recherche)</show-value>
                             </resource>
                             <resource xml:lang="no">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Vis bare valgt verdi</selected-only>
                                 <show-all>Vis alle verdier som radioknapper</show-all>
                                 <suggest-existing>Foreslå verdier fra eksisterende oppføringer</suggest-existing>
+                                <show-value>Vis valgverdi som merke (og inkluder i søk)</show-value>
                             </resource>
                             <resource xml:lang="ru">
                                 <automatic-pdf>Автоматический PDF</automatic-pdf>
                                 <selected-only>Показывать только выбранное значение</selected-only>
                                 <show-all>Показать все значения как переключатели</show-all>
                                 <suggest-existing>Предлагать значения из существующих записей</suggest-existing>
+                                <show-value>Показывать значение варианта как значок (и включать в поиск)</show-value>
                             </resource>
                             <resource xml:lang="it">
                                 <automatic-pdf>PDF automatico</automatic-pdf>
                                 <selected-only>Mostra solo il valore selezionato</selected-only>
                                 <show-all>Mostra tutti i valori come pulsanti di scelta</show-all>
                                 <suggest-existing>Suggerisci valori dai record esistenti</suggest-existing>
+                                <show-value>Mostra il valore della scelta come badge (e includi nella ricerca)</show-value>
                             </resource>
                             <resource xml:lang="de">
                                 <automatic-pdf>Automatisches PDF</automatic-pdf>
                                 <selected-only>Nur ausgewählten Wert anzeigen</selected-only>
                                 <show-all>Alle Werte als Optionsfelder anzeigen</show-all>
                                 <suggest-existing>Werte aus vorhandenen Einträgen vorschlagen</suggest-existing>
+                                <show-value>Auswahlwert als Abzeichen anzeigen (und in die Suche einbeziehen)</show-value>
                             </resource>
                             <resource xml:lang="fi">
                                 <automatic-pdf>Automaattinen PDF</automatic-pdf>
                                 <selected-only>Näytä vain valittu arvo</selected-only>
                                 <show-all>Näytä kaikki arvot radiopainikkeina</show-all>
                                 <suggest-existing>Ehdota arvoja olemassa olevista tietueista</suggest-existing>
+                                <show-value>Näytä vaihtoehdon arvo merkkinä (ja sisällytä hakuun)</show-value>
                             </resource>
                             <resource xml:lang="es">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar solo el valor seleccionado</selected-only>
                                 <show-all>Mostrar todos los valores como botones de opción</show-all>
                                 <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                                <show-value>Mostrar el valor de la opción como insignia (e incluir en la búsqueda)</show-value>
                             </resource>
                             <resource xml:lang="nl">
                                 <automatic-pdf>Automatische PDF</automatic-pdf>
                                 <selected-only>Alleen geselecteerde waarde tonen</selected-only>
                                 <show-all>Alle waarden als keuzerondjes tonen</show-all>
                                 <suggest-existing>Waarden uit bestaande records voorstellen</suggest-existing>
+                                <show-value>Keuzewaarde als badge tonen (en opnemen in zoekopdracht)</show-value>
                             </resource>
                             <resource xml:lang="pt">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar apenas o valor selecionado</selected-only>
                                 <show-all>Mostrar todos os valores como botões de opção</show-all>
                                 <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                                <show-value>Mostrar o valor da opção como emblema (e incluir na pesquisa)</show-value>
                             </resource>
                             <resource xml:lang="sv">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Visa bara valt värde</selected-only>
                                 <show-all>Visa alla värden som radioknappar</show-all>
                                 <suggest-existing>Föreslå värden från befintliga poster</suggest-existing>
+                                <show-value>Visa valvärde som bricka (och inkludera i sökning)</show-value>
                             </resource>
                             <resource xml:lang="ar">
                                 <automatic-pdf>PDF تلقائي</automatic-pdf>
                                 <selected-only>إظهار القيمة المحددة فقط</selected-only>
                                 <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
                                 <suggest-existing>اقتراح قيم من السجلات الموجودة</suggest-existing>
+                                <show-value>إظهار قيمة الخيار كشارة (وتضمينها في البحث)</show-value>
                             </resource>
                             <resource xml:lang="pl">
                                 <automatic-pdf>Automatyczny PDF</automatic-pdf>
                                 <selected-only>Pokazuj tylko wybraną wartość</selected-only>
                                 <show-all>Pokaż wszystkie wartości jako przyciski opcji</show-all>
                                 <suggest-existing>Podpowiadaj wartości z istniejących rekordów</suggest-existing>
+                                <show-value>Pokazuj wartość opcji jako plakietkę (i uwzględniaj w wyszukiwaniu)</show-value>
                             </resource>
                             <resource xml:lang="ja">
                                 <automatic-pdf>自動PDF</automatic-pdf>
                                 <selected-only>選択値だけ表示</selected-only>
                                 <show-all>すべての値をラジオボタンで表示</show-all>
                                 <suggest-existing>既存のレコードから値を提案する</suggest-existing>
+                                <show-value>選択肢の値をバッジとして表示（検索対象にも含める）</show-value>
                             </resource>
                         </_>
                     </xf:instance>
@@ -216,6 +234,13 @@
                                     <xf:value>full</xf:value>
                                 </xf:item>
                             </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/show-value" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                            </fr:checkbox-input>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
@@ -248,6 +273,20 @@
                     <xf:delete
                         if="xxf:is-blank($new-value)"
                         ref="instance()/@*[local-name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-show-value-action"
+                    event="xforms-value-changed"
+                    observer="show-value-control">
+
+                    <xf:var name="enabled" value="string(event('xxf:binding')) = 'true'"/>
+                    <xf:insert
+                        context="instance()"
+                        if="$enabled"
+                        origin="xf:attribute('show-value', 'true')"/>
+                    <xf:delete
+                        if="not($enabled)"
+                        ref="instance()/@show-value"/>
                 </xf:action>
                 <xf:action
                     id="fb-editor-open-selection-action"
@@ -285,16 +324,44 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
-            <xbl:style src="/webjars/select2/4.0.13/dist/css/select2.css"/>
         </xbl:resources>
 
+        <xbl:implementation>
+            <xf:model id="dropdown-select1-search-model">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><search-placeholder>Search…</search-placeholder><no-results>No matching choices</no-results><all>All</all></resource>
+                        <resource xml:lang="fr"><search-placeholder>Rechercher…</search-placeholder><no-results>Aucun choix correspondant</no-results><all>Toutes</all></resource>
+                        <resource xml:lang="no"><search-placeholder>Søk…</search-placeholder><no-results>Ingen samsvarende valg</no-results><all>Alle</all></resource>
+                        <resource xml:lang="ru"><search-placeholder>Поиск…</search-placeholder><no-results>Совпадений не найдено</no-results><all>Все</all></resource>
+                        <resource xml:lang="it"><search-placeholder>Cerca…</search-placeholder><no-results>Nessuna opzione corrispondente</no-results><all>Tutte</all></resource>
+                        <resource xml:lang="de"><search-placeholder>Suchen…</search-placeholder><no-results>Keine passenden Optionen</no-results><all>Alle</all></resource>
+                        <resource xml:lang="fi"><search-placeholder>Hae…</search-placeholder><no-results>Ei vastaavia vaihtoehtoja</no-results><all>Kaikki</all></resource>
+                        <resource xml:lang="es"><search-placeholder>Buscar…</search-placeholder><no-results>No hay opciones coincidentes</no-results><all>Todas</all></resource>
+                        <resource xml:lang="nl"><search-placeholder>Zoeken…</search-placeholder><no-results>Geen overeenkomende keuzes</no-results><all>Alle</all></resource>
+                        <resource xml:lang="pt"><search-placeholder>Pesquisar…</search-placeholder><no-results>Nenhuma opção correspondente</no-results><all>Todas</all></resource>
+                        <resource xml:lang="sv"><search-placeholder>Sök…</search-placeholder><no-results>Inga matchande val</no-results><all>Alla</all></resource>
+                        <resource xml:lang="ar"><search-placeholder>بحث…</search-placeholder><no-results>لا توجد خيارات مطابقة</no-results><all>الكل</all></resource>
+                        <resource xml:lang="pl"><search-placeholder>Szukaj…</search-placeholder><no-results>Brak pasujących opcji</no-results><all>Wszystkie</all></resource>
+                        <resource xml:lang="ja"><search-placeholder>検索…</search-placeholder><no-results>一致する選択肢がありません</no-results><all>すべて</all></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:template>
+            <xf:var name="binding"             value="xxf:binding('fr-dropdown-select1-search')"/>
             <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
             <xf:var name="min-input-length"    value="fr:component-param-value('min-input-length')"/>
+            <xf:var name="show-value"          value="fr:component-param-value('show-value') = 'true'"/>
+            <xf:var name="is-view-mode"        value="xxf:is-control-static-readonly('fr-dropdown-select1-search')"/>
+            <xf:var
+                name="r"
+                value="(instance('orbeon-resources')/resource[@xml:lang = xxf:lang()], instance('orbeon-resources')/resource[@xml:lang = 'en'])[1]"/>
 
             <xf:select1
                 appearance="minimal"
-                ref="xxf:binding('fr-dropdown-select1-search')"
+                ref="$binding"
                 id="select1"
                 xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance"
                 data-placeholder="{
@@ -306,6 +373,7 @@
                         xxf:r('components.labels.please-select', '|fr-fr-resources|')
                 }"
                 data-min-input-length="{$min-input-length}"
+                data-show-value="{$show-value}"
             >
                 <xf:itemset ref="''[not($disable-placeholder)]">
                     <xf:label/>
@@ -313,6 +381,30 @@
                 </xf:itemset>
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select1>
+
+            <xf:group ref="$binding[not($is-view-mode)]" appearance="xxf:internal">
+                <xh:span
+                    class="fr-select1-picker-data xforms-hidden"
+                    hidden="hidden"
+                    data-itemset="{xxf:itemset('select1', 'json', false())}"
+                    data-raw-values="{
+                        if ($show-value) then
+                            concat(
+                                '[',
+                                string-join(
+                                    for $v in xxf:itemset('select1', 'xml', false())//item[exists(value)]/value/string()
+                                    return concat('&quot;', replace(replace($v, '\\', '\\\\'), '&quot;', '\\&quot;'), '&quot;'),
+                                    ','
+                                ),
+                                ']'
+                            )
+                        else
+                            ''
+                    }"
+                    data-search-placeholder="{$r/search-placeholder}"
+                    data-no-results="{$r/no-results}"
+                    data-all-label="{$r/all}"/>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 
@@ -369,13 +461,30 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
-            <xbl:style src="/webjars/select2/4.0.13/dist/css/select2.css"/>
         </xbl:resources>
 
         <xbl:implementation>
             <xf:model id="open-select1-search-model">
                 <xf:instance id="existing-values" xxf:exclude-result-prefixes="#all">
                     <_/>
+                </xf:instance>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><search-placeholder>Search or type a custom value…</search-placeholder><no-results>No matching choices</no-results><all>All</all></resource>
+                        <resource xml:lang="fr"><search-placeholder>Rechercher ou saisir une valeur…</search-placeholder><no-results>Aucun choix correspondant</no-results><all>Toutes</all></resource>
+                        <resource xml:lang="no"><search-placeholder>Søk eller skriv inn en verdi…</search-placeholder><no-results>Ingen samsvarende valg</no-results><all>Alle</all></resource>
+                        <resource xml:lang="ru"><search-placeholder>Поиск или ввод своего значения…</search-placeholder><no-results>Совпадений не найдено</no-results><all>Все</all></resource>
+                        <resource xml:lang="it"><search-placeholder>Cerca o inserisci un valore…</search-placeholder><no-results>Nessuna opzione corrispondente</no-results><all>Tutte</all></resource>
+                        <resource xml:lang="de"><search-placeholder>Suchen oder eigenen Wert eingeben…</search-placeholder><no-results>Keine passenden Optionen</no-results><all>Alle</all></resource>
+                        <resource xml:lang="fi"><search-placeholder>Hae tai kirjoita oma arvo…</search-placeholder><no-results>Ei vastaavia vaihtoehtoja</no-results><all>Kaikki</all></resource>
+                        <resource xml:lang="es"><search-placeholder>Buscar o escribir un valor…</search-placeholder><no-results>No hay opciones coincidentes</no-results><all>Todas</all></resource>
+                        <resource xml:lang="nl"><search-placeholder>Zoek of typ een eigen waarde…</search-placeholder><no-results>Geen overeenkomende keuzes</no-results><all>Alle</all></resource>
+                        <resource xml:lang="pt"><search-placeholder>Pesquisar ou digitar um valor…</search-placeholder><no-results>Nenhuma opção correspondente</no-results><all>Todas</all></resource>
+                        <resource xml:lang="sv"><search-placeholder>Sök eller ange ett eget värde…</search-placeholder><no-results>Inga matchande val</no-results><all>Alla</all></resource>
+                        <resource xml:lang="ar"><search-placeholder>ابحث أو أدخل قيمة مخصصة…</search-placeholder><no-results>لا توجد خيارات مطابقة</no-results><all>الكل</all></resource>
+                        <resource xml:lang="pl"><search-placeholder>Szukaj lub wpisz własną wartość…</search-placeholder><no-results>Brak pasujących opcji</no-results><all>Wszystkie</all></resource>
+                        <resource xml:lang="ja"><search-placeholder>検索または自由入力…</search-placeholder><no-results>一致する選択肢がありません</no-results><all>すべて</all></resource>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>
@@ -410,13 +519,18 @@
             <xf:var name="binding"             value="xxf:binding('fr-open-select1-search')"/>
             <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
             <xf:var name="min-input-length"    value="fr:component-param-value('min-input-length')"/>
+            <xf:var name="show-value"          value="fr:component-param-value('show-value') = 'true'"/>
+            <xf:var name="is-view-mode"        value="xxf:is-control-static-readonly('fr-open-select1-search')"/>
+            <xf:var
+                name="r"
+                value="(instance('orbeon-resources')/resource[@xml:lang = xxf:lang()], instance('orbeon-resources')/resource[@xml:lang = 'en'])[1]"/>
 
             <!-- Internal select1 so xxf:itemset() returns the static itemset -->
             <xf:select1 id="internal-select1" ref="$binding" appearance="xxf:internal">
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select1>
 
-            <xf:var name="static-items"        value="xxf:itemset('internal-select1', 'xml')/itemset/choices/item"/>
+            <xf:var name="static-items"        value="xxf:itemset('internal-select1', 'xml')//item[exists(value)]"/>
             <xf:var name="static-values-lower" value="$static-items/value/lower-case(string(.))"/>
             <xf:var name="static-labels-lower" value="$static-items/label/lower-case(string(.))"/>
             <xf:var
@@ -441,6 +555,7 @@
                 }"
                 data-is-open-selection="true"
                 data-min-input-length="{$min-input-length}"
+                data-show-value="{$show-value}"
             >
                 <xf:itemset ref="''[not($disable-placeholder)]">
                     <xf:label/>
@@ -456,6 +571,30 @@
                     <xf:value ref="."/>
                 </xf:itemset>
             </xf:select1>
+
+            <xf:group ref="$binding[not($is-view-mode)]" appearance="xxf:internal">
+                <xh:span
+                    class="fr-select1-picker-data xforms-hidden"
+                    hidden="hidden"
+                    data-itemset="{xxf:itemset('select1', 'json', false())}"
+                    data-raw-values="{
+                        if ($show-value) then
+                            concat(
+                                '[',
+                                string-join(
+                                    for $v in xxf:itemset('select1', 'xml', false())//item[exists(value)]/value/string()
+                                    return concat('&quot;', replace(replace($v, '\\', '\\\\'), '&quot;', '\\&quot;'), '&quot;'),
+                                    ','
+                                ),
+                                ']'
+                            )
+                        else
+                            ''
+                    }"
+                    data-search-placeholder="{$r/search-placeholder}"
+                    data-no-results="{$r/no-results}"
+                    data-all-label="{$r/all}"/>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

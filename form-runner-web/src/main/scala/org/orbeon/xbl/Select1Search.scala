@@ -33,8 +33,6 @@ import scala.scalajs.js.JSConverters.*
 
 
 object Select1Search {
-  XFormsXbl.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
-  XFormsXbl.declareCompanion(name = "fr|open-select1-search"     , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|dropdown-select-search"  , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
@@ -146,18 +144,27 @@ object Select1Search {
   private def extractLeadingEmoji(s: String): Option[String] =
     s.takeWhile(c => c.isSurrogate || c.isWhitespace).trimAllToOpt
 
-  def formatPhoneCountrySelection(option: Select2.Option): String = {
-    val text    = Option(option.text).getOrElse("")
-    val flagOpt = extractLeadingEmoji(text)
-    CallingCodeRegex.findFirstMatchIn(text) match {
+  def aliasesForCountryCode(codeUpper: String): List[String] =
+    CountryAliases.getOrElse(codeUpper, Nil)
+
+  def callingCodeForLabel(label: String): Option[String] =
+    CallingCodeRegex.findFirstMatchIn(Option(label).getOrElse("")).map(_.group(2).stripPrefix("+"))
+
+  def formatPhoneCountryLabel(text: String): String = {
+    val safeText = Option(text).getOrElse("")
+    val flagOpt  = extractLeadingEmoji(safeText)
+    CallingCodeRegex.findFirstMatchIn(safeText) match {
       case Some(m) =>
         val isoCodeOpt  = Option(m.group(1)).map(_.toUpperCase)
         val callingCode = m.group(2)
         List(flagOpt, isoCodeOpt, Some(callingCode)).flatten.mkString(" ")
       case None =>
-        text
+        safeText
     }
   }
+
+  def formatPhoneCountrySelection(option: Select2.Option): String =
+    formatPhoneCountryLabel(Option(option.text).getOrElse(""))
 
   // Lower tier number = higher relevance rank when sorting search results:
   // 1: Exact ISO code, exact calling code, exact label, or exact alias match

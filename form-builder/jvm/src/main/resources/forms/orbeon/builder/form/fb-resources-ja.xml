@@ -643,6 +643,7 @@
             <label>サマリーページ</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>メタデータ列</title>
             <created><label>作成日</label></created>
             <last-modified><label>更新日</label></last-modified>
             <workflow-stage><label>ワークフロー段階</label></workflow-stage>
@@ -654,6 +655,14 @@
                 <item id="2">非表示</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>フォーム項目</title>
+            <hint>項目をドラッグしてサマリーページでの表示順を選択します</hint>
+            <reset>フォームの順序にリセット</reset>
+            <empty>サマリーページに表示するよう設定されたコントロールはありません。</empty>
+            <move-up>上へ移動</move-up>
+            <move-down>下へ移動</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>コントロール設定: "{1}" / "{0}" ({2})</label>
@@ -733,6 +742,8 @@
             <show>サマリーに表示</show>
             <column-only>列のみ表示</column-only>
             <search-only>検索のみ表示</search-only>
+            <position>位置 {0} / {1}</position>
+            <change-order>順序を変更…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>データを保存</save-data>

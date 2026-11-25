@@ -43,7 +43,7 @@
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
                     iterate="
-                        'for-button-name', 'app', 'form', 'thumbnail', 'allow-template-use',
+                        'for-button-name', 'initial-tab', 'app', 'form', 'thumbnail', 'allow-template-use',
                         'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
@@ -213,7 +213,7 @@
                 <xf:action if="$is-form-settings" iterate="('created', 'last-modified', 'workflow-stage', 'created-by', 'last-modified-by')">
                     <xf:var name="column-name" value="."/>
                     <xf:var name="column"      value="event('summary-metadata-columns')/column[@name = $column-name]"/>
-                    <xf:insert context="$i/summary-metadata-columns" origin="
+                        <xf:insert context="$i/summary-metadata-columns" origin="
                         xf:element(
                             'column',
                             (
@@ -226,6 +226,13 @@
                             )
                         )"/>
                 </xf:action>
+
+                <!-- Load summary control columns order -->
+                <xf:delete ref="$i/summary-control-columns/*"/>
+                <xf:insert
+                    if="$is-form-settings"
+                    context="$i/summary-control-columns"
+                    origin="fbf:buildSummaryControlColumnsXml()/*"/>
 
                 <!-- Process `fb:control-details` -->
 
@@ -398,7 +405,7 @@
                 <xf:setfocus
                     if="$is-new-form and not($show-templates)"
                     control="fb-general-settings-grid"/>
-
+                <xf:setvalue ref="$i/summary-order-announcement" value="''"/>
                 <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
                 <xf:action if="$is-app-form or $is-form-settings">
                     <xf:var
@@ -410,8 +417,14 @@
                             control="fb-{name()}-name-input"/>
                     </xf:action>
                     <!-- Explicit focus is necessary or the tab might not consistently open -->
+                    <xf:action if="empty($invalid-app-form) and $is-form-settings and $i/initial-tab = 'summary'">
+                        <xf:dispatch name="fr-select-tab" targetid="fb-tabbable">
+                            <xf:property name="tab-index" value="8"/>
+                        </xf:dispatch>
+                        <xf:setfocus control="fb-summary-tab"/>
+                    </xf:action>
                     <xf:setfocus
-                        if="empty($invalid-app-form)"
+                        if="empty($invalid-app-form) and not($is-form-settings and $i/initial-tab = 'summary')"
                         control="fb-general-settings-grid"/>
                 </xf:action>
 
@@ -548,6 +561,7 @@
                         <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
                         <xf:property name="property-profile"                       value="$i/property-profile/string()[. != '[none]']"/>
                         <xf:property name="summary-metadata-columns"               value="$i/summary-metadata-columns"/>
+                        <xf:property name="summary-control-columns"                value="$i/summary-control-columns"/>
 
                         <xf:property
                             name="labels"
@@ -684,11 +698,16 @@
                         <data-migration/>
                         <analysis-calculate/>
                         <xbl/>
+                        <initial-tab/>
                         <continue-trigger/>
                         <summary-metadata-columns>
                             <!--<column name="created" show="default" role-required="false" require-role-constraint=""><require-role/></column>-->
                             <!-- ... -->
                         </summary-metadata-columns>
+                        <summary-control-columns>
+                            <!--<column control="first-name" section-name="" default-pos="1" role-restricted="false"><label lang="en">First Name</label></column>-->
+                        </summary-control-columns>
+                        <summary-order-announcement/>
                     </_>
                 </xf:instance>
 
@@ -1874,91 +1893,253 @@
                             </fr:tab>
 
                             <!-- Summary Page tab (#7553) -->
-                            <fr:tab class="fb-dialog-form-settings-summary" visible="$is-form-settings">
+                            <fr:tab id="fb-summary-tab" class="fb-dialog-form-settings-summary" visible="$is-form-settings" active="$is-form-settings and $i/initial-tab = 'summary'">
                                 <fr:label value="$resources/dialog-form-settings/summary-tab/label"/>
 
                                 <xf:var name="smc"           value="$i/summary-metadata-columns"/>
                                 <xf:var name="smc-resources" value="$resources/dialog-form-settings/summary-metadata-columns"/>
+                                <xf:var name="scc"           value="$i/summary-control-columns"/>
+                                <xf:var name="scc-resources" value="$resources/dialog-form-settings/summary-control-columns"/>
+                                <xf:var name="is-readonly"   value="fr:is-readonly-mode()"/>
+                                <xf:var
+                                    name="has-custom-order"
+                                    value="
+                                        some $pos in 1 to count($scc/column)
+                                        satisfies xs:integer(($scc/column[$pos]/@default-pos[. castable as xs:integer], $pos)[1]) != $pos"/>
 
-                                <xh:div class="fb-dialog-form-settings-summary-grid">
-                                    <xf:repeat ref="('created', 'last-modified', 'created-by', 'last-modified-by', 'workflow-stage')">
-                                        <xf:var name="column-name" value="."/>
-                                        <xf:var name="column"      value="$smc/column[@name = $column-name]"/>
+                                <xh:div class="fb-dialog-form-settings-summary-columns">
+                                    <!-- Left section: Metadata Columns -->
+                                    <xf:group class="fb-summary-metadata-section">
+                                        <xf:label value="$smc-resources/title"/>
 
-                                        <xh:div class="fb-dialog-form-settings-summary-row">
-                                            <!-- Use property / Show / Hide radio buttons-->
-                                            <xf:select1 ref="$column/@show" appearance="full xxf:horizontal" class="fb-summary-metadata-show-hide">
-                                                <xf:label ref="$smc-resources/*[name() = $column-name]/label"/>
-                                                <xf:itemset ref="$smc-resources/show/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
-                                                </xf:itemset>
-                                                <xf:action event="xforms-value-changed" if="$column/@show != 'true'">
-                                                    <xf:setvalue ref="$column/@role-required" value="false()"/>
-                                                    <xf:setvalue ref="$column/@require-role-constraint" value="'all'"/>
-                                                    <xf:delete ref="$column/require-role"/>
-                                                </xf:action>
-                                            </xf:select1>
+                                        <xh:div class="fb-dialog-form-settings-summary-grid">
+                                            <xf:repeat ref="('created', 'last-modified', 'created-by', 'last-modified-by', 'workflow-stage')">
+                                                <xf:var name="column-name" value="."/>
+                                                <xf:var name="column"      value="$smc/column[@name = $column-name]"/>
 
-                                            <xh:div class="fb-role-required-checkbox">
-                                                <xh:div>
-                                                    <fr:checkbox-input ref="$column/@role-required">
-                                                        <xf:label ref="$resources/role-restriction/restrict"/>
-                                                        <xf:action event="xforms-select">
-                                                            <xf:insert if="count($column/require-role) = 0" context="$column" origin="xf:element('require-role')"/>
-                                                        </xf:action>
-                                                        <xf:action event="xforms-deselect">
+                                                <xh:div class="fb-dialog-form-settings-summary-row">
+                                                    <!-- Use property / Show / Hide radio buttons-->
+                                                    <xf:select1 ref="$column/@show" appearance="full xxf:horizontal" class="fb-summary-metadata-show-hide">
+                                                        <xf:label ref="$smc-resources/*[name() = $column-name]/label"/>
+                                                        <xf:itemset ref="$smc-resources/show/item">
+                                                            <xf:label ref="."/>
+                                                            <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                        </xf:itemset>
+                                                        <xf:action event="xforms-value-changed" if="$column/@show != 'true'">
+                                                            <xf:setvalue ref="$column/@role-required" value="false()"/>
                                                             <xf:setvalue ref="$column/@require-role-constraint" value="'all'"/>
                                                             <xf:delete ref="$column/require-role"/>
                                                         </xf:action>
-                                                    </fr:checkbox-input>
-                                                </xh:div>
-                                                <xh:div>
-                                                    <xf:switch caseref="count($column/require-role) gt 1" class="fb-roles-any-or-all">
-                                                        <xf:case value="true()">
-                                                            <xh:div>
-                                                                <xf:select1 ref="$column/@require-role-constraint">
-                                                                    <xf:item><xf:label ref="$resources/role-restriction/all"/><xf:value>all</xf:value></xf:item>
-                                                                    <xf:item><xf:label ref="$resources/role-restriction/any"/><xf:value>any</xf:value></xf:item>
-                                                                </xf:select1>
-                                                                <xf:output ref="$resources/role-restriction/of-the-following"/>
-                                                            </xh:div>
-                                                        </xf:case>
-                                                        <xf:case value="false()"/>
-                                                    </xf:switch>
+                                                    </xf:select1>
 
-                                                    <xf:var name="can-remove" value="count($column/require-role) gt 1"/>
-
-                                                    <fr:dnd-repeat ref="if (count($column/require-role) gt 0) then $column/require-role else instance('require-role-template')/require-role">
-                                                        <xf:var name="current-role" value="."/>
-                                                        <xf:var name="can-move"     value="count($column/require-role) gt 1"/>
-
-                                                        <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
-                                                            <xh:div><xf:input ref="$current-role" class="fb-control-settings-summary-role">
-                                                                <xf:alert validation="role-non-empty"      ref="$resources/role-restriction/empty"/>
-                                                                <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
-                                                            </xf:input></xh:div>
-                                                            <xf:group ref=".[count($column/require-role) gt 0]">
-                                                                <xh:div class="fb-param-buttons">
-                                                                    <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
-                                                                    <xf:trigger appearance="minimal" ref="if ($can-remove) then $current-role else ''">
-                                                                        <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
-                                                                        <xf:action event="DOMActivate"><xf:delete ref="$current-role"/></xf:action>
-                                                                    </xf:trigger>
-                                                                    <xf:trigger appearance="minimal">
-                                                                        <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
-                                                                        <xf:action event="DOMActivate">
-                                                                            <xf:insert context="$column" ref="$current-role[parent::* is $column]" position="after" origin="xf:element('require-role')"/>
-                                                                        </xf:action>
-                                                                    </xf:trigger>
-                                                                </xh:div>
-                                                            </xf:group>
+                                                    <xh:div class="fb-role-required-checkbox">
+                                                        <xh:div>
+                                                            <fr:checkbox-input ref="$column/@role-required">
+                                                                <xf:label ref="$resources/role-restriction/restrict"/>
+                                                                <xf:action event="xforms-select">
+                                                                    <xf:insert if="count($column/require-role) = 0" context="$column" origin="xf:element('require-role')"/>
+                                                                </xf:action>
+                                                                <xf:action event="xforms-deselect">
+                                                                    <xf:setvalue ref="$column/@require-role-constraint" value="'all'"/>
+                                                                    <xf:delete ref="$column/require-role"/>
+                                                                </xf:action>
+                                                            </fr:checkbox-input>
                                                         </xh:div>
-                                                    </fr:dnd-repeat>
+                                                        <xh:div>
+                                                            <xf:switch caseref="count($column/require-role) gt 1" class="fb-roles-any-or-all">
+                                                                <xf:case value="true()">
+                                                                    <xh:div>
+                                                                        <xf:select1 ref="$column/@require-role-constraint">
+                                                                            <xf:item><xf:label ref="$resources/role-restriction/all"/><xf:value>all</xf:value></xf:item>
+                                                                            <xf:item><xf:label ref="$resources/role-restriction/any"/><xf:value>any</xf:value></xf:item>
+                                                                        </xf:select1>
+                                                                        <xf:output ref="$resources/role-restriction/of-the-following"/>
+                                                                    </xh:div>
+                                                                </xf:case>
+                                                                <xf:case value="false()"/>
+                                                            </xf:switch>
+
+                                                            <xf:var name="can-remove" value="count($column/require-role) gt 1"/>
+
+                                                            <fr:dnd-repeat ref="if (count($column/require-role) gt 0) then $column/require-role else instance('require-role-template')/require-role">
+                                                                <xf:var name="current-role" value="."/>
+                                                                <xf:var name="can-move"     value="count($column/require-role) gt 1"/>
+
+                                                                <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
+                                                                    <xh:div><xf:input ref="$current-role" class="fb-control-settings-summary-role">
+                                                                        <xf:alert validation="role-non-empty"      ref="$resources/role-restriction/empty"/>
+                                                                        <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
+                                                                    </xf:input></xh:div>
+                                                                    <xf:group ref=".[count($column/require-role) gt 0]">
+                                                                        <xh:div class="fb-param-buttons">
+                                                                            <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
+                                                                            <xf:trigger appearance="minimal" ref="if ($can-remove) then $current-role else ''">
+                                                                                <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                                                                <xf:action event="DOMActivate"><xf:delete ref="$current-role"/></xf:action>
+                                                                            </xf:trigger>
+                                                                            <xf:trigger appearance="minimal">
+                                                                                <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
+                                                                                <xf:action event="DOMActivate">
+                                                                                    <xf:insert context="$column" ref="$current-role[parent::* is $column]" position="after" origin="xf:element('require-role')"/>
+                                                                                </xf:action>
+                                                                            </xf:trigger>
+                                                                        </xh:div>
+                                                                    </xf:group>
+                                                                </xh:div>
+                                                            </fr:dnd-repeat>
+                                                        </xh:div>
+                                                    </xh:div>
                                                 </xh:div>
-                                            </xh:div>
+                                            </xf:repeat>
                                         </xh:div>
-                                    </xf:repeat>
+                                    </xf:group>
+
+                                    <!-- Right section: Form Fields Order -->
+                                    <xf:group class="fb-summary-fields-section">
+                                        <xh:p id="fb-summary-fields-sr-status" role="status" class="fb-summary-fields-sr-status">
+                                            <xf:output value="$i/summary-order-announcement"/>
+                                        </xh:p>
+
+                                        <xh:div class="fb-summary-fields-header">
+                                            <xh:div class="fb-summary-fields-title-wrap">
+                                                <xh:span class="xforms-label"><xf:output value="$scc-resources/title"/></xh:span>
+                                                <xf:group ref=".[exists($scc/column)]">
+                                                    <xh:span class="fb-summary-fields-hint"><xf:output value="$scc-resources/hint"/></xh:span>
+                                                </xf:group>
+                                            </xh:div>
+                                            <xf:trigger
+                                                id="fb-summary-reset-order-trigger"
+                                                ref="$scc[not($is-readonly) and $has-custom-order]"
+                                                appearance="minimal"
+                                                class="fb-summary-reset-order-btn">
+                                                <xf:label>
+                                                    <xh:i class="fa fa-fw fa-undo" aria-hidden="true"/>
+                                                    <xh:span><xf:output value="$scc-resources/reset"/></xh:span>
+                                                </xf:label>
+                                                <xf:action event="DOMActivate">
+                                                    <xf:var
+                                                        name="reset-elem"
+                                                        value="
+                                                            xf:element(
+                                                                'summary-control-columns',
+                                                                for $p in 1 to count($scc/column)
+                                                                return $scc/column[xs:integer(@default-pos) = $p]
+                                                            )"/>
+                                                    <xf:delete ref="$scc/*"/>
+                                                    <xf:insert context="$scc" origin="$reset-elem/*"/>
+                                                    <xf:setvalue ref="$i/summary-order-announcement" value="$scc-resources/reset"/>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:div>
+
+                                        <xf:group ref=".[empty($scc/column)]" class="fb-summary-fields-empty">
+                                            <xf:output value="$scc-resources/empty"/>
+                                        </xf:group>
+
+                                        <xf:group ref=".[exists($scc/column)]" class="fb-summary-fields-list-wrap">
+                                            <xf:var name="col-count" value="count($scc/column)"/>
+                                            <xf:var name="can-dnd"   value="not($is-readonly) and $col-count gt 1"/>
+
+                                            <fr:dnd-repeat ref="$scc/column" id="fb-summary-fields-repeat" class="fr-dnd-drop-indicator">
+                                                <xf:var name="current-col" value="."/>
+                                                <xf:var name="pos"         value="position()"/>
+                                                <xf:var name="sec-name"    value="string(@section-name)"/>
+                                                <xf:var name="ctrl-name"   value="string(@control)"/>
+                                                <xf:var
+                                                    name="display-label"
+                                                    value="
+                                                        (
+                                                            label[@lang = $i/lang][xxf:non-blank()]/string(),
+                                                            label[xxf:non-blank()][1]/string(),
+                                                            $ctrl-name
+                                                        )[1]"/>
+                                                <xf:var
+                                                    name="display-section-label"
+                                                    value="
+                                                        if (xxf:non-blank($sec-name)) then
+                                                            (
+                                                                section-label[@lang = $i/lang][xxf:non-blank()]/string(),
+                                                                section-label[xxf:non-blank()][1]/string(),
+                                                                $sec-name
+                                                            )[1]
+                                                        else
+                                                            ''"/>
+                                                <xf:var
+                                                    name="code-text"
+                                                    value="if (xxf:non-blank($sec-name)) then concat($sec-name, ' / ', $ctrl-name) else $ctrl-name"/>
+
+                                                <xh:div class="{{'fb-summary-field-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-dnd]}}">
+                                                    <xh:span
+                                                        class="{{'fb-summary-field-drag-handle', 'xforms-dnd-handle', 'xforms-hidden'[not($can-dnd)]}}"
+                                                        aria-hidden="true">
+                                                        <xh:i class="fa fa-grip-vertical"/>
+                                                    </xh:span>
+
+                                                    <xh:span class="fb-summary-field-pos"><xf:output value="$pos"/></xh:span>
+
+                                                    <xh:div class="fb-summary-field-info">
+                                                        <xh:span class="fb-summary-field-label" title="{{$display-label}}">
+                                                            <xf:output value="$display-label"/>
+                                                        </xh:span>
+                                                        <xf:group ref=".[xxf:non-blank($display-section-label)]">
+                                                            <xh:span class="fb-summary-field-section" title="{{$display-section-label}}">
+                                                                <xf:output value="$display-section-label"/>
+                                                            </xh:span>
+                                                        </xf:group>
+                                                    </xh:div>
+
+                                                    <xh:code class="fb-summary-field-code" title="{{$code-text}}">
+                                                        <xf:output value="$code-text"/>
+                                                    </xh:code>
+
+                                                    <xf:group ref=".[$can-dnd]" class="fb-summary-field-actions">
+                                                        <xf:trigger
+                                                            appearance="minimal"
+                                                            id="fb-summary-field-move-up-btn"
+                                                            class="{{'fb-summary-field-move-btn', 'fb-summary-field-move-btn-disabled'[$pos le 1]}}">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-arrow-up" aria-hidden="true"/>
+                                                                <xh:span class="xforms-hidden"><xf:output value="concat($scc-resources/move-up, ': ', $display-label)"/></xh:span>
+                                                            </xf:label>
+                                                            <xf:hint ref="$scc-resources/move-up"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:var name="prev-col" value="$current-col/preceding-sibling::column[1]"/>
+                                                                <xf:action if="exists($prev-col)">
+                                                                    <xf:var name="new-pos" value="count($prev-col/preceding-sibling::column) + 1"/>
+                                                                    <xf:setvalue
+                                                                        ref="$i/summary-order-announcement"
+                                                                        value="concat($display-label, ' — ', xxf:format-message($resources/dialog-control-settings/summary-show/position, ($new-pos, $col-count)))"/>
+                                                                    <xf:insert context="$scc" ref="$prev-col" position="before" origin="$current-col"/>
+                                                                    <xf:delete ref="$current-col"/>
+                                                                </xf:action>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                        <xf:trigger
+                                                            appearance="minimal"
+                                                            id="fb-summary-field-move-down-btn"
+                                                            class="{{'fb-summary-field-move-btn', 'fb-summary-field-move-btn-disabled'[$pos ge $col-count]}}">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-arrow-down" aria-hidden="true"/>
+                                                                <xh:span class="xforms-hidden"><xf:output value="concat($scc-resources/move-down, ': ', $display-label)"/></xh:span>
+                                                            </xf:label>
+                                                            <xf:hint ref="$scc-resources/move-down"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:var name="next-col" value="$current-col/following-sibling::column[1]"/>
+                                                                <xf:action if="exists($next-col)">
+                                                                    <xf:var name="new-pos" value="count($next-col/preceding-sibling::column) + 1"/>
+                                                                    <xf:setvalue
+                                                                        ref="$i/summary-order-announcement"
+                                                                        value="concat($display-label, ' — ', xxf:format-message($resources/dialog-control-settings/summary-show/position, ($new-pos, $col-count)))"/>
+                                                                    <xf:insert context="$scc" ref="$next-col" position="after" origin="$current-col"/>
+                                                                    <xf:delete ref="$current-col"/>
+                                                                </xf:action>
+                                                            </xf:action>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xh:div>
+                                            </fr:dnd-repeat>
+                                        </xf:group>
+                                    </xf:group>
                                 </xh:div>
                             </fr:tab>
 

@@ -642,4 +642,150 @@ class IndexTest
       assert(extractItems(replacedStatic) == Seq("Alpina" -> "Alpina", "Olivetti" -> "Olivetti"))
     }
   }
+
+  describe("Custom `<summary-control-columns>` ordering in `searchableValues`") {
+
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
+
+    it("must reorder top-level and section-template indexed controls, append unlisted controls in document order, and ignore stale entries") {
+      val formWithCustomOrder =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:xbl="http://www.w3.org/ns/xbl"
+          xmlns:my="http://orbeon.org/oxf/xml/form-builder/component/acme/library">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <main>
+                    <first/>
+                    <second/>
+                    <third/>
+                  </main>
+                  <addr-a><city/></addr-a>
+                  <addr-b><city/></addr-b>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-bind" name="main" ref="main">
+                  <xf:bind id="first-bind" name="first" ref="first"/>
+                  <xf:bind id="second-bind" name="second" ref="second"/>
+                  <xf:bind id="third-bind" name="third" ref="third"/>
+                </xf:bind>
+                <xf:bind id="addr-a-bind" name="addr-a" ref="addr-a"/>
+                <xf:bind id="addr-b-bind" name="addr-b" ref="addr-b"/>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>acme</application-name>
+                  <form-name>ordered</form-name>
+                  <summary-control-columns>
+                    <column section-name="addr-b" control="city"/>
+                    <column control="deleted-control"/>
+                    <column control="second"/>
+                    <column section-name="addr-a" control="city"/>
+                  </summary-control-columns>
+                </metadata>
+              </xf:instance>
+              <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                  <resource xml:lang="en">
+                    <main><label>Main</label></main>
+                    <first><label>First</label></first>
+                    <second><label>Second</label></second>
+                    <third><label>Third</label></third>
+                    <addr-a><label>Address A</label></addr-a>
+                    <addr-b><label>Address B</label></addr-b>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+            <xbl:xbl>
+              <xbl:binding id="acme-addr-component" element="my|addr" class="fr-section-component">
+                <xbl:implementation>
+                  <xf:model id="addr-model">
+                    <xf:instance id="fr-form-template"><addr><city/></addr></xf:instance>
+                    <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                      <xf:bind id="city-bind" name="city" ref="city"/>
+                    </xf:bind>
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                      <resources>
+                        <resource xml:lang="en"><city><label>City</label></city></resource>
+                      </resources>
+                    </xf:instance>
+                  </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                  <xf:group appearance="xxf:internal" model="addr-model">
+                    <fr:grid id="addr-grid">
+                      <fr:c x="1" y="1" w="12">
+                        <xf:input id="city-control" bind="city-bind">
+                          <fr:index><fr:summary-show/></fr:index>
+                          <xf:label ref="$form-resources/city/label"/>
+                        </xf:input>
+                      </fr:c>
+                    </fr:grid>
+                  </xf:group>
+                </xbl:template>
+              </xbl:binding>
+            </xbl:xbl>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="main-section" bind="main-bind">
+                  <fr:grid id="main-grid">
+                    <fr:c x="1" y="1" w="4">
+                      <xf:input id="first-control" bind="first-bind">
+                        <fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/first/label"/>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="5" y="1" w="4">
+                      <xf:input id="second-control" bind="second-bind">
+                        <fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/second/label"/>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="9" y="1" w="4">
+                      <xf:input id="third-control" bind="third-bind">
+                        <fr:index/>
+                        <xf:label ref="$form-resources/third/label"/>
+                      </xf:input>
+                    </fr:c>
+                  </fr:grid>
+                </fr:section>
+                <fr:section id="addr-a-section" bind="addr-a-bind">
+                  <my:addr id="addr-a-content-control"/>
+                </fr:section>
+                <fr:section id="addr-b-section" bind="addr-b-bind">
+                  <my:addr id="addr-b-content-control"/>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+
+      val result =
+        Index.searchableValues(
+          formDoc                   = elemToDocumentInfo(formWithCustomOrder),
+          appForm                   = AppForm("acme", "ordered"),
+          searchVersionOpt          = None,
+          databaseDataFormatVersion = DataFormatVersion.V20191
+        ).controls
+
+      assert(
+        result.map(c => c.xpath -> c.sectionNameOpt) == List(
+          "addr-b/city" -> Some("addr-b"),
+          "main/second" -> None,
+          "addr-a/city" -> Some("addr-a"),
+          "main/first"  -> None,
+          "main/third"  -> None
+        )
+      )
+    }
+  }
 }

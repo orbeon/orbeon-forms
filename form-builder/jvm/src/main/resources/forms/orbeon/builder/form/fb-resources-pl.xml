@@ -643,6 +643,7 @@
             <label>Strona podsumowania</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Kolumny metadanych</title>
             <created><label>Utworzony</label></created>
             <last-modified><label>Zmodyfikowany</label></last-modified>
             <workflow-stage><label>Etap przepływu pracy</label></workflow-stage>
@@ -654,6 +655,14 @@
                 <item id="2">Ukryj</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Pola formularza</title>
+            <hint>Przeciągnij pola, aby wybrać ich kolejność na stronie podsumowania</hint>
+            <reset>Przywróć kolejność z formularza</reset>
+            <empty>Żadne kontrolki nie są oznaczone do wyświetlania na stronie podsumowania.</empty>
+            <move-up>Przenieś wyżej</move-up>
+            <move-down>Przenieś niżej</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Ustawienia kontrolki: "{1}" / "{0}" ({2})</label>
@@ -733,6 +742,8 @@
             <show>Pokaż na stronie podsumowania</show>
             <column-only>Tylko kolumna</column-only>
             <search-only>Tylko wyszukiwanie</search-only>
+            <position>Pozycja {0} z {1}</position>
+            <change-order>Zmień kolejność…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Zapisz dane</save-data>

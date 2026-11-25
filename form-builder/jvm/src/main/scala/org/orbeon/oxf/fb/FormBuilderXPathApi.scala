@@ -1903,6 +1903,18 @@ object FormBuilderXPathApi {
     }
 
   //@XPathFunction
+  def buildSummaryControlColumnsXml(): NodeInfo = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    SummaryOrderOps.buildSummaryControlColumnsXml
+  }
+
+  //@XPathFunction
+  def controlSummaryPositionInfo(controlName: String): NodeInfo = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    SummaryOrderOps.controlSummaryPositionInfo(controlName)
+  }
+
+  //@XPathFunction
   def isControlSummaryShow(controlName: String): Boolean = {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     FormRunner.findControlByName(controlName).exists { controlElem =>

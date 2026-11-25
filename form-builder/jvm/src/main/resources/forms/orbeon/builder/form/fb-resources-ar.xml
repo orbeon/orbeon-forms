@@ -643,6 +643,7 @@
             <label>صفحة الملخص</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>أعمدة البيانات الوصفية</title>
             <created><label>تم الإنشاء</label></created>
             <last-modified><label>تم التعديل</label></last-modified>
             <workflow-stage><label>مرحلة سير العمل</label></workflow-stage>
@@ -654,6 +655,14 @@
                 <item id="2">إخفاء</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>حقول النموذج</title>
+            <hint>اسحب الحقول لاختيار ترتيبها في صفحة الملخص</hint>
+            <reset>إعادة التعيين إلى ترتيب النموذج</reset>
+            <empty>لم يتم تحديد أي عناصر تحكم للعرض في صفحة الملخص.</empty>
+            <move-up>تحريك لأعلى</move-up>
+            <move-down>تحريك لأسفل</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>إعدادات عنصر التحكم: "{1}" / "{0}" ({2})</label>
@@ -733,6 +742,8 @@
             <show>عرض في صفحة الملخص</show>
             <column-only>عرض العمود فقط</column-only>
             <search-only>عرض البحث فقط</search-only>
+            <position>الموضع {0} من {1}</position>
+            <change-order>تغيير الترتيب…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>حفظ البيانات</save-data>

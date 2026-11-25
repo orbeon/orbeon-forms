@@ -643,6 +643,7 @@
             <label>Summary Page</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metadata Columns</title>
             <created><label>Created</label></created>
             <last-modified><label>Last Modified</label></last-modified>
             <workflow-stage><label>Workflow Stage</label></workflow-stage>
@@ -654,6 +655,14 @@
                 <item id="2">Hide</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Form Fields</title>
+            <hint>Drag fields to choose their order on the Summary page</hint>
+            <reset>Reset to form order</reset>
+            <empty>No controls are marked to show on the Summary page.</empty>
+            <move-up>Move up</move-up>
+            <move-down>Move down</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Control Settings: "{1}" / "{0}" ({2})</label>
@@ -751,6 +760,8 @@
             <show>Show on Summary page</show>
             <column-only>Show column only</column-only>
             <search-only>Show search only</search-only>
+            <position>Position {0} of {1}</position>
+            <change-order>Change order…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Save data</save-data>

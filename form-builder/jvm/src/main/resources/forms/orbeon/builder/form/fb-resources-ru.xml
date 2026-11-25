@@ -623,6 +623,7 @@
             <label>Сводная страница</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Столбцы метаданных</title>
             <created><label>Дата создания</label></created>
             <last-modified><label>Дата изменения</label></last-modified>
             <workflow-stage><label>Стадия рабочего процесса</label></workflow-stage>
@@ -634,6 +635,14 @@
                 <item id="2">Скрыть</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Поля формы</title>
+            <hint>Перетащите поля, чтобы выбрать их порядок на сводной странице</hint>
+            <reset>Сбросить к порядку в форме</reset>
+            <empty>Ни один элемент управления не отмечен для показа на сводной странице.</empty>
+            <move-up>Переместить вверх</move-up>
+            <move-down>Переместить вниз</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Настройки элемента: "{1}" / "{0}" ({2})</label>
@@ -713,6 +722,8 @@
             <show>Показывать на сводной странице</show>
             <column-only>Показывать только столбец</column-only>
             <search-only>Показывать только поиск</search-only>
+            <position>Позиция {0} из {1}</position>
+            <change-order>Изменить порядок…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Сохранить данные</save-data>

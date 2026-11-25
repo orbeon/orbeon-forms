@@ -1336,6 +1336,35 @@
                                         )
                                     )
                             )"/>
+
+                    <!-- Summary control columns order -->
+                    <xf:delete
+                        bind="summary-control-columns-bind"/>
+                    <xf:var
+                        name="summary-control-cols"
+                        value="event('summary-control-columns')/column[xxf:non-blank(@control)]"/>
+                    <xf:insert
+                        if="
+                            some $pos in 1 to count($summary-control-cols)
+                            satisfies xs:integer(($summary-control-cols[$pos]/@default-pos[. castable as xs:integer], $pos)[1]) != $pos"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'summary-control-columns',
+                                for $c in $summary-control-cols
+                                return
+                                    xf:element(
+                                        'column',
+                                        (
+                                            xf:attribute('control', string($c/@control)),
+                                            if (xxf:non-blank($c/@section-name)) then
+                                                xf:attribute('section-name', string($c/@section-name))
+                                            else
+                                                ()
+                                        )
+                                    )
+                            )"/>
                 </xf:action>
 
                 <xf:action
@@ -1491,6 +1520,12 @@
                     event="fb-dialog-control-settings-closed"
                     name="fb-sync-toolbar"
                     targetid="fr-form-model"/>
+                <xf:dispatch
+                    event="fb-open-summary-settings"
+                    name="fb-open-form-settings"
+                    targetid="open-form-settings-trigger">
+                    <xf:property name="initial-tab" value="'summary'"/>
+                </xf:dispatch>
             </fb:dialog-control-settings>
 
             <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>

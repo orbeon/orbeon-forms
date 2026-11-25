@@ -47,9 +47,26 @@
     }
 
     .xbl-fr-dnd-repeat {
+        &.fr-dnd-drop-indicator {
+            .xforms-dnd-handle {
+                cursor: grab;
+                touch-action: none;
+                -webkit-user-select: none;
+                user-select: none;
+
+                &:active {
+                    cursor: grabbing;
+                }
+            }
+        }
+
         .xforms-dnd-item.xforms-dnd-source {
             opacity: 0.45;
             transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
         }
 
         .xforms-dnd-item.xforms-dnd-mirror {

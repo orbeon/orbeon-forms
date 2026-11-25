@@ -114,6 +114,11 @@
                         ref="$instance-element/@direction"
                         value="if (exists($control-element/@direction)) then $control-element/@direction else 'asc'"/>
                 </xf:action>
+                <xf:var name="summary-pos-info" value="fbf:controlSummaryPositionInfo($i/original-control-name)"/>
+                <xf:setvalue ref="$i/fr-summary-show/@initially-enabled" value="$summary-pos-info/@initially-enabled"/>
+                <xf:setvalue ref="$i/fr-summary-show/@active-pos"        value="$summary-pos-info/@active-pos"/>
+                <xf:setvalue ref="$i/fr-summary-show/@new-pos"           value="$summary-pos-info/@new-pos"/>
+                <xf:setvalue ref="$i/fr-summary-show/@other-count"       value="$summary-pos-info/@other-count"/>
                 <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
                 <xf:setvalue ref="$i/fr-persist/@enabled" value="not(fbf:findBindByNameOrEmpty($i/control-name)/@fb:persist = 'false()')"/>
                 <!-- TODO: move this logic, also found in workflow20201, to a common component -->
@@ -1070,7 +1075,7 @@
 
                         <fr-persist             enabled=""/>
                         <fr-index               enabled=""/>
-                        <fr-summary-show        enabled="" role-required="" require-role-constraint="" legacy="">
+                        <fr-summary-show        enabled="" role-required="" require-role-constraint="" legacy="" initially-enabled="" active-pos="" new-pos="" other-count="">
                             <!--<require-role/>-->
                         </fr-summary-show>
                         <fr-allow-bulk-edit     enabled="" role-required="" require-role-constraint="" action="" process="">
@@ -2441,6 +2446,52 @@
                                                                     </xf:select1>
                                                                 </xf:case>
                                                             </xf:switch>
+
+                                                            <!-- Summary column position indicator + shortcut to Form Settings -> Summary Page -->
+                                                            <xf:group
+                                                                ref="$base-binding[$current-value = 'fr-summary-show' and data(@enabled)]"
+                                                                class="fb-control-settings-summary-order">
+                                                                <xf:var
+                                                                    name="summary-pos"
+                                                                    value="
+                                                                        if (@initially-enabled = 'true') then
+                                                                            xs:integer((@active-pos[. castable as xs:integer], 1)[1])
+                                                                        else
+                                                                            xs:integer((@new-pos[. castable as xs:integer], 1)[1])"/>
+                                                                <xf:var
+                                                                    name="summary-total"
+                                                                    value="xs:integer((@other-count[. castable as xs:integer], 0)[1]) + 1"/>
+
+                                                                <xh:span class="fb-control-settings-summary-position">
+                                                                    <xf:output
+                                                                        value="
+                                                                            xxf:format-message(
+                                                                                $resources/dialog-control-settings/summary-show/position,
+                                                                                ($summary-pos, $summary-total)
+                                                                            )"/>
+                                                                </xh:span>
+
+                                                                <xf:trigger
+                                                                    id="open-summary-order-button"
+                                                                    ref=".[not(fr:is-readonly-mode())]"
+                                                                    appearance="minimal"
+                                                                    class="fb-control-settings-summary-order-btn">
+                                                                    <xf:label ref="$resources/dialog-control-settings/summary-show/change-order"/>
+                                                                    <xf:action event="DOMActivate">
+                                                                        <xf:action if="$i/@valid = 'true'">
+                                                                            <xxf:hide dialog="dialog">
+                                                                                <xf:property name="fb-save" value="true()"/>
+                                                                            </xxf:hide>
+                                                                            <xf:setvalue ref="$li/lang"/>
+                                                                            <xf:dispatch name="fb-open-summary-settings" targetid="fb-dialog-control-settings"/>
+                                                                        </xf:action>
+                                                                        <xxf:setvisited
+                                                                            if="not($i/@valid = 'true')"
+                                                                            control="dialog"
+                                                                            recurse="true"/>
+                                                                    </xf:action>
+                                                                </xf:trigger>
+                                                            </xf:group>
 
                                                             <xf:switch caseref="$fr-index-sub-values">
                                                                 <xf:case value="true()">

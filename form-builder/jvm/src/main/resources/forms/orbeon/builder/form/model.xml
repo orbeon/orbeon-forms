@@ -534,6 +534,7 @@
                     <xf:bind id="nonrelevant-bind"                ref="nonrelevant"/>
                     <xf:bind id="xbl-bind"                        ref="xbl"/>
                     <xf:bind id="summary-metadata-columns-bind"   ref="summary-metadata-columns"/>
+                    <xf:bind id="summary-control-columns-bind"    ref="summary-control-columns"/>
                     <xf:bind id="library-versions-bind"           ref="library-versions">
                         <xf:bind
                             ref="_ | orbeon | app"

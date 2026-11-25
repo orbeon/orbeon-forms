@@ -136,25 +136,31 @@ trait FormDefinition {
     // or suggest-existing="true" (for Searchable Combobox distinct-values suggestions)
     val indexedControlBindPathHolders = {
       val bySubElementOrClass =
-        FormRunner.searchControlsInFormBySubElement(subElements = Set("*:index"),   databaseDataFormatVersion) ++
-        FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
+        FormRunner.searchControlsInFormByControlPredicateWithSectionTemplate(
+          controlPredicate  = nodeInfo => (nodeInfo / "*:index").nonEmpty,
+          dataFormatVersion = databaseDataFormatVersion
+        ) ++
+        FormRunner.searchControlsInFormByControlPredicateWithSectionTemplate(
+          controlPredicate  = frc.hasAnyClassPredicate(ClassesPredicate),
+          dataFormatVersion = databaseDataFormatVersion
+        )
 
-      val alreadyIndexedPaths = bySubElementOrClass.map(c => pathString(c.path)).toSet
+      val alreadyIndexedPaths = bySubElementOrClass.map { case (c, _) => pathString(c.path) }.toSet
 
       val bySuggestExisting =
-        FormRunner.searchControlsInFormByControlPredicate(
+        FormRunner.searchControlsInFormByControlPredicateWithSectionTemplate(
           controlPredicate  = _.attValueOpt("suggest-existing").contains("true"),
           dataFormatVersion = databaseDataFormatVersion
-        ).filterNot(c => alreadyIndexedPaths.contains(pathString(c.path)))
+        ).filterNot { case (c, _) => alreadyIndexedPaths.contains(pathString(c.path)) }
 
       bySubElementOrClass ++ bySuggestExisting
     }
 
     val distinctValuesOpt = searchVersionOpt.toSeq.map { searchVersion =>
-      val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>
+      val dynamicControlPaths = indexedControlBindPathHolders.filter { case (controlInfo, _) =>
         // Is the control databound/dynamic or open-selection single control (e.g. Searchable Combobox)?
         isDataboundControl(controlInfo.control) || isOpenSelectionSingleControl(controlInfo.control)
-      }.map { controlInfo =>
+      }.map { case (controlInfo, _) =>
         pathString(controlInfo.path)
       }
 
@@ -166,29 +172,37 @@ trait FormDefinition {
       controlDetails.path -> controlDetails.distinctValues
     }.toMap
 
-    val controls = indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
-      val controlName = FormRunner.getControlName(control)
-      val controlPath = pathString(path)
+    val rawControls = indexedControlBindPathHolders map {
+      case (ControlBindPathHoldersResources(control, bind, path, _, resources), sectionNameOpt) =>
+        val controlName = FormRunner.getControlName(control)
+        val controlPath = pathString(path)
 
-      val resourcesWithDynamicItems = distinctValuesByControlPath.get(controlPath) match {
-        case Some(distinctValues) =>
-          withDynamicItems(resources, distinctValues, preserveStaticItems = isOpenSelectionSingleControl(control))
-        case None =>
-          resources
-      }
+        val resourcesWithDynamicItems = distinctValuesByControlPath.get(controlPath) match {
+          case Some(distinctValues) =>
+            withDynamicItems(resources, distinctValues, preserveStaticItems = isOpenSelectionSingleControl(control))
+          case None =>
+            resources
+        }
 
-      IndexedControl(
-        name               = controlName,
-        xpath              = controlPath,
-        xsType             = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
-        control            = control.localname,
-        summarySettings    = summarySettings(control),
-        staticallyRequired = isBindRequired(bind),
-        htmlLabel          = FormRunner.hasHTMLMediatype(FormRunner.findControlOrSeparateLabelElem(control)),
-        resources          = resourcesWithDynamicItems.toList,
-        controlElem        = includeControlElem option control
-      )
+        IndexedControl(
+          name               = controlName,
+          xpath              = controlPath,
+          xsType             = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
+          control            = control.localname,
+          summarySettings    = summarySettings(control),
+          staticallyRequired = isBindRequired(bind),
+          htmlLabel          = FormRunner.hasHTMLMediatype(FormRunner.findControlOrSeparateLabelElem(control)),
+          resources          = resourcesWithDynamicItems.toList,
+          controlElem        = includeControlElem option control,
+          sectionNameOpt     = sectionNameOpt
+        )
     }
+
+    val customOrder = FormRunnerSummaryOrder.readSummaryControlColumns(ctx.metadataRootElemOpt)
+    val controls    =
+      FormRunnerSummaryOrder.sortBySummaryOrder(rawControls, customOrder) { ic =>
+        FormRunnerSummaryOrder.SummaryControlColumn(ic.name, ic.sectionNameOpt)
+      }
 
     SearchableValues(
       controls        = controls,

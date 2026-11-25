@@ -643,6 +643,7 @@
             <label>Sammanfattningssida</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metadatakolumner</title>
             <created><label>Skapad</label></created>
             <last-modified><label>Senast ändrad</label></last-modified>
             <workflow-stage><label>Arbetsflödessteg</label></workflow-stage>
@@ -654,6 +655,14 @@
                 <item id="2">Dölj</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Formulärfält</title>
+            <hint>Dra fälten för att välja deras ordning på sammanfattningssidan</hint>
+            <reset>Återställ till formulärordning</reset>
+            <empty>Inga kontroller är markerade för att visas på sammanfattningssidan.</empty>
+            <move-up>Flytta upp</move-up>
+            <move-down>Flytta ner</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Inställningar för kontroll: "{1}" / "{0}" ({2})</label>
@@ -733,6 +742,8 @@
             <show>Visa på sammanfattningssidan</show>
             <column-only>Visa bara kolumn</column-only>
             <search-only>Visa bara sökning</search-only>
+            <position>Position {0} av {1}</position>
+            <change-order>Ändra ordning…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Spara data</save-data>

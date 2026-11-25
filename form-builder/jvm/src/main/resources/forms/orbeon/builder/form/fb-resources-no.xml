@@ -623,6 +623,7 @@
             <label>Oppsummeringsside</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metadatakolonner</title>
             <created><label>Opprettet</label></created>
             <last-modified><label>Endret</label></last-modified>
             <workflow-stage><label>Arbeidsflytstadium</label></workflow-stage>
@@ -634,6 +635,14 @@
                 <item id="2">Skjul</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Skjemafelt</title>
+            <hint>Dra feltene for å velge rekkefølgen på sammendragssiden</hint>
+            <reset>Tilbakestill til skjemarekkefølge</reset>
+            <empty>Ingen kontroller er merket for visning på sammendragssiden.</empty>
+            <move-up>Flytt opp</move-up>
+            <move-down>Flytt ned</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Rediger elementdetaljer: "{1}" / "{0}" ({2})</label>
@@ -713,6 +722,8 @@
             <show>Vis på oppsummeringssiden</show>
             <column-only>Vis kun kolonne</column-only>
             <search-only>Vis kun søk</search-only>
+            <position>Posisjon {0} av {1}</position>
+            <change-order>Endre rekkefølge…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Lagre data</save-data>

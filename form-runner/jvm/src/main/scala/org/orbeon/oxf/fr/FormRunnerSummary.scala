@@ -326,11 +326,12 @@ trait FormRunnerSummary {
         s"xf:element('label'))[1]"
 
       PreparedSummaryColumn(
-        columnKey   = ic.xpath,
-        labelExpr   = labelExpr,
-        isSortable  = ! NonSortableControlLocalNames(ic.control),
-        controlElem = elem,
-        alignRight  = alignRight
+        columnKey        = ic.xpath,
+        summaryColumnKey = FormRunnerSummaryOrder.SummaryControlColumn(ic.name, ic.sectionNameOpt),
+        labelExpr        = labelExpr,
+        isSortable       = ! NonSortableControlLocalNames(ic.control),
+        controlElem      = elem,
+        alignRight       = alignRight
       )
     }
 
@@ -384,15 +385,16 @@ trait FormRunnerSummary {
         s"($$form-resources/*[local-name() = '$escapedResourceName']/label, xf:element('label'))[1]"
 
       PreparedSummaryColumn(
-        columnKey   = controlName,
-        labelExpr   = labelExpr,
-        isSortable  = false,
-        controlElem = elem,
-        alignRight  = alignRight
+        columnKey        = controlName,
+        summaryColumnKey = FormRunnerSummaryOrder.SummaryControlColumn(controlName, None),
+        labelExpr        = labelExpr,
+        isSortable       = false,
+        controlElem      = elem,
+        alignRight       = alignRight
       )
     }
 
-    // 2. Prepare visible summary controls in source document order (including non-indexed `<fr:summary-show/>` computed controls)
+    // 2. Prepare visible summary controls (defaulting to source document order, then applying `<summary-control-columns>` if present)
     val bodyElemOpt =
       frc.findFormRunnerBodyElem(formDoc) orElse
         (formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body"))
@@ -414,13 +416,16 @@ trait FormRunnerSummary {
 
     // Append any visible indexed controls outside the top-level body (e.g. inside section templates in `<xbl:xbl>`)
     val remainingIndexedColumns: List[PreparedSummaryColumn] =
-      for {
-        (ic, idx0)  <- allControls.zipWithIndex
-        if ic.summarySettings.show && ! matchedIndexedIndices.contains(idx0)
-        controlNode <- ic.controlElem
-      } yield prepareIndexedColumn(ic, idx0, controlNode)
+      allControls.zipWithIndex.flatMap { case (ic, idx0) =>
+        if (ic.summarySettings.show && ! matchedIndexedIndices.contains(idx0))
+          ic.controlElem.map(prepareIndexedColumn(ic, idx0, _))
+        else
+          None
+      }
 
-    val preparedColumns = bodyPreparedColumns ::: remainingIndexedColumns
+    val defaultPreparedColumns = bodyPreparedColumns ::: remainingIndexedColumns
+    val customOrder            = FormRunnerSummaryOrder.readSummaryControlColumns(frc.metadataInstanceRootOpt(formDoc))
+    val preparedColumns        = FormRunnerSummaryOrder.sortBySummaryOrder(defaultPreparedColumns, customOrder)(_.summaryColumnKey)
 
     // 3. Populate `<xh:tr id="fr-summary-header-row">`
     val headerRowElem =
@@ -655,11 +660,12 @@ object FormRunnerSummary extends FormRunnerSummary {
   private val VarRefFallbackRegex = """\$([A-Za-z_][\w.\-]*)""".r
 
   private case class PreparedSummaryColumn(
-    columnKey  : String,
-    labelExpr  : String,
-    isSortable : Boolean,
-    controlElem: dom.Element,
-    alignRight : Boolean
+    columnKey       : String,
+    summaryColumnKey: FormRunnerSummaryOrder.SummaryControlColumn,
+    labelExpr       : String,
+    isSortable      : Boolean,
+    controlElem     : dom.Element,
+    alignRight      : Boolean
   )
 
   private def isComputedSummaryShowControl(control: NodeInfo): Boolean =

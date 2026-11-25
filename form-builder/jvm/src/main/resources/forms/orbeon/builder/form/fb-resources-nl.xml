@@ -624,6 +624,7 @@
             <label>Overzichtspagina</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metagegevenskolommen</title>
             <created><label>Aangemaakt</label></created>
             <last-modified><label>Bewerkt</label></last-modified>
             <workflow-stage><label>Workflowfase</label></workflow-stage>
@@ -635,6 +636,14 @@
                 <item id="2">Verbergen</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Formuliervelden</title>
+            <hint>Versleep velden om hun volgorde op de overzichtspagina te kiezen</hint>
+            <reset>Formuliervolgorde herstellen</reset>
+            <empty>Er zijn geen besturingselementen gemarkeerd om op de overzichtspagina te tonen.</empty>
+            <move-up>Omhoog verplaatsen</move-up>
+            <move-down>Omlaag verplaatsen</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Control-instellingen: "{1}" / "{0}" ({2})</label>
@@ -714,6 +723,8 @@
             <show>Tonen op overzichtspagina</show>
             <column-only>Alleen kolom tonen</column-only>
             <search-only>Alleen zoeken tonen</search-only>
+            <position>Positie {0} van {1}</position>
+            <change-order>Volgorde wijzigen…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Gegevens opslaan</save-data>

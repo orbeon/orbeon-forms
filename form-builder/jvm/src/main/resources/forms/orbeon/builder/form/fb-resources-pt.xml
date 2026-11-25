@@ -624,6 +624,7 @@
             <label>Página de sumário</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Colunas de metadados</title>
             <created><label>Criado</label></created>
             <last-modified><label>Modificado</label></last-modified>
             <workflow-stage><label>Estado do fluxo de trabalho</label></workflow-stage>
@@ -635,6 +636,14 @@
                 <item id="2">Ocultar</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Campos do formulário</title>
+            <hint>Arraste os campos para escolher a ordem na página de resumo</hint>
+            <reset>Repor a ordem do formulário</reset>
+            <empty>Nenhum controlo está marcado para ser apresentado na página de resumo.</empty>
+            <move-up>Mover para cima</move-up>
+            <move-down>Mover para baixo</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Configurações do Controlo: "{1}" / "{0}" ({2})</label>
@@ -714,6 +723,8 @@
             <show>Mostrar na página de Sumário</show>
             <column-only>Mostrar apenas coluna</column-only>
             <search-only>Mostrar apenas pesquisa</search-only>
+            <position>Posição {0} de {1}</position>
+            <change-order>Alterar ordem…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Guardar dados</save-data>

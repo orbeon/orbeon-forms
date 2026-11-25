@@ -3405,6 +3405,25 @@ body.orbeon {
                     margin-left: 40px;
                 }
 
+                .fb-control-settings-summary-order {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin: 2px 0 6px 60px;
+
+                    .fb-control-settings-summary-position {
+                        color: var(--orbeon-hint-color);
+                        font-size: .92em;
+                    }
+
+                    .fb-control-settings-summary-order-btn button.btn-link {
+                        padding: 0;
+                        font-size: .92em;
+                        vertical-align: baseline;
+                    }
+                }
+
                 .fb-role-required-checkbox {
                     .xforms-items {
                         margin-left: 60px;
@@ -3530,6 +3549,19 @@ body.orbeon {
     }
 
     .fb-dialog-form-settings-summary {
+        .fb-dialog-form-settings-summary-columns {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            column-gap: 24px;
+            align-items: start;
+        }
+
+        .fb-summary-metadata-section > .xforms-label,
+        .fb-summary-fields-header .xforms-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
         .fb-dialog-form-settings-summary-row {
             display: grid;
             grid-template-columns: max-content 1fr;
@@ -3569,6 +3601,216 @@ body.orbeon {
             // TODO: workaround for the help icon appearing above the checkbox
             .fb-role-required-checkbox .xforms-help {
                 display: none;
+            }
+        }
+
+        .fb-summary-fields-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+
+            .fb-summary-fields-title-wrap {
+                .xforms-label {
+                    margin-bottom: 2px;
+                }
+
+                .fb-summary-fields-hint {
+                    display: block;
+                    color: var(--orbeon-hint-color);
+                    font-size: .92em;
+                }
+            }
+
+            .fb-summary-reset-order-btn button.btn-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 2px 6px;
+                font-size: .92em;
+                white-space: nowrap;
+            }
+        }
+
+        .fb-summary-fields-empty {
+            display: block;
+            padding: 14px 16px;
+            color: var(--orbeon-hint-color);
+            background-color: var(--orbeon-fb-background-color);
+            border: 1px dashed var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-control-border-radius);
+        }
+
+        .fb-summary-fields-sr-status {
+            position: absolute;
+            clip-path: inset(50%);
+            overflow: hidden;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            white-space: nowrap;
+        }
+
+        .fb-summary-fields-list-wrap {
+            display: block;
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 4px 6px;
+
+            .xbl-fr-dnd-repeat {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                & > .xforms-repeat-begin-end,
+                & > .xforms-repeat-delimiter,
+                & > .xforms-repeat-template {
+                    display: none !important;
+                }
+            }
+        }
+
+        .fb-summary-field-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background-color: var(--orbeon-form-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-control-border-radius);
+
+            &.xforms-dnd-moves:hover {
+                background-color: var(--orbeon-fb-hover-background-color);
+            }
+
+            .fb-summary-field-drag-handle {
+                flex: 0 0 auto;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 24px;
+                color: var(--orbeon-hint-color);
+                cursor: grab;
+                touch-action: none;
+                -webkit-user-select: none;
+                user-select: none;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+
+                &:active {
+                    cursor: grabbing;
+                }
+
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-base-color);
+                    }
+                }
+            }
+
+            .fb-summary-field-pos {
+                flex: 0 0 auto;
+                min-width: 22px;
+                height: 22px;
+                padding: 0 6px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: .85em;
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+                color: var(--orbeon-hint-color);
+                background-color: var(--orbeon-fb-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: 999px;
+                box-sizing: border-box;
+            }
+
+            .fb-summary-field-info {
+                flex: 1 1 auto;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+
+                .fb-summary-field-label {
+                    color: var(--orbeon-base-color);
+                    font-weight: 500;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .fb-summary-field-section {
+                    color: var(--orbeon-hint-color);
+                    font-size: .85em;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            .fb-summary-field-code {
+                flex: 0 1 auto;
+                max-width: 180px;
+                padding: 1px 6px;
+                font-size: .85em;
+                color: var(--orbeon-hint-color);
+                background-color: var(--orbeon-fb-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: var(--orbeon-control-border-radius);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .fb-summary-field-actions {
+                flex: 0 0 auto;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+
+                .fb-summary-field-move-btn {
+                    margin: 0;
+
+                    button.btn-link {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 24px;
+                        min-height: 24px;
+                        padding: 0;
+                        margin: 0;
+                        border: 1px solid transparent;
+                        border-radius: var(--orbeon-control-border-radius);
+                        color: var(--orbeon-hint-color);
+                        text-decoration: none;
+                        box-shadow: none;
+
+                        @media (hover: hover) {
+                            &:hover {
+                                color: var(--orbeon-base-color);
+                                background-color: var(--orbeon-pill-muted-background-color);
+                                border-color: var(--orbeon-pill-muted-border-color);
+                            }
+                        }
+
+                        &:focus-visible {
+                            outline: 2px solid var(--orbeon-focus-border-color);
+                            outline-offset: -2px;
+                        }
+                    }
+
+                    &.fb-summary-field-move-btn-disabled button.btn-link {
+                        opacity: 0.32;
+                        cursor: default;
+                    }
+                }
             }
         }
     }

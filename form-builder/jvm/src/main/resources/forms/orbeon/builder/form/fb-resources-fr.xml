@@ -641,6 +641,7 @@
             <label>Page de sommaire</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Colonnes de métadonnées</title>
             <created><label>Date de création</label></created>
             <last-modified><label>Dernière modification</label></last-modified>
             <workflow-stage><label>Étape du processus</label></workflow-stage>
@@ -652,6 +653,14 @@
                 <item id="2">Masquer</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Champs du formulaire</title>
+            <hint>Faites glisser les champs pour choisir leur ordre sur la page Récapitulatif</hint>
+            <reset>Rétablir l'ordre du formulaire</reset>
+            <empty>Aucun contrôle n'est configuré pour s'afficher sur la page Récapitulatif.</empty>
+            <move-up>Monter</move-up>
+            <move-down>Descendre</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Paramètres du contrôle: "{1}" / "{0}" ({2})</label>
@@ -749,6 +758,8 @@
             <show>Inclure dans le sommaire</show>
             <column-only>Afficher la colonne uniquement</column-only>
             <search-only>Afficher la recherche uniquement</search-only>
+            <position>Position {0} sur {1}</position>
+            <change-order>Modifier l'ordre…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Sauvegarder les données</save-data>

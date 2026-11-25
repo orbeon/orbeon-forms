@@ -305,24 +305,32 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     dataFormatVersion : DataFormatVersion // used to adjust `path`
   )(implicit
     ctx               : FormRunnerDocContext
-  ): List[ControlBindPathHoldersResources] = {
+  ): List[ControlBindPathHoldersResources] =
+    searchControlsInFormByControlPredicateWithSectionTemplate(controlPredicate, dataFormatVersion).map(_._1)
+
+  def searchControlsInFormByControlPredicateWithSectionTemplate(
+    controlPredicate  : NodeInfo => Boolean,
+    dataFormatVersion : DataFormatVersion // used to adjust `path`
+  )(implicit
+    ctx               : FormRunnerDocContext
+  ): List[(ControlBindPathHoldersResources, Option[String])] = {
     val headOpt = (ctx.formDefinitionRootElem / "*:head").headOption
-    val controlBindPathHoldersResourcesList = {
+    val controlBindPathHoldersResourcesList: List[(ControlBindPathHoldersResources, Option[String])] = {
 
       val topLevelOnly =
         frc.searchControlsTopLevelOnly(
           data      = None,
           predicate = controlPredicate
-        )
+        ).map(_ -> None)
 
       val withSectionTemplatesOpt =
         headOpt map { head =>
-          frc.searchControlsUnderSectionTemplates(
+          frc.searchControlsUnderSectionTemplatesWithSectionName(
             head             = head,
             data             = None,
             sectionPredicate = _ => true,
             controlPredicate = controlPredicate
-          )
+          ).map { case (cbphr, sectionName) => cbphr -> Some(sectionName) }
         }
 
       topLevelOnly ++: withSectionTemplatesOpt.toList.flatten
@@ -344,11 +352,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             json         <- findMigrationForVersion(metadataElem, ops.version)
           } yield
             ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
-        controlBindPathHoldersResourcesList map { controlBindPathHoldersResources =>
+        controlBindPathHoldersResourcesList map { case (controlBindPathHoldersResources, sectionNameOpt) =>
           val path = controlBindPathHoldersResources.path
           val adjustedBindPathElems =
             (pathMigrationFunctions.iterator flatMap (_.apply(path))).nextOption() getOrElse path
-          controlBindPathHoldersResources.copy(path = adjustedBindPathElems)
+          controlBindPathHoldersResources.copy(path = adjustedBindPathElems) -> sectionNameOpt
         }
     }
   }
@@ -373,6 +381,21 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   )(implicit
     ctx              : FormRunnerDocContext
   ): collection.Seq[ControlBindPathHoldersResources] =
+    searchControlsUnderSectionTemplatesWithSectionName(
+      head             = head,
+      data             = data,
+      sectionPredicate = sectionPredicate,
+      controlPredicate = controlPredicate
+    ).map(_._1)
+
+  def searchControlsUnderSectionTemplatesWithSectionName(
+    head             : NodeInfo,
+    data             : Option[NodeInfo],
+    sectionPredicate : NodeInfo => Boolean,
+    controlPredicate : NodeInfo => Boolean
+  )(implicit
+    ctx              : FormRunnerDocContext
+  ): collection.Seq[(ControlBindPathHoldersResources, String)] =
     for {
       section         <- frc.findSectionsWithTemplates
       if sectionPredicate(section)
@@ -403,7 +426,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
                          predicate      = controlPredicate
                        )(new InDocFormRunnerDocContext(xblBinding))
     } yield
-      ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels)
+      ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels) -> sectionName
 
   // NOTE: Return at most one `ControlBindPathHoldersResources` per incoming control element.
   def searchControlBindPathHoldersInDoc(

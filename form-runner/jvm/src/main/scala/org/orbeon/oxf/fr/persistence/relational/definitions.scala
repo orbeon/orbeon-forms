@@ -73,7 +73,8 @@ case class IndexedControl(
   staticallyRequired : Boolean,
   htmlLabel          : Boolean,
   resources          : List[(String, NodeInfo)],
-  controlElem        : Option[NodeInfo] = None
+  controlElem        : Option[NodeInfo] = None,
+  sectionNameOpt     : Option[String]   = None
 ) {
   def toXML: Elem =
     <query

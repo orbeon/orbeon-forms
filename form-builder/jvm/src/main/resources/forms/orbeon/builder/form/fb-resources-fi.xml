@@ -644,6 +644,7 @@
             <label>Yhteenvetosivu</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metatietosarakkeet</title>
             <created><label>Luotu</label></created>
             <last-modified><label>Muokattu</label></last-modified>
             <workflow-stage><label>Työvaihe</label></workflow-stage>
@@ -655,6 +656,14 @@
                 <item id="2">Piilota</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Lomakkeen kentät</title>
+            <hint>Valitse kenttien järjestys yhteenvetosivulla vetämällä niitä</hint>
+            <reset>Palauta lomakkeen järjestys</reset>
+            <empty>Yhtään ohjausobjektia ei ole merkitty näytettäväksi yhteenvetosivulla.</empty>
+            <move-up>Siirrä ylös</move-up>
+            <move-down>Siirrä alas</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
@@ -734,6 +743,8 @@
             <show>Näytä yhteenvetosivulla</show>
             <column-only>Näytä vain sarake</column-only>
             <search-only>Näytä vain haku</search-only>
+            <position>Sijainti {0}/{1}</position>
+            <change-order>Muuta järjestystä…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Tallenna tiedot</save-data>

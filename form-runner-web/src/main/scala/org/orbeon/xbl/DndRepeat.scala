@@ -119,6 +119,9 @@ object DndRepeat {
     private def orbeonRootEl: html.Element =
       dom.document.querySelectorOpt(".orbeon").getOrElse(dom.document.body)
 
+    private def overlayContainerEl: html.Element =
+      containerElem.closestOpt("dialog, .xforms-dialog").getOrElse(orbeonRootEl)
+
     private def onPointerDown(event: dom.PointerEvent): Unit =
       if (event.button == 0 && lineDragState.isEmpty) {
         for {
@@ -256,7 +259,7 @@ object DndRepeat {
         val indicator       = dom.document.createDivElement
         indicator.className = "fr-dnd-drop-indicator-line"
         indicator.hide()
-        orbeonRootEl.appendChild(indicator)
+        overlayContainerEl.appendChild(indicator)
         indicatorElOpt = Some(indicator)
       }
     }

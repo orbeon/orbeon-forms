@@ -635,6 +635,7 @@
             <label>Übersichtsseite</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Metadatenspalten</title>
             <created><label>Erstellt</label></created>
             <last-modified><label>Geändert am</label></last-modified>
             <workflow-stage><label>Workflow-Stufe</label></workflow-stage>
@@ -646,6 +647,14 @@
                 <item id="2">Ausblenden</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Formularfelder</title>
+            <hint>Ziehen Sie Felder, um ihre Reihenfolge auf der Übersichtsseite festzulegen</hint>
+            <reset>Auf Formularreihenfolge zurücksetzen</reset>
+            <empty>Keine Steuerelemente sind für die Anzeige auf der Übersichtsseite markiert.</empty>
+            <move-up>Nach oben</move-up>
+            <move-down>Nach unten</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Einstellungen Steuerelemente: "{1}" / "{0}" ({2})</label>
@@ -725,6 +734,8 @@
             <show>In der Übersicht anzeigen</show>
             <column-only>Nur Spalte anzeigen</column-only>
             <search-only>Nur in der Suche anzeigen</search-only>
+            <position>Position {0} von {1}</position>
+            <change-order>Reihenfolge ändern…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Daten speichern</save-data>

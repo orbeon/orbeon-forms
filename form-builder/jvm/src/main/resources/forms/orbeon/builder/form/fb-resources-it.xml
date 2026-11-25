@@ -631,6 +631,7 @@
             <label>Pagina Sommario</label>
         </summary-tab>
         <summary-metadata-columns>
+            <title>Colonne dei metadati</title>
             <created><label>Creato</label></created>
             <last-modified><label>Modificato</label></last-modified>
             <workflow-stage><label>Fase del workflow</label></workflow-stage>
@@ -642,6 +643,14 @@
                 <item id="2">Nascondi</item>
             </show>
         </summary-metadata-columns>
+        <summary-control-columns>
+            <title>Campi del modulo</title>
+            <hint>Trascina i campi per sceglierne l'ordine nella pagina di riepilogo</hint>
+            <reset>Ripristina l'ordine del modulo</reset>
+            <empty>Nessun controllo è contrassegnato per essere mostrato nella pagina di riepilogo.</empty>
+            <move-up>Sposta su</move-up>
+            <move-down>Sposta giù</move-down>
+        </summary-control-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Impostazioni di controllo: "{1}" / "{0}" ({2})</label>
@@ -721,6 +730,8 @@
             <show>Mostra nella pagina Sommario</show>
             <column-only>Mostra solo colonna</column-only>
             <search-only>Mostra solo ricerca</search-only>
+            <position>Posizione {0} di {1}</position>
+            <change-order>Modifica ordine…</change-order>
         </summary-show>
         <bulk-edit-actions>
             <save-data>Salva dati</save-data>

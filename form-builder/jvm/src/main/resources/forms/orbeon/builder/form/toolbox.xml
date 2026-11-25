@@ -43,10 +43,11 @@
                         name="toolbox.open-form-settings">
                     <xf:label><xh:i class="fa fa-cogs fa-fw"/></xf:label>
                     <xf:hint ref="$form-resources/dialog-form-settings/open/label"/>
-                    <xf:action ev:event="DOMActivate">
+                    <xf:action ev:event="DOMActivate fb-open-form-settings">
                         <!-- Open the dialog in "edit" mode -->
                         <xxf:show dialog="dialog-form-settings">
                             <xf:property name="for-button-name"                           value="event('for-button-name')"/>
+                            <xf:property name="initial-tab"                               value="event('initial-tab')"/>
                             <xf:property name="lang"                                      value="$fb-lang"/>
                             <xf:property name="mode"                                      value="(event('mode'), 'form-settings')[1]"/>
                             <xf:property name="app"                                       value="bind('application-name-bind')"/>

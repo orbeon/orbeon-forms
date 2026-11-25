@@ -1285,5 +1285,142 @@ class SummaryDynamicTest
         }
       }
     }
+
+    it("must honor `<summary-control-columns>` across indexed, computed `<fr:summary-show/>`, and section-template columns while keeping binds aligned") {
+      val orderedForm =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <main>
+                    <first-col/>
+                    <second-col/>
+                    <unlisted-col/>
+                  </main>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-bind" name="main" ref="main">
+                  <xf:bind id="first-col-bind" name="first-col" ref="first-col"/>
+                  <xf:bind id="second-col-bind" name="second-col" ref="second-col"/>
+                  <xf:bind id="unlisted-col-bind" name="unlisted-col" ref="unlisted-col"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>acme</application-name>
+                  <form-name>reordered</form-name>
+                  <summary-control-columns>
+                    <column control="computed-full"/>
+                    <column control="second-col"/>
+                    <column control="first-col"/>
+                  </summary-control-columns>
+                </metadata>
+              </xf:instance>
+              <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                  <resource xml:lang="en">
+                    <main><label>Main</label></main>
+                    <first-col><label>First</label></first-col>
+                    <second-col><label>Second</label></second-col>
+                    <computed-full><label>Computed Full</label></computed-full>
+                    <unlisted-col><label>Unlisted</label></unlisted-col>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="main-section" bind="main-bind">
+                  <fr:grid id="main-grid">
+                    <fr:c x="1" y="1" w="3">
+                      <xf:input id="first-col-control" bind="first-col-bind">
+                        <xf:label ref="$form-resources/first-col/label"/>
+                        <fr:index><fr:summary-show/></fr:index>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="4" y="1" w="3">
+                      <xf:input id="second-col-control" bind="second-col-bind">
+                        <xf:label ref="$form-resources/second-col/label"/>
+                        <fr:index><fr:summary-show/></fr:index>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="7" y="1" w="3">
+                      <xf:output id="computed-full-control" value="concat($first-col, '/', $second-col)">
+                        <xf:label ref="$form-resources/computed-full/label"/>
+                        <fr:summary-show/>
+                      </xf:output>
+                    </fr:c>
+                    <fr:c x="10" y="1" w="3">
+                      <xf:input id="unlisted-col-control" bind="unlisted-col-bind">
+                        <xf:label ref="$form-resources/unlisted-col/label"/>
+                        <fr:index><fr:summary-show/></fr:index>
+                      </xf:input>
+                    </fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+
+      val builtNode =
+        FormRunnerSummary.buildSummaryDynamicFormImpl(
+          formDoc                   = elemToDocumentInfo(orderedForm),
+          templateNode              = summaryTemplateNode,
+          appForm                   = AppForm("acme", "reordered"),
+          databaseDataFormatVersion = DataFormatVersion.V20191,
+          resourcesRootElemOpt      = None,
+          functionLibrary           = FormRunnerFunctionLibrary
+        )
+
+      val domRoot = StaticXPath.tinyTreeToOrbeonDom(builtNode).getRootElement
+
+      // Header column order: `computed-full`, `main/second-col`, `main/first-col`, then unlisted `main/unlisted-col`
+      val sortableThs =
+        domRoot.descendantElementIterator(includeSelf = true)
+          .filter(_.getName == "sortable-th")
+          .filter(_.attributeValue("column") != "{$column}")
+          .toList
+
+      assert(sortableThs.map(_.attributeValue("column")) == List(
+        "computed-full",
+        "main/second-col",
+        "main/first-col",
+        "main/unlisted-col"
+      ))
+
+      // Body cell controls follow the exact same order, with binds matching reordered `allControls` (`second-col` -> pos 1, `first-col` -> pos 2, `unlisted-col` -> pos 3)
+      val cellControls =
+        domRoot.descendantElementIterator(includeSelf = true)
+          .filter(_.attributeValue("class") == "fr-summary-cell-value")
+          .flatMap(_.elements)
+          .toList
+
+      assert(cellControls.map(_.attributeValue("id")) == List(
+        "fr-summary-computed-col-1-control",
+        "fr-summary-col-1-control",
+        "fr-summary-col-2-control",
+        "fr-summary-col-3-control"
+      ))
+
+      val col1Bind = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "fr-col-1-bind").get
+      val col2Bind = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "fr-col-2-bind").get
+      assert(col1Bind.attributeValue("ref") == "(detail[@path = 'main/second-col'], detail[1])[1]")
+      assert(col2Bind.attributeValue("ref") == "(detail[@path = 'main/first-col'], detail[2])[1]")
+
+      // Injected `$first-col` and `$second-col` variables point to the reordered `detailPos`
+      val repeatElem = domRoot.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == "documents-repeat").get
+      val varsByName = repeatElem.elements.filter(_.getName == "var").map(v => v.attributeValue("name") -> v.attributeValue("value")).toMap
+      assert(varsByName("second-col") == "details/(detail[@path = 'main/second-col'], detail[1])[1]")
+      assert(varsByName("first-col")  == "details/(detail[@path = 'main/first-col'], detail[2])[1]")
+    }
   }
 }

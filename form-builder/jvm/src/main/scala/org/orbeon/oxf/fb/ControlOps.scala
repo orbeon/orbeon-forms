@@ -970,6 +970,27 @@ trait ControlOps extends ResourcesOps {
       (emailTemplates / "enable-if-true").foreach(renameNodeContent(_, avt = false))
     }
 
+    // Update Summary control column ordering in form metadata
+    locally {
+      val summaryControlCols =
+        ctx.metadataRootElemOpt.toList /
+          org.orbeon.oxf.fr.FormRunnerSummaryOrder.SummaryControlColumnsElemName /
+          org.orbeon.oxf.fr.FormRunnerSummaryOrder.ColumnElemName
+
+      // Top-level `@control` (skip when `@section-name` targets a section template)
+      summaryControlCols
+        .filter(_.attValueNonBlankOpt(org.orbeon.oxf.fr.FormRunnerSummaryOrder.SectionNameAttName).isEmpty)
+        .flatMap(_ /@ org.orbeon.oxf.fr.FormRunnerSummaryOrder.ControlAttName)
+        .filter(_.stringValue == oldName)
+        .foreach(updateNode(newName))
+
+      // Section template host `@section-name`
+      summaryControlCols
+        .flatMap(_ /@ org.orbeon.oxf.fr.FormRunnerSummaryOrder.SectionNameAttName)
+        .filter(_.stringValue == oldName)
+        .foreach(updateNode(newName))
+    }
+
     // Update new actions
     locally {
 

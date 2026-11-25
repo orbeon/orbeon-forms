@@ -22,7 +22,6 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, SafeReques
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ResourceServer
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.oxf.util.Logging.*
@@ -196,7 +195,7 @@ object XFormsAssetServerRoute extends NativeRoute {
           // NOTE: The validity is the time the static state was put in cache. We could do better by finding the last modified time
           // of the form definition, but that information is harder to obtain right now.
           response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
-          response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+          response.setImmutableResourceCaching(validity)
 
           IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
             ScriptBuilder.writeScripts(
@@ -216,8 +215,7 @@ object XFormsAssetServerRoute extends NativeRoute {
             response.setContentType(ContentTypes.CssContentTypeWithCharset)
             // Make sure the CSS is only interpreted as CSS
             response.setHeader("X-Content-Type-Options", "nosniff")
-            // Use expiration far in the future, as the path changes with the content
-            response.setResourceCaching(requestTime, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+            response.setImmutableResourceCaching(requestTime)
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8))(_.write(css))
           case None =>
             response.setStatus(StatusCode.NotFound)
@@ -350,8 +348,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
     // Set Last-Modified, required for caching and conditional get
     if (URLRewriterUtils.isResourcesVersioned)
-      // Use expiration far in the future
-      response.setResourceCaching(combinedLastModified, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+      response.setImmutableResourceCaching(combinedLastModified)
     else
       // Use standard expiration policy
       response.setResourceCaching(combinedLastModified, 0)

@@ -37,7 +37,6 @@ import java.util.List;
 public class ResourceServer extends ProcessorImpl {
 
     public static final String RESOURCE_SERVER_NAMESPACE_URI = "http://www.orbeon.com/oxf/resource-server";
-    public static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
     public ResourceServer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, RESOURCE_SERVER_NAMESPACE_URI));
@@ -95,8 +94,7 @@ public class ResourceServer extends ProcessorImpl {
 
                 // Set Last-Modified, required for caching and conditional get
                 if (isVersioned) {
-                    // Use expiration far in the future
-                    response.setResourceCaching(lastModified, System.currentTimeMillis() + ONE_YEAR_IN_MILLISECONDS);
+                    response.setImmutableResourceCaching(lastModified);
                 } else {
                     // Use standard expiration policy
                     response.setResourceCaching(lastModified, 0);

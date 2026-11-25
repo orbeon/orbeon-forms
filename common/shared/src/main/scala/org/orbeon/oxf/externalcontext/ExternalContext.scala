@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.StringUtils.*
 
 import scala.jdk.CollectionConverters.*
 import scala.collection.immutable
+import scala.concurrent.duration.DurationInt
 import scala.util.control.NonFatal
 
 
@@ -113,6 +114,8 @@ object CredentialsSupport {
   * interface.
   */
 object ExternalContext {
+
+  private val ImmutableResourceExpiration = 365.days
 
   val EmbeddableParam                          = "orbeon-embeddable"
 
@@ -272,6 +275,10 @@ object ExternalContext {
       * @param expires      requested expiration, or <=0 if unknown or to trigger default policy
       */
     def setResourceCaching(lastModified: Long, expires: Long): Unit
+
+    // For a resource whose URL changes with its content or with its version: the content at a given URL never changes
+    def setImmutableResourceCaching(lastModified: Long): Unit =
+      setResourceCaching(lastModified, System.currentTimeMillis + ImmutableResourceExpiration.toMillis)
 
     def checkIfModifiedSince(request: Request, lastModified: Long): Boolean
 

@@ -1719,13 +1719,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/system-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="system-grid" ref="$active-scope/curated/system">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -1813,13 +1806,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/appearance-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="appearance-grid" ref="$active-scope/curated/appearance">
                                     <fr:c x="1" y="1" w="12">
@@ -2147,13 +2133,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/navbar-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="navbar-grid" ref="$active-scope/curated/navbar">
                                     <fr:c x="1" y="1" w="12">
@@ -2264,13 +2243,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/resources-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:resources-editor
                                     id="global-resources-editor"
@@ -2295,13 +2267,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/landing-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="landing-grid" ref="$active-scope/curated/landing">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -2353,13 +2318,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/summary-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="summary-grid" ref="$active-scope/curated/summary">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -2527,13 +2485,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/detail-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="detail-grid" ref="$active-scope/curated/detail">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -3111,13 +3062,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/wizard-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="wizard-grid" ref="$active-scope/curated/wizard">
                                     <fr:c x="1" y="1" w="12">
@@ -3273,13 +3217,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/formulas-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="formulas-grid" ref="$active-scope/curated/formulas">
                                     <fr:c x="1" y="1" w="12">
@@ -3376,13 +3313,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/processes-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
 
                                 <!-- Toolbar: Override Built-in Process + Add Custom Process -->
@@ -3572,13 +3502,6 @@
                                         <xh:h3 class="fr-config-category-title">
                                             <xf:output ref="$form-resources/control-settings-section/label"/>
                                         </xh:h3>
-                                        <xh:span class="fr-config-scope-context-pill">
-                                            <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                            <xf:output value="$active-scope-display"/>
-                                            <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                                <xf:output value="$active-scope-profiles"/>
-                                            </xh:span>
-                                        </xh:span>
                                     </xh:div>
 
                                     <!-- Toolbar: Searchable Control Picker + Configure Button -->
@@ -3704,13 +3627,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/admin-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="admin-grid" ref="$active-scope/curated/admin">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -3789,13 +3705,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/pdf-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="pdf-grid" ref="$active-scope/curated/pdf">
                                     <fr:c x="1" y="1" w="12">
@@ -4024,13 +3933,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/email-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="email-grid" ref="$active-scope/curated/email">
                                     <fr:c x="1" y="1" w="12">
@@ -4276,13 +4178,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/import-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="import-grid" ref="$active-scope/curated/import">
                                     <fr:c x="1" y="1" w="12">
@@ -4408,13 +4303,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/form-builder-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="form-builder-grid" ref="$active-scope/curated/form-builder">
                                     <fr:c x="1" y="1" w="12">
@@ -4705,13 +4593,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/security-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="security-grid" ref="$active-scope/curated/security">
                                     <fr:c x="1" y="1" w="12">
@@ -4864,13 +4745,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/formats-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <fr:grid id="formats-grid" ref="$active-scope/curated/formats">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
@@ -4987,13 +4861,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/caches-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw {if ($is-global-scope or $active-override/@app = '*') then 'fa-globe' else if ($active-override/@form = '*') then 'fa-cube' else 'fa-file-lines'}" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                        <xh:span class="fr-config-profile-badge {'xforms-hidden'[xxf:is-blank($active-scope-profiles)]}">
-                                            <xf:output value="$active-scope-profiles"/>
-                                        </xh:span>
-                                    </xh:span>
                                 </xh:div>
                                 <xh:div class="fr-config-subgroups">
                                     <xh:div class="fr-config-subgroup">
@@ -5364,10 +5231,6 @@
                                     <xh:h3 class="fr-config-category-title">
                                         <xf:output ref="$form-resources/custom-properties-section/label"/>
                                     </xh:h3>
-                                    <xh:span class="fr-config-scope-context-pill">
-                                        <xh:i class="fa fa-fw fa-globe" aria-hidden="true"/>
-                                        <xf:output value="$active-scope-display"/>
-                                    </xh:span>
                                 </xh:div>
                                 <xf:group
                                     id="custom-properties-filter-group"

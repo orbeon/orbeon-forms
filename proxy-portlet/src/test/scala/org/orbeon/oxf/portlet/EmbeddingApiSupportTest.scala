@@ -32,6 +32,7 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
     List(
       s"/xforms-server/${optionalPath1}orbeon-6894eff3d69256b3d8e076b0b689b84d810606af.css",
       s"/xforms-server/${optionalPath1}orbeon-b1e8ca0abe4480447f361045b4620f13e92a0953.js",
+      s"/xforms-server/form/style/6894eff3d69256b3d8e076b0b689b84d810606af.css",
 
       s"/xforms-server",
       s"/xforms-server/upload",

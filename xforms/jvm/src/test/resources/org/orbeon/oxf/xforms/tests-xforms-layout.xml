@@ -1618,6 +1618,45 @@
         </output>
     </test>
 
+    <test description="oxf:assets-aggregator: inline stylesheets served by URL" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="data" type="output"/>
+                <p:processor name="oxf:assets-aggregator">
+                    <p:input name="data">
+                        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
+                            <xh:head>
+                                <xh:title>Title</xh:title>
+                                <xh:style>.red { color: red }</xh:style>
+                                <xh:style media="print">.print { color: black }</xh:style>
+                                <xh:style id="my-style">.id { color: black }</xh:style>
+                                <xh:style>.url { background: url(/a.png) }</xh:style>
+                                <xh:style type="text/css" media="all">.blue { color: blue }</xh:style>
+                                <xh:style>.red { color: red }</xh:style>
+                            </xh:head>
+                            <xh:body/>
+                        </xh:html>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:head>
+                    <xh:title>Title</xh:title>
+                    <xh:link href="/xforms-server/form/style/6e4afba5876c48e78a691cdfc047a7c65410e660.css" rel="stylesheet" type="text/css" media="all"/>
+                    <xh:style media="print">.print { color: black }</xh:style>
+                    <xh:style id="my-style">.id { color: black }</xh:style>
+                    <xh:style>.url { background: url(/a.png) }</xh:style>
+                    <xh:link href="/xforms-server/form/style/8c37b80005e0d518e33341614a6194625132c6a5.css" rel="stylesheet" type="text/css" media="all"/>
+                    <xh:link href="/xforms-server/form/style/6e4afba5876c48e78a691cdfc047a7c65410e660.css" rel="stylesheet" type="text/css" media="all"/>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </output>
+    </test>
+
     <test description="Nested layout repeat with and without initial data" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315953&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-controls.xpl"/>

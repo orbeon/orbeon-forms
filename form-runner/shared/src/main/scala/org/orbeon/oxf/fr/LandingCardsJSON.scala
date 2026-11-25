@@ -102,21 +102,27 @@ object LandingCardsJSON {
     "/apps/fr/style/images/orbeon/crane.svg"
   )
 
-  val DefaultCards: List[LandingCard] = List(
+  val QuickLinksCard: LandingCard.QuickLinks =
     QuickLinks(
       links = List(QuickLinkToken.Main)
-    ),
+    )
+
+  val AdminCard: LandingCard.QuickLinks =
     QuickLinks(
       title = Some(LocalizedString.ByResource("landing.titles.admin")),
       links = List(QuickLinkToken.Admin)
-    ),
+    )
+
+  val DemoFormsCard: LandingCard.PublishedForms =
     PublishedForms(
       title       = LocalizedString.ByResource("landing.titles.demo-forms"),
       description = Some(LocalizedString.ByResource("landing.descriptions.demo-forms")),
       thumbnail   = Some("/apps/fr/style/images/orbeon/sports-car.svg"),
       app         = Some("orbeon"),
       sort        = Some((SortBy.Title, None))
-    ),
+    )
+
+  val DemoFeaturesCard: LandingCard.PublishedForms =
     PublishedForms(
       title       = LocalizedString.ByResource("landing.titles.demo-features"),
       description = Some(LocalizedString.ByResource("landing.descriptions.demo-features")),
@@ -124,14 +130,18 @@ object LandingCardsJSON {
       app         = Some("orbeon-features"),
       linkTo      = List(LinkTo.New),
       sort        = Some((SortBy.Title, None))
-    ),
+    )
+
+  val PublishedFormsCard: LandingCard.PublishedForms =
     PublishedForms(
       title       = LocalizedString.ByResource("landing.titles.published-forms"),
       description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
       thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
       linkTo      = List(LinkTo.Summary, LinkTo.New),
       sort        = Some((SortBy.LastModified, None))
-    ),
+    )
+
+  val FormBuilderFormsCard: LandingCard.FormData =
     FormData(
       title       = Some(LocalizedString.ByResource("landing.titles.form-builder-forms")),
       description = Some(LocalizedString.ByResource("landing.descriptions.form-builder-forms")),
@@ -139,7 +149,9 @@ object LandingCardsJSON {
       app         = "orbeon",
       form        = "builder",
       version     = Some(1)
-    ),
+    )
+
+  val BookshelfCard: LandingCard.FormData =
     FormData(
       title       = None,
       description = None,
@@ -148,6 +160,14 @@ object LandingCardsJSON {
       form        = "bookshelf",
       version     = Some(1)
     )
+
+  val DefaultCards: List[LandingCard] = List(
+    QuickLinksCard,
+    DemoFormsCard,
+    DemoFeaturesCard,
+    PublishedFormsCard,
+    FormBuilderFormsCard,
+    BookshelfCard
   )
 
   def parseValue(rawValue: String): Try[Option[Seq[LandingCard]]] =

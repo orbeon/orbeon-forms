@@ -1433,21 +1433,6 @@
                                 <span class="fr-toolbar-divider" aria-hidden="true"/>
 
                                 <xf:trigger class="btn-group">
-                                    <xf:label mediatype="text/html" value="concat('&lt;i class=&quot;fa fa-fw fa-gear&quot;&gt;&lt;/i&gt; ', $fr-resources/home/buttons/configuration)"/>
-                                    <xf:load event="DOMActivate" resource="/fr/orbeon/configuration/new"/>
-                                </xf:trigger>
-
-                                <xf:trigger class="btn-group" ref=".[doc-available('oxf:/apps/fr/console/console.xhtml')]">
-                                    <xf:label mediatype="text/html" value="concat('&lt;i class=&quot;fa fa-fw fa-gauge-high&quot;&gt;&lt;/i&gt; ', $fr-resources/home/buttons/console)"/>
-                                    <xf:load event="DOMActivate" resource="/fr/console"/>
-                                </xf:trigger>
-
-                                <xf:trigger class="btn-group" ref=".[doc-available('oxf:/apps/fr/analytics/analytics.xhtml')]">
-                                    <xf:label mediatype="text/html" value="concat('&lt;i class=&quot;fa fa-fw fa-chart-column&quot;&gt;&lt;/i&gt; ', $fr-resources/home/buttons/analytics)"/>
-                                    <xf:load event="DOMActivate" resource="/fr/analytics"/>
-                                </xf:trigger>
-
-                                <xf:trigger class="btn-group">
                                     <xf:label ref="$fr-resources/home/buttons/reload-properties"/>
                                     <xf:action event="DOMActivate" type="xpath">
                                         frf:invalidatePersistencePropertiesCache()

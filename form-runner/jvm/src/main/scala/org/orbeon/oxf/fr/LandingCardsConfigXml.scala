@@ -133,13 +133,13 @@ object LandingCardsConfigXml {
     val AllQuickLinksTokens   = s"$MainQuickLinksTokens $AdminQuickLinksTokens"
 
     val PresetDefinitions: List[(String, LandingCard)] = List(
-      "preset-quick-links"        -> LandingCardsJSON.DefaultCards(0),
-      "preset-admin"              -> LandingCardsJSON.DefaultCards(1),
-      "preset-published-forms"    -> LandingCardsJSON.DefaultCards(4),
-      "preset-form-builder-forms" -> LandingCardsJSON.DefaultCards(5),
-      "preset-demo-forms"         -> LandingCardsJSON.DefaultCards(2),
-      "preset-demo-features"      -> LandingCardsJSON.DefaultCards(3),
-      "preset-bookshelf"          -> LandingCardsJSON.DefaultCards(6)
+      "preset-quick-links"        -> LandingCardsJSON.QuickLinksCard,
+      "preset-admin"              -> LandingCardsJSON.AdminCard,
+      "preset-published-forms"    -> LandingCardsJSON.PublishedFormsCard,
+      "preset-form-builder-forms" -> LandingCardsJSON.FormBuilderFormsCard,
+      "preset-demo-forms"         -> LandingCardsJSON.DemoFormsCard,
+      "preset-demo-features"      -> LandingCardsJSON.DemoFeaturesCard,
+      "preset-bookshelf"          -> LandingCardsJSON.BookshelfCard
     )
 
     def isNonBlankLocalizedString(ls: LocalizedString): Boolean =

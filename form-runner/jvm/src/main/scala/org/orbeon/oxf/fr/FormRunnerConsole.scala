@@ -43,10 +43,8 @@ trait FormRunnerConsole {
   ConsoleMetricsHistory.ensureConfigured()
 
   //@XPathFunction
-  def isConsoleAuthorized: Boolean = {
-    val configurationOpt = formBuilderPermissionsConfiguration
-    formBuilderPermissions(configurationOpt, FormRunner.orbeonRolesFromCurrentRequest).nonEmpty
-  }
+  def isConsoleAuthorized: Boolean =
+    isAdminAuthorized
 
   //@XPathFunction
   def consoleSnapshotXml(): DocumentNodeInfoType =

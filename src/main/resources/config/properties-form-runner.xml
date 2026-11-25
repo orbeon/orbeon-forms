@@ -158,6 +158,7 @@
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"                  value=""/>
 
     <property as="xs:boolean" name="oxf.fr.navbar.home-link.enable"                                value="true"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.admin-menu.enable"                               value="true"/>
     <property as="xs:boolean" name="oxf.fr.navbar.language-selector.enable"                        value="true"/>
     <property as="xs:boolean" name="oxf.fr.navbar.color-scheme-selector.enable.*.*"                value="true"/>
     <property as="xs:boolean" name="oxf.fr.navbar.color-scheme-selector.enable"                    value="true"/>
@@ -830,11 +831,6 @@
         {
           "card-type": "quick-links",
           "links": "main"
-        },
-        {
-          "card-type": "quick-links",
-          "title": "landing.titles.admin",
-          "links": "admin"
         },
         {
           "card-type": "published-forms",

@@ -97,6 +97,12 @@ trait FormBuilderPermissionsOps {
   }
 
   //@XPathFunction
+  def isAdminAuthorized: Boolean = {
+    val configurationOpt = formBuilderPermissionsConfiguration
+    formBuilderPermissions(configurationOpt, orbeonRolesFromCurrentRequest).nonEmpty
+  }
+
+  //@XPathFunction
   def isFormBuilderAuthorized: Boolean = {
     val configurationOpt = formBuilderPermissionsConfiguration
     findConfiguredRoles(configurationOpt).isEmpty ||

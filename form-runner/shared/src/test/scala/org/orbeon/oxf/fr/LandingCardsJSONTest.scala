@@ -340,5 +340,11 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       val roundTrip = LandingCardsJSON.parseString(LandingCardsJSON.serializeToJson(cards).noSpaces).get.get._1
       assert(roundTrip == cards)
     }
+
+    it("must omit the Admin card from DefaultCards") {
+      assert(LandingCardsJSON.DefaultCards.size == 6)
+      assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.AdminCard))
+      assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.QuickLinksCard)
+    }
   }
 }

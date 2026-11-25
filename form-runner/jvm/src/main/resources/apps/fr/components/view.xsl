@@ -520,6 +520,11 @@
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <xh:ul class="navbar-nav ms-auto">
+                            <xsl:if test="$is-landing or $is-home or $is-form-configuration or $is-console or $is-analytics or $is-form-analytics">
+                                <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                    <fr:admin-nav/>
+                                </xh:li>
+                            </xsl:if>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:language-selector appearance="bootstrap5" fr:dropdown-align="right"/>
                             </xh:li>
@@ -1131,6 +1136,87 @@
                             <xh:i class="fa fa-fw fa-circle-half-stroke me-2"/>
                             <xf:output value="xxf:r('components.color-scheme.system', '|fr-fr-resources|')"/>
                         </xh:button>
+                    </xh:li>
+                </xh:ul>
+            </xh:div>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:admin-nav">
+        <xf:group
+            class="fr-admin-nav"
+            ref=".[
+                not(fr:mode() = 'test')                         and
+                not(fr:is-embedded())                           and
+                xxf:property('oxf.fr.navbar.admin-menu.enable') and
+                {if ($is-home) then 'xxf:get-request-path() = ''/fr/admin'' and ' else ''}
+                (
+                    frf:isAdminAuthorized() or
+                    frf:isAnalyticsAuthorized()
+                )
+            ]">
+            <xf:var name="is-allow-admin"     value="frf:isAdminAuthorized()"/>
+            <xf:var name="show-forms-admin"   value="$is-allow-admin"/>
+            <xf:var name="show-configuration" value="$is-allow-admin and doc-available('oxf:/forms/orbeon/configuration/form/form.xhtml')"/>
+            <xf:var name="show-console"       value="$is-allow-admin and doc-available('oxf:/apps/fr/console/console.xhtml')"/>
+            <xf:var name="show-analytics"     value="frf:isAnalyticsAuthorized()"/>
+
+            <xh:div class="dropdown">
+                <xh:button
+                    id="fr-admin-menu-button"
+                    type="button"
+                    class="btn btn-secondary dropdown-toggle"
+                    data-orbeon-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <xh:i class="fa fa-fw fa-sliders" aria-hidden="true"/>
+                    <xh:span class="fr-admin-nav-label"><xf:output value="xxf:r('landing.titles.admin', '|fr-fr-resources|')"/></xh:span>
+                </xh:button>
+                <xh:ul class="dropdown-menu dropdown-menu-end" aria-labelledby="fr-admin-menu-button">
+                    <xh:li class="{{'xforms-hidden'[not($show-forms-admin)]}}">
+                        <xh:a href="/fr/admin" class="dropdown-item">
+                            <xsl:if test="$is-home">
+                                <xsl:attribute name="aria-current">page</xsl:attribute>
+                            </xsl:if>
+                            <xh:i class="fa fa-fw fa-sliders" aria-hidden="true"/>
+                            <xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
+                        </xh:a>
+                    </xh:li>
+                    <xh:li class="{{'xforms-hidden'[not($show-configuration)]}}">
+                        <xh:a href="/fr/orbeon/configuration/new" class="dropdown-item">
+                            <xsl:if test="$is-form-configuration">
+                                <xsl:attribute name="aria-current">page</xsl:attribute>
+                            </xsl:if>
+                            <xh:i class="fa fa-fw fa-gear" aria-hidden="true"/>
+                            <xf:output value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
+                        </xh:a>
+                    </xh:li>
+                    <xh:li class="{{'xforms-hidden'[not($show-console)]}}">
+                        <xh:a href="/fr/console" class="dropdown-item">
+                            <xsl:if test="$is-console">
+                                <xsl:attribute name="aria-current">page</xsl:attribute>
+                            </xsl:if>
+                            <xh:i class="fa fa-fw fa-gauge-high" aria-hidden="true"/>
+                            <xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
+                        </xh:a>
+                    </xh:li>
+                    <xh:li class="{{'xforms-hidden'[not($show-analytics)]}}">
+                        <xh:a class="dropdown-item">
+                            <xsl:attribute name="href">
+                                <xsl:choose>
+                                    <xsl:when test="$is-form-analytics">/fr/analytics?app={{encode-for-uri(fr:app-name())}}&amp;form={{encode-for-uri(fr:form-name())}}</xsl:when>
+                                    <xsl:otherwise>/fr/analytics</xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                            <xsl:if test="$is-analytics">
+                                <xsl:attribute name="aria-current">page</xsl:attribute>
+                            </xsl:if>
+                            <xh:i class="fa fa-fw fa-chart-column" aria-hidden="true"/>
+                            <xf:output value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-fw fa-check fr-admin-nav-check" aria-hidden="true"/>
+                        </xh:a>
                     </xh:li>
                 </xh:ul>
             </xh:div>

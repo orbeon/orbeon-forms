@@ -1738,6 +1738,30 @@
         </attachment-metadata>
         <add-param>+ パラメーター</add-param>
         <add-mapping>+ マッピング</add-mapping>
+        <select-step>Select a step…</select-step>
+        <step-label>Step</step-label>
+        <no-steps>No steps defined for this action.</no-steps>
+        <add-step>Add Step</add-step>
+        <categories>
+            <services-and-processes>Services and Processes</services-and-processes>
+            <controls>Control Values and State</controls>
+            <repeats>Repeats</repeats>
+            <datasets>Datasets</datasets>
+            <flow-control>Flow Control</flow-control>
+            <navigation>Navigation and Feedback</navigation>
+            <form-processes>Custom Processes</form-processes>
+            <sub-processes>Built-in Sub-processes</sub-processes>
+        </categories>
+        <alerts>
+            <invalid-action-name>A valid and unique action name is required</invalid-action-name>
+            <required>Value is required</required>
+            <step-required>A step is required</step-required>
+            <steps-required>At least one step is required</steps-required>
+            <container-empty>Container must contain at least one step</container-empty>
+            <invalid-avt>Incorrect XPath value template</invalid-avt>
+            <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
+            <invalid-positive-integer>Must be a positive integer</invalid-positive-integer>
+        </alerts>
     </dialog-actions>
     <dialog-test>
         <label>フォームプレビュー</label>

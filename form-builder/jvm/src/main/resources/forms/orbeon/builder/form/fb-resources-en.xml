@@ -754,7 +754,7 @@
         </summary-show>
         <bulk-edit-actions>
             <save-data>Save data</save-data>
-            <run-process>Run Process</run-process>
+            <run-process>Call Process</run-process>
         </bulk-edit-actions>
         <default-sort-column>
             <ascending>Ascending</ascending>
@@ -1705,7 +1705,7 @@
             <label>Message</label>
             <hint>For instance, "Name: {$name}"</hint>
         </message>
-        <run-process>Run Process</run-process>
+        <run-process>Call Process</run-process>
         <process-name>Process Name</process-name>
         <navigate>Navigate</navigate>
         <location>URL or Path</location>
@@ -1715,12 +1715,12 @@
             <new-window>New window</new-window>
         </target>
         <set-control-value-unavailable>Set Control Value is only available when "after the controls are ready" is selected</set-control-value-unavailable>
-        <data-iterate>Iterate over data</data-iterate>
-        <if>Run only if condition is met</if>
-        <repeat-clear>Clear repeat</repeat-clear>
-        <repeat-add-iteration>Add repeat iteration</repeat-add-iteration>
-        <repeat-remove-iteration>Remove repeat iteration</repeat-remove-iteration>
-        <copy-content>Copy content</copy-content>
+        <data-iterate>Iterate over Data</data-iterate>
+        <if>Condition (if)</if>
+        <repeat-clear>Clear Repeat</repeat-clear>
+        <repeat-add-iteration>Add Repeat Iteration</repeat-add-iteration>
+        <repeat-remove-iteration>Remove Repeat Iteration</repeat-remove-iteration>
+        <copy-content>Copy Content</copy-content>
         <iteration-xpath>
             <label>Items XPath</label>
         </iteration-xpath>
@@ -1764,6 +1764,30 @@
         </attachment-metadata>
         <add-param>+ Parameter</add-param>
         <add-mapping>+ Mapping</add-mapping>
+        <select-step>Select a step…</select-step>
+        <step-label>Step</step-label>
+        <no-steps>No steps defined for this action.</no-steps>
+        <add-step>Add Step</add-step>
+        <categories>
+            <services-and-processes>Services and Processes</services-and-processes>
+            <controls>Control Values and State</controls>
+            <repeats>Repeats</repeats>
+            <datasets>Datasets</datasets>
+            <flow-control>Flow Control</flow-control>
+            <navigation>Navigation and Feedback</navigation>
+            <form-processes>Custom Processes</form-processes>
+            <sub-processes>Built-in Sub-processes</sub-processes>
+        </categories>
+        <alerts>
+            <invalid-action-name>A valid and unique action name is required</invalid-action-name>
+            <required>Value is required</required>
+            <step-required>A step is required</step-required>
+            <steps-required>At least one step is required</steps-required>
+            <container-empty>Container must contain at least one step</container-empty>
+            <invalid-avt>Incorrect XPath value template</invalid-avt>
+            <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
+            <invalid-positive-integer>Must be a positive integer</invalid-positive-integer>
+        </alerts>
     </dialog-actions>
     <dialog-test>
         <label>Form Preview</label>

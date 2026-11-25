@@ -752,7 +752,7 @@
         </summary-show>
         <bulk-edit-actions>
             <save-data>Sauvegarder les données</save-data>
-            <run-process>Exécuter le processus</run-process>
+            <run-process>Appeler un processus</run-process>
         </bulk-edit-actions>
         <default-sort-column>
             <ascending>Croissant</ascending>
@@ -1706,7 +1706,7 @@
             <label>Message</label>
             <hint>Par exemple, "Nom&#8239;: {$name}"</hint>
         </message>
-        <run-process>Exécuter le processus</run-process>
+        <run-process>Appeler un processus</run-process>
         <process-name>Nom du processus</process-name>
         <navigate>Naviguer</navigate>
         <location>URL ou chemin</location>
@@ -1765,6 +1765,30 @@
         </attachment-metadata>
         <add-param>+ Paramètre</add-param>
         <add-mapping>+ Correspondance</add-mapping>
+        <select-step>Sélectionner une étape…</select-step>
+        <step-label>Étape</step-label>
+        <no-steps>Aucune étape définie pour cette action.</no-steps>
+        <add-step>Ajouter une étape</add-step>
+        <categories>
+            <services-and-processes>Services et processus</services-and-processes>
+            <controls>Valeurs et état des contrôles</controls>
+            <repeats>Répétitions</repeats>
+            <datasets>Datasets</datasets>
+            <flow-control>Contrôle de flux</flow-control>
+            <navigation>Navigation et messages</navigation>
+            <form-processes>Processus personnalisés</form-processes>
+            <sub-processes>Sous-processus intégrés</sub-processes>
+        </categories>
+        <alerts>
+            <invalid-action-name>Un nom d'action valide et unique est requis</invalid-action-name>
+            <required>Une valeur est requise</required>
+            <step-required>Une étape est requise</step-required>
+            <steps-required>Au moins une étape est requise</steps-required>
+            <container-empty>Le bloc doit contenir au moins une étape</container-empty>
+            <invalid-avt>Modèle de valeur XPath incorrect</invalid-avt>
+            <invalid-ncname>Doit être un identifiant XML valide</invalid-ncname>
+            <invalid-positive-integer>Doit être un entier positif</invalid-positive-integer>
+        </alerts>
     </dialog-actions>
     <dialog-test>
         <label>Test du formulaire</label>

@@ -74,7 +74,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dropdown-controls>
                             <grid-12>
                                 <dropdown>cat</dropdown>
-                                <dropdown-with-search>cat</dropdown-with-search>
+                                <dropdown-with-search>6100-AIR</dropdown-with-search>
                                 <dropdown-with-other>Pistachio</dropdown-with-other>
                                 <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
                                 <dynamic-dropdown-with-search-by-ui itemset-empty="false">Canada</dynamic-dropdown-with-search-by-ui>
@@ -982,22 +982,73 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dropdown-with-search>
                             <label>Dropdown with Search</label>
 
-                            <hint></hint>
+                            <hint>Search by label, hint, or code, and filter by category</hint>
                             <item>
-                                <label>Cat</label>
-                                <value>cat</value>
+                                <label>Travel &amp; Lodging</label>
+                                <item>
+                                    <label>Flights</label>
+                                    <hint>Domestic and international airfare</hint>
+                                    <value>6100-AIR</value>
+                                </item>
+                                <item>
+                                    <label>Hotel &amp; Lodging</label>
+                                    <hint>Nightly accommodation and room taxes</hint>
+                                    <value>6110-HTL</value>
+                                </item>
+                                <item>
+                                    <label>Ground Transport</label>
+                                    <hint>Rail, taxi, rideshare, and rental cars</hint>
+                                    <value>6120-TRN</value>
+                                </item>
+                                <item>
+                                    <label>Meals &amp; Per Diem</label>
+                                    <hint>Business meals during travel</hint>
+                                    <value>6130-MLS</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Dog</label>
-                                <value>dog</value>
+                                <label>Software &amp; Cloud</label>
+                                <item>
+                                    <label>Cloud Infrastructure</label>
+                                    <hint>Compute, storage, and managed databases</hint>
+                                    <value>6200-CLD</value>
+                                </item>
+                                <item>
+                                    <label>SaaS Subscriptions</label>
+                                    <hint>Per-seat productivity and collaboration tools</hint>
+                                    <value>6210-SAS</value>
+                                </item>
+                                <item>
+                                    <label>Developer Tools &amp; APIs</label>
+                                    <hint>CI/CD, monitoring, and third-party APIs</hint>
+                                    <value>6220-DEV</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Bird</label>
-                                <value>bird</value>
+                                <label>Office &amp; Equipment</label>
+                                <item>
+                                    <label>Workstations &amp; Displays</label>
+                                    <hint>Laptops, monitors, and ergonomic accessories</hint>
+                                    <value>6300-HDW</value>
+                                </item>
+                                <item>
+                                    <label>Office Supplies</label>
+                                    <hint>Stationery, printing, and postage</hint>
+                                    <value>6310-SUP</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Fish</label>
-                                <value>fish</value>
+                                <label>Events &amp; Training</label>
+                                <item>
+                                    <label>Conferences &amp; Seminars</label>
+                                    <hint>Registration fees and booth sponsorships</hint>
+                                    <value>6400-EVT</value>
+                                </item>
+                                <item>
+                                    <label>Training &amp; Certifications</label>
+                                    <hint>Courses, workshops, and exam vouchers</hint>
+                                    <value>6410-TRG</value>
+                                </item>
                             </item>
                         </dropdown-with-search>
                         <dropdown-with-other>
@@ -1070,22 +1121,47 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Dynamic Multiselect</label>
                             <hint></hint>
                         </dynamic-multiselect><searchable-combobox><label>Searchable Combobox</label><hint>Search existing choices or type a new value</hint><item>
-            <label>Cat</label>
-            <hint></hint>
-            <value>cat</value>
-          </item><item>
-            <label>Dog</label>
-            <hint></hint>
-            <value>dog</value>
-          </item><item>
-            <label>Bird</label>
-            <hint></hint>
-            <value>bird</value>
-          </item><item>
-            <label>Fish</label>
-            <hint></hint>
-            <value>fish</value>
-          </item></searchable-combobox>
+                            <label>Travel &amp; Lodging</label>
+                            <item>
+                                <label>Flights</label>
+                                <hint>Domestic and international airfare</hint>
+                                <value>Flights</value>
+                            </item>
+                            <item>
+                                <label>Hotel &amp; Lodging</label>
+                                <hint>Nightly accommodation and room taxes</hint>
+                                <value>Hotel &amp; Lodging</value>
+                            </item>
+                            <item>
+                                <label>Ground Transport</label>
+                                <hint>Rail, taxi, rideshare, and rental cars</hint>
+                                <value>Ground Transport</value>
+                            </item>
+                        </item><item>
+                            <label>Software &amp; Cloud</label>
+                            <item>
+                                <label>Cloud Infrastructure</label>
+                                <hint>Compute, storage, and managed databases</hint>
+                                <value>Cloud Infrastructure</value>
+                            </item>
+                            <item>
+                                <label>SaaS Subscriptions</label>
+                                <hint>Per-seat productivity and collaboration tools</hint>
+                                <value>SaaS Subscriptions</value>
+                            </item>
+                        </item><item>
+                            <label>Office &amp; Equipment</label>
+                            <item>
+                                <label>Workstations &amp; Displays</label>
+                                <hint>Laptops, monitors, and ergonomic accessories</hint>
+                                <value>Workstations &amp; Displays</value>
+                            </item>
+                            <item>
+                                <label>Office Supplies</label>
+                                <hint>Stationery, printing, and postage</hint>
+                                <value>Office Supplies</value>
+                            </item>
+                        </item></searchable-combobox>
                         <explanatory-text>
                             <text>&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
@@ -2105,22 +2181,73 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dropdown-with-search>
                             <label>Menu déroulant avec recherche</label>
 
-                            <hint></hint>
+                            <hint>Recherchez par libellé, conseil ou code, et filtrez par catégorie</hint>
                             <item>
-                                <label>Chat</label>
-                                <value>cat</value>
+                                <label>Déplacements et hébergement</label>
+                                <item>
+                                    <label>Vols</label>
+                                    <hint>Billets d'avion nationaux et internationaux</hint>
+                                    <value>6100-AIR</value>
+                                </item>
+                                <item>
+                                    <label>Hôtel et hébergement</label>
+                                    <hint>Nuitées d'hôtel et taxes de séjour</hint>
+                                    <value>6110-HTL</value>
+                                </item>
+                                <item>
+                                    <label>Transport terrestre</label>
+                                    <hint>Train, taxi, VTC et location de voiture</hint>
+                                    <value>6120-TRN</value>
+                                </item>
+                                <item>
+                                    <label>Repas et indemnités</label>
+                                    <hint>Repas professionnels en déplacement</hint>
+                                    <value>6130-MLS</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Chien</label>
-                                <value>dog</value>
+                                <label>Logiciels et cloud</label>
+                                <item>
+                                    <label>Infrastructure cloud</label>
+                                    <hint>Calcul, stockage et bases de données gérées</hint>
+                                    <value>6200-CLD</value>
+                                </item>
+                                <item>
+                                    <label>Abonnements SaaS</label>
+                                    <hint>Outils collaboratifs et de productivité par utilisateur</hint>
+                                    <value>6210-SAS</value>
+                                </item>
+                                <item>
+                                    <label>Outils de développement et API</label>
+                                    <hint>CI/CD, supervision et API tierces</hint>
+                                    <value>6220-DEV</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
+                                <label>Bureau et équipement</label>
+                                <item>
+                                    <label>Postes de travail et écrans</label>
+                                    <hint>Ordinateurs portables, écrans et accessoires ergonomiques</hint>
+                                    <value>6300-HDW</value>
+                                </item>
+                                <item>
+                                    <label>Fournitures de bureau</label>
+                                    <hint>Papeterie, impression et affranchissement</hint>
+                                    <value>6310-SUP</value>
+                                </item>
                             </item>
                             <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
+                                <label>Événements et formation</label>
+                                <item>
+                                    <label>Conférences et séminaires</label>
+                                    <hint>Frais d'inscription et parrainage de stands</hint>
+                                    <value>6400-EVT</value>
+                                </item>
+                                <item>
+                                    <label>Formation et certifications</label>
+                                    <hint>Cours, ateliers et bons d'examen</hint>
+                                    <value>6410-TRG</value>
+                                </item>
                             </item>
                         </dropdown-with-search>
                         <dropdown-with-other>
@@ -2193,22 +2320,47 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <label>Sélection multiple dynamique</label>
                             <hint></hint>
                         </dynamic-multiselect><searchable-combobox><label>Liste déroulante modifiable avec recherche</label><hint>Recherchez un choix existant ou saisissez une nouvelle valeur</hint><item>
-            <label>Chat</label>
-            <hint></hint>
-            <value>cat</value>
-          </item><item>
-            <label>Chien</label>
-            <hint></hint>
-            <value>dog</value>
-          </item><item>
-            <label>Oiseau</label>
-            <hint></hint>
-            <value>bird</value>
-          </item><item>
-            <label>Poisson</label>
-            <hint></hint>
-            <value>fish</value>
-          </item></searchable-combobox>
+                            <label>Déplacements et hébergement</label>
+                            <item>
+                                <label>Vols</label>
+                                <hint>Billets d'avion nationaux et internationaux</hint>
+                                <value>Flights</value>
+                            </item>
+                            <item>
+                                <label>Hôtel et hébergement</label>
+                                <hint>Nuitées d'hôtel et taxes de séjour</hint>
+                                <value>Hotel &amp; Lodging</value>
+                            </item>
+                            <item>
+                                <label>Transport terrestre</label>
+                                <hint>Train, taxi, VTC et location de voiture</hint>
+                                <value>Ground Transport</value>
+                            </item>
+                        </item><item>
+                            <label>Logiciels et cloud</label>
+                            <item>
+                                <label>Infrastructure cloud</label>
+                                <hint>Calcul, stockage et bases de données gérées</hint>
+                                <value>Cloud Infrastructure</value>
+                            </item>
+                            <item>
+                                <label>Abonnements SaaS</label>
+                                <hint>Outils collaboratifs et de productivité par utilisateur</hint>
+                                <value>SaaS Subscriptions</value>
+                            </item>
+                        </item><item>
+                            <label>Bureau et équipement</label>
+                            <item>
+                                <label>Postes de travail et écrans</label>
+                                <hint>Ordinateurs portables, écrans et accessoires ergonomiques</hint>
+                                <value>Workstations &amp; Displays</value>
+                            </item>
+                            <item>
+                                <label>Fournitures de bureau</label>
+                                <hint>Papeterie, impression et affranchissement</hint>
+                                <value>Office Supplies</value>
+                            </item>
+                        </item></searchable-combobox>
                         <explanatory-text>
                             <text>&lt;div&gt;
 &lt;div&gt;&lt;strong&gt;Ceci est un texte explicatif :&lt;/strong&gt;&lt;/div&gt;
@@ -3516,13 +3668,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </fr:dropdown-select1>
                             </fr:c>
                             <fr:c x="5" y="1" w="4" h="1">
-                                <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control" appearance="search" ref="">
+                                <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control" appearance="search" show-value="true" ref="">
                                     <xf:label ref="$form-resources/dropdown-with-search/label"></xf:label>
                                     <xf:hint ref="$form-resources/dropdown-with-search/hint"></xf:hint>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
-                                    <xf:itemset ref="$form-resources/dropdown-with-search/item">
+                                    <xf:itemset ref="$form-resources/dropdown-with-search//item">
                                         <xf:label ref="label"></xf:label>
                                         <xf:value ref="value"></xf:value>
+                                        <xf:hint ref="hint"></xf:hint>
                                     </xf:itemset>
                                 </xf:select1>
                             </fr:c>
@@ -3631,7 +3784,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:hint ref="$form-resources/searchable-combobox/hint"></xf:hint>
                         
                         <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
-                        <xf:itemset ref="$form-resources/searchable-combobox/item">
+                        <xf:itemset ref="$form-resources/searchable-combobox//item">
                             <xf:label ref="label"></xf:label>
                             <xf:value ref="value"></xf:value>
                             <xf:hint ref="hint"></xf:hint>

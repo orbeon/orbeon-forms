@@ -1175,6 +1175,23 @@
                         constraint="xxf:is-blank() or (every $p in xxf:split(.) satisfies $p castable as xs:NMTOKEN)"/>
                 </xf:bind>
 
+                <xf:bind ref="resources/message | app-form-overrides/override/resources/message">
+                    <xf:bind
+                        ref="@name"
+                        xxf:whitespace="trim"
+                        required="xxf:non-blank(..) or string(../@html) = 'true'"
+                        constraint="
+                            xxf:is-blank() or (
+                                for $l in string(../@xml:lang)
+                                return not(((../../message[@xml:lang = $l]/@name) except .) = .)
+                            )"/>
+                    <xf:bind
+                        ref="."
+                        xxf:whitespace="trim"
+                        required="xxf:non-blank(@name) or string(@html) = 'true'"/>
+                    <xf:bind ref="@html" type="xs:boolean"/>
+                </xf:bind>
+
                 <xf:bind ref="processes/process | app-form-overrides/override/processes/process">
                     <xf:bind
                         ref="@name"
@@ -1451,7 +1468,13 @@
                                             name="global-override-count"
                                             value="
                                                 count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
-                                                count(instance('fr-configuration-instance')/resources/message) +
+                                                count(
+                                                    instance('fr-configuration-instance')/resources/message[
+                                                        xxf:non-blank(@name) or
+                                                        xxf:non-blank(.) or
+                                                        string(@html) = 'true'
+                                                    ]
+                                                ) +
                                                 count(instance('fr-configuration-instance')/processes/process) +
                                                 count(instance('fr-configuration-instance')/control-settings/*) +
                                                 count(
@@ -1469,7 +1492,7 @@
                                                 not($is-global-scope) and
                                                 exists((
                                                     instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']/@value |
-                                                    instance('fr-configuration-instance')/resources/message/(@xml:lang | @name) |
+                                                    instance('fr-configuration-instance')/resources/message/(. | @xml:lang | @name) |
                                                     instance('fr-configuration-instance')/processes/process/(. | @name) |
                                                     instance('fr-configuration-instance')/custom-properties/property/(@name | @type | @profiles)
                                                 )[not(xxf:valid(.))])
@@ -1543,7 +1566,15 @@
                                                 name="row-override-count"
                                                 value="
                                                     count(curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]) +
-                                                    count(resources/message[xxf:is-blank($ov/@profiles)]) +
+                                                    count(
+                                                        resources/message[
+                                                            xxf:is-blank($ov/@profiles) and (
+                                                                xxf:non-blank(@name) or
+                                                                xxf:non-blank(.) or
+                                                                string(@html) = 'true'
+                                                            )
+                                                        ]
+                                                    ) +
                                                     count(processes/process) +
                                                     count(control-settings/*)
                                                 "/>
@@ -1553,7 +1584,7 @@
                                                     not($is-selected) and
                                                     exists((
                                                         curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]/@value |
-                                                        resources/message[xxf:is-blank($ov/@profiles)]/(@xml:lang | @name) |
+                                                        resources/message[xxf:is-blank($ov/@profiles)]/(. | @xml:lang | @name) |
                                                         processes/process/(. | @name)
                                                     )[not(xxf:valid(.))])
                                                 "/>
@@ -1661,6 +1692,7 @@
                                                                     <xf:setvalue if="exists(quantity/@unit)" ref="quantity/@unit" value="'MB'"/>
                                                                 </xf:action>
                                                                 <xf:delete ref="$ov/resources/message"/>
+                                                                <xf:insert context="$ov/resources" origin="instance('fr-configuration-instance')/templates/message"/>
                                                                 <xf:delete ref="$ov/processes/process"/>
                                                                 <xf:delete ref="$ov/control-settings/*"/>
                                                             </xf:action>
@@ -2234,7 +2266,15 @@
                                 <xf:label
                                     mediatype="text/html"
                                     value="
-                                        let $c := count($active-scope/resources/message[$is-global-scope or xxf:is-blank($active-scope-profiles)])
+                                        let $c := count(
+                                            $active-scope/resources/message[
+                                                ($is-global-scope or xxf:is-blank($active-scope-profiles)) and (
+                                                    xxf:non-blank(@name) or
+                                                    xxf:non-blank(.) or
+                                                    string(@html) = 'true'
+                                                )
+                                            ]
+                                        )
                                         return concat(
                                             $form-resources/resources-section/label,
                                             if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
@@ -2244,11 +2284,28 @@
                                         <xf:output ref="$form-resources/resources-section/label"/>
                                     </xh:h3>
                                 </xh:div>
-                                <fr:resources-editor
-                                    id="global-resources-editor"
-                                    ref="$active-scope/resources"
-                                    languages-ref="('*', xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code/string())"
-                                    items-ref="$resource-override-items"/>
+                                <xf:group
+                                    id="resources-filter-group"
+                                    ref=".[
+                                        let $f := lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))
+                                        return
+                                            $f = '' or
+                                            exists($active-scope/resources/message/(. | @xml:lang | @name)[not(xxf:valid(.))]) or
+                                            contains(lower-case(concat('resource resources message messages i18n oxf.fr.resource ', $form-resources/resources-section/label)), $f) or
+                                            exists(
+                                                $active-scope/resources/message[
+                                                    (xxf:non-blank(@name) or xxf:non-blank(.) or string(@html) = 'true') and
+                                                    contains(lower-case(concat(@xml:lang, ' ', @name, ' ', .)), $f)
+                                                ]
+                                            )
+                                    ]">
+                                    <fr:resources-editor
+                                        id="global-resources-editor"
+                                        ref="$active-scope/resources"
+                                        allow-blank-row="true"
+                                        languages-ref="('*', xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code/string())"
+                                        items-ref="$resource-override-items"/>
+                                </xf:group>
                             </fr:tab>
 
                             <!-- Landing Page -->
@@ -5314,13 +5371,13 @@
                                         (
                                             instance('fr-configuration-instance')[not($is-global-scope)]/(
                                                 curated/*/*[string(@override) = 'true']/@value |
-                                                resources/message/(@xml:lang | @name) |
+                                                resources/message/(. | @xml:lang | @name) |
                                                 processes/process/(. | @name) |
                                                 custom-properties/property/(@name | @type | @profiles)
                                             ),
                                             instance('fr-configuration-instance')/app-form-overrides/override[@id != $selected-scope-id]/(
                                                 curated/*/*[string(@override) = 'true' and (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')]/@value |
-                                                resources/message[xxf:is-blank(ancestor::override/@profiles)]/(@xml:lang | @name) |
+                                                resources/message[xxf:is-blank(ancestor::override/@profiles)]/(. | @xml:lang | @name) |
                                                 processes/process/(. | @name)
                                             )
                                         )">
@@ -5336,7 +5393,7 @@
                                                         else
                                                             concat($ov/@app, ' / ', $ov/@form),
                                                     $prop-label :=
-                                                        if (exists(parent::message)) then
+                                                        if (exists(self::message | parent::message)) then
                                                             $form-resources/resources-section/label
                                                         else if (exists(self::process | parent::process)) then
                                                             $form-resources/processes-section/label
@@ -5591,7 +5648,7 @@
                                 exists($existing-match) and
                                 $eff-profiles = '' and
                                 empty($existing-match/curated/*/*[string(@override) = 'true']) and
-                                empty($existing-match/resources/message) and
+                                empty($existing-match/resources/message[xxf:non-blank(@name) or xxf:non-blank(.) or string(@html) = 'true']) and
                                 empty($existing-match/processes/process) and
                                 empty($existing-match/control-settings/*)
                             "/>
@@ -5723,7 +5780,7 @@
                                             exists($cur-existing-match) and
                                             $cur-profiles = '' and
                                             empty($cur-existing-match/curated/*/*[string(@override) = 'true']) and
-                                            empty($cur-existing-match/resources/message) and
+                                            empty($cur-existing-match/resources/message[xxf:non-blank(@name) or xxf:non-blank(.) or string(@html) = 'true']) and
                                             empty($cur-existing-match/processes/process) and
                                             empty($cur-existing-match/control-settings/*)
                                         "/>

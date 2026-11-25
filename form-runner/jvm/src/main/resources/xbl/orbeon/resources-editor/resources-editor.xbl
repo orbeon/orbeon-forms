@@ -154,8 +154,9 @@
                     </_>
                 </xf:instance>
 
-                <xf:var name="i"  value="instance('i')"/>
-                <xf:var name="ti" value="instance('template')"/>
+                <xf:var name="i"               value="instance('i')"/>
+                <xf:var name="ti"              value="instance('template')"/>
+                <xf:var name="allow-blank-row" value="xxf:component-param-value('allow-blank-row') = 'true'"/>
 
                 <xf:bind
                     ref="$i//*"
@@ -163,11 +164,21 @@
 
                 <xf:bind ref="$i/message">
                     <xf:bind ref="@xml:lang" readonly="xs:integer(instance('languages-count')) le 1"/>
-                    <xf:bind ref="@name, ."  xxf:whitespace="trim" readonly="false()" required="true()"/>
-
-                    <!-- No duplicate resource names for a given language -->
-                    <xf:bind ref="@name"     constraint="for $l in string(../@xml:lang) return
-                                                         not(($i/message[@xml:lang = $l]/@name except .) = .)"/>
+                    <xf:bind
+                        ref="@name"
+                        xxf:whitespace="trim"
+                        readonly="false()"
+                        required="not($allow-blank-row) or xxf:non-blank(..) or string(../@html) = 'true'"
+                        constraint="
+                            xxf:is-blank() or (
+                                for $l in string(../@xml:lang)
+                                return not(($i/message[@xml:lang = $l]/@name except .) = .)
+                            )"/>
+                    <xf:bind
+                        ref="."
+                        xxf:whitespace="trim"
+                        readonly="false()"
+                        required="not($allow-blank-row) or xxf:non-blank(@name) or string(@html) = 'true'"/>
 
                     <xf:bind ref="@html"     type="xs:boolean"/>
                 </xf:bind>
@@ -180,7 +191,7 @@
             <xf:group appearance="xxf:internal">
                 <xf:var name="languages" as="xs:string*"><xxf:value xxbl:scope="outer" xbl:attr="model context value=languages-ref"/></xf:var>
                 <xf:var name="items"     as="xs:string*"><xxf:value xxbl:scope="outer" xbl:attr="model context value=items-ref"/></xf:var>
-                <xf:var name="valid-ref" as="item()?"   ><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=valid-ref"/></xf:var>
+                <xf:var name="valid-ref" as="item()?"   ><xxf:value value="()" xxbl:scope="outer" xbl:attr="model context value=valid-ref"/></xf:var>
 
                 <xf:var name="default-lang" value="$languages[1]">
                     <xf:setvalue
@@ -232,6 +243,7 @@
                         <xh:td class="fr-resources-editor-name-column">
                             <fr:open-select1 id="fr-resources-editor-name-select" class="fr-resources-editor-name-select" ref="@name" appearance="minimal">
                                 <xf:label ref="fr:r('name-header')"/>
+                                <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
 
                                 <xf:itemset ref="$items">
                                     <xf:label ref="context()"/>
@@ -248,9 +260,11 @@
                             <xf:var name="text" value="."/>
                             <xf:input id="fr-resources-editor-value-input" ref="$text[@html = false()]" class="fr-resources-editor-value-input">
                                 <xf:label ref="fr:r('value-header')"/>
+                                <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                             </xf:input>
                             <xf:textarea id="fr-resources-editor-value-textarea" ref="$text[@html = true()]" mediatype="text/html" class="fr-resources-editor-value-textarea">
                                 <xf:label ref="fr:r('value-header')"/>
+                                <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                             </xf:textarea>
                         </xh:td>
                     </xh:tr>

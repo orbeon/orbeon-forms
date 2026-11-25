@@ -2274,6 +2274,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     appendControlSettingsBlock(templateOverride, Map.empty, catalog)
 
     appendEmptyCustomProperty(templatesElem)
+    appendEmptyResourceMessage(templatesElem)
 
     normalizeOverridesDom(configDoc)
     configDoc
@@ -2429,18 +2430,30 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     }
   }
 
+  private def appendEmptyResourceMessage(parent: Element): Element = {
+    val msgElem = parent.addElement("message")
+    msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, "*")
+    msgElem.addAttribute("name", "")
+    msgElem.addAttribute("html", "false")
+    msgElem
+  }
+
   private def appendResourcesBlock(
     parent   : Element,
     resources: scala.collection.Map[ResourceOverrideKey, String],
     htmlMap  : scala.collection.Map[ResourceOverrideKey, Boolean]
   ): Unit = {
     val resourcesElem = parent.addElement("resources")
-    for ((key, v) <- resources) {
-      val msgElem = resourcesElem.addElement("message")
-      msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, key.lang)
-      msgElem.addAttribute("name", key.name)
-      msgElem.addAttribute("html", htmlMap.getOrElse(key, false).toString)
-      msgElem.setText(v)
+    if (resources.isEmpty) {
+      appendEmptyResourceMessage(resourcesElem)
+    } else {
+      for ((key, v) <- resources) {
+        val msgElem = resourcesElem.addElement("message")
+        msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, key.lang)
+        msgElem.addAttribute("name", key.name)
+        msgElem.addAttribute("html", htmlMap.getOrElse(key, false).toString)
+        msgElem.setText(v)
+      }
     }
   }
 

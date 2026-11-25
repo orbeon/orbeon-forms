@@ -288,17 +288,24 @@ class ConfigurationPropertiesTest
       }
     }
 
-    it("must provide a default empty custom property row when none exist and omit it when saving") {
+    it("must provide default empty custom property and resource rows when none exist and omit them when saving") {
       val inputPropsXml     = """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"/>"""
       val inputPropsDoc     = IOSupport.readOrbeonDom(inputPropsXml)
       val configDoc         = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputPropsDoc)
       val customProps       = configDoc.getRootElement.element("custom-properties").elements("property")
+      val resourceMessages  = configDoc.getRootElement.element("resources").elements("message")
 
       assert(customProps.size == 1)
       assert(customProps.head.attributeValue("name") == "")
       assert(customProps.head.attributeValue("type") == "xs:string")
       assert(customProps.head.attributeValue("profiles") == "")
       assert(customProps.head.getText == "")
+
+      assert(resourceMessages.size == 1)
+      assert(resourceMessages.head.attributeValue(XMLConstants.XML_LANG_QNAME) == "*")
+      assert(resourceMessages.head.attributeValue("name") == "")
+      assert(resourceMessages.head.attributeValue("html") == "false")
+      assert(resourceMessages.head.getText == "")
 
       val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
       assert(roundTripPropsDoc.getRootElement.elements("property").isEmpty)
@@ -1295,6 +1302,40 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(customValueControl.effectiveId, "")
             assert(customNameControl.isValid)
             assert(! customTabLabelHtml.contains("fr-config-tab-badge"))
+
+            // Verify default empty resource row: present on load, valid and unbadged when blank,
+            // invalid if a value is entered without a name, and omitted upon save when left blank
+            val initialResources = (configRoot / "resources" / "message").toList
+            assert(initialResources.size == 1)
+            assert(initialResources.head.attValue("*:lang") == "*")
+            assert((initialResources.head /@ "name").stringValue == "")
+            assert((initialResources.head /@ "html").stringValue == "false")
+            assert(initialResources.head.stringValue == "")
+
+            def resourcesTabLabelHtml: String =
+              ControlsIterator(resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("fr-configuration-categories-tabs").get, includeSelf = false)
+                .collect { case c: XFormsValueControl => c.getValue(EventCollector.Throw) }
+                .find(_.contains("Resources"))
+                .get
+
+            assert(! resourcesTabLabelHtml.contains("fr-config-tab-badge"))
+
+            val resourcesEditor      = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("global-resources-editor").get
+            val resNameSelectControl = ControlsIterator(resourcesEditor, includeSelf = false).collectFirst { case c: XFormsSingleNodeControl if c.getId == "fr-resources-editor-name-select" => c }.get
+            val resValueInputControl = ControlsIterator(resourcesEditor, includeSelf = false).collectFirst { case c: XFormsValueControl if c.getId == "fr-resources-editor-value-input" => c }.get
+            assert(resNameSelectControl.isValid)
+            assert(resValueInputControl.isValid)
+
+            setControlValueWithEventSearchNested(resValueInputControl.effectiveId, "orphan-resource")
+            assert(! resNameSelectControl.isValid)
+            assert(FormRunner.countValidationsByLevel(org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel) == 1)
+            assert(resourcesTabLabelHtml.contains("fr-config-tab-badge"))
+
+            setControlValueWithEventSearchNested(resValueInputControl.effectiveId, "")
+            assert(resNameSelectControl.isValid)
+            assert(resValueInputControl.isValid)
+            assert(FormRunner.countValidationsByLevel(org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel) == 0)
+            assert(! resourcesTabLabelHtml.contains("fr-config-tab-badge"))
 
             // Leave the default first row empty and add a second custom property
             val templatePropNodes = configRoot / "templates" / "property"

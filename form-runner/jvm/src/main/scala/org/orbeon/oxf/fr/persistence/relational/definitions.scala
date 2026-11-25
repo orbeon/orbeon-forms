@@ -100,7 +100,7 @@ case class IndexedControl(
                     <label>{label.escapeXmlMinimal}</label>
                 }
 
-            val itemElems = resourceHolder child "item" map { item =>
+            val itemElems = (resourceHolder descendant "item").filter(i => (i / "value").nonEmpty).map { item =>
               <item>{
                 <label>{item elemValue "label"}</label>
                 <value>{item elemValue "value"}</value>

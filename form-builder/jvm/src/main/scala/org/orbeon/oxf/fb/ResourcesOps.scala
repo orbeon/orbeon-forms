@@ -128,7 +128,22 @@ trait ResourcesOps extends BaseOps {
   ): Boolean =
     findControlByName(controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
 
-  // Get the control's items for all languages
+  def hasGroupedItemsInResources(
+    controlName: String
+  )(implicit
+    ctx        : FormBuilderDocContext
+  ): Boolean =
+    findResourceHoldersWithLang(controlName, resourcesRoot).exists { case (_, holder) =>
+      (holder / "item").exists(item => (item / "value").isEmpty)
+    }
+
+  def buildItemsetResourcePointer(
+    controlName: String,
+    grouped    : Boolean
+  ): String =
+    s"$$form-resources/$controlName${if (grouped) "//item" else "/item"}"
+
+  // Get the control's items for all languages (flat choices and optional 1-level `<item>` groups)
   def getControlItemsGroupedByValue(
     controlName: String
   )(implicit
@@ -140,41 +155,111 @@ trait ResourcesOps extends BaseOps {
 
     val holdersWithLang = findResourceHoldersWithLang(controlName, localResourcesRoot)
 
-    // All unique values in the order they appear
-    val distinctValues = (
-      for {
-        (lang, holder) <- holdersWithLang
-        item           <- holder / "item"
-      } yield
-        item / "value" stringValue
-    ).distinct
-
-    // All languages in the order they appear
     val allLangs =
       holdersWithLang map (_._1)
 
-    def holderItemForValue(holder: NodeInfo, value: String): Option[NodeInfo] =
-      holder / "item" find (_ / "value" === value)
+    val addHints = hasItemHintEditor(controlName)
+
+    val anyGroups =
+      holdersWithLang.exists { case (_, holder) =>
+        (holder / "item").exists(item => (item / "value").isEmpty)
+      }
+
+    def findChoiceItemForValue(holder: NodeInfo, value: String): Option[NodeInfo] =
+      (holder descendant "item").find(i => (i / "value").nonEmpty && (i / "value" === value))
 
     def lhhaForLangAndValue(lang: String, value: String, lhha: String): String =
       findResourceHolderForLang(controlName, lang, localResourcesRoot)
-        .map(holderItemForValue(_, value).toList / lhha stringValue)
+        .map(findChoiceItemForValue(_, value).toList / lhha stringValue)
         .getOrElse("")
 
-    val addHints = hasItemHintEditor(controlName)
+    def choiceItemElem(value: String): scala.xml.Elem =
+      <item>
+        {
+          for (lang <- allLangs)
+          yield
+            <label lang={lang}>{lhhaForLangAndValue(lang, value, "label")}</label> ::
+            (addHints list <hint lang={lang}>{lhhaForLangAndValue(lang, value, "hint")}</hint>)
+        }
+        <value>{value}</value>
+      </item>
 
-    val newItemElems =
-      for (value <- distinctValues)
-      yield
-        <item>
-          {
-            for (lang <- allLangs)
-            yield
-              <label lang={lang}>{lhhaForLangAndValue(lang, value, "label")}</label> ::
-              (addHints list <hint lang={lang}>{lhhaForLangAndValue(lang, value, "hint")}</hint>)
+    def groupItemElem(groupIdx: Int): scala.xml.Elem = {
+      def groupLabelForLang(lang: String): String =
+        findResourceHolderForLang(controlName, lang, localResourcesRoot)
+          .flatMap { holder =>
+            (holder / "item").filter(i => (i / "value").isEmpty).lift(groupIdx)
           }
-          <value>{value}</value>
-        </item>
+          .map(_ / "label" stringValue)
+          .getOrElse("")
+
+      <item group="true">
+        {
+          for (lang <- allLangs)
+          yield
+            <label lang={lang}>{groupLabelForLang(lang)}</label> ::
+            (addHints list <hint lang={lang}/>)
+        }
+        <value/>
+      </item>
+    }
+
+    val newItemElems: Seq[scala.xml.Elem] =
+      if (! anyGroups) {
+        val distinctValues = (
+          for {
+            (_, holder) <- holdersWithLang
+            item        <- holder / "item"
+            if (item / "value").nonEmpty
+          } yield
+            item / "value" stringValue
+        ).distinct
+
+        distinctValues.map(choiceItemElem).toList
+      } else {
+        val seenValues = scala.collection.mutable.LinkedHashSet.empty[String]
+        val buf        = scala.collection.mutable.ListBuffer.empty[scala.xml.Elem]
+
+        holdersWithLang.headOption.foreach { case (_, primaryHolder) =>
+          var groupIdx = 0
+          (primaryHolder / "item").foreach { topItem =>
+            if ((topItem / "value").nonEmpty) {
+              val v = (topItem / "value").stringValue
+              if (seenValues.add(v))
+                buf += choiceItemElem(v)
+            } else {
+              val currentGroupIdx = groupIdx
+              groupIdx += 1
+              buf += groupItemElem(currentGroupIdx)
+
+              // Collect choices in this group across all languages in appearance order
+              for {
+                (_, holder) <- holdersWithLang
+                groupNode   <- (holder / "item").filter(i => (i / "value").isEmpty).lift(currentGroupIdx).toList
+                childItem   <- groupNode / "item"
+                if (childItem / "value").nonEmpty
+              } {
+                val v = (childItem / "value").stringValue
+                if (seenValues.add(v))
+                  buf += choiceItemElem(v)
+              }
+            }
+          }
+        }
+
+        // Include any extra choice values that existed only in secondary language holders outside known groups
+        for {
+          (_, holder) <- holdersWithLang
+          item        <- holder descendant "item"
+          if (item / "value").nonEmpty
+        } {
+          val v = (item / "value").stringValue
+          if (seenValues.add(v))
+            buf += choiceItemElem(v)
+        }
+
+        buf.toList
+      }
 
     def emptyItemElem =
       <item>

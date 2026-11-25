@@ -1348,6 +1348,12 @@
         <remove-all>
             <label>Usuń wszystko</label>
         </remove-all>
+        <add-group>
+            <label>Dodaj grupę</label>
+        </add-group>
+        <group-toggle>
+            <label>Nagłówek grupy</label>
+        </group-toggle>
         <filter>
             <label>Formuła filtru</label>
             <help>

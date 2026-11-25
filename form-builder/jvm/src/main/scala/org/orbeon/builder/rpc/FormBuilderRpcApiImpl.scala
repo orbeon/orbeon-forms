@@ -335,13 +335,20 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
         None
       } else {
         val newItems = parsedItems.map { case (label, value, hint) =>
-          <item>
-            <label>{label}</label>
-            <value>{value}</value>
-            {
-              hint.nonEmpty.list(<hint>{hint}</hint>)
-            }
-          </item>
+          if (label.trim.nonEmpty && value.trim.isEmpty && hint.trim.isEmpty) {
+            <item group="true">
+              <label>{label}</label>
+              <value/>
+            </item>
+          } else {
+            <item>
+              <label>{label}</label>
+              <value>{value}</value>
+              {
+                hint.nonEmpty.list(<hint>{hint}</hint>)
+              }
+            </item>
+          }
         }
         Some(newItems.map(NodeConversions.elemToNodeInfo))
       }

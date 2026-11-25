@@ -1331,6 +1331,12 @@
         <remove-all>
             <label>Удалить все</label>
         </remove-all>
+        <add-group>
+            <label>Добавить группу</label>
+        </add-group>
+        <group-toggle>
+            <label>Заголовок группы</label>
+        </group-toggle>
         <filter>
             <label>Формула фильтра</label>
             <help>

@@ -122,5 +122,81 @@ class GridDndTest
         }
       }
     }
+
+    it("must reorder repeat=\"content\" grid iterations with ref and iteration-name when dispatching xxforms-dnd") {
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <items>
+                    <item><label>Cat</label><value>cat</value></item>
+                    <item><label>Dog</label><value>dog</value></item>
+                    <item><label>Bird</label><value>bird</value></item>
+                  </items>
+                </form>
+              </xf:instance>
+              <xf:instance id="item-template">
+                <item><label/><value/></item>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:grid
+              id="itemset-grid"
+              repeat="content"
+              ref="items"
+              iteration-name="item"
+              template="instance('item-template')">
+              <xh:tr>
+                <xh:td>
+                  <xf:input id="label-control" ref="label">
+                    <xf:label>Label</xf:label>
+                  </xf:input>
+                </xh:td>
+              </xh:tr>
+            </fr:grid>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { _ =>
+        withXFormsDocument(xhtml) { implicit doc =>
+          withActionAndDoc(doc) {
+
+            def currentLabels: List[String] =
+              (1 to 3).map { i =>
+                resolveObject[XFormsValueControl]("label-control", indexes = List(i)).get.getValue(EventCollector.Throw)
+              }.toList
+
+            def dispatchDnd(start: Int, end: Int): Unit =
+              withAction {
+                val target = doc.getObjectByEffectiveId("itemset-grid≡itemset-grid-repeat").asInstanceOf[XFormsEventTarget]
+                Dispatch.dispatchEvent(
+                  new XXFormsDndEvent(
+                    target,
+                    Map(
+                      "dnd-start" -> Some(start.toString),
+                      "dnd-end"   -> Some(end.toString)
+                    )
+                  ),
+                  EventCollector.Throw
+                )
+              }
+
+            assert(currentLabels == List("Cat", "Dog", "Bird"))
+
+            dispatchDnd(start = 3, end = 1)
+
+            assert(currentLabels == List("Bird", "Cat", "Dog"))
+          }
+        }
+      }
+    }
   }
 }

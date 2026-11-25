@@ -1370,6 +1370,12 @@
         <remove-all>
             <label>Tout supprimer</label>
         </remove-all>
+        <add-group>
+            <label>Ajouter un groupe</label>
+        </add-group>
+        <group-toggle>
+            <label>En-tête de groupe</label>
+        </group-toggle>
         <filter>
             <label>Formule filtre</label>
             <help>

@@ -31,17 +31,16 @@ object DialogItemset {
     dom.document.addEventListener("change", (event: dom.Event) =>
       event.targetT.closestOpt(LabelInputSelector).foreach { labelInput =>
 
-        val valueXFormsInput =
-          labelInput.closestT(".fr-grid-tr").querySelectorT(".fb-itemset-value-input")
-
-        if (DocumentAPI.getValue(valueXFormsInput).toOption.exists(_.isAllBlank)) {
-          DocumentAPI
-            .getValue(labelInput)
-            .toOption
-            .flatMap(suggestValueFromLabel)
-            .foreach { suggestedValue =>
-              DocumentAPI.setValue(valueXFormsInput, suggestedValue)
-            }
+        labelInput.closestT(".fr-grid-tr").querySelectorOpt(".fb-itemset-value-input:not(.xforms-disabled)").foreach { valueXFormsInput =>
+          if (DocumentAPI.getValue(valueXFormsInput).toOption.exists(_.isAllBlank)) {
+            DocumentAPI
+              .getValue(labelInput)
+              .toOption
+              .flatMap(suggestValueFromLabel)
+              .foreach { suggestedValue =>
+                DocumentAPI.setValue(valueXFormsInput, suggestedValue)
+              }
+          }
         }
       }
     )

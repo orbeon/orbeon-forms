@@ -1304,6 +1304,12 @@
         <remove-all>
             <label>Rimuovi tutto</label>
         </remove-all>
+        <add-group>
+            <label>Aggiungi gruppo</label>
+        </add-group>
+        <group-toggle>
+            <label>Intestazione gruppo</label>
+        </group-toggle>
         <filter>
             <label>Formula di filtro</label>
             <help>

@@ -1351,6 +1351,12 @@
         <remove-all>
             <label>Ta bort alla</label>
         </remove-all>
+        <add-group>
+            <label>Lägg till grupp</label>
+        </add-group>
+        <group-toggle>
+            <label>Grupprubrik</label>
+        </group-toggle>
         <filter>
             <label>Filterformel</label>
             <help>

@@ -861,7 +861,7 @@ trait BindingOps {
             origin = newTemplateItemsets.map(copyElementInfoWithoutExtraNamespaces(_, None))
           )
           if (newIsStaticItemset)
-            setvalue(updatedElem / XFormsItemsetTest /@ "ref", FormBuilder.buildResourcePointer(controlName, "item", None))
+            setvalue(updatedElem / XFormsItemsetTest /@ "ref", FormBuilder.buildItemsetResourcePointer(controlName, FormBuilder.hasGroupedItemsInResources(controlName)))
         }
       } else {
         delete(updatedElem / XFormsItemElemsTest)

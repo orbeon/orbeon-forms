@@ -53,8 +53,9 @@
                 <xf:setvalue ref="$i/lang"            value="fbf:currentLang()"/>
                 <xf:insert   context="$i/items"       origin="fbf:getControlItemsGroupedByValue($i/control-name)"/>
 
-                <!-- Create empty template with all placeholders -->
+                <!-- Create empty template with all placeholders (always a regular choice, never a group) -->
                 <xf:insert   context="$i/template"    origin="$i/items/item[1]"/>
+                <xf:delete   ref="$i/template/item/@group"/>
                 <xf:setvalue iterate="$i/template/item/*" ref="."/>
 
                 <!-- Set focus on input rather than button -->
@@ -64,6 +65,22 @@
             <!-- Close dialog upon click on save/cancel -->
             <xbl:handler event="DOMActivate" observer="save-trigger cancel-trigger">
                 <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <!-- Add group header -->
+            <xbl:handler event="DOMActivate" observer="add-group-trigger">
+                <xf:var
+                    name="single-blank-item"
+                    value="$i/items/item[count($i/items/item) = 1 and not(@group = 'true') and value = '' and (every $l in label satisfies $l = '')]"/>
+                <xf:action if="exists($single-blank-item)">
+                    <xf:insert context="$single-blank-item" origin="xf:attribute('group', 'true')"/>
+                </xf:action>
+                <xf:action if="empty($single-blank-item)">
+                    <xf:var name="new-group" value="xxf:mutable-document($i/template/item)/*"/>
+                    <xf:insert context="$new-group" origin="xf:attribute('group', 'true')"/>
+                    <xf:insert context="$i/items" ref="*" origin="$new-group"/>
+                </xf:action>
+                <xf:setfocus control="fb-itemset-label-input"/>
             </xbl:handler>
 
             <!-- Remove all values -->
@@ -100,31 +117,49 @@
                 <xf:action if="exists($items)">
                     <xf:action iterate="$items">
                         <xf:var name="item" value="."/>
-                        <!-- Create item with value if missing -->
-                        <xf:action if="not(exists($i/items/item[value = $item/value]))">
-                            <xf:insert
-                                context="$i/items"
-                                ref="*"
-                                origin="$i/template/item"/>
-                            <xf:setvalue
-                                ref="$i/items/item[last()]/value"
-                                value="$item/value"/>
+                        <xf:action if="$item/@group = 'true'">
+                            <xf:var
+                                name="group-label"
+                                value="($item/label[@lang = $i/lang], $item/label[empty(@lang)])[1]"/>
+                            <xf:var
+                                name="existing-group"
+                                value="$i/items/item[@group = 'true' and label[@lang = $i/lang] = $group-label][1]"/>
+                            <xf:action if="empty($existing-group)">
+                                <xf:var name="new-group" value="xxf:mutable-document($i/template/item)/*"/>
+                                <xf:insert context="$new-group" origin="xf:attribute('group', 'true')"/>
+                                <xf:insert context="$i/items" ref="*" origin="$new-group"/>
+                                <xf:setvalue
+                                    ref="$i/items/item[last()]/label[@lang = $i/lang]"
+                                    value="$group-label"/>
+                            </xf:action>
                         </xf:action>
-                        <xf:setvalue
-                            ref="$i/items/item[value = $item/value]/label[@lang = $i/lang]"
-                            value="
-                                (
-                                    $item/label[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
-                                    $item/label[empty(@lang)]     (: but for now we don't :)
-                                )[1]"/>
-                        <!-- Note that `hint` might be missing from the template, in which case it won't be set -->
-                        <xf:setvalue
-                            ref="$i/items/item[value = $item/value]/hint[@lang = $i/lang]"
-                            value="
-                                (
-                                    $item/hint[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
-                                    $item/hint[empty(@lang)]     (: but for now we don't :)
-                                )[1]"/>
+                        <xf:action if="not($item/@group = 'true')">
+                            <!-- Create item with value if missing -->
+                            <xf:action if="not(exists($i/items/item[not(@group = 'true') and value = $item/value]))">
+                                <xf:insert
+                                    context="$i/items"
+                                    ref="*"
+                                    origin="$i/template/item"/>
+                                <xf:setvalue
+                                    ref="$i/items/item[last()]/value"
+                                    value="$item/value"/>
+                            </xf:action>
+                            <xf:setvalue
+                                ref="$i/items/item[not(@group = 'true') and value = $item/value]/label[@lang = $i/lang]"
+                                value="
+                                    (
+                                        $item/label[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
+                                        $item/label[empty(@lang)]     (: but for now we don't :)
+                                    )[1]"/>
+                            <!-- Note that `hint` might be missing from the template, in which case it won't be set -->
+                            <xf:setvalue
+                                ref="$i/items/item[not(@group = 'true') and value = $item/value]/hint[@lang = $i/lang]"
+                                value="
+                                    (
+                                        $item/hint[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
+                                        $item/hint[empty(@lang)]     (: but for now we don't :)
+                                    )[1]"/>
+                        </xf:action>
                     </xf:action>
                 </xf:action>
             </xbl:handler>
@@ -207,12 +242,22 @@
                 <xf:bind ref="html" type="xs:boolean"/>
                 <xf:bind ref="items/item">                                                                                      <!-- Constraints on items' value and label -->
                     <xf:bind ref="label, value" xxf:whitespace="trim" readonly="false()"/>                                      <!-- Additional spaces are most likely there by error -->
-                    <xf:bind ref="label" constraint="for $l in string(@lang) return
-                                                         . = '' or
-                                                         not(($i/items/item/label[@lang = $l] except .) = .)"/>                 <!-- No duplicate label are allowed -->
-                    <xf:bind ref="value">
+                    <xf:bind
+                        ref="label[../@group = 'true']"
+                        constraint="
+                            not(every $l in ../label satisfies $l = '') and
+                            (for $l in string(@lang) return
+                                . = '' or
+                                not(($i/items/item[@group = 'true']/label[@lang = $l] except .) = .))"/>
+                    <xf:bind
+                        ref="label[not(../@group = 'true')]"
+                        constraint="
+                            for $l in string(@lang) return
+                                . = '' or
+                                not(($i/items/item[not(@group = 'true')]/label[@lang = $l] except .) = .)"/>                   <!-- No duplicate label are allowed -->
+                    <xf:bind ref="value[not(../@group = 'true')]">
                         <xf:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
-                        <xf:bind ref="." constraint="not(($i/items/item/value except .) = .)"/>                                 <!-- No duplicate values are allowed -->
+                        <xf:bind ref="." constraint="not(($i/items/item[not(@group = 'true')]/value except .) = .)"/>           <!-- No duplicate values are allowed -->
                         <xf:bind ref="." constraint="frf:isSingleSelectionControl($control-type) or not(contains(., ' '))"/>    <!-- No spaces in values are allowed for xf:select -->
                     </xf:bind>
                 </xf:bind>
@@ -243,56 +288,102 @@
                         <xf:label ref="$resources/messages/lhha-checkbox"/>
                     </fr:checkbox-input>
 
-                    <xf:group ref="$i/items" appearance="xxf:internal">
-<!--                        <xf:var name="control-element" value="fbf:findControlByNameOrEmpty($i/control-name)"/>-->
-                        <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
-                             decide to remove support for legacy mode. -->
-                        <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item" class="fb-hide-alert">
+                    <fr:grid
+                        id="fb-itemset-repeat"
+                        repeat="content"
+                        ref="$i/items"
+                        iteration-name="item"
+                        template="$i/template/item"
+                        class="fb-hide-alert">
                             <xh:tr>
-                                <xh:td>
+                                <xh:td class="fb-itemset-label-cell">
+                                    <xf:var name="current-item" value="."/>
+                                    <xh:span
+                                        class="fb-itemset-row-state xforms-hidden"
+                                        hidden="hidden"
+                                        data-is-group="{$current-item/@group = 'true'}"
+                                        data-in-group="{not($current-item/@group = 'true') and exists($current-item/preceding-sibling::item[@group = 'true'])}"/>
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        class="fb-itemset-group-toggle"
+                                        ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
+                                        <xf:label>
+                                            <xh:i
+                                                class="fa fa-fw {if ($current-item/@group = 'true') then 'fa-folder-open-o' else 'fa-folder-o'}"
+                                                title="{$resources/dialog-itemsets/group-toggle/label}"/>
+                                        </xf:label>
+                                        <xf:action event="DOMActivate">
+                                            <xf:var name="was-group" value="$current-item/@group = 'true'"/>
+                                            <xf:action if="$was-group">
+                                                <xf:delete ref="$current-item/@group"/>
+                                                <xf:action if="xxf:is-blank($current-item/value) and xxf:non-blank($current-item/label[@lang = $i/lang])">
+                                                    <xf:setvalue
+                                                        ref="$current-item/value"
+                                                        value="lower-case(replace(xxf:trim($current-item/label[@lang = $i/lang]), '\s+', '-'))"/>
+                                                </xf:action>
+                                            </xf:action>
+                                            <xf:action if="not($was-group)">
+                                                <xf:var name="old-val" value="string($current-item/value)"/>
+                                                <xf:insert context="$current-item" origin="xf:attribute('group', 'true')"/>
+                                                <xf:action if="xxf:non-blank($old-val)">
+                                                    <xf:setvalue
+                                                        if="frf:isSingleSelectionControl($i/control-type) and $i/control-value = $old-val"
+                                                        ref="$i/control-value"/>
+                                                    <xf:setvalue
+                                                        if="not(frf:isSingleSelectionControl($i/control-type))"
+                                                        ref="$i/control-value"
+                                                        value="string-join(xxf:split($i/control-value)[. != $old-val], ' ')"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
                                     <xf:input ref="label[@lang = $i/lang]" id="fb-itemset-label-input" class="fb-itemset-label-input">
                                         <xf:label ref="$resources/dialog-itemsets/label-header/label"/>
                                     </xf:input>
                                 </xh:td>
                                 <xh:td>
-                                    <xf:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
+                                    <xf:input ref="value[not(../@group = 'true')]" id="fb-itemset-value-input" class="fb-itemset-value-input">
                                         <xf:label ref="$resources/dialog-itemsets/value-header/label"/>
                                     </xf:input>
                                 </xh:td>
                                 <xh:td class="fb-itemset-hint-cell {if (not(exists($i/items/item/hint))) then 'xforms-hidden' else ()}">
-                                    <xf:input ref="hint[@lang = $i/lang]" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
+                                    <xf:input ref="hint[@lang = $i/lang and not(../@group = 'true')]" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
                                         <xf:label ref="$resources/dialog-itemsets/hint-header/label"/>
                                     </xf:input>
                                 </xh:td>
                                 <xh:td class="fb-itemset-selected">
                                     <xf:var name="item" value="."/>
-                                    <xf:var name="is-single-selection" value="frf:isSingleSelectionControl($i/control-type)"/>
-                                    <xf:switch caseref="frf:isSingleSelectionControl($i/control-type)">
-                                        <xf:case value="false()">
-                                            <xf:select ref="$i/control-value"
-                                                       appearance="full">
-                                                <xf:item>
-                                                    <xf:label ref="''"/>
-                                                    <xf:value ref="$item/value"/>
-                                                </xf:item>
-                                            </xf:select>
-                                        </xf:case>
-                                        <xf:case value="true()">
-                                            <xf:select1 ref="$i/control-value"
-                                                        appearance="full">
-                                                <xf:item>
-                                                    <xf:label ref="''"/>
-                                                    <xf:value ref="$item/value"/>
-                                                </xf:item>
-                                            </xf:select1>
-                                        </xf:case>
-                                    </xf:switch>
+                                    <xf:group ref=".[not(@group = 'true')]">
+                                        <xf:var name="is-single-selection" value="frf:isSingleSelectionControl($i/control-type)"/>
+                                        <xf:switch caseref="frf:isSingleSelectionControl($i/control-type)">
+                                            <xf:case value="false()">
+                                                <xf:select ref="$i/control-value"
+                                                           appearance="full">
+                                                    <xf:item>
+                                                        <xf:label ref="''"/>
+                                                        <xf:value ref="$item/value"/>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </xf:case>
+                                            <xf:case value="true()">
+                                                <xf:select1 ref="$i/control-value"
+                                                            appearance="full">
+                                                    <xf:item>
+                                                        <xf:label ref="''"/>
+                                                        <xf:value ref="$item/value"/>
+                                                    </xf:item>
+                                                </xf:select1>
+                                            </xf:case>
+                                        </xf:switch>
+                                    </xf:group>
                                 </xh:td>
                             </xh:tr>
-                        </fr:grid>
-                    </xf:group>
+                    </fr:grid>
 
                     <xh:div class="fb-itemset-toolbar">
+                        <xf:trigger id="add-group-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
+                            <xf:label><xh:i class="fa fa-fw fa-folder-o"/> <xf:output value="$resources/dialog-itemsets/add-group/label"/></xf:label>
+                        </xf:trigger>
                         <xf:trigger id="clipboard-copy-trigger">
                             <xf:label ref="$resources/dialog-itemsets/copy/label"/>
                             <xf:help ref="xxf:r('dialog-itemsets.copy.help', '|fr-form-resources|')" mediatype="text/html"/>

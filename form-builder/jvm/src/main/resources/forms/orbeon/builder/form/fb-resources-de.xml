@@ -1301,6 +1301,12 @@
         <remove-all>
             <label>Alle entfernen</label>
         </remove-all>
+        <add-group>
+            <label>Gruppe hinzufügen</label>
+        </add-group>
+        <group-toggle>
+            <label>Gruppenüberschrift</label>
+        </group-toggle>
         <filter>
             <label>Filterformel</label>
             <help>

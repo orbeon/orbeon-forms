@@ -398,8 +398,10 @@ trait ControlOps extends ResourcesOps {
 
     // If using a static itemset editor, set `xf:itemset/@ref` value
     // TODO: Does this work if the itemset points to the data?
-    if (hasEditor(controlElement, "static-itemset"))
-      setvalue(controlElement / "*:itemset" /@ "ref", FormBuilder.buildResourcePointer(newName, "item", None))
+    if (hasEditor(controlElement, "static-itemset")) {
+      val isGrouped = (controlElement / "*:itemset" /@ "ref").exists(_.stringValue.endsWith("//item"))
+      setvalue(controlElement / "*:itemset" /@ "ref", FormBuilder.buildItemsetResourcePointer(newName, isGrouped))
+    }
   }
 
   // Rename a bind
@@ -751,33 +753,72 @@ trait ControlOps extends ResourcesOps {
   def buildFormBuilderControlEffectiveId(staticId: String)(implicit ctx: FormBuilderDocContext): Option[String] =
     findInViewTryIndex(staticId) map (DynamicControlId + ComponentSeparator + buildControlEffectiveId(_))
 
-  // Set the control's items for all languages
+  // Set the control's items for all languages (supporting optional 1-level `<item group="true">` headers)
   def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
 
     import ctx.bindingIndex
 
-    val addHints = FormBuilder.hasItemHintEditor(controlName)
+    val addHints  = FormBuilder.hasItemHintEditor(controlName)
+    val rawItems  = (items / "item").toList
+    val hasGroups = rawItems.exists(_.attValue("group") == "true")
+
+    // Partition sequential flat editor rows into top-level choices (`Left`) and 1-level groups (`Right`)
+    val structured = new ListBuffer[Either[NodeInfo, (NodeInfo, ListBuffer[NodeInfo])]]
+    rawItems.foreach { item =>
+      if (item.attValue("group") == "true") {
+        structured += Right((item, new ListBuffer[NodeInfo]))
+      } else {
+        structured.lastOption match {
+          case Some(Right((_, groupChildren))) => groupChildren += item
+          case _                               => structured += Left(item)
+        }
+      }
+    }
 
     val values = new ListBuffer[String]
+    rawItems.filterNot(_.attValue("group") == "true").foreach { choice =>
+      values += (choice / "value").stringValue
+    }
+
+    def renderChoiceElem(choice: NodeInfo, lang: String): scala.xml.Elem =
+      <item>
+        <label>{(choice / "label" filter (_.attValue("lang") == lang)).stringValue}</label>
+        {
+          if (addHints)
+            <hint>{(choice / "hint" filter (_.attValue("lang") == lang)).stringValue}</hint>
+        }
+        <value>{(choice / "value").stringValue}</value>
+      </item>
 
     for ((lang, holder) <- FormRunner.findResourceHoldersWithLang(controlName, resourcesRoot)) {
 
       delete(holder / "item")
 
       val newItemElems =
-        for (item <- items / "item")
-        yield {
-          <item>
-            <label>{(item / "label" filter (_.attValue("lang") == lang)).stringValue}</label>
-            {
-              if (addHints)
-                <hint>{(item / "hint"  filter (_.attValue("lang") == lang)).stringValue}</hint>
-            }
-            <value>{(item / "value").stringValue.kestrel(values += _)}</value>
-          </item>
+        structured.toList.map {
+          case Left(choice) =>
+            renderChoiceElem(choice, lang)
+          case Right((groupElem, children)) =>
+            <item>
+              <label>{(groupElem / "label" filter (_.attValue("lang") == lang)).stringValue}</label>
+              { children.toList.map(renderChoiceElem(_, lang)) }
+            </item>
         }
 
-      insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo toList)
+      insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo)
+    }
+
+    // Update `xf:itemset/@ref` between `/item` (flat) and `//item` (grouped) when pointing at `$form-resources/`,
+    // and ensure `<xf:hint ref="hint"/>` is present on older controls once non-blank item hints are authored
+    for {
+      controlElem <- findControlByName(controlName)
+      itemsetElem <- (controlElem / "*:itemset").headOption
+      refAttr     <- (itemsetElem /@ "ref").headOption
+      if refAttr.stringValue.startsWith("$form-resources/")
+    } {
+      setvalue(List(refAttr), FormBuilder.buildItemsetResourcePointer(controlName, hasGroups))
+      if (addHints && rawItems.exists(i => (i / "hint").exists(_.stringValue.nonAllBlank)) && (itemsetElem / "*:hint").isEmpty)
+        insert(into = itemsetElem, after = itemsetElem / *, origin = elementInfo(XF -> "hint", List(attributeInfo("ref", "hint"))))
     }
 
     // Remove or clear no longer allowed values in the data

@@ -1351,6 +1351,12 @@
         <remove-all>
             <label>إزالة الكل</label>
         </remove-all>
+        <add-group>
+            <label>إضافة مجموعة</label>
+        </add-group>
+        <group-toggle>
+            <label>عنوان المجموعة</label>
+        </group-toggle>
         <filter>
             <label>صيغة التصفية</label>
             <help>

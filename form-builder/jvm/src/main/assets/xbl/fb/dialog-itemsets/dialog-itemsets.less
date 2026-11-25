@@ -17,7 +17,7 @@
     // Itemset editor dialog
     // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
     .xforms-dialog.fb-dialog-itemsets {
-        width: 750px;
+        width: 800px;
         max-width: none;
 
         .fb-dialog-body {
@@ -34,6 +34,87 @@
         .fr-grid-2-columns .xforms-input input { width: 13em }
         .xforms-invalid .xforms-input-input {
             border-color: var(--orbeon-error-color);                    // Show errors also for fields that aren't visited
+        }
+
+        .fr-grid-td.fb-itemset-label-cell {
+
+            .fb-itemset-group-toggle {
+                position: absolute;
+                inset-inline-start: 7px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin: 0;
+
+                &:focus-within {
+                    z-index: 2;
+                }
+
+                button,
+                .btn-link {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+                    width: 26px;
+                    height: 26px;
+                    min-width: 26px;
+                    min-height: 26px;
+                    padding: 0;
+                    border-radius: 6px;
+                    color: var(--orbeon-hint-color);
+                    opacity: 0.65;
+                    text-decoration: none;
+
+                    &:hover,
+                    &:focus-visible {
+                        opacity: 1;
+                        color: var(--orbeon-base-color);
+                    }
+
+                    &:hover {
+                        background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+                    }
+                }
+            }
+
+            .fb-itemset-label-input:focus-within {
+                position: relative;
+                z-index: 2;
+            }
+
+            &:has(.fb-itemset-group-toggle:not(.xforms-disabled)) {
+                .fb-itemset-label-input {
+                    margin-inline-start: 40px;
+                }
+            }
+
+            &:has(.fb-itemset-row-state[data-in-group="true"]) {
+                padding-inline-start: 18px;
+                box-shadow: inset 2px 0 0 color-mix(in oklab, var(--orbeon-accent-color) 35%, transparent);
+
+                .fb-itemset-group-toggle {
+                    inset-inline-start: 25px;
+                }
+            }
+
+            &:has(.fb-itemset-row-state[data-is-group="true"]) {
+                .fb-itemset-group-toggle {
+                    button,
+                    .btn-link {
+                        opacity: 1;
+                        color: var(--orbeon-accent-color);
+                        background-color: color-mix(in oklab, var(--orbeon-accent-color) 14%, transparent);
+                    }
+                }
+
+                .fb-itemset-label-input input.xforms-input-input {
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .fr-grid-tr:has(.fb-itemset-row-state[data-is-group="true"]) > .fr-grid-td {
+            background-color: color-mix(in oklab, var(--orbeon-base-color) 4%, transparent);
         }
 
         .navbar {
@@ -63,7 +144,7 @@
 
         .fb-itemset-toolbar {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 0.5em;
             margin-top: 5px;
             margin-bottom: 10px;
@@ -78,6 +159,10 @@
                 button.btn {
                     width: 100%;
                     min-width: 0;
+
+                    i.fa {
+                        margin-right: 5px;
+                    }
                 }
 
                 .xforms-help {

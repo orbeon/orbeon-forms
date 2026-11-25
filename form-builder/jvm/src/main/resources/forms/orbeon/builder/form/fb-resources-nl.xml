@@ -1332,6 +1332,12 @@
         <remove-all>
             <label>Alles verwijderen</label>
         </remove-all>
+        <add-group>
+            <label>Groep toevoegen</label>
+        </add-group>
+        <group-toggle>
+            <label>Groepskop</label>
+        </group-toggle>
         <filter>
             <label>Filterformule</label>
             <help>

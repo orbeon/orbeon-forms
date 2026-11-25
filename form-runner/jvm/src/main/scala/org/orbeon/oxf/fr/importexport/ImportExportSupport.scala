@@ -418,7 +418,7 @@ object ImportExportSupport {
 
       List(yesLabel.stringValue -> "true", noLabel.stringValue -> "false")
     } else {
-      val items = resources.find(_._1 == requestedLang).toList map (_._2) child "item"
+      val items = (resources.find(_._1 == requestedLang).toList.map(_._2) descendant "item").filter(i => (i / "value").nonEmpty)
       items map (item => item.elemValue("label") -> item.elemValue("value"))
     }
 

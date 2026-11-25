@@ -91,6 +91,9 @@ object Grid {
     private def orbeonRootEl: html.Element =
       dom.document.querySelectorOpt(".orbeon").getOrElse(dom.document.body)
 
+    private def overlayHostEl(fromEl: html.Element): html.Element =
+      fromEl.closestOpt("dialog[open]").getOrElse(orbeonRootEl)
+
     private def onPointerDown(event: dom.PointerEvent): Unit =
       if (event.button == 0 && dragState.isEmpty) {
         for {
@@ -197,6 +200,12 @@ object Grid {
         case _ =>
       }
 
+      val origCells  = rowEl.querySelectorAllT(":scope > tr > td, :scope > tr > th")
+      val cloneCells = clone.querySelectorAllT(":scope > tr > td, :scope > tr > th")
+      origCells.zip(cloneCells).foreach { case (origCell, copyCell) =>
+        copyCell.style.width = s"${origCell.getBoundingClientRect().width}px"
+      }
+
       clone
     }
 
@@ -228,7 +237,7 @@ object Grid {
         val indicator       = dom.document.createDivElement
         indicator.className = "fr-grid-drop-indicator"
         indicator.hide()
-        orbeonRootEl.appendChild(indicator)
+        overlayHostEl(state.repeatGridElem).appendChild(indicator)
         indicatorElOpt = Some(indicator)
       }
     }

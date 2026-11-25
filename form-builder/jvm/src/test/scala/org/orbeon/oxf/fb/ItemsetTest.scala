@@ -302,10 +302,106 @@ class ItemsetTest
       compareItemsElemToNodeInfoElems(expected, result.getOrElse(Nil))
     }
 
+    it("must parse 1-level group headers in TSV when value and hint are blank") {
+      val tsv = "Engineering\t\t\nFrontend\tfe\tUI team\nOperations\t\t\nFinance\tfin\t"
+      val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
+      val expected = <items>
+        <item group="true">
+          <label>Engineering</label>
+          <value/>
+        </item>
+        <item>
+          <label>Frontend</label>
+          <value>fe</value>
+          <hint>UI team</hint>
+        </item>
+        <item group="true">
+          <label>Operations</label>
+          <value/>
+        </item>
+        <item>
+          <label>Finance</label>
+          <value>fin</value>
+        </item>
+      </items>
+      compareItemsElemToNodeInfoElems(expected, result.getOrElse(Nil))
+    }
+
     it("must return error element for invalid or empty TSV") {
       val tsv = "   \n  "
       val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
       assert(result.isEmpty)
+    }
+  }
+
+  describe("1-level grouped itemsets") {
+    it("must write nested `<item>` groups, switch `xf:itemset/@ref` to `//item`, and round-trip across languages") {
+      withActionAndFBDoc(ItemsetsDoc) { implicit ctx =>
+        import ctx.bindingIndex
+
+        val groupedItems =
+          <items>
+            <item group="true">
+              <label lang="en">Data</label>
+              <hint  lang="en"/>
+              <label lang="fr">Données</label>
+              <hint  lang="fr"/>
+              <value/>
+            </item>
+            <item>
+              <label lang="en">Save</label>
+              <hint  lang="en">Persist data</hint>
+              <label lang="fr">Enregistrer</label>
+              <hint  lang="fr">Sauvegarder</hint>
+              <value>save</value>
+            </item>
+            <item group="true">
+              <label lang="en">Flow</label>
+              <hint  lang="en"/>
+              <label lang="fr">Flux</label>
+              <hint  lang="fr"/>
+              <value/>
+            </item>
+            <item>
+              <label lang="en">Send</label>
+              <hint  lang="en"/>
+              <label lang="fr">Envoyer</label>
+              <hint  lang="fr"/>
+              <value>send</value>
+            </item>
+          </items>
+
+        FormBuilder.setControlItems("dropdown", groupedItems)
+
+        val dropdownControl = FormRunner.findControlByName("dropdown").get
+        assert((dropdownControl / "*:itemset" /@ "ref").stringValue == "$form-resources/dropdown//item")
+
+        val enHolder = FormBuilder.findResourceHolderForLang("dropdown", "en", FormBuilder.resourcesRoot).get
+        assert((enHolder / "item").size == 2)
+        assert(((enHolder / "item").head / "label").stringValue == "Data")
+        assert(((enHolder / "item").head / "value").isEmpty)
+        assert((((enHolder / "item").head / "item").head / "value").stringValue == "save")
+
+        val roundTripped = FormBuilder.getControlItemsGroupedByValue("dropdown").map(TransformerUtils.tinyTreeToOrbeonDom)
+        val expectedList = (groupedItems: NodeInfo) / "item" map TransformerUtils.tinyTreeToOrbeonDom
+        assert(roundTripped.size == expectedList.size)
+        for ((exp, act) <- expectedList.zip(roundTripped))
+          assertXMLDocumentsIgnoreNamespacesInScope(exp, act)
+
+        // Removing groups switches `xf:itemset/@ref` back to `/item`
+        val flatAgain =
+          <items>
+            <item>
+              <label lang="en">Save</label>
+              <hint  lang="en"/>
+              <label lang="fr">Enregistrer</label>
+              <hint  lang="fr"/>
+              <value>save</value>
+            </item>
+          </items>
+        FormBuilder.setControlItems("dropdown", flatAgain)
+        assert((dropdownControl / "*:itemset" /@ "ref").stringValue == "$form-resources/dropdown/item")
+      }
     }
   }
 

@@ -1345,6 +1345,12 @@
         <remove-all>
             <label>Poista kaikki</label>
         </remove-all>
+        <add-group>
+            <label>Lisää ryhmä</label>
+        </add-group>
+        <group-toggle>
+            <label>Ryhmäotsikko</label>
+        </group-toggle>
         <filter>
             <label>Suodatinkaava</label>
             <help>

@@ -1599,9 +1599,13 @@ object FormBuilderXPathApi {
 
     items.map { itemElem =>
       val label = itemElem.child("label").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
-      val value = itemElem.elemValue("value")
-      val hint  = itemElem.child("hint").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
-      s"${escapeTsvCell(label)}\t${escapeTsvCell(value)}\t${escapeTsvCell(hint)}"
+      if (itemElem.attValue("group") == "true") {
+        s"${escapeTsvCell(label)}\t\t"
+      } else {
+        val value = itemElem.elemValue("value")
+        val hint  = itemElem.child("hint").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
+        s"${escapeTsvCell(label)}\t${escapeTsvCell(value)}\t${escapeTsvCell(hint)}"
+      }
     }.mkString("\r\n")
   }
 

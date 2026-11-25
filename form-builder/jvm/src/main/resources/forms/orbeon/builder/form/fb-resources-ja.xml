@@ -1343,6 +1343,12 @@
         <remove-all>
             <label>すべて削除</label>
         </remove-all>
+        <add-group>
+            <label>グループを追加</label>
+        </add-group>
+        <group-toggle>
+            <label>グループ見出し</label>
+        </group-toggle>
         <filter>
             <label>フィルター式</label>
             <help>

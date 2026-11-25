@@ -1317,6 +1317,12 @@
         <remove-all>
             <label>Eliminar todo</label>
         </remove-all>
+        <add-group>
+            <label>Añadir grupo</label>
+        </add-group>
+        <group-toggle>
+            <label>Encabezado de grupo</label>
+        </group-toggle>
         <filter>
             <label>Fórmula de filtrado</label>
             <help>

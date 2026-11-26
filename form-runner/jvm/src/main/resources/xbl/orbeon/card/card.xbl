@@ -32,6 +32,7 @@
                 <xf:var name="empty-action-href"  value="fr:component-param-value('empty-action-href')[xxf:non-blank()]"/>
                 <xf:var name="empty-action-label" value="fr:component-param-value('empty-action-label')[xxf:non-blank()]"/>
                 <xf:var name="columns"            value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
+                <xf:var name="show-headings"      value="not(fr:component-param-value('show-headings') = 'false')"/>
 
                 <xsl:choose>
                     <xsl:when test="exists(/*/fr:rows)">
@@ -110,9 +111,9 @@
                     class="list-group list-group-flush fr-card-cols-{{$columns}} {{'fr-card-is-refreshing'[$status = 'loading']}} {{'xforms-hidden'[not($has-loaded and $status != 'error' and not($is-empty))]}}"
                 >
                     <xsl:if test="exists(/*/fr:headings)">
-                        <xsl:attribute name="role">table</xsl:attribute>
+                        <xsl:attribute name="role">{{if ($show-headings) then 'table' else 'list'}}</xsl:attribute>
                         <xsl:attribute name="aria-label">{{xxf:label('fr-card')}}</xsl:attribute>
-                        <xh:li class="list-group-item fr-card-head text-truncate" role="row">
+                        <xh:li class="list-group-item fr-card-head text-truncate {{'xforms-hidden'[not($show-headings)]}}" role="row">
                             <xbl:content includes=":root > fr|headings > *"/>
                         </xh:li>
                     </xsl:if>

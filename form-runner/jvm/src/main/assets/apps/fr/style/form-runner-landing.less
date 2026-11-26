@@ -483,9 +483,14 @@
 
     .fr-landing-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(100%, 26.5em), 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 26.5em), 1fr));
         gap: 1.15em;
         padding: 0.75em 0.25em 2em;
+
+        // Keep a lone visible card from stretching full-bleed across wide viewports
+        &.fr-landing-grid-single {
+            grid-template-columns: minmax(0, 48em);
+        }
 
         // Hide XForms repeat markers, non-relevant items, empty quick-links cards, auto-hidden empty demo cards, and filtered-out cards so they never occupy grid tracks
         & > .xforms-hidden,
@@ -681,8 +686,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        column-gap: 0.85em;
-        padding: 0.8em 1em;
+        column-gap: 0.75em;
+        padding: 0.55em 1em;
         border-bottom: 1px solid var(--orbeon-landing-card-border-color);
         text-align: start;
 
@@ -697,14 +702,14 @@
         .fr-card-intro-text {
             flex: 1 1 auto;
             min-inline-size: 0;
-            min-block-size: 3.1em; // Match `.fr-card-intro-media` icon/thumbnail block-size so cards without media align
+            min-block-size: 2.25em; // Match `.fr-card-intro-media` icon/thumbnail block-size so cards without media align
             display: flex;
             align-items: center;
 
             .card-text {
                 margin: 0;
-                font-size: 0.95em;
-                line-height: 1.42;
+                font-size: 0.92em;
+                line-height: 1.38;
                 color: var(--orbeon-hint-color);
             }
         }
@@ -726,19 +731,18 @@
 
             img.img-thumbnail.img-invertible {
                 display: block;
-                inline-size: 3.1em;
-                block-size: 3.1em;
+                inline-size: 2.25em;
+                block-size: 2.25em;
                 aspect-ratio: 1;
             }
 
             .fr-card-metadata-thumbnail img {
                 display: block;
-                max-inline-size: 4.4em;
-                max-block-size: 3.1em;
+                max-inline-size: 3.2em;
+                max-block-size: 2.25em;
                 object-fit: cover;
                 object-position: top;
                 border-radius: var(--orbeon-landing-tile-border-radius);
-                box-shadow: 0 0 0 1px var(--orbeon-landing-card-image-border);
             }
         }
     }
@@ -1161,6 +1165,10 @@
                 color: var(--orbeon-landing-card-link-color);
                 font-weight: 500;
 
+                &.xforms-hidden {
+                    display: none;
+                }
+
                 &:hover {
                     color: var(--orbeon-landing-card-link-hover-color);
                 }
@@ -1219,7 +1227,11 @@
                 }
 
                 @media (hover: hover) {
-                    opacity: 0.4;
+                    opacity: 0;
+                }
+
+                @media (hover: none) {
+                    opacity: 0.75;
                 }
 
                 @media (forced-colors: active) {
@@ -1336,6 +1348,10 @@
     a figure,
     .card .list-group-item.fr-card-published-row,
     .card .list-group-item.fr-card-data-row-clickable {
+        &:focus-within {
+            background-color: var(--orbeon-landing-card-hover-background-color);
+        }
+
         @media (hover: hover) {
             &:hover {
                 background-color: var(--orbeon-landing-card-hover-background-color);

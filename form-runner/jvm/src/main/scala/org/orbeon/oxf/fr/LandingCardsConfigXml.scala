@@ -39,10 +39,13 @@ object LandingCardsConfigXml {
               appOpt.forall(a => AppFormSlugRegex.matches(a.trim)) &&
               excludeApps.forall(a => AppFormSlugRegex.matches(a.trim)) &&
               ! (appOpt.isDefined && excludeApps.nonEmpty)
-          case FormData(_, _, _, app, form, versionOpt) =>
+          case FormData(_, _, _, app, form, versionOpt, titleFields, pillFieldOpt) =>
             AppFormSlugRegex.matches(app.trim) &&
               AppFormSlugRegex.matches(form.trim) &&
-              versionOpt.forall(_ >= 1)
+              versionOpt.forall(_ >= 1) &&
+              titleFields.forall(f => AppFormSlugRegex.matches(f.trim)) &&
+              pillFieldOpt.forall(f => AppFormSlugRegex.matches(f.trim)) &&
+              ! (pillFieldOpt.isDefined && titleFields.isEmpty)
         }
       case Failure(_) =>
         false
@@ -316,6 +319,8 @@ object LandingCardsConfigXml {
           c.addAttribute("form",               "")
           c.addAttribute("version-mode",       "specific")
           c.addAttribute("version",            "1")
+          c.addAttribute("title-field",        "")
+          c.addAttribute("pill-field",         "")
           c.addAttribute("link-to",            "")
           c.addAttribute("sort-by",            "")
           c.addAttribute("sort-direction",     "")
@@ -336,6 +341,8 @@ object LandingCardsConfigXml {
           c.addAttribute("form",               "")
           c.addAttribute("version-mode",       "specific")
           c.addAttribute("version",            "1")
+          c.addAttribute("title-field",        "")
+          c.addAttribute("pill-field",         "")
           c.addAttribute("link-to",            linkTo.map { case LinkTo.New => "new"; case LinkTo.Summary => "summary" }.mkString(" "))
           c.addAttribute("sort-by",            sortOpt.map(s => sortByToString(s._1)).getOrElse(""))
           c.addAttribute("sort-direction",     sortOpt.flatMap(_._2).map(sortDirectionToString).getOrElse(""))
@@ -343,7 +350,7 @@ object LandingCardsConfigXml {
           appendLocalizedStringElement(c, "title",       Some(title),    allowAutoMode = false)
           appendLocalizedStringElement(c, "description", descriptionOpt, allowAutoMode = true)
 
-        case FormData(titleOpt, descriptionOpt, thumbnailOpt, app, form, versionOpt) =>
+        case FormData(titleOpt, descriptionOpt, thumbnailOpt, app, form, versionOpt, titleFields, pillFieldOpt) =>
           c.addAttribute("type",               "form-data")
           c.addAttribute("links-mode",         "main")
           c.addAttribute("links-explicit-all", "false")
@@ -356,6 +363,8 @@ object LandingCardsConfigXml {
           c.addAttribute("form",               form)
           c.addAttribute("version-mode",       if (versionOpt.isDefined) "specific" else "default")
           c.addAttribute("version",            versionOpt.map(_.toString).getOrElse("1"))
+          c.addAttribute("title-field",        titleFields.mkString(" "))
+          c.addAttribute("pill-field",         if (titleFields.nonEmpty) pillFieldOpt.getOrElse("") else "")
           c.addAttribute("link-to",            "")
           c.addAttribute("sort-by",            "")
           c.addAttribute("sort-direction",     "")
@@ -481,13 +490,24 @@ object LandingCardsConfigXml {
             else
               None
 
+          val titleFields =
+            elem.attributeValueOpt("title-field").getOrElse("").splitTo[List]().distinct
+
+          val pillFieldOpt =
+            if (titleFields.nonEmpty)
+              elem.attributeValueOpt("pill-field").flatMap(_.trimAllToOpt)
+            else
+              None
+
           FormData(
             title       = parseLocalizedStringElement(Option(elem.element("title")),       required = false),
             description = parseLocalizedStringElement(Option(elem.element("description")), required = false),
             thumbnail   = parseThumbnailFromAttributes(elem),
             app         = elem.attributeValueOpt("app").map(_.trim).getOrElse(""),
             form        = elem.attributeValueOpt("form").map(_.trim).getOrElse(""),
-            version     = versionOpt
+            version     = versionOpt,
+            titleFields = titleFields,
+            pillField   = pillFieldOpt
           )
       }
   }

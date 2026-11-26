@@ -861,18 +861,14 @@
           "thumbnail": "/apps/fr/style/images/orbeon/library.svg",
           "app": "orbeon",
           "form": "builder",
-          "version": 1
-        },
-        {
-          "card-type": "form-data",
-          "app": "orbeon",
-          "form": "bookshelf",
-          "version": 1
+          "version": 1,
+          "title-field": "title form-name",
+          "pill-field": "application-name"
         }
       ]
     </property>
 
-    <property as="xs:integer" name="oxf.fr.landing.page-size"                                      value="8"/>
+    <property as="xs:integer" name="oxf.fr.landing.page-size"                                      value="6"/>
 
     <property as="xs:integer" name="oxf.fr.home.page-size"                                         value="20"/>
     <property as="xs:string"  name="oxf.fr.home.table.link-to"                                     value="summary new"/>

@@ -601,6 +601,13 @@ object FormRunnerApp extends App {
       val (tabbedMode, activePanelOpt) = syncTabsAndPanels()
       val noResultsOpt                 = document.querySelectorOpt(".orbeon .fr-landing-no-results")
 
+      List(workspacePanelOpt, demosPanelOpt).flatten.foreach { panel =>
+        panel.querySelectorOpt(".fr-landing-grid").foreach { grid =>
+          val visibleInGrid = availableCardsInPanel(panel).count(!_.hasClass(FilteredOutClass))
+          grid.toggleClass("fr-landing-grid-single", visibleInGrid == 1)
+        }
+      }
+
       // Update per-tab filter match counts when filtering in tabbed mode
       tabButtons.foreach { btn =>
         btn.querySelectorOpt(".fr-landing-tab-count").foreach { badge =>

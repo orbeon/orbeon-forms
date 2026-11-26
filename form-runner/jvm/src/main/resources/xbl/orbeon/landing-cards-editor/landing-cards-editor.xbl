@@ -79,7 +79,7 @@
                             <add-preset>Add preset…</add-preset>
                             <preset-quick-links>Quick Links (Authoring)</preset-quick-links>
                             <preset-admin>Admin Links</preset-admin>
-                            <preset-published-forms>Published Forms (All Apps)</preset-published-forms>
+                            <preset-published-forms>Published Forms</preset-published-forms>
                             <preset-form-builder-forms>Form Builder Forms</preset-form-builder-forms>
                             <preset-demo-forms>Demo Forms</preset-demo-forms>
                             <preset-demo-features>Demo Features</preset-demo-features>
@@ -117,7 +117,7 @@
                             <app-specific>Specific application</app-specific>
                             <app-label>Application Name</app-label>
                             <exclude-apps-label>Excluded Applications</exclude-apps-label>
-                            <exclude-apps-hint>Space-separated names (for example: orbeon orbeon-features)</exclude-apps-hint>
+                            <exclude-apps-hint>Space-separated names (for example: orbeon orbeon-features test orbeon-screenshots)</exclude-apps-hint>
                             <form-label>Form Name</form-label>
                             <version-mode-label>Form Version</version-mode-label>
                             <version-specific>Specific version</version-specific>
@@ -185,7 +185,7 @@
                             <add-preset>Ajouter un modèle…</add-preset>
                             <preset-quick-links>Raccourcis (Création)</preset-quick-links>
                             <preset-admin>Liens d'administration</preset-admin>
-                            <preset-published-forms>Formulaires publiés (Toutes les apps)</preset-published-forms>
+                            <preset-published-forms>Formulaires publiés</preset-published-forms>
                             <preset-form-builder-forms>Formulaires Form Builder</preset-form-builder-forms>
                             <preset-demo-forms>Formulaires de démonstration</preset-demo-forms>
                             <preset-demo-features>Fonctions de démonstration</preset-demo-features>
@@ -223,7 +223,7 @@
                             <app-specific>Application spécifique</app-specific>
                             <app-label>Nom de l'application</app-label>
                             <exclude-apps-label>Applications exclues</exclude-apps-label>
-                            <exclude-apps-hint>Noms séparés par des espaces (ex. orbeon orbeon-features)</exclude-apps-hint>
+                            <exclude-apps-hint>Noms séparés par des espaces (ex. orbeon orbeon-features test orbeon-screenshots)</exclude-apps-hint>
                             <form-label>Nom du formulaire</form-label>
                             <version-mode-label>Version du formulaire</version-mode-label>
                             <version-specific>Version spécifique</version-specific>
@@ -717,7 +717,7 @@
                                         </xh:span>
                                         <xh:span class="fr-lce-card-icon-wrap fr-lce-card-icon-fallback {'xforms-hidden'[xxf:non-blank($preview-icon-src)]}">
                                             <xh:i
-                                                class="fa fa-fw {if ($card-type = 'quick-links') then 'fa-grip' else if ($card-type = 'published-forms') then 'fa-rectangle-list' else 'fa-table'}"
+                                                class="fa fa-fw {if ($card-type = 'quick-links') then 'fa-grip' else if ($card-type = 'published-forms' or xxf:non-blank(@title-field)) then 'fa-rectangle-list' else 'fa-table'}"
                                                 aria-hidden="true"/>
                                         </xh:span>
                                         <xh:span class="fr-lce-card-title"><xf:output value="$resolved-title"/></xh:span>

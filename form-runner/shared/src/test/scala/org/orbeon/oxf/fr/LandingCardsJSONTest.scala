@@ -341,12 +341,48 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       assert(roundTrip == cards)
     }
 
-    it("must omit the Quick Links and Admin cards from DefaultCards and exclude demo apps on PublishedFormsCard") {
-      assert(LandingCardsJSON.DefaultCards.size == 5)
+    it("must omit the Quick Links, Admin, and Bookshelf cards from DefaultCards and exclude demo apps on PublishedFormsCard") {
+      assert(LandingCardsJSON.DefaultCards.size == 4)
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.QuickLinksCard))
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.AdminCard))
+      assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.BookshelfCard))
       assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.DemoFormsCard)
       assert(LandingCardsJSON.PublishedFormsCard.excludeApps == List("orbeon", "orbeon-features"))
+      assert(LandingCardsJSON.FormBuilderFormsCard.titleFields == List("title", "form-name"))
+      assert(LandingCardsJSON.FormBuilderFormsCard.pillField.contains("application-name"))
+    }
+
+    it("must parse, validate, and serialize title-field and pill-field on form-data") {
+      val formDataJson =
+        """[
+          |  {"card-type": "form-data", "app": "orbeon", "form": "builder", "version": 1, "title-field": "title form-name", "pill-field": "application-name"},
+          |  {"card-type": "form-data", "app": "hr", "form": "onboarding", "title-field": ["employee-name", "request-id", "employee-name"]},
+          |  {"card-type": "form-data", "app": "orbeon", "form": "bookshelf", "title-field": null, "pill-field": "   "}
+          |]""".stripMargin
+
+      val cards = LandingCardsJSON.parseString(formDataJson).get.get._1.collect { case f: FormData => f }
+      assert(cards.map(f => (f.titleFields, f.pillField)) == List(
+        (List("title", "form-name"), Some("application-name")),
+        (List("employee-name", "request-id"), None),
+        (Nil, None)
+      ))
+
+      val serialized = LandingCardsJSON.serializeToJson(cards)
+      val reparsed   = LandingCardsJSON.parseString(serialized.noSpaces).get.get._1.collect { case f: FormData => f }
+      assert(reparsed == cards)
+
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "form-data", "app": "hr", "form": "onboarding", "pill-field": "department"}]""").get
+      }
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "form-data", "app": "hr", "form": "onboarding", "title-field": "bad/field"}]""").get
+      }
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "form-data", "app": "hr", "form": "onboarding", "title-field": "title", "pill-field": "bad/pill"}]""").get
+      }
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "form-data", "app": "hr", "form": "onboarding", "title-field": 123}]""").get
+      }
     }
 
     it("must parse, validate, and serialize exclude-apps on published-forms") {

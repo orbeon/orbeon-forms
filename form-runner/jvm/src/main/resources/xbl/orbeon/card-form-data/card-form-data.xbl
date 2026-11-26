@@ -318,8 +318,24 @@
                 value="('attachment', 'image-attachment', 'video-attachment', 'audio-attachment', 'handwritten-signature', 'wpaint')"/>
 
             <xf:var
+                name="title-fields"
+                value="xxf:split(fr:component-param-value('title-field'))"/>
+
+            <xf:var
+                name="pill-field"
+                value="fr:component-param-value('pill-field')[xxf:non-blank()]"/>
+
+            <xf:var
+                name="is-list-mode"
+                value="exists($title-fields)"/>
+
+            <xf:var
+                name="all-named-queries"
+                value="instance('fr-search-instance')/query[exists(@name)]"/>
+
+            <xf:var
                 name="card-query-paths"
-                value="instance('fr-search-instance')/query[@name and @summary-show = 'true' and not(@control = $non-card-controls)]/@path"/>
+                value="$all-named-queries[@summary-show = 'true' and not(@control = $non-card-controls)]/@path"/>
 
             <xf:var
                 name="summary-queries"
@@ -327,7 +343,49 @@
 
             <xf:var
                 name="detail-positions"
-                value="instance('fr-search-instance')/query[@name and @summary-show = 'true' and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)"/>
+                value="$all-named-queries[@summary-show = 'true' and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)"/>
+
+            <xf:var
+                name="active-query-positions"
+                value="
+                    if ($is-list-mode) then
+                        $all-named-queries[@name = ($title-fields, $pill-field) and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)
+                    else
+                        $detail-positions"/>
+
+            <xf:var
+                name="active-query-names"
+                value="for $p in $active-query-positions return string($all-named-queries[$p]/@name)"/>
+
+            <xf:var
+                name="primary-sort-query"
+                value="
+                    (
+                        for $tf in $title-fields
+                        return $all-named-queries[@name = $tf]
+                    )[1]"/>
+
+            <xf:var
+                name="primary-sort-path"
+                value="string($primary-sort-query/@path)"/>
+
+            <xf:var
+                name="primary-sort-label"
+                value="
+                    let $lq := instance('fr-search-labels-instance')/query[@path = $primary-sort-path][1]
+                    return string(($lq/resources[@lang = xxf:lang()]/label, $lq/resources/label, $primary-sort-query/@name)[1])"/>
+
+            <xf:var
+                name="is-sorted-by-primary"
+                value="xxf:non-blank($primary-sort-path) and instance('fr-order-by')/column = $primary-sort-path"/>
+
+            <xf:var
+                name="list-sort-toggle-label"
+                value="
+                    if ($is-sorted-by-primary) then
+                        xxf:r('landing.buttons.sort-by-last-modified', '|fr-fr-resources|')
+                    else
+                        xxf:r('landing.buttons.sort-by-title', '|fr-fr-resources|')"/>
 
             <xf:var
                 name="documents"
@@ -490,7 +548,8 @@
                 total-count="{$search-total}"
                 filtered-out="{$is-filtered-out}"
                 auto-hidden="{$is-auto-hidden}"
-                columns="{max((count($detail-positions), 1))}"
+                columns="{if ($is-list-mode) then 1 else max((count($detail-positions), 1))}"
+                show-headings="{not($is-list-mode)}"
                 is-empty="{empty($documents)}"
                 empty-message="{xxf:r('landing.messages.no-data', '|fr-fr-resources|')}"
             >
@@ -501,6 +560,53 @@
                 </fr:card-status>
 
                 <fr:card-actions>
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fr-card-action-btn fr-card-sort-mode-btn {'xforms-hidden'[not($is-list-mode) or xxf:is-blank($primary-sort-path) or $search-total le 1]}">
+                        <xf:label>
+                            <xh:i class="fa {if ($is-sorted-by-primary) then 'fa-arrow-down-a-z' else 'fa-clock'}" aria-hidden="true"/>
+                            <xh:span class="xforms-hidden"><xf:output value="$list-sort-toggle-label"/></xh:span>
+                        </xf:label>
+                        <xf:hint value="$list-sort-toggle-label"/>
+                        <xf:action event="DOMActivate">
+                            <xf:var name="next-col" value="if ($is-sorted-by-primary) then 'last-modified' else $primary-sort-path"/>
+                            <xf:var name="next-dir" value="if ($next-col = 'last-modified') then 'desc' else 'asc'"/>
+                            <xf:var name="announce-col-label" value="
+                                if ($next-col = 'last-modified') then
+                                    xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
+                                else
+                                    $primary-sort-label
+                            "/>
+
+                            <xf:setvalue ref="instance('fr-order-by')/column"    value="$next-col"/>
+                            <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
+                            <xf:setvalue
+                                ref="instance('fr-state-instance')/@sort-announcement"
+                                value="
+                                    if ($next-dir = 'asc') then
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
+                                            $announce-col-label
+                                        )
+                                    else
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
+                                            $announce-col-label
+                                        )"/>
+
+                            <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
+
+                            <xf:insert
+                                context="
+                                    if ($next-col = 'last-modified') then
+                                        instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
+                                    else
+                                        instance('fr-search-instance')/query[@path = $next-col][1]"
+                                origin="xf:attribute('sort', $next-dir)"/>
+
+                            <xf:send submission="fr-search-submission"/>
+                        </xf:action>
+                    </xf:trigger>
                     <xh:a
                         href="{$new-href}"
                         title="{$new-label}"
@@ -518,7 +624,7 @@
                 </fr:card-actions>
 
                 <fr:headings>
-                    <xf:repeat ref="$summary-queries">
+                    <xf:repeat ref="$summary-queries[not($is-list-mode)]">
                         <xf:var name="path"      value="string(@path)"/>
                         <xf:var name="label"     value="string((resources[@lang = xxf:lang()]/label, resources/label, @name)[1])"/>
                         <xf:var name="is-sorted" value="instance('fr-order-by')/column = $path"/>
@@ -635,7 +741,11 @@
                 <fr:rows>
                     <xf:var
                         name="column-labels"
-                        value="for $q in $summary-queries return string(($q/resources[@lang = xxf:lang()]/label, $q/resources/label, $q/@name)[1])"/>
+                        value="
+                            for $p in $active-query-positions,
+                                $q in $all-named-queries[$p],
+                                $lq in (instance('fr-search-labels-instance')/query[@path = $q/@path][1], $q)[1]
+                            return string(($lq/resources[@lang = xxf:lang()]/label, $lq/resources/label, $q/@name)[1])"/>
 
                     <xf:repeat ref="$documents[position() le $document-count-to-render]">
                         <xf:var name="is-extra-row" value="position() gt $page-size"/>
@@ -643,13 +753,13 @@
                         <xf:var
                             name="cell-values"
                             value="
-                                if (empty($detail-positions)) then
+                                if (empty($active-query-positions)) then
                                     string($document/@name)
                                 else
-                                    for $detail-position in $detail-positions
+                                    for $detail-position in $active-query-positions
                                     return
                                         let $raw     := $document/details/detail[$detail-position],
-                                            $query   := instance('fr-search-instance')/query[exists(@name)][$detail-position],
+                                            $query   := $all-named-queries[$detail-position],
                                             $control := $query/@control,
                                             $value   :=
                                                 if (frf:isMultipleSelectionControl($control)) then
@@ -787,6 +897,23 @@
                                         ''"/>
 
                         <xf:var
+                            name="list-title"
+                            value="
+                                (
+                                    for $tf in $title-fields,
+                                        $idx in index-of($active-query-names, $tf)[1]
+                                    return $cell-values[$idx][. != '–'],
+                                    string($document/@name)
+                                )[1]"/>
+
+                        <xf:var
+                            name="list-pill"
+                            value="
+                                for $pf in $pill-field,
+                                    $idx in index-of($active-query-names, $pf)[1]
+                                return $cell-values[$idx][. != '–']"/>
+
+                        <xf:var
                             name="row-tooltip"
                             value="
                                 if (empty($column-labels)) then
@@ -794,17 +921,44 @@
                                 else
                                     string-join(
                                         for $idx in 1 to count($cell-values)
-                                        return concat($column-labels[$idx], ': ', $cell-values[$idx]),
+                                        return
+                                            if ($is-list-mode and $cell-values[$idx] = '–') then
+                                                ()
+                                            else
+                                                concat($column-labels[$idx], ': ', $cell-values[$idx]),
                                         ' · '
                                     )"/>
 
                         <xf:var name="is-single-cell" value="count($cell-values) le 1"/>
 
                         <xh:li
-                            class="list-group-item fr-card-data-row {'fr-card-data-row-clickable'[xxf:non-blank($row-href)]} {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"
-                            role="row"
+                            class="list-group-item {if ($is-list-mode) then 'fr-card-published-row' else ('fr-card-data-row', 'fr-card-data-row-clickable'[xxf:non-blank($row-href)])} {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"
+                            role="{if ($is-list-mode) then 'listitem' else 'row'}"
                             title="{$row-tooltip}">
-                            <xf:repeat ref="1 to count($cell-values)">
+                            <xh:a
+                                href="{if (xxf:non-blank($row-href)) then $row-href else '#'}"
+                                class="fr-card-row-primary {'xforms-hidden'[not($is-list-mode) or xxf:is-blank($row-href)]}">
+                                <xh:span class="fr-card-col fr-card-col-single">
+                                    <xh:span class="fr-card-col-text text-truncate">
+                                        <xf:output value="$list-title"/>
+                                    </xh:span>
+                                    <xh:span class="fr-card-app-pill {'xforms-hidden'[empty($list-pill)]}">
+                                        <xf:output value="$list-pill"/>
+                                    </xh:span>
+                                </xh:span>
+                            </xh:a>
+                            <xh:div
+                                class="fr-card-row-primary {'xforms-hidden'[not($is-list-mode) or xxf:non-blank($row-href)]}">
+                                <xh:span class="fr-card-col fr-card-col-single">
+                                    <xh:span class="fr-card-col-text text-truncate">
+                                        <xf:output value="$list-title"/>
+                                    </xh:span>
+                                    <xh:span class="fr-card-app-pill {'xforms-hidden'[empty($list-pill)]}">
+                                        <xf:output value="$list-pill"/>
+                                    </xh:span>
+                                </xh:span>
+                            </xh:div>
+                            <xf:repeat ref="(1 to count($cell-values))[not($is-list-mode)]">
                                 <xf:var name="col-idx"   value="."/>
                                 <xf:var name="cell-text" value="$cell-values[$col-idx]"/>
                                 <xf:var name="is-link"   value="$col-idx = 1 and xxf:non-blank($row-href)"/>

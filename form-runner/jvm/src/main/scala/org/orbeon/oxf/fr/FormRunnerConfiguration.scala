@@ -1242,7 +1242,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       baseName      = "oxf.fr.landing.page-size",
       xsType        = "xs:integer",
       hasAppForm    = false,
-      defaultValue  = "8",
+      defaultValue  = "6",
       validationOpt = Some("positive-integer")
     ),
     CuratedPropertyDef(

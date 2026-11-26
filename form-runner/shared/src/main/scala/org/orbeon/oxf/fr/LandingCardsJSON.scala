@@ -33,7 +33,9 @@ object LandingCard {
     thumbnail  : Option[String],
     app        : String,
     form       : String,
-    version    : Option[Int]
+    version    : Option[Int],
+    titleFields: List[String]   = Nil,
+    pillField  : Option[String] = None
   ) extends LandingCard
 }
 
@@ -150,7 +152,9 @@ object LandingCardsJSON {
       thumbnail   = Some("/apps/fr/style/images/orbeon/library.svg"),
       app         = "orbeon",
       form        = "builder",
-      version     = Some(1)
+      version     = Some(1),
+      titleFields = List("title", "form-name"),
+      pillField   = Some("application-name")
     )
 
   val BookshelfCard: LandingCard.FormData =
@@ -167,8 +171,7 @@ object LandingCardsJSON {
     DemoFormsCard,
     DemoFeaturesCard,
     PublishedFormsCard,
-    FormBuilderFormsCard,
-    BookshelfCard
+    FormBuilderFormsCard
   )
 
   def parseValue(rawValue: String): Try[Option[Seq[LandingCard]]] =
@@ -221,7 +224,7 @@ object LandingCardsJSON {
               }
               .getOrElse(Json.obj())
             )
-        case FormData(title, description, thumbnail, app, form, version) =>
+        case FormData(title, description, thumbnail, app, form, version, titleFields, pillField) =>
           Json.obj(
             "card-type"  -> Json.fromString("form-data"),
             "app"        -> Json.fromString(app),
@@ -231,6 +234,8 @@ object LandingCardsJSON {
             .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
             .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
             .deepMerge(version    .map(v => Json.obj("version"     -> Json.fromInt(v)))            .getOrElse(Json.obj()))
+            .deepMerge(if (titleFields.nonEmpty) Json.obj("title-field" -> Json.fromString(titleFields.mkString(" "))) else Json.obj())
+            .deepMerge(pillField  .map(p => Json.obj("pill-field"  -> Json.fromString(p)))         .getOrElse(Json.obj()))
       }
     )
 
@@ -276,16 +281,7 @@ object LandingCardsJSON {
           )
         )
       case "form-builder-forms"   =>
-        List(
-          LandingCard.FormData(
-            title       = Some(LocalizedString.ByResource("landing.titles.form-builder-forms")),
-            description = Some(LocalizedString.ByResource("landing.descriptions.form-builder-forms")),
-            thumbnail   = Some("/apps/fr/style/images/orbeon/library.svg"),
-            app         = "orbeon",
-            form        = "builder",
-            version     = Some(1)
-          )
-        )
+        List(FormBuilderFormsCard)
       case AppFormVersionRegex(app, form, version) =>
         List(
           LandingCard.FormData(
@@ -514,15 +510,52 @@ object LandingCardsJSON {
         case None                        => error("Expected string for `sort-direction`")
       }
 
-    def parseFormData(o: JsonObject): FormData =
+    def parseFormData(o: JsonObject): FormData = {
+      val titleFields = o("title-field").filterNot(_.isNull).map(j => parseSlugList(j, "title-field")).getOrElse(Nil)
+      val pillField   = o("pill-field") .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `pill-field`")).trimAllToOpt)
+
+      pillField.foreach { p =>
+        if (! AppSlugRegex.matches(p))
+          error(s"Invalid field name in `pill-field`: $p")
+      }
+      if (pillField.isDefined && titleFields.isEmpty)
+        error("Cannot specify `pill-field` without `title-field` for `form-data`")
+
       FormData(
         title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString),
         description = o("description").filterNot(_.isNull).map(parseLocalizedString),
         thumbnail   = o("thumbnail")  .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `thumbnail`")).trimAllToOpt),
         app         = o("app")        .flatMap(_.asString).getOrElse(error("Missing `app` for `form-data`")),
         form        = o("form")       .flatMap(_.asString).getOrElse(error("Missing `form` for `form-data`")),
-        version     = o("version")    .filterNot(_.isNull).flatMap(_.asNumber).flatMap(_.toInt)
+        version     = o("version")    .filterNot(_.isNull).flatMap(_.asNumber).flatMap(_.toInt),
+        titleFields = titleFields,
+        pillField   = pillField
       )
+    }
+
+    def parseSlugList(json: Json, fieldName: String): List[String] = {
+      val tokens =
+        json.asString match {
+          case Some(s) =>
+            s.splitTo[List]().distinct
+          case None =>
+            json.asArray match {
+              case Some(arr) =>
+                arr.toList
+                  .flatMap { elem =>
+                    elem.asString.getOrElse(error(s"Expected string in `$fieldName` array")).splitTo[List]()
+                  }
+                  .distinct
+              case None =>
+                error(s"Expected string or array of strings for `$fieldName`")
+            }
+        }
+      tokens.foreach { t =>
+        if (! AppSlugRegex.matches(t))
+          error(s"Invalid field name in `$fieldName`: $t")
+      }
+      tokens
+    }
 
     def parseLocalizedString(json: Json): LocalizedString = {
       json.asObject match {

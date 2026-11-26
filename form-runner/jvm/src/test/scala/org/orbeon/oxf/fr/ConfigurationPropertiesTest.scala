@@ -128,7 +128,7 @@ class ConfigurationPropertiesTest
 
       val landingElem = curatedElem.element("landing").element("landing-page-size")
       assert(landingElem.attributeValue("override") == "false")
-      assert(landingElem.attributeValue("value") == "8")
+      assert(landingElem.attributeValue("value") == "6")
 
       val adminElem = curatedElem.element("admin").element("home-page-size")
       assert(adminElem.attributeValue("override") == "false")

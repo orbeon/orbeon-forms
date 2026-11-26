@@ -361,10 +361,19 @@
                 <fr:rows>
                     <xf:repeat ref="$forms[position() le $max-rows]">
                         <xf:var name="is-extra-row" value="position() gt $page-size"/>
-                        <xf:var name="form-app"     value="string(application-name)"/>
-                        <xf:var name="form-name"    value="string(form-name)"/>
-                        <xf:var name="form-version" value="string(form-version)"/>
-                        <xf:var name="form-title"   value="string((title[@xml:lang = xxf:lang()], title, form-name)[normalize-space()][1])"/>
+                        <xf:var name="form-app"       value="string(application-name)"/>
+                        <xf:var name="form-name"      value="string(form-name)"/>
+                        <xf:var name="form-version"   value="string(form-version)"/>
+                        <xf:var name="raw-form-title" value="string((title[@xml:lang = xxf:lang()], title, form-name)[normalize-space()][1])"/>
+                        <xf:var name="strip-prefix"   value="fr:component-param-value('strip-title-prefix')[xxf:non-blank()]"/>
+                        <xf:var
+                            name="form-title"
+                            value="
+                                if (exists($strip-prefix)) then
+                                    let $stripped := replace($raw-form-title, $strip-prefix, '', 'i')
+                                    return if (normalize-space($stripped) != '') then $stripped else $raw-form-title
+                                else
+                                    $raw-form-title"/>
                         <xf:var name="ops"          value="xxf:split(@operations)"/>
                         <xf:var name="can-summary"  value="$ops = ('*', 'list')"/>
                         <xf:var name="can-new"      value="$ops = ('*', 'create')"/>

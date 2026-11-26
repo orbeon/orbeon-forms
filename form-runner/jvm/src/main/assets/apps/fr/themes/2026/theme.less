@@ -386,6 +386,8 @@
   --orbeon-fb-form-area-background-color          : @gray-96;
   --orbeon-fb-hover-background-color              : @tint-hover;
   --orbeon-fb-editable-hover-background-color     : @tint-edit-hover;
+  --orbeon-fb-selected-background-color           : fade(@accent, 6%);
+  --orbeon-fb-selected-box-shadow                 : inset 0 0 0 1px var(--orbeon-focus-border-color);
   --orbeon-fb-placeholder-color                   : @gray-82;
   --orbeon-fb-dnd-background-color                : @gray-82;
   --orbeon-fb-navbar-color                        : @gray-52;
@@ -665,6 +667,7 @@
     --orbeon-attachment-dragover-background-color   : var(--orbeon-accent-color);
     --orbeon-focus-border-color                     : var(--orbeon-accent-color);
     --orbeon-focus-highlight-color                  : color-mix(in oklab, var(--orbeon-accent-color) 25%, transparent);
+    --orbeon-fb-selected-background-color           : color-mix(in oklab, var(--orbeon-accent-color) 6%, transparent);
 
     // @accent-hover, @accent-text, @accent-text-hover
     --orbeon-button-primary-highlight-background-color: color-mix(in oklab, var(--orbeon-accent-color) 88%, black);
@@ -868,6 +871,7 @@
     --orbeon-fb-form-area-background-color                   : @dark-28;
     --orbeon-fb-hover-background-color                       : @dark-32;
     --orbeon-fb-editable-hover-background-color              : @dark-38;
+    --orbeon-fb-selected-background-color                    : color-mix(in oklab, var(--orbeon-accent-color) 14%, transparent);
     --orbeon-fb-placeholder-color                            : @dark-55;
     --orbeon-fb-dnd-background-color                         : @dark-44;
     --orbeon-fb-navbar-color                                 : @dark-62;

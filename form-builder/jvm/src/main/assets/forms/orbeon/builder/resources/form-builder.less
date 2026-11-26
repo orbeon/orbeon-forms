@@ -4964,9 +4964,10 @@ body.orbeon {
             .xbl-fr-grid .fr-grid.fr-editable {
                 .fr-grid-td {
                     &.fb-selected {
-                        box-shadow: 0 0 0 2px var(--orbeon-focus-border-color), 0 0 0 5px var(--orbeon-focus-highlight-color) !important;
+                        box-shadow: var(--orbeon-fb-selected-box-shadow) !important;
+                        background-color: var(--orbeon-fb-selected-background-color);
                         outline: 0;
-                        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+                        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, background-color .15s ease-in-out;
                         border-radius: var(--orbeon-body-decorations-border-radius);
                         z-index: 1; // Highlight to show over grey background for hover cell
                     }

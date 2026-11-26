@@ -798,10 +798,15 @@
             <demo-features>Orbeon Formsの特定機能のデモを試す</demo-features>
         </descriptions>
         <show-more>もっと見る…</show-more>
+        <tabs>
+            <workspace>ワークスペース</workspace>
+            <demos>デモとサンプル</demos>
+        </tabs>
         <labels>
             <updated>更新</updated>
             <auto-refresh>自動更新</auto-refresh>
             <auto-off>オフ</auto-off>
+            <sections>ランディングページのセクション</sections>
         </labels>
         <buttons>
             <refresh>更新</refresh>
@@ -814,6 +819,7 @@
         </buttons>
         <messages>
             <no-forms>公開済みのフォームはありません</no-forms>
+            <no-forms-onboarding>公開済みのフォームはまだありません。Form Builder でフォームを作成して公開すると、ここに表示されます。</no-forms-onboarding>
             <no-data>フォームデータはありません</no-data>
             <sorted-by-ascending>{0} の昇順で並べ替えました</sorted-by-ascending>
             <sorted-by-descending>{0} の降順で並べ替えました</sorted-by-descending>

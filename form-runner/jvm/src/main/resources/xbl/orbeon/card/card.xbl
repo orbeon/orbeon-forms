@@ -18,17 +18,20 @@
             xxbl:transform="oxf:unsafe-xslt"
         >
             <xh:div
-                class="card h-100 {{'fr-card-filtered-out'[fr:component-param-value('filtered-out') = 'true']}}"
+                class="card h-100 {{'fr-card-filtered-out'[fr:component-param-value('filtered-out') = 'true']}} {{'fr-card-auto-hidden'[fr:component-param-value('auto-hidden') = 'true']}}"
                 xsl:version="2.0"
+                data-has-loaded="{{if (xxf:non-blank(fr:component-param-value('has-loaded'))) then fr:component-param-value('has-loaded') = 'true' else (fr:component-param-value('status')[xxf:non-blank()], 'done')[1] = 'done'}}"
                 data-total-count="{{(fr:component-param-value('total-count')[xxf:non-blank()], fr:component-param-value('count')[xxf:non-blank()])[1]}}"
             >
 
-                <xf:var name="binding"       value="xxf:binding('fr-card')"/>
-                <xf:var name="status"        value="(fr:component-param-value('status')[xxf:non-blank()], 'done')[1]"/>
-                <xf:var name="has-loaded"    value="if (xxf:non-blank(fr:component-param-value('has-loaded'))) then fr:component-param-value('has-loaded') = 'true' else $status = 'done'"/>
-                <xf:var name="count"         value="fr:component-param-value('count')[xxf:non-blank()]"/>
-                <xf:var name="empty-message" value="fr:component-param-value('empty-message')"/>
-                <xf:var name="columns"       value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
+                <xf:var name="binding"            value="xxf:binding('fr-card')"/>
+                <xf:var name="status"             value="(fr:component-param-value('status')[xxf:non-blank()], 'done')[1]"/>
+                <xf:var name="has-loaded"         value="if (xxf:non-blank(fr:component-param-value('has-loaded'))) then fr:component-param-value('has-loaded') = 'true' else $status = 'done'"/>
+                <xf:var name="count"              value="fr:component-param-value('count')[xxf:non-blank()]"/>
+                <xf:var name="empty-message"      value="fr:component-param-value('empty-message')"/>
+                <xf:var name="empty-action-href"  value="fr:component-param-value('empty-action-href')[xxf:non-blank()]"/>
+                <xf:var name="empty-action-label" value="fr:component-param-value('empty-action-label')[xxf:non-blank()]"/>
+                <xf:var name="columns"            value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
 
                 <xsl:choose>
                     <xsl:when test="exists(/*/fr:rows)">
@@ -92,7 +95,15 @@
                     class="fr-card-state fr-card-state-empty {{'fr-card-is-refreshing'[$status = 'loading']}}"
                     xxf:control="true"
                     ref=".[$has-loaded and $status != 'error' and $is-empty]">
-                    <xf:output value="$empty-message"/>
+                    <xh:div class="fr-card-empty-content">
+                        <xh:p class="fr-card-empty-text"><xf:output value="$empty-message"/></xh:p>
+                        <xh:a
+                            href="{{($empty-action-href, '#')[1]}}"
+                            class="btn fr-card-empty-cta {{'xforms-hidden'[empty($empty-action-href) or empty($empty-action-label)]}}">
+                            <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                            <xh:span><xf:output value="$empty-action-label"/></xh:span>
+                        </xh:a>
+                    </xh:div>
                 </xh:div>
 
                 <xh:ul

@@ -9,7 +9,7 @@
             Nazwa aplikacji to nazwa, która pozwala grupować formularze. Nazwa aplikacji (nazwa "app") może być na przykład:
             &lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;nazwą firmy, na przykład "orbeon" lub "acme"&lt;/li&gt;
+                &lt;li&gt;nazwą firmy, na przykład "acme"&lt;/li&gt;
                 &lt;li&gt;nazwą działu w firmie, na przykład "hr", "sales" lub "engineering"&lt;/li&gt;
                 &lt;li&gt;nazwą projektu, na przykład "mercury" lub "phoenix"&lt;/li&gt;
             &lt;/ul&gt;

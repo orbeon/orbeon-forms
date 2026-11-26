@@ -811,10 +811,15 @@
             <demo-features>جرب العروض التوضيحية لميزات محددة من Orbeon Forms</demo-features>
         </descriptions>
         <show-more>إظهار المزيد…</show-more>
+        <tabs>
+            <workspace>مساحة العمل</workspace>
+            <demos>العروض والأمثلة</demos>
+        </tabs>
         <labels>
             <updated>آخر تحديث</updated>
             <auto-refresh>تحديث تلقائي</auto-refresh>
             <auto-off>إيقاف</auto-off>
+            <sections>أقسام الصفحة الرئيسية</sections>
         </labels>
         <buttons>
             <refresh>تحديث</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>لا توجد نماذج منشورة</no-forms>
+            <no-forms-onboarding>لا توجد نماذج منشورة بعد. أنشئ نموذجًا وانشره في Form Builder ليظهر هنا.</no-forms-onboarding>
             <no-data>لا توجد بيانات</no-data>
             <sorted-by-ascending>مرتب حسب {0}، تصاعديًا</sorted-by-ascending>
             <sorted-by-descending>مرتب حسب {0}، تنازليًا</sorted-by-descending>

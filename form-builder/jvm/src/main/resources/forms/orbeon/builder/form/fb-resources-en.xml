@@ -9,7 +9,7 @@
             The application name is a name which allows grouping form together. The application name (or app name) can be, for example:
             &lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;a company name such as "orbeon" or "acme"&lt;/li&gt;
+                &lt;li&gt;a company name such as "acme"&lt;/li&gt;
                 &lt;li&gt;a company entity such as "hr" or "sales" or "engineering"&lt;/li&gt;
                 &lt;li&gt;a project name such as "mercury" or "phoenix"&lt;/li&gt;
             &lt;/ul&gt;

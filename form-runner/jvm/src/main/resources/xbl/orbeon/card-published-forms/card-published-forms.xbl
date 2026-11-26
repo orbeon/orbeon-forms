@@ -42,7 +42,16 @@
                     "/>
 
                 <xf:instance id="fr-ui-instance" xxf:exclude-result-prefixes="#all">
-                    <ui state="initial" has-loaded="false" sort-by="" sort-direction="" sort-announcement=""/>
+                    <ui
+                        state="initial"
+                        has-loaded="false"
+                        sort-by=""
+                        sort-direction=""
+                        sort-announcement=""
+                        unfiltered-total=""
+                        latest-modified=""
+                        pending-query=""
+                        submitted-query=""/>
                 </xf:instance>
 
                 <xf:instance id="fr-search-request-instance" xxf:exclude-result-prefixes="#all">
@@ -72,6 +81,14 @@
                             value="fr:component-param-value('app')[xxf:non-blank()]"/>
 
                         <xf:var
+                            name="exclude-apps"
+                            value="if (empty($app)) then xxf:split(fr:component-param-value('exclude-apps')) else ()"/>
+
+                        <xf:var
+                            name="pending-query"
+                            value="string(instance('fr-ui-instance')/@pending-query)"/>
+
+                        <xf:var
                             name="sort-by"
                             value="(instance('fr-ui-instance')/@sort-by[xxf:non-blank()], fr:component-param-value('sort-by')[xxf:non-blank()], 'last-modified')[1]"/>
 
@@ -97,9 +114,10 @@
                                     ' '
                                 )"/>
 
-                        <xf:setvalue ref="instance('fr-ui-instance')/@state"          value="'loading'"/>
-                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-by"        value="$sort-by"/>
-                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-direction" value="$sort-direction"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@state"           value="'loading'"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@submitted-query" value="$pending-query"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-by"         value="$sort-by"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-direction"  value="$sort-direction"/>
 
                         <xf:setvalue
                             ref="instance('fr-search-request-instance')/@xml:lang"
@@ -112,21 +130,55 @@
                             context="instance('fr-search-request-instance')"
                             origin="
                                 (
+                                    for $q in $pending-query[xxf:non-blank()]
+                                    return xf:element('query', $q),
                                     for $a in $app
                                     return xf:element('filter', (xf:attribute('metadata', 'application-name'), xf:attribute('match', 'exact'), $a)),
+                                    for $ea in $exclude-apps
+                                    return xf:element('filter', (xf:attribute('metadata', 'application-name'), xf:attribute('match', 'exact'), xf:attribute('exclude', 'true'), $ea)),
                                     xf:element('filter', (xf:attribute('metadata', 'form-version'), xf:attribute('match', 'exact'), 'latest')),
                                     xf:element('filter', (xf:attribute('metadata', 'operations'),   xf:attribute('match', 'token'), xf:attribute('combinator', 'or'), $operations-filter)),
-                                    xf:element('sort',   (xf:attribute('metadata', $sort-by), xf:attribute('direction', $sort-direction)))
+                                    xf:element('sort',   (xf:attribute('metadata', $sort-by), xf:attribute('direction', $sort-direction))),
+                                    xf:element('pagination', (xf:attribute('page-number', '1'), xf:attribute('page-size', string($max-rows))))
                                 )"/>
                     </xf:action>
 
                     <xf:action event="xforms-submit-done">
                         <xf:setvalue ref="instance('fr-ui-instance')/@state"      value="'done'"/>
                         <xf:setvalue ref="instance('fr-ui-instance')/@has-loaded" value="'true'"/>
+
+                        <xf:var name="returned-forms" value="instance('fr-forms-instance')/*"/>
+                        <xf:var name="search-total"   value="xs:integer((instance('fr-forms-instance')/@search-total[. castable as xs:integer], count($returned-forms))[1])"/>
+
+                        <xf:action if="xxf:is-blank(instance('fr-ui-instance')/@submitted-query)">
+                            <xf:setvalue
+                                ref="instance('fr-ui-instance')/@unfiltered-total"
+                                value="string($search-total)"/>
+                            <xf:setvalue
+                                ref="instance('fr-ui-instance')/@latest-modified"
+                                value="
+                                    if ($search-total le 0 or empty($returned-forms)) then
+                                        ''
+                                    else if (instance('fr-ui-instance')/@sort-by = 'last-modified' and instance('fr-ui-instance')/@sort-direction = 'desc') then
+                                        string($returned-forms[1]/last-modified-time)
+                                    else
+                                        string(
+                                            max((
+                                                instance('fr-ui-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.),
+                                                $returned-forms/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.)
+                                            ))
+                                        )"/>
+                        </xf:action>
+
+                        <!-- If the filter query changed while this submission was in flight, immediately run the latest query -->
+                        <xf:action if="string(instance('fr-ui-instance')/@pending-query) != string(instance('fr-ui-instance')/@submitted-query)">
+                            <xf:send submission="fr-read-demo-forms-submission"/>
+                        </xf:action>
                     </xf:action>
 
                     <xf:setvalue
                         event="xforms-submit-error"
+                        if="event('error-type') != 'submission-in-progress'"
                         ref="instance('fr-ui-instance')/@state"
                         value="'error'"/>
                 </xf:submission>
@@ -139,8 +191,13 @@
         <xbl:template>
 
             <xf:var name="app-filter"       value="fr:component-param-value('app')[xxf:non-blank()]"/>
-            <xf:var name="all-forms"        value="instance('fr-forms-instance')/*"/>
-            <xf:var name="total-form-count" value="count($all-forms)"/>
+            <xf:var name="exclude-apps"     value="if (empty($app-filter)) then xxf:split(fr:component-param-value('exclude-apps')) else ()"/>
+            <xf:var name="hide-when-empty"  value="fr:component-param-value('hide-when-empty') = 'true'"/>
+            <xf:var name="forms"            value="instance('fr-forms-instance')/*"/>
+            <xf:var name="search-total"     value="xs:integer((instance('fr-forms-instance')/@search-total[. castable as xs:integer], count($forms))[1])"/>
+            <xf:var
+                name="unfiltered-total-opt"
+                value="instance('fr-ui-instance')/@unfiltered-total[. castable as xs:integer]/xs:integer(.)"/>
             <xf:var name="filter"           value="lower-case(xxf:trim(fr:component-param-value('filter')))"/>
             <xf:var name="is-filtering"     value="xxf:non-blank($filter)"/>
             <xf:var
@@ -151,30 +208,32 @@
                         (exists($app-filter) and contains(lower-case($app-filter), $filter))
                     )"/>
             <xf:var
-                name="forms"
-                value="
-                    if (not($is-filtering) or $card-title-matches) then
-                        $all-forms
-                    else
-                        $all-forms[
-                            let $t := string((title[@xml:lang = xxf:lang()], title, form-name)[normalize-space()][1])
-                            return
-                                contains(lower-case($t), $filter)                       or
-                                contains(lower-case(string(application-name)), $filter) or
-                                contains(lower-case(string(form-name)), $filter)
-                        ]"/>
-            <xf:var name="form-count"       value="count($forms)"/>
+                name="effective-query"
+                value="if ($is-filtering and not($card-title-matches)) then xxf:trim(fr:component-param-value('filter')) else ''"/>
             <xf:var
                 name="count-display"
                 value="
-                    if ($is-filtering and $form-count != $total-form-count) then
-                        concat($form-count, ' / ', $total-form-count)
+                    if (xxf:non-blank($effective-query) and exists($unfiltered-total-opt) and $search-total != $unfiltered-total-opt) then
+                        concat($search-total, ' / ', $unfiltered-total-opt)
                     else
-                        string($form-count)"/>
+                        string($search-total)"/>
             <xf:var
                 name="is-filtered-out"
-                value="$is-filtering and not($card-title-matches) and instance('fr-ui-instance')/@has-loaded = 'true' and $form-count = 0"/>
-            <xf:var name="show-more"        value="$form-count gt $page-size"/>
+                value="
+                    $is-filtering                                     and
+                    not($card-title-matches)                          and
+                    instance('fr-ui-instance')/@has-loaded = 'true'   and
+                    instance('fr-ui-instance')/@state      = 'done'   and
+                    $search-total                           = 0"/>
+            <xf:var
+                name="is-auto-hidden"
+                value="
+                    $hide-when-empty                                  and
+                    instance('fr-ui-instance')/@has-loaded = 'true'   and
+                    instance('fr-ui-instance')/@state      = 'done'   and
+                    exists($unfiltered-total-opt)                     and
+                    $unfiltered-total-opt                   = 0"/>
+            <xf:var name="show-more"        value="$search-total gt $page-size"/>
             <xf:var
                 name="show-more-href"
                 value="
@@ -190,7 +249,14 @@
                     )"/>
             <xf:var
                 name="latest-modified-dt"
-                value="max($forms/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))"/>
+                value="
+                    if (xxf:non-blank($effective-query)) then
+                        max($forms/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))
+                    else
+                        (
+                            instance('fr-ui-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.),
+                            max($forms/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))
+                        )[1]"/>
             <xf:var name="is-sorted-by-title" value="instance('fr-ui-instance')/@sort-by = 'title'"/>
             <xf:var
                 name="sort-toggle-label"
@@ -201,22 +267,42 @@
                         xxf:r('landing.buttons.sort-by-title', '|fr-fr-resources|')"/>
 
             <xf:var
+                name="show-empty-cta"
+                value="
+                    not($is-filtering)                                      and
+                    exists($unfiltered-total-opt)                           and
+                    $unfiltered-total-opt = 0                               and
+                    xxf:non-blank(fr:component-param-value('empty-action-href'))"/>
+            <xf:var
+                name="empty-message"
+                value="
+                    if ($show-empty-cta) then
+                        xxf:r('landing.messages.no-forms-onboarding', '|fr-fr-resources|')
+                    else
+                        xxf:r('landing.messages.no-forms', '|fr-fr-resources|')"/>
+
+            <xf:var
                 name="refresh-watch"
-                value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'))">
-                <xf:send
-                    event="xforms-value-changed"
-                    if="instance('fr-ui-instance')/@has-loaded = 'true' or instance('fr-ui-instance')/@state = 'error'"
-                    submission="fr-read-demo-forms-submission"/>
+                value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'), '|', $effective-query, '|', string-join($exclude-apps, ' '))">
+                <xf:action event="xforms-value-changed">
+                    <xf:setvalue ref="instance('fr-ui-instance')/@pending-query" value="$effective-query"/>
+                    <xf:send
+                        if="instance('fr-ui-instance')/@has-loaded = 'true' or instance('fr-ui-instance')/@state = 'error'"
+                        submission="fr-read-demo-forms-submission"/>
+                </xf:action>
             </xf:var>
 
             <fr:card
                 status="{instance('fr-ui-instance')/@state}"
                 has-loaded="{instance('fr-ui-instance')/@has-loaded}"
                 count="{$count-display}"
-                total-count="{$form-count}"
+                total-count="{$search-total}"
                 filtered-out="{$is-filtered-out}"
+                auto-hidden="{$is-auto-hidden}"
                 is-empty="{empty($forms)}"
-                empty-message="{xxf:r('landing.messages.no-forms', '|fr-fr-resources|')}"
+                empty-message="{$empty-message}"
+                empty-action-href="{fr:component-param-value('empty-action-href')[$show-empty-cta]}"
+                empty-action-label="{fr:component-param-value('empty-action-label')[$show-empty-cta]}"
             >
                 <xf:label ref="xxf:label('fr-card-published-forms')"/>
 
@@ -227,7 +313,7 @@
                 <fr:card-actions>
                     <xf:trigger
                         appearance="minimal"
-                        class="fr-card-action-btn fr-card-sort-mode-btn {'xforms-hidden'[$form-count le 1]}">
+                        class="fr-card-action-btn fr-card-sort-mode-btn {'xforms-hidden'[$search-total le 1]}">
                         <xf:label>
                             <xh:i class="fa {if ($is-sorted-by-title) then 'fa-arrow-down-a-z' else 'fa-clock'}" aria-hidden="true"/>
                             <xh:span class="xforms-hidden"><xf:output value="$sort-toggle-label"/></xh:span>

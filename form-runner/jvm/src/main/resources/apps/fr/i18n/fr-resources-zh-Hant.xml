@@ -811,10 +811,15 @@
             <demo-features>試用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>顯示更多…</show-more>
+        <tabs>
+            <workspace>工作區</workspace>
+            <demos>示範與範例</demos>
+        </tabs>
         <labels>
             <updated>已更新</updated>
             <auto-refresh>自動重新整理</auto-refresh>
             <auto-off>關閉</auto-off>
+            <sections>首頁分區</sections>
         </labels>
         <buttons>
             <refresh>重新整理</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>尚無已發佈的表單</no-forms>
+            <no-forms-onboarding>尚無已發佈的表單。請在 Form Builder 中建立並發佈表單以在此處查看。</no-forms-onboarding>
             <no-data>尚無表單資料</no-data>
             <sorted-by-ascending>已依 {0} 升冪排列</sorted-by-ascending>
             <sorted-by-descending>已依 {0} 降冪排列</sorted-by-descending>

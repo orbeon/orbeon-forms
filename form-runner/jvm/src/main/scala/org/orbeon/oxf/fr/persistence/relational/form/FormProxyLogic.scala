@@ -31,6 +31,7 @@ import org.orbeon.oxf.fr.persistence.relational.form.adt.*
 import org.orbeon.oxf.http.{BasicCredentials, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.PathUtils.PathOps
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xml.dom.IOSupport.readOrbeonDom
 import org.orbeon.saxon.om.NodeInfo
@@ -166,11 +167,29 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
     }
 
     // 1) Filter forms
-    val appFormsSet    = formRequest.appForms.toSet
-    val queriesToCheck = formRequest.filterQueries.diff(latestFormVersionQueryOpt.toSeq)
-    val filteredForms  = formsWithLocalOperations.filter { form =>
+    val appFormsSet     = formRequest.appForms.toSet
+    val queriesToCheck  = formRequest.filterQueries.diff(latestFormVersionQueryOpt.toSeq)
+    val loweredQueryOpt = formRequest.queryOpt.map(_.toLowerCase)
+
+    def matchesFreeQuery(form: Form): Boolean =
+      loweredQueryOpt.forall { q =>
+        lazy val lang      = formRequest.languageOpt.getOrElse(FormRunner.getDefaultLang(form.appForm.some))
+        val metadataSeq    = form.localMetadataOpt.toSeq ++ form.remoteMetadata.values
+        val resolvedTitles =
+          metadataSeq.flatMap { m =>
+            m.title.get(lang).filter(_.nonAllBlank).orElse(m.title.values.find(_.nonAllBlank))
+          }
+        val effectiveTitle = resolvedTitles.headOption.getOrElse(form.appForm.form)
+
+        effectiveTitle.toLowerCase.contains(q)      ||
+          form.appForm.app.toLowerCase.contains(q)  ||
+          form.appForm.form.toLowerCase.contains(q)
+      }
+
+    val filteredForms   = formsWithLocalOperations.filter { form =>
       (appFormsSet.isEmpty || appFormsSet.contains(form.appForm)) &&
-        queriesToCheck.forall(_.satisfies(form, formRequest))
+        queriesToCheck.forall(_.satisfies(form, formRequest))     &&
+        matchesFreeQuery(form)
     }
 
     // 2) Sort forms

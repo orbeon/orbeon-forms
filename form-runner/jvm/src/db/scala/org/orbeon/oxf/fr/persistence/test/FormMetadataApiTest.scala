@@ -1049,6 +1049,84 @@ class FormMetadataApiTest
       }
     }
 
+    it("supports excluded application filters and free-text query with pagination (#8109)") {
+      withProvider(applicationCounts) { provider => externalContext =>
+
+        implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
+
+        val demoApp1 = s"${provider.entryName}-1"
+        val demoApp2 = s"${provider.entryName}-2"
+        val userApp3 = s"${provider.entryName}-3"
+        val userApp4 = s"${provider.entryName}-4"
+
+        TestForm(appForm = AppForm(demoApp1, "bookshelf"),  titlesByLanguage = Map("en" -> "Orbeon Demo: Bookshelf"),  controls = Seq.empty, operations = None).putFormDefinition(Version.Specific(1))
+        TestForm(appForm = AppForm(demoApp2, "controls"),   titlesByLanguage = Map("en" -> "Orbeon Demo: Controls"),   controls = Seq.empty, operations = None).putFormDefinition(Version.Specific(1))
+        TestForm(appForm = AppForm(userApp3, "onboarding"), titlesByLanguage = Map("en" -> "Employee Onboarding"),     controls = Seq.empty, operations = None).putFormDefinition(Version.Specific(1))
+        TestForm(appForm = AppForm(userApp3, "expense"),    titlesByLanguage = Map("en" -> "Travel Expense Claim"),    controls = Seq.empty, operations = None).putFormDefinition(Version.Specific(1))
+        TestForm(appForm = AppForm(userApp4, "invoice"),    titlesByLanguage = Map("en" -> "Vendor Invoice Approval"), controls = Seq.empty, operations = None).putFormDefinition(Version.Specific(1))
+
+        // 1. Exclude demo apps + paginate page-size=2 -> search-total must be 3 (exact non-demo count) and return 2 forms
+        val excludePagedReq =
+          <search all-forms="true" xml:lang="en">
+            <filter metadata="application-name" match="exact" exclude="true">{demoApp1}</filter>
+            <filter metadata="application-name" match="exact" exclude="true">{demoApp2}</filter>
+            <filter metadata="form-version" match="exact">latest</filter>
+            <sort metadata="title" direction="asc"/>
+            <pagination page-number="1" page-size="2"/>
+          </search>.toDocument
+
+        HttpCall.assertCall(
+          actualRequest  = solicitedRequest(excludePagedReq),
+          assertResponse = response => {
+            assert(response.code == StatusCode.Ok)
+            val root = orbeonDomToTinyTree(IOSupport.readOrbeonDom(new ByteArrayInputStream(response.body))).rootElement
+            assert(root.attValue("search-total") == "3")
+            assert((root / "form").map(_.elemValue("form-name")).toList == List("onboarding", "expense"))
+          }
+        )
+
+        // 2. Combine excluded apps with free-text `<query>` matching title OR form-name OR application-name
+        val queryByTitleReq =
+          <search all-forms="true" xml:lang="en">
+            <query>vendor invoice</query>
+            <filter metadata="application-name" match="exact" exclude="true">{demoApp1}</filter>
+            <filter metadata="application-name" match="exact" exclude="true">{demoApp2}</filter>
+            <filter metadata="form-version" match="exact">latest</filter>
+            <pagination page-number="1" page-size="10"/>
+          </search>.toDocument
+
+        HttpCall.assertCall(
+          actualRequest  = solicitedRequest(queryByTitleReq),
+          assertResponse = response => {
+            assert(response.code == StatusCode.Ok)
+            val root = orbeonDomToTinyTree(IOSupport.readOrbeonDom(new ByteArrayInputStream(response.body))).rootElement
+            assert(root.attValue("search-total") == "1")
+            assert((root / "form").map(_.elemValue("form-name")).toList == List("invoice"))
+          }
+        )
+
+        // Query matching excluded demo title must return 0 when demoApp1 is excluded
+        val queryExcludedDemoReq =
+          <search all-forms="true" xml:lang="en">
+            <query>bookshelf</query>
+            <filter metadata="application-name" match="exact" exclude="true">{demoApp1}</filter>
+            <pagination page-number="1" page-size="10"/>
+          </search>.toDocument
+
+        assertCall(
+          searchRequest = queryExcludedDemoReq,
+          searchResult  = <forms search-total="0"/>.toDocument,
+          contentType   = Check.Some(ContentTypes.XmlContentType)
+        )
+
+        // Invalid `exclude` attribute value returns 400 Bad Request
+        HttpCall.assertCall(
+          actualRequest  = solicitedRequest(<search all-forms="true"><filter metadata="application-name" match="exact" exclude="maybe">{demoApp1}</filter></search>.toDocument),
+          assertResponse = response => assert(response.code == StatusCode.BadRequest)
+        )
+      }
+    }
+
     it("serializes and deserializes requests and responses") {
       withProvider(applicationCounts) { provider => implicit externalContext =>
 
@@ -1063,10 +1141,11 @@ class FormMetadataApiTest
             "https://localhost:8081" -> BasicCredentials("user-1", "pass-1".some, preemptiveAuth = true, None),
             "https://localhost:8082" -> BasicCredentials("user-2", "pass-2".some, preemptiveAuth = true, None)
           ),
-          filterQueries           = Seq(FilterQuery.latestVersionsQuery),
+          filterQueries           = Seq(FilterQuery.latestVersionsQuery, FilterQuery.excludedExactAppQuery("orbeon")),
           sortQuery               = SortQuery.defaultSortQuery,
           paginationOpt           = Pagination(pageNumber = 1, pageSize = 10).some,
-          appForms                = Seq(AppForm("acme", "order"), AppForm("hr", "onboarding"))
+          appForms                = Seq(AppForm("acme", "order"), AppForm("hr", "onboarding")),
+          queryOpt                = "onboarding".some
         )
 
         val deserializedFormRequest = FormRequest(formRequest.toXML)

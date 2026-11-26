@@ -811,10 +811,15 @@
             <demo-features>Testen Sie Demos spezifischer Orbeon Forms-Funktionen</demo-features>
         </descriptions>
         <show-more>Mehr anzeigen…</show-more>
+        <tabs>
+            <workspace>Arbeitsbereich</workspace>
+            <demos>Demos &amp; Beispiele</demos>
+        </tabs>
         <labels>
             <updated>Aktualisiert</updated>
             <auto-refresh>Auto-Aktualisierung</auto-refresh>
             <auto-off>Aus</auto-off>
+            <sections>Startseitenbereiche</sections>
         </labels>
         <buttons>
             <refresh>Aktualisieren</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>Keine veröffentlichten Formulare</no-forms>
+            <no-forms-onboarding>Noch keine veröffentlichten Formulare. Erstellen und veröffentlichen Sie ein Formular im Form Builder, um es hier anzuzeigen.</no-forms-onboarding>
             <no-data>Keine Formulardaten</no-data>
             <sorted-by-ascending>Sortiert nach {0}, aufsteigend</sorted-by-ascending>
             <sorted-by-descending>Sortiert nach {0}, absteigend</sorted-by-descending>

@@ -7,7 +7,7 @@
         <help>
             &lt;p&gt;Der Anwendungsname ist ein Name, mit dem Formulare gruppiert werden können. Beispiele:&lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;ein Firmenname wie „orbeon“ oder „acme“&lt;/li&gt;
+                &lt;li&gt;ein Firmenname wie „acme“&lt;/li&gt;
                 &lt;li&gt;eine Unternehmenseinheit wie „hr“, „sales“ oder „engineering“&lt;/li&gt;
                 &lt;li&gt;ein Projektname wie „mercury“ oder „phoenix“&lt;/li&gt;
             &lt;/ul&gt;

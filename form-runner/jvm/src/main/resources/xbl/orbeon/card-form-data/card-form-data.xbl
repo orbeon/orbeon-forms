@@ -67,7 +67,7 @@
                 <xf:var name="version" value="xs:integer((fr:component-param-value('version')[. castable as xs:integer], 1)[1])"/>
 
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial" has-loaded="false" source-form-loaded="false" operations="" latest-modified="" unfiltered-total="" submitted-query="" sort-announcement=""/>
+                    <_ state="initial" has-loaded="false" source-form-loaded="false" form-not-found="false" operations="" latest-modified="" unfiltered-total="" submitted-query="" sort-announcement=""/>
                 </xf:instance>
 
                 <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
@@ -135,10 +135,10 @@
                         <xf:value value="$version"/>
                     </xf:header>
 
-                    <xf:setvalue
-                        event="xforms-submit"
-                        ref="instance('fr-state-instance')/@state"
-                        value="'loading'"/>
+                    <xf:action event="xforms-submit">
+                        <xf:setvalue ref="instance('fr-state-instance')/@form-not-found" value="'false'"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@state"          value="'loading'"/>
+                    </xf:action>
 
                     <xf:action event="xforms-submit-done">
                         <xf:delete ref="instance('fr-form-metadata-instance')/*"/>
@@ -156,10 +156,12 @@
                             value="string-join($operations-from-role, ' ')"/>
                     </xf:action>
 
-                    <xf:setvalue
-                        event="xforms-submit-error"
-                        ref="instance('fr-state-instance')/@state"
-                        value="'error'"/>
+                    <xf:action event="xforms-submit-error" if="event('error-type') != 'submission-in-progress'">
+                        <xf:var name="is-not-found" value="event('response-status-code') = (404, 410)"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@form-not-found" value="string($is-not-found)"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@has-loaded"     value="if ($is-not-found) then 'true' else ."/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@state"          value="if ($is-not-found and fr:component-param-value('hide-when-empty') = 'true') then 'done' else 'error'"/>
+                    </xf:action>
 
                 </xf:submission>
 
@@ -451,6 +453,18 @@
                     instance('fr-state-instance')/@state      = 'done'  and
                     $search-total                             = 0"/>
 
+            <xf:var
+                name="is-auto-hidden"
+                value="
+                    fr:component-param-value('hide-when-empty') = 'true' and (
+                        instance('fr-state-instance')/@form-not-found = 'true' or (
+                            instance('fr-state-instance')/@has-loaded = 'true' and
+                            instance('fr-state-instance')/@state      = 'done' and
+                            exists($unfiltered-total-opt)                      and
+                            $unfiltered-total-opt                     = 0
+                        )
+                    )"/>
+
             <xf:var name="new-label"     value="xxf:r('landing.buttons.new', '|fr-fr-resources|')"/>
             <xf:var name="summary-label" value="xxf:r('landing.buttons.summary', '|fr-fr-resources|')"/>
 
@@ -464,7 +478,7 @@
                         if="instance('fr-state-instance')/@source-form-loaded = 'true'"
                         submission="fr-search-submission"/>
                     <xf:send
-                        if="instance('fr-state-instance')/@state = 'error' and not(instance('fr-state-instance')/@source-form-loaded = 'true')"
+                        if="(instance('fr-state-instance')/@state = 'error' or instance('fr-state-instance')/@form-not-found = 'true') and not(instance('fr-state-instance')/@source-form-loaded = 'true')"
                         submission="fr-get-source-form-submission"/>
                 </xf:action>
             </xf:var>
@@ -475,6 +489,7 @@
                 count="{$count-display}"
                 total-count="{$search-total}"
                 filtered-out="{$is-filtered-out}"
+                auto-hidden="{$is-auto-hidden}"
                 columns="{max((count($detail-positions), 1))}"
                 is-empty="{empty($documents)}"
                 empty-message="{xxf:r('landing.messages.no-data', '|fr-fr-resources|')}"

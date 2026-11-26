@@ -811,10 +811,15 @@
             <demo-features>Probeer demo's van specifieke Orbeon Forms-functies uit</demo-features>
         </descriptions>
         <show-more>Meer weergeven…</show-more>
+        <tabs>
+            <workspace>Werkruimte</workspace>
+            <demos>Demo's en voorbeelden</demos>
+        </tabs>
         <labels>
             <updated>Bijgewerkt</updated>
             <auto-refresh>Automatisch vernieuwen</auto-refresh>
             <auto-off>Uit</auto-off>
+            <sections>Secties op de startpagina</sections>
         </labels>
         <buttons>
             <refresh>Vernieuwen</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>Geen gepubliceerde formulieren</no-forms>
+            <no-forms-onboarding>Nog geen gepubliceerde formulieren. Maak en publiceer een formulier in Form Builder om het hier te zien.</no-forms-onboarding>
             <no-data>Geen formuliergegevens</no-data>
             <sorted-by-ascending>Gesorteerd op {0}, oplopend</sorted-by-ascending>
             <sorted-by-descending>Gesorteerd op {0}, aflopend</sorted-by-descending>

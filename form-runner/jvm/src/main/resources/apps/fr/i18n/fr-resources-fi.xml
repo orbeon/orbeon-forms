@@ -811,10 +811,15 @@
             <demo-features>Tutustu yksittäisten Orbeon Forms -ominaisuuksien esimerkkeihin</demo-features>
         </descriptions>
         <show-more>Näytä lisää…</show-more>
+        <tabs>
+            <workspace>Työtila</workspace>
+            <demos>Demot ja esimerkit</demos>
+        </tabs>
         <labels>
             <updated>Päivitetty</updated>
             <auto-refresh>Automaattinen päivitys</auto-refresh>
             <auto-off>Pois</auto-off>
+            <sections>Aloitussivun osiot</sections>
         </labels>
         <buttons>
             <refresh>Päivitä</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>Ei julkaistuja lomakkeita</no-forms>
+            <no-forms-onboarding>Ei vielä julkaistuja lomakkeita. Luo ja julkaise lomake Form Builderissa nähdäksesi sen täällä.</no-forms-onboarding>
             <no-data>Ei lomaketietoja</no-data>
             <sorted-by-ascending>Järjestetty sarakkeen {0} mukaan, nouseva</sorted-by-ascending>
             <sorted-by-descending>Järjestetty sarakkeen {0} mukaan, laskeva</sorted-by-descending>

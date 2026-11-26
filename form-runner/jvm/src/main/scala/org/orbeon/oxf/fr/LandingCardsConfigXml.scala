@@ -34,9 +34,11 @@ object LandingCardsConfigXml {
         cards.forall {
           case QuickLinks(_, _, _, _) =>
             true
-          case PublishedForms(title, _, _, appOpt, _, _) =>
+          case PublishedForms(title, _, _, appOpt, excludeApps, _, _) =>
             isNonBlankLocalizedString(title) &&
-              appOpt.forall(a => AppFormSlugRegex.matches(a.trim))
+              appOpt.forall(a => AppFormSlugRegex.matches(a.trim)) &&
+              excludeApps.forall(a => AppFormSlugRegex.matches(a.trim)) &&
+              ! (appOpt.isDefined && excludeApps.nonEmpty)
           case FormData(_, _, _, app, form, versionOpt) =>
             AppFormSlugRegex.matches(app.trim) &&
               AppFormSlugRegex.matches(form.trim) &&
@@ -310,6 +312,7 @@ object LandingCardsConfigXml {
           c.addAttribute("layout-explicit",    layoutExplicit)
           c.addAttribute("app-mode",           "all")
           c.addAttribute("app",                "")
+          c.addAttribute("exclude-apps",       "")
           c.addAttribute("form",               "")
           c.addAttribute("version-mode",       "specific")
           c.addAttribute("version",            "1")
@@ -320,7 +323,7 @@ object LandingCardsConfigXml {
           appendLocalizedStringElement(c, "title",       titleOpt,       allowAutoMode = true)
           appendLocalizedStringElement(c, "description", descriptionOpt, allowAutoMode = true)
 
-        case PublishedForms(title, descriptionOpt, thumbnailOpt, appOpt, linkTo, sortOpt) =>
+        case PublishedForms(title, descriptionOpt, thumbnailOpt, appOpt, excludeApps, linkTo, sortOpt) =>
           c.addAttribute("type",               "published-forms")
           c.addAttribute("links-mode",         "main")
           c.addAttribute("links-explicit-all", "false")
@@ -329,6 +332,7 @@ object LandingCardsConfigXml {
           c.addAttribute("layout-explicit",    "false")
           c.addAttribute("app-mode",           if (appOpt.isDefined) "specific" else "all")
           c.addAttribute("app",                appOpt.getOrElse(""))
+          c.addAttribute("exclude-apps",       if (appOpt.isEmpty) excludeApps.mkString(" ") else "")
           c.addAttribute("form",               "")
           c.addAttribute("version-mode",       "specific")
           c.addAttribute("version",            "1")
@@ -348,6 +352,7 @@ object LandingCardsConfigXml {
           c.addAttribute("layout-explicit",    "false")
           c.addAttribute("app-mode",           "specific")
           c.addAttribute("app",                app)
+          c.addAttribute("exclude-apps",       "")
           c.addAttribute("form",               form)
           c.addAttribute("version-mode",       if (versionOpt.isDefined) "specific" else "default")
           c.addAttribute("version",            versionOpt.map(_.toString).getOrElse("1"))
@@ -440,6 +445,12 @@ object LandingCardsConfigXml {
             else
               None
 
+          val excludeApps =
+            if (appOpt.isEmpty)
+              elem.attributeValueOpt("exclude-apps").getOrElse("").splitTo[List]().distinct
+            else
+              Nil
+
           val linkTo =
             elem.attributeValueOpt("link-to").getOrElse("").splitTo[List]().distinct.flatMap {
               case "new"     => Some(LinkTo.New)
@@ -458,6 +469,7 @@ object LandingCardsConfigXml {
             description = parseLocalizedStringElement(Option(elem.element("description")), required = false),
             thumbnail   = parseThumbnailFromAttributes(elem),
             app         = appOpt,
+            excludeApps = excludeApps,
             linkTo      = linkTo,
             sort        = sortOpt
           )

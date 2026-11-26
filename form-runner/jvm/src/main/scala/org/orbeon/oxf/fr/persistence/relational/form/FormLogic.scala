@@ -47,10 +47,16 @@ object FormLogic {
     RelationalUtils.withConnection(provider) { connection =>
       val allForms = appFormChunks.flatMap { appFormsChunkOpt =>
 
-        // At the moment, the only things we filter at the SQL level are exact app/form names and batched (app, form) pairs
+        // At the moment, the only things we filter at the SQL level are exact app/form names, excluded exact app names, and batched (app, form) pairs
         val innerWhereClauses: List[(String, List[Setter])] = List(
           formRequest.exactAppOpt .map(app  => (s"app =  ?", List[Setter](_.setString(_, app )))),
           formRequest.exactFormOpt.map(form => (s"form = ?", List[Setter](_.setString(_, form)))),
+          Option.when(formRequest.excludedExactApps.nonEmpty) {
+            val apps    = formRequest.excludedExactApps
+            val sql     = s"app NOT IN (${apps.map(_ => "?").mkString(", ")})"
+            val setters = apps.toList.map(app => ((ps, idx) => ps.setString(idx, app)): Setter)
+            (sql, setters)
+          },
           appFormsChunkOpt.map { chunk =>
             val sql     = chunk.map(_ => "(app = ? AND form = ?)").mkString("(", " OR ", ")")
             val setters = chunk.toList.flatMap { af =>

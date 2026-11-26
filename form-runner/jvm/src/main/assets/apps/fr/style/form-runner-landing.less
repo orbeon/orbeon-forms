@@ -46,6 +46,128 @@
         gap: 0.75em;
         padding: 0.75em 0.25em 0;
 
+        .fr-landing-tablist {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            align-items: stretch;
+            gap: 0.2em;
+            min-inline-size: 0;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            &.xforms-hidden {
+                display: none !important;
+            }
+        }
+
+        .fr-landing-tab {
+            flex: none;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45em;
+            padding: 0.55em 0.85em 0.7em;
+            margin: 0;
+            border: 0;
+            background: transparent;
+            color: var(--orbeon-tab-inactive-color);
+            font: inherit;
+            font-weight: 500;
+            line-height: 1.25;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+
+            @media (pointer: coarse) {
+                min-block-size: 40px;
+            }
+
+            @media (hover: hover) {
+                &:hover {
+                    color: var(--orbeon-tab-inactive-hover-color);
+                }
+            }
+
+            .fr-landing-tab-label {
+                .xforms-output,
+                .xforms-output-output {
+                    display: inline;
+                }
+            }
+
+            .fr-landing-tab-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 1.55em;
+                padding: 0.06em 0.48em;
+                border-radius: 9999px;
+                border: 1px solid var(--orbeon-pill-muted-border-color);
+                background-color: var(--orbeon-pill-muted-background-color);
+                color: var(--orbeon-pill-muted-color);
+                font-size: 0.8em;
+                font-weight: 600;
+                line-height: 1.25;
+                font-variant-numeric: tabular-nums;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            &[aria-selected="true"] {
+                color: var(--orbeon-landing-card-link-color);
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset: auto 0 0;
+                    border-block-end: 2px solid var(--orbeon-accent-color);
+
+                    @media (forced-colors: active) {
+                        border-block-end-color: Highlight;
+                    }
+                }
+
+                .fr-landing-tab-count {
+                    border-color: var(--orbeon-pill-border-color);
+                    background-color: var(--orbeon-pill-active-background-color);
+                    color: var(--orbeon-pill-active-color);
+                }
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: -2px;
+                border-radius: 4px;
+            }
+        }
+
+        &:has(> .fr-landing-tablist:not(.xforms-hidden)) {
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+            align-items: flex-end;
+            padding-block-start: 0.55em;
+
+            .fr-landing-toolbar-search {
+                flex: 0 1 auto;
+                margin-inline-start: auto;
+                padding-block-end: 0.5em;
+            }
+
+            .fr-landing-toolbar-actions:not(.xforms-disabled) {
+                margin-inline-start: 0;
+                padding-block-end: 0.5em;
+            }
+        }
+
         .fr-landing-toolbar-search {
             display: flex;
             flex-wrap: wrap;
@@ -321,7 +443,7 @@
             }
         }
 
-        &:has(~ .fr-landing-grid .fr-card-is-refreshing) .fr-landing-refresh-trigger button.btn i.fa {
+        &:has(~ .fr-landing-panels .fr-card-is-refreshing, ~ .fr-landing-grid .fr-card-is-refreshing) .fr-landing-refresh-trigger button.btn i.fa {
             animation: fr-landing-spin 0.8s linear infinite;
 
             @media (prefers-reduced-motion: reduce) {
@@ -355,13 +477,17 @@
         }
     }
 
+    .fr-landing-panel.xforms-hidden {
+        display: none;
+    }
+
     .fr-landing-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(100%, 26.5em), 1fr));
         gap: 1.15em;
         padding: 0.75em 0.25em 2em;
 
-        // Hide XForms repeat markers, non-relevant items, empty quick-links cards, and filtered-out cards so they never occupy grid tracks
+        // Hide XForms repeat markers, non-relevant items, empty quick-links cards, auto-hidden empty demo cards, and filtered-out cards so they never occupy grid tracks
         & > .xforms-hidden,
         & > .xforms-disabled,
         & > .xforms-repeat-begin-end,
@@ -370,14 +496,16 @@
         & > .xbl-fr-card-quick-links:has(> .xforms-hidden),
         & > .xbl-fr-card-quick-links:has(.fr-card-filtered-out),
         & > .xbl-fr-card-published-forms:has(.fr-card-filtered-out),
-        & > .xbl-fr-card-form-data:has(.fr-card-filtered-out) {
+        & > .xbl-fr-card-published-forms:has(.fr-card-auto-hidden),
+        & > .xbl-fr-card-form-data:has(.fr-card-filtered-out),
+        & > .xbl-fr-card-form-data:has(.fr-card-auto-hidden) {
             display: none !important;
         }
 
         & > .fr-landing-card-cell:not(.xforms-hidden),
         & > .xbl-fr-card-quick-links:not(.xforms-disabled):not(:has(> .xforms-hidden)):not(:has(.fr-card-filtered-out)),
-        & > .xbl-fr-card-published-forms:not(.xforms-disabled):not(:has(.fr-card-filtered-out)),
-        & > .xbl-fr-card-form-data:not(.xforms-disabled):not(:has(.fr-card-filtered-out)) {
+        & > .xbl-fr-card-published-forms:not(.xforms-disabled):not(:has(.fr-card-filtered-out)):not(:has(.fr-card-auto-hidden)),
+        & > .xbl-fr-card-form-data:not(.xforms-disabled):not(:has(.fr-card-filtered-out)):not(:has(.fr-card-auto-hidden)) {
             min-inline-size: 0;
             display: flex;
             flex-direction: column;
@@ -846,6 +974,81 @@
         &.fr-card-state-empty {
             color: var(--orbeon-hint-color);
             font-size: 0.95em;
+
+            .fr-card-empty-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8em;
+                max-inline-size: 24em;
+            }
+
+            .fr-card-empty-text {
+                margin: 0;
+                line-height: 1.45;
+
+                .xforms-output,
+                .xforms-output-output {
+                    display: inline;
+                }
+            }
+
+            a.fr-card-empty-cta {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.35em;
+                min-block-size: var(--orbeon-control-height);
+                padding: 0 0.95em;
+                margin: 0;
+                font: inherit;
+                font-weight: 500;
+                line-height: 1;
+                white-space: nowrap;
+                text-decoration: none;
+                color: var(--orbeon-button-color);
+                background-color: var(--orbeon-button-background-color);
+                border: 1px solid transparent;
+                border-radius: var(--orbeon-button-border-radius);
+                box-shadow: none;
+                transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+
+                &.xforms-hidden {
+                    display: none !important;
+                }
+
+                @media (pointer: coarse) {
+                    min-block-size: 40px;
+                }
+
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-button-color);
+                        background-color: var(--orbeon-button-highlight-background-color);
+                        text-decoration: none;
+                    }
+                }
+
+                &:focus-visible {
+                    color: var(--orbeon-button-color);
+                    box-shadow: var(--orbeon-button-focus-ring);
+                    outline: none;
+                }
+
+                @media (forced-colors: active) {
+                    border-color: ButtonText;
+                    color: ButtonText;
+                }
+
+                .xforms-output,
+                .xforms-output-output {
+                    display: inline;
+                }
+            }
         }
 
         &.fr-card-state-error .alert {

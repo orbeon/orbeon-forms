@@ -341,11 +341,44 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       assert(roundTrip == cards)
     }
 
-    it("must omit the Quick Links and Admin cards from DefaultCards") {
+    it("must omit the Quick Links and Admin cards from DefaultCards and exclude demo apps on PublishedFormsCard") {
       assert(LandingCardsJSON.DefaultCards.size == 5)
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.QuickLinksCard))
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.AdminCard))
       assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.DemoFormsCard)
+      assert(LandingCardsJSON.PublishedFormsCard.excludeApps == List("orbeon", "orbeon-features"))
+    }
+
+    it("must parse, validate, and serialize exclude-apps on published-forms") {
+      val excludeJson =
+        """[
+          |  {"card-type": "published-forms", "title": "t", "exclude-apps": "orbeon orbeon-features"},
+          |  {"card-type": "published-forms", "title": "t", "exclude-apps": ["orbeon", "orbeon-features", "orbeon"]},
+          |  {"card-type": "published-forms", "title": "t", "exclude-apps": null},
+          |  {"card-type": "published-forms", "title": "t", "exclude-apps": "   "}
+          |]""".stripMargin
+
+      val cards = LandingCardsJSON.parseString(excludeJson).get.get._1.collect { case p: PublishedForms => p }
+      assert(cards.map(_.excludeApps) == List(
+        List("orbeon", "orbeon-features"),
+        List("orbeon", "orbeon-features"),
+        Nil,
+        Nil
+      ))
+
+      val serialized = LandingCardsJSON.serializeToJson(cards)
+      val reparsed   = LandingCardsJSON.parseString(serialized.noSpaces).get.get._1.collect { case p: PublishedForms => p }
+      assert(reparsed == cards)
+
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "published-forms", "title": "t", "app": "hr", "exclude-apps": "orbeon"}]""").get
+      }
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "published-forms", "title": "t", "exclude-apps": "bad/slug"}]""").get
+      }
+      assertThrows[IllegalArgumentException] {
+        LandingCardsJSON.parseString("""[{"card-type": "published-forms", "title": "t", "exclude-apps": 123}]""").get
+      }
     }
   }
 }

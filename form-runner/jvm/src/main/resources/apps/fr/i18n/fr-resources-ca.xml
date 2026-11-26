@@ -824,10 +824,15 @@
             <demo-features>Proveu demostracions de funcions específiques d'Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Mostrar més…</show-more>
+        <tabs>
+            <workspace>Espai de treball</workspace>
+            <demos>Demos i exemples</demos>
+        </tabs>
         <labels>
             <updated>Actualitzat</updated>
             <auto-refresh>Actualització automàtica</auto-refresh>
             <auto-off>Desactivada</auto-off>
+            <sections>Seccions de la pàgina d'inici</sections>
         </labels>
         <buttons>
             <refresh>Actualitzar</refresh>
@@ -840,6 +845,7 @@
         </buttons>
         <messages>
             <no-forms>No hi ha formularis publicats</no-forms>
+            <no-forms-onboarding>Encara no hi ha formularis publicats. Creeu i publiqueu un formulari a Form Builder per veure'l aquí.</no-forms-onboarding>
             <no-data>No hi ha dades</no-data>
             <sorted-by-ascending>Ordenat per {0}, ascendent</sorted-by-ascending>
             <sorted-by-descending>Ordenat per {0}, descendent</sorted-by-descending>

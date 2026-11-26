@@ -804,10 +804,15 @@
             <demo-features>Попробуйте демонстрации отдельных возможностей Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Показать больше…</show-more>
+        <tabs>
+            <workspace>Рабочая область</workspace>
+            <demos>Демо и примеры</demos>
+        </tabs>
         <labels>
             <updated>Обновлено</updated>
             <auto-refresh>Автообновление</auto-refresh>
             <auto-off>Выкл.</auto-off>
+            <sections>Разделы начальной страницы</sections>
         </labels>
         <buttons>
             <refresh>Обновить</refresh>
@@ -820,6 +825,7 @@
         </buttons>
         <messages>
             <no-forms>Нет опубликованных форм</no-forms>
+            <no-forms-onboarding>Опубликованных форм пока нет. Создайте и опубликуйте форму в Form Builder, чтобы увидеть её здесь.</no-forms-onboarding>
             <no-data>Нет данных формы</no-data>
             <sorted-by-ascending>Отсортировано по {0}, по возрастанию</sorted-by-ascending>
             <sorted-by-descending>Отсортировано по {0}, по убыванию</sorted-by-descending>

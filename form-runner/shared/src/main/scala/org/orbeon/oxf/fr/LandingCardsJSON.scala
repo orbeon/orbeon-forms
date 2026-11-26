@@ -19,10 +19,11 @@ object LandingCard {
 
   case class PublishedForms(
     title      : LocalizedString,
-    description: Option[LocalizedString]               = None,
-    thumbnail  : Option[String]                        = None,
-    app        : Option[String]                        = None,
-    linkTo     : List[LinkTo]                          = Nil,
+    description: Option[LocalizedString]                 = None,
+    thumbnail  : Option[String]                          = None,
+    app        : Option[String]                          = None,
+    excludeApps: List[String]                            = Nil,
+    linkTo     : List[LinkTo]                            = Nil,
     sort       : Option[(SortBy, Option[SortDirection])] = None
   ) extends LandingCard
 
@@ -137,6 +138,7 @@ object LandingCardsJSON {
       title       = LocalizedString.ByResource("landing.titles.published-forms"),
       description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
       thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
+      excludeApps = List("orbeon", "orbeon-features"),
       linkTo      = List(LinkTo.Summary, LinkTo.New),
       sort        = Some((SortBy.LastModified, None))
     )
@@ -202,7 +204,7 @@ object LandingCardsJSON {
             .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))) .getOrElse(Json.obj()))
             .deepMerge(if (links.nonEmpty) Json.obj("links" -> serializeQuickLinks(links))          else Json.obj())
             .deepMerge(layout     .map(l => Json.obj("layout"      -> serializeQuickLinksLayout(l))).getOrElse(Json.obj()))
-        case PublishedForms(title, description, thumbnail, app, linkTo, sort) =>
+        case PublishedForms(title, description, thumbnail, app, excludeApps, linkTo, sort) =>
           Json.obj(
             "card-type" -> Json.fromString("published-forms"),
             "title"     -> serializeLocalizedString(title)
@@ -210,6 +212,7 @@ object LandingCardsJSON {
             .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
             .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
             .deepMerge(app        .map(a => Json.obj("app"         -> Json.fromString(a)))         .getOrElse(Json.obj()))
+            .deepMerge(if (excludeApps.nonEmpty) Json.obj("exclude-apps" -> Json.fromString(excludeApps.mkString(" "))) else Json.obj())
             .deepMerge(if (linkTo.nonEmpty) Json.obj("link-to" -> serializeLinkTo(linkTo)) else Json.obj())
             .deepMerge(
               sort.map { case (sortBy, sortDirection) =>
@@ -301,6 +304,7 @@ object LandingCardsJSON {
   private object Private {
 
     val AppFormVersionRegex = """([A-Za-z0-9\-_]+)/([A-Za-z0-9\-_]+)/(\d+)""".r
+    val AppSlugRegex        = """^[A-Za-z0-9_\-]+$""".r
 
     def serializeLocalizedString(ls: LocalizedString): Json =
       ls match {
@@ -436,14 +440,45 @@ object LandingCardsJSON {
       if (sortByOpt.isEmpty && sortDirectionOpt.isDefined)
         error("Missing `sort-by` when `sort-direction` is present")
 
+      val appOpt      = o("app")         .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `app`")).trimAllToOpt)
+      val excludeApps = o("exclude-apps").filterNot(_.isNull).map(parseExcludeApps).getOrElse(Nil)
+
+      if (appOpt.isDefined && excludeApps.nonEmpty)
+        error("Cannot specify both `app` and `exclude-apps` for `published-forms`")
+
       PublishedForms(
         title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
         description = o("description").filterNot(_.isNull).map(parseLocalizedString),
         thumbnail   = o("thumbnail")  .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `thumbnail`")).trimAllToOpt),
-        app         = o("app")        .filterNot(_.isNull).flatMap(j => j.asString.getOrElse(error("Expected string for `app`")).trimAllToOpt),
+        app         = appOpt,
+        excludeApps = excludeApps,
         linkTo      = o("link-to")    .filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
         sort        = sortByOpt.map(sortBy => (sortBy, sortDirectionOpt))
       )
+    }
+
+    def parseExcludeApps(json: Json): List[String] = {
+      val tokens =
+        json.asString match {
+          case Some(s) =>
+            s.splitTo[List]().distinct
+          case None =>
+            json.asArray match {
+              case Some(arr) =>
+                arr.toList
+                  .flatMap { elem =>
+                    elem.asString.getOrElse(error("Expected string in `exclude-apps` array")).splitTo[List]()
+                  }
+                  .distinct
+              case None =>
+                error("Expected string or array of strings for `exclude-apps`")
+            }
+        }
+      tokens.foreach { a =>
+        if (! AppSlugRegex.matches(a))
+          error(s"Invalid application name in `exclude-apps`: $a")
+      }
+      tokens
     }
 
     def parseLinkTo(json: Json): List[LinkTo] =

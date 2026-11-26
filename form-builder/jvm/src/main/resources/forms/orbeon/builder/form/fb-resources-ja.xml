@@ -9,7 +9,7 @@
             アプリ名はフォームをグループ化するための名前です。例えば:
             &lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;"orbeon" や "acme" のような会社名&lt;/li&gt;
+                &lt;li&gt;"acme" のような会社名&lt;/li&gt;
                 &lt;li&gt;"hr"、"sales"、"engineering" のような部門名&lt;/li&gt;
                 &lt;li&gt;"mercury"、"phoenix" のようなプロジェクト名&lt;/li&gt;
             &lt;/ul&gt;

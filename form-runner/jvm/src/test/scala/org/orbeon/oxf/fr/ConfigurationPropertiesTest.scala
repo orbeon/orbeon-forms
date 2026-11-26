@@ -524,6 +524,7 @@ class ConfigurationPropertiesTest
           description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
           thumbnail   = Some("https://example.org/custom-icon.svg"),
           app         = None,
+          excludeApps = List("orbeon", "orbeon-features"),
           linkTo      = List(LinkTo.New),
           sort        = Some((SortBy.LastModified, None))
         ),
@@ -562,6 +563,7 @@ class ConfigurationPropertiesTest
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "published-forms", "title": {"_": "   "}}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "orbeon", "form": ""}]"""))
       assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "form-data", "app": "bad slug!", "form": "bookshelf"}]"""))
+      assert(! FormRunnerConfiguration.isValidLandingCards("""[{"card-type": "published-forms", "title": "t", "exclude-apps": "bad/slug"}]"""))
 
       assert(FormRunnerConfiguration.isValidPermissionsJson(""))
       assert(FormRunnerConfiguration.isValidPermissionsJson("{}"))

@@ -7,7 +7,7 @@
             Le nom de l'application est un nom qui permet de grouper des formulaires. Le nom d'application peut être, par exemple :
             &lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;un nom de compagnie, comme "orbeon" ou "acme"&lt;/li&gt;
+                &lt;li&gt;un nom de compagnie, comme "acme"&lt;/li&gt;
                 &lt;li&gt;une entité dans une compagnie, comme "rh" ou "ventes" or "recherche"&lt;/li&gt;
                 &lt;li&gt;un nom de projet comme "mercury" ou "phoenix"&lt;/li&gt;
             &lt;/ul&gt;

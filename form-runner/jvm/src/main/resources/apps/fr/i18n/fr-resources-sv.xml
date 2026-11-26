@@ -811,10 +811,15 @@
             <demo-features>Prova demonstrationer av specifika Orbeon Forms-funktioner</demo-features>
         </descriptions>
         <show-more>Visa fler…</show-more>
+        <tabs>
+            <workspace>Arbetsyta</workspace>
+            <demos>Demor och exempel</demos>
+        </tabs>
         <labels>
             <updated>Uppdaterad</updated>
             <auto-refresh>Automatisk uppdatering</auto-refresh>
             <auto-off>Av</auto-off>
+            <sections>Sektioner på startsidan</sections>
         </labels>
         <buttons>
             <refresh>Uppdatera</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>Inga publicerade formulär</no-forms>
+            <no-forms-onboarding>Inga publicerade formulär ännu. Skapa och publicera ett formulär i Form Builder för att se det här.</no-forms-onboarding>
             <no-data>Inga formulärdata</no-data>
             <sorted-by-ascending>Sorterat efter {0}, stigande</sorted-by-ascending>
             <sorted-by-descending>Sorterat efter {0}, fallande</sorted-by-descending>

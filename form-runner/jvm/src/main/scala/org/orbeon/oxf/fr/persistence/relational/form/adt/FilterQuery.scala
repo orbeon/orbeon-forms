@@ -27,17 +27,25 @@ case class FilterQuery[T](
   languageOpt            : Option[String],
   localRemoteOrCombinator: LocalRemoteOrCombinator,
   matchType              : MatchType,
-  value                  : T
+  value                  : T,
+  exclude                : Boolean = false
 ) extends FilterOrSortQuery[T] {
 
   def toXML: NodeInfo =
-    elem("filter", metadata.valueAsString(value), "match" -> matchType.string)
+    elem(
+      "filter",
+      metadata.valueAsString(value),
+      (Seq("match" -> matchType.string) ++ (if (exclude) Seq("exclude" -> "true") else Nil)) *
+    )
 
-  def satisfies(form: Form, formRequest: FormRequest): Boolean =
-    metadata.valueOpt(form, localRemoteOrCombinator, effectiveLanguageOpt(formRequest)) match {
-      case None            => false // No form value was found (e.g. query on local metadata, but only remote metadata is available)
-      case Some(formValue) => matchType.satisfies(formValue, value, metadata)
-    }
+  def satisfies(form: Form, formRequest: FormRequest): Boolean = {
+    val matches =
+      metadata.valueOpt(form, localRemoteOrCombinator, effectiveLanguageOpt(formRequest)) match {
+        case None            => false // No form value was found (e.g. query on local metadata, but only remote metadata is available)
+        case Some(formValue) => matchType.satisfies(formValue, value, metadata)
+      }
+    if (exclude) ! matches else matches
+  }
 }
 
 object FilterQuery {
@@ -46,6 +54,13 @@ object FilterQuery {
     // TODO: fix type design/inference
     val metadata: Metadata[T] = Metadata(xml.attValue("metadata")).asInstanceOf[Metadata[T]]
     val matchType             = MatchType(xml.attValue("match"))
+    val exclude               =
+      xml.attValueOpt("exclude").map(_.toLowerCase) match {
+        case None          => false
+        case Some("true")  => true
+        case Some("false") => false
+        case Some(other)   => throw new IllegalArgumentException(s"Invalid `exclude` attribute value: `$other`")
+      }
 
     if (! metadata.allowedMatchTypes.contains(matchType)) {
       throw new IllegalArgumentException(s"Match type `${matchType.string}` is not allowed for metadata `${metadata.string}`")
@@ -55,8 +70,9 @@ object FilterQuery {
       metadata                = metadata,
       languageOpt             = xml.attValueOpt("*:lang"),
       localRemoteOrCombinator = LocalRemoteOrCombinator(xml),
-      matchType               = MatchType(xml.attValue("match")),
-      value                   = metadata.valueFromString(xml.stringValue)
+      matchType               = matchType,
+      value                   = metadata.valueFromString(xml.stringValue),
+      exclude                 = exclude
     )
   }
 
@@ -67,6 +83,16 @@ object FilterQuery {
       localRemoteOrCombinator = Local,
       matchType               = MatchType.Exact,
       value                   = app
+    )
+
+  def excludedExactAppQuery(app: String): FilterQuery[String] =
+    FilterQuery(
+      metadata                = Metadata.AppName,
+      languageOpt             = None,
+      localRemoteOrCombinator = Local,
+      matchType               = MatchType.Exact,
+      value                   = app,
+      exclude                 = true
     )
 
   def exactFormQuery(form: String): FilterQuery[String] =

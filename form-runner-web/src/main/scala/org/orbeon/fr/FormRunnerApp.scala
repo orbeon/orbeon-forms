@@ -499,6 +499,13 @@ object FormRunnerApp extends App {
     val FilterDebounceMs = 120.0
     val HiddenClass      = "xforms-hidden"
     val FilteredOutClass = "fr-card-filtered-out"
+    val AutoHiddenClass  = "fr-card-auto-hidden"
+    val TabStorageKey    = "orbeon.fr.landing.tab"
+
+    val tablistOpt        = toolbarElem.querySelectorOpt("#fr-landing-tablist")
+    val tabButtons        = tablistOpt.toList.flatMap(_.querySelectorAllT("button[role='tab']"))
+    val workspacePanelOpt = Option(document.getElementById("fr-landing-panel-workspace")).collect { case e: html.Element => e }
+    val demosPanelOpt     = Option(document.getElementById("fr-landing-panel-demos")).collect { case e: html.Element => e }
 
     val inputOpt     = toolbarElem.querySelectorOpt(".fr-landing-filter-input").map(_.asInstanceOf[html.Input])
     val clearBtnOpt  = toolbarElem.querySelectorOpt(".fr-landing-filter-clear")
@@ -506,10 +513,189 @@ object FormRunnerApp extends App {
     val countElemOpt = toolbarElem.querySelectorOpt(".fr-landing-filter-count")
     val formElemOpt  = toolbarElem.closestOpt("form").map(_.asInstanceOf[html.Form])
 
+    var lastSentQuery : String = ""
+    var selectedTabKey: String =
+      scala.util.Try(Option(window.sessionStorage.getItem(TabStorageKey))).toOption.flatten
+        .filter(k => k == "workspace" || k == "demos")
+        .getOrElse("workspace")
+
+    def availableCardsInPanel(panelElem: html.Element): List[html.Element] =
+      panelElem
+        .querySelectorAllT(".fr-landing-grid .card")
+        .iterator
+        .filter { card =>
+          !card.hasClass(HiddenClass) &&
+            !card.hasClass(AutoHiddenClass) &&
+            card.closestOpt(".xforms-disabled, .xforms-hidden, .xforms-repeat-template").isEmpty
+        }
+        .toList
+
+    def confirmedNonEmptyDemoCards(panelElem: html.Element): List[html.Element] =
+      availableCardsInPanel(panelElem).filter { card =>
+        card.attValueOpt("data-has-loaded").contains("true") &&
+          card.querySelectorOpt(".fr-card-state-error:not(.xforms-disabled)").isEmpty
+      }
+
+    def setPanelTabSemantics(panelElem: html.Element, enabled: Boolean): Unit =
+      if (enabled) {
+        panelElem.setAttribute("role", "tabpanel")
+        panelElem.attValueOpt("data-tab-id").foreach(panelElem.setAttribute("aria-labelledby", _))
+      } else {
+        panelElem.removeAttribute("role")
+        panelElem.removeAttribute("aria-labelledby")
+      }
+
+    def syncTabsAndPanels(): (Boolean, Option[html.Element]) = {
+      val hasWorkspace = workspacePanelOpt.exists(p => !p.hasClass(HiddenClass) && availableCardsInPanel(p).nonEmpty)
+      val hasDemos     = demosPanelOpt.exists(p => !p.hasClass(HiddenClass) && confirmedNonEmptyDemoCards(p).nonEmpty)
+      val tabbedMode   = hasWorkspace && hasDemos
+
+      tablistOpt.foreach(_.toggleClass(HiddenClass, !tabbedMode))
+
+      if (tabbedMode) {
+        tabButtons.foreach { btn =>
+          val isSelected = btn.attValueOpt("data-tab-key").contains(selectedTabKey)
+          btn.setAttribute("aria-selected", isSelected.toString)
+          btn.setAttribute("tabindex", if (isSelected) "0" else "-1")
+        }
+        workspacePanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = true)
+          if (selectedTabKey == "workspace") p.removeAttribute("hidden") else p.setAttribute("hidden", "until-found")
+        }
+        demosPanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = true)
+          if (selectedTabKey == "demos") p.removeAttribute("hidden") else p.setAttribute("hidden", "until-found")
+        }
+        val activePanelOpt = if (selectedTabKey == "demos") demosPanelOpt else workspacePanelOpt
+        (true, activePanelOpt)
+      } else if (hasWorkspace) {
+        workspacePanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = false)
+          p.removeAttribute("hidden")
+        }
+        demosPanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = false)
+          p.setAttribute("hidden", "")
+        }
+        (false, workspacePanelOpt)
+      } else if (hasDemos) {
+        workspacePanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = false)
+          p.setAttribute("hidden", "")
+        }
+        demosPanelOpt.foreach { p =>
+          setPanelTabSemantics(p, enabled = false)
+          p.removeAttribute("hidden")
+        }
+        (false, demosPanelOpt)
+      } else {
+        val fallbackPanelOpt = workspacePanelOpt.filterNot(_.hasClass(HiddenClass)).orElse(demosPanelOpt.filterNot(_.hasClass(HiddenClass)))
+        workspacePanelOpt.foreach(setPanelTabSemantics(_, enabled = false))
+        demosPanelOpt.foreach(setPanelTabSemantics(_, enabled = false))
+        fallbackPanelOpt.foreach(_.removeAttribute("hidden"))
+        (false, fallbackPanelOpt)
+      }
+    }
+
+    def updateMatchSummary(): Unit = {
+      val (tabbedMode, activePanelOpt) = syncTabsAndPanels()
+      val noResultsOpt                 = document.querySelectorOpt(".orbeon .fr-landing-no-results")
+
+      // Update per-tab filter match counts when filtering in tabbed mode
+      tabButtons.foreach { btn =>
+        btn.querySelectorOpt(".fr-landing-tab-count").foreach { badge =>
+          if (!tabbedMode || lastSentQuery.isEmpty) {
+            badge.textContent = ""
+            badge.classList.add(HiddenClass)
+          } else {
+            val panelOpt =
+              if (btn.attValueOpt("data-tab-key").contains("demos")) demosPanelOpt else workspacePanelOpt
+            val matches  = panelOpt.toList.flatMap(availableCardsInPanel).count(!_.hasClass(FilteredOutClass))
+            badge.textContent = matches.toString
+            badge.classList.remove(HiddenClass)
+          }
+        }
+      }
+
+      if (lastSentQuery.isEmpty) {
+        countElemOpt.foreach { el =>
+          el.textContent = ""
+          el.classList.add(HiddenClass)
+        }
+        noResultsOpt.foreach(_.classList.add(HiddenClass))
+      } else {
+        activePanelOpt.foreach { panel =>
+          val availableCards = availableCardsInPanel(panel)
+          val matchingCards  = availableCards.filterNot(_.hasClass(FilteredOutClass))
+          val anyLoading     = availableCards.exists(c => c.querySelectorOpt(".fr-card-is-refreshing, .fr-card-skeleton:not(.xforms-disabled)").isDefined)
+
+          countElemOpt.foreach { el =>
+            val template = toolbarElem.attValueOpt("data-matching-template").flatMap(_.trimAllToOpt).getOrElse("{0} / {1}")
+            el.textContent =
+              template
+                .replace("{0}", matchingCards.size.toString)
+                .replace("{1}", availableCards.size.toString)
+            el.classList.remove(HiddenClass)
+          }
+
+          noResultsOpt.foreach(_.toggleClass(HiddenClass, matchingCards.nonEmpty || anyLoading))
+        }
+      }
+    }
+
+    def selectTab(key: String, focusTab: Boolean): Unit = {
+      selectedTabKey = key
+      scala.util.Try(window.sessionStorage.setItem(TabStorageKey, key))
+      updateMatchSummary()
+      if (focusTab) {
+        tabButtons.find(_.attValueOpt("data-tab-key").contains(key)).foreach { btn =>
+          btn.focus()
+          scala.util.Try(btn.asInstanceOf[js.Dynamic].scrollIntoView(js.Dynamic.literal(block = "nearest", inline = "nearest")))
+        }
+      }
+    }
+
+    tabButtons.foreach { btn =>
+      btn.addEventListener("click", (_: dom.MouseEvent) => {
+        btn.attValueOpt("data-tab-key").foreach(selectTab(_, focusTab = false))
+      })
+
+      btn.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+        val isRtl = tablistOpt.exists(tl => window.getComputedStyle(tl).direction == "rtl")
+        val nextDeltaOpt =
+          e.key match {
+            case "ArrowRight" => Some(if (isRtl) -1 else 1)
+            case "ArrowLeft"  => Some(if (isRtl) 1 else -1)
+            case _            => None
+          }
+
+        nextDeltaOpt match {
+          case Some(delta) if tabButtons.nonEmpty =>
+            e.preventDefault()
+            val idx     = math.max(0, tabButtons.indexOf(btn))
+            val nextIdx = (idx + delta + tabButtons.size) % tabButtons.size
+            tabButtons(nextIdx).attValueOpt("data-tab-key").foreach(selectTab(_, focusTab = true))
+          case None if e.key == "Home" && tabButtons.nonEmpty =>
+            e.preventDefault()
+            tabButtons.head.attValueOpt("data-tab-key").foreach(selectTab(_, focusTab = true))
+          case None if e.key == "End" && tabButtons.nonEmpty =>
+            e.preventDefault()
+            tabButtons.last.attValueOpt("data-tab-key").foreach(selectTab(_, focusTab = true))
+          case _ =>
+        }
+      })
+    }
+
+    // Sync tab state automatically when browser find-in-page reveals a `hidden="until-found"` panel
+    workspacePanelOpt.foreach(_.addEventListener("beforematch", (_: dom.Event) => selectTab("workspace", focusTab = false)))
+    demosPanelOpt    .foreach(_.addEventListener("beforematch", (_: dom.Event) => selectTab("demos",     focusTab = false)))
+
+    AjaxClient.ajaxResponseProcessed.add(_ => updateMatchSummary())
+    updateMatchSummary()
+
     inputOpt.foreach { inputElem =>
 
       var debounceTimerOpt: Option[timers.SetTimeoutHandle] = None
-      var lastSentQuery   : String                          = ""
 
       def isComposingEvent(e: dom.Event): Boolean =
         js.DynamicImplicits.truthValue(e.asInstanceOf[js.Dynamic].isComposing)
@@ -519,43 +705,6 @@ object FormRunnerApp extends App {
         val isFocused = document.activeElement == inputElem
         clearBtnOpt.foreach(_.toggleClass(HiddenClass, !hasText))
         kbdHintOpt .foreach(_.toggleClass(HiddenClass, hasText || isFocused))
-      }
-
-      def updateMatchSummary(): Unit = {
-        val noResultsOpt = document.querySelectorOpt(".orbeon .fr-landing-no-results")
-        val gridOpt      = document.querySelectorOpt(".orbeon .fr-landing-grid")
-
-        if (lastSentQuery.isEmpty) {
-          countElemOpt.foreach { el =>
-            el.textContent = ""
-            el.classList.add(HiddenClass)
-          }
-          noResultsOpt.foreach(_.classList.add(HiddenClass))
-        } else {
-          gridOpt.foreach { grid =>
-            val availableCards =
-              grid
-                .childrenT
-                .iterator
-                .filterNot(w => w.hasClass("xforms-disabled") || w.hasClass(HiddenClass))
-                .flatMap(_.querySelectorOpt(".card").filterNot(_.hasClass(HiddenClass)))
-                .toList
-
-            val matchingCards = availableCards.filterNot(_.hasClass(FilteredOutClass))
-            val anyLoading    = availableCards.exists(c => c.querySelectorOpt(".fr-card-is-refreshing, .fr-card-skeleton:not(.xforms-disabled)").isDefined)
-
-            countElemOpt.foreach { el =>
-              val template = toolbarElem.attValueOpt("data-matching-template").flatMap(_.trimAllToOpt).getOrElse("{0} / {1}")
-              el.textContent =
-                template
-                  .replace("{0}", matchingCards.size.toString)
-                  .replace("{1}", availableCards.size.toString)
-              el.classList.remove(HiddenClass)
-            }
-
-            noResultsOpt.foreach(_.toggleClass(HiddenClass, matchingCards.nonEmpty || anyLoading))
-          }
-        }
       }
 
       def sendFilter(rawValue: String, immediate: Boolean): Unit = {
@@ -649,8 +798,6 @@ object FormRunnerApp extends App {
           }
         }
       })
-
-      AjaxClient.ajaxResponseProcessed.add(_ => updateMatchSummary())
 
       syncInputChrome()
     }

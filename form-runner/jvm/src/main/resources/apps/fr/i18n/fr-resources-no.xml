@@ -811,10 +811,15 @@
             <demo-features>Prøv demonstrasjoner av enkelte Orbeon Forms-funksjoner</demo-features>
         </descriptions>
         <show-more>Vis mer…</show-more>
+        <tabs>
+            <workspace>Arbeidsområde</workspace>
+            <demos>Demoer og eksempler</demos>
+        </tabs>
         <labels>
             <updated>Oppdatert</updated>
             <auto-refresh>Automatisk oppdatering</auto-refresh>
             <auto-off>Av</auto-off>
+            <sections>Seksjoner på startsiden</sections>
         </labels>
         <buttons>
             <refresh>Oppdater</refresh>
@@ -827,6 +832,7 @@
         </buttons>
         <messages>
             <no-forms>Ingen publiserte skjemaer</no-forms>
+            <no-forms-onboarding>Ingen publiserte skjemaer ennå. Opprett og publiser et skjema i Form Builder for å se det her.</no-forms-onboarding>
             <no-data>Ingen skjemadata</no-data>
             <sorted-by-ascending>Sortert etter {0}, stigende</sorted-by-ascending>
             <sorted-by-descending>Sortert etter {0}, synkende</sorted-by-descending>

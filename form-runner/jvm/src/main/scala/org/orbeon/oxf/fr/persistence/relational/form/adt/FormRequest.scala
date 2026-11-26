@@ -45,7 +45,8 @@ case class FormRequest(
   sortQuery              : SortQuery[?],
   // Support no-pagination mode for compatibility reasons (i.e. old API returns all results)
   paginationOpt          : Option[Pagination],
-  appForms               : Seq[AppForm]
+  appForms               : Seq[AppForm],
+  queryOpt               : Option[String] = None
 ) {
 
   def toXML: NodeInfo = {
@@ -58,11 +59,12 @@ case class FormRequest(
         }
 
         val appFormsXml      = appForms.map(af => <app-form app={af.app} form={af.form}/>)
+        val queryXml         = queryOpt.map(q => <query>{q}</query>)
         val filterQueriesXml = filterQueries.map(_.toXML).map(nodeInfoToElem)
         val sortQueryXml     = sortQuery.toXML
         val paginationXml    = paginationOpt.map(_.toXML).map(nodeInfoToElem)
 
-        (remoteServersXml ++ appFormsXml ++ filterQueriesXml :+ sortQueryXml) ++ paginationXml.toSeq
+        (remoteServersXml ++ appFormsXml ++ queryXml.toSeq ++ filterQueriesXml :+ sortQueryXml) ++ paginationXml.toSeq
        }</search>
 
     // toString method on Boolean returns "false"/"true"
@@ -81,18 +83,26 @@ case class FormRequest(
 
   private val exactAppQueryOpt: Option[FilterQuery[String]] =
     filterQueries
-      .collectFirst { case query @ FilterQuery(Metadata.AppName, _, _, MatchType.Exact, _) => query }
+      .collectFirst { case query @ FilterQuery(Metadata.AppName, _, _, MatchType.Exact, _, false) => query }
       .asInstanceOf[Option[FilterQuery[String]]] // TODO: fix type design/inference
 
   private val exactFormQueryOpt: Option[FilterQuery[String]] =
     filterQueries
-      .collectFirst { case query @ FilterQuery(Metadata.FormName, _, _, MatchType.Exact, _) => query }
+      .collectFirst { case query @ FilterQuery(Metadata.FormName, _, _, MatchType.Exact, _, false) => query }
       .asInstanceOf[Option[FilterQuery[String]]] // TODO: fix type design/inference
 
   val latestFormVersionQueryOpt: Option[FilterQuery[FormDefinitionVersion]] =
     filterQueries
-      .collectFirst { case query @ FilterQuery(Metadata.FormVersion, _, _, MatchType.Exact, FormDefinitionVersion.Latest) => query }
+      .collectFirst { case query @ FilterQuery(Metadata.FormVersion, _, _, MatchType.Exact, FormDefinitionVersion.Latest, false) => query }
       .asInstanceOf[Option[FilterQuery[FormDefinitionVersion]]] // TODO: fix type design/inference
+
+  val excludedExactAppQueries: Seq[FilterQuery[String]] =
+    filterQueries
+      .collect { case query @ FilterQuery(Metadata.AppName, _, LocalRemoteOrCombinator.Local, MatchType.Exact, _, true) => query }
+      .asInstanceOf[Seq[FilterQuery[String]]]
+
+  val excludedExactApps: Seq[String] =
+    excludedExactAppQueries.map(_.value).distinct
 
   val exactAppOpt: Option[String] =
     exactAppQueryOpt.map(_.value)
@@ -123,8 +133,9 @@ case class FormRequest(
   def formRequestForRemoteServer: FormRequest =
     copy(
       remoteServerCredentials = Map.empty,
-      filterQueries           = Seq(exactAppQueryOpt, exactFormQueryOpt, latestFormVersionQueryOpt).flatten,
-      paginationOpt           = None
+      filterQueries           = Seq(exactAppQueryOpt, exactFormQueryOpt, latestFormVersionQueryOpt).flatten ++ excludedExactAppQueries,
+      paginationOpt           = None,
+      queryOpt                = None
     )
 }
 
@@ -138,8 +149,15 @@ object FormRequest {
   def apply(
     request            : Request,
     bodyFromPipelineOpt: Option[NodeInfo],
+    appFormFromUrlOpt  : Option[AppFormOpt]
+  ): FormRequest =
+    apply(request, bodyFromPipelineOpt, appFormFromUrlOpt, allVersionsDefault = false)
+
+  def apply(
+    request            : Request,
+    bodyFromPipelineOpt: Option[NodeInfo],
     appFormFromUrlOpt  : Option[AppFormOpt],
-    allVersionsDefault : Boolean = false
+    allVersionsDefault : Boolean
   ): FormRequest =
     if (request.getMethod == HttpMethod.GET) {
       // Compatibility with old API: read parameters from URL
@@ -233,7 +251,8 @@ object FormRequest {
       filterQueries           = filterQueries,
       sortQuery               = searchElement.child("sort")      .headOption.map(SortQuery .apply).getOrElse(SortQuery.defaultSortQuery),
       paginationOpt           = searchElement.child("pagination").headOption.map(Pagination.apply),
-      appForms                = appForms
+      appForms                = appForms,
+      queryOpt                = searchElement.child("query")     .headOption.flatMap(_.stringValue.trimAllToOpt)
     )
   }
 }

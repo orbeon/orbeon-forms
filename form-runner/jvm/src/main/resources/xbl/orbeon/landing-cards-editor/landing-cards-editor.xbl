@@ -113,8 +113,11 @@
                             <layout-list>Compact List</layout-list>
                             <app-scope-label>Application Scope</app-scope-label>
                             <app-all>All applications</app-all>
+                            <app-all-excluding>All applications (except {0})</app-all-excluding>
                             <app-specific>Specific application</app-specific>
                             <app-label>Application Name</app-label>
+                            <exclude-apps-label>Excluded Applications</exclude-apps-label>
+                            <exclude-apps-hint>Space-separated names (for example: orbeon orbeon-features)</exclude-apps-hint>
                             <form-label>Form Name</form-label>
                             <version-mode-label>Form Version</version-mode-label>
                             <version-specific>Specific version</version-specific>
@@ -216,8 +219,11 @@
                             <layout-list>Liste compacte</layout-list>
                             <app-scope-label>Périmètre applicatif</app-scope-label>
                             <app-all>Toutes les applications</app-all>
+                            <app-all-excluding>Toutes les applications (sauf {0})</app-all-excluding>
                             <app-specific>Application spécifique</app-specific>
                             <app-label>Nom de l'application</app-label>
+                            <exclude-apps-label>Applications exclues</exclude-apps-label>
+                            <exclude-apps-hint>Noms séparés par des espaces (ex. orbeon orbeon-features)</exclude-apps-hint>
                             <form-label>Nom du formulaire</form-label>
                             <version-mode-label>Version du formulaire</version-mode-label>
                             <version-specific>Version spécifique</version-specific>
@@ -306,6 +312,11 @@
                         required="instance('state')/@readonly != 'true'"
                         xxf:whitespace="trim"
                         constraint="instance('state')/@readonly = 'true' or matches(., '^[A-Za-z0-9_\-]+$')"/>
+
+                    <xf:bind
+                        ref="@exclude-apps[../@type = 'published-forms' and ../@app-mode != 'specific']"
+                        xxf:whitespace="trim"
+                        constraint="instance('state')/@readonly = 'true' or (every $t in xxf:split(.) satisfies matches($t, '^[A-Za-z0-9_\-]+$'))"/>
 
                     <xf:bind
                         ref="title[../@type = 'published-forms']/@single[../@mode = 'single']"
@@ -653,6 +664,8 @@
                                 else if ($card-type = 'published-forms') then
                                     if (@app-mode = 'specific' and xxf:non-blank(@app)) then
                                         concat(fr:r('app-label'), ': ', @app)
+                                    else if (xxf:non-blank(@exclude-apps)) then
+                                        xxf:format-message(fr:r('app-all-excluding'), string-join(xxf:split(@exclude-apps), ', '))
                                     else
                                         fr:r('app-all')
                                 else
@@ -901,6 +914,14 @@
                                                         <xf:alert value="fr:r('alert-slug')"/>
                                                     </xf:input>
                                                 </xf:group>
+                                            </xf:group>
+
+                                            <xf:group ref=".[@app-mode != 'specific']" class="fr-lce-subfield">
+                                                <xf:input id="fr-lce-pf-exclude-apps" ref="@exclude-apps">
+                                                    <xf:label value="fr:r('exclude-apps-label')"/>
+                                                    <xf:hint value="fr:r('exclude-apps-hint')"/>
+                                                    <xf:alert value="fr:r('alert-slug')"/>
+                                                </xf:input>
                                             </xf:group>
                                         </xh:div>
 

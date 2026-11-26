@@ -9,7 +9,7 @@
             Sovelluksen nimi on nimi, joka mahdollistaa lomakkeiden ryhmittelyn. Sovelluksen nimi voi olla esimerkiksi:
             &lt;/p&gt;
             &lt;ul&gt;
-                &lt;li&gt;yrityksen nimi kuten "orbeon" tai "acme"&lt;/li&gt;
+                &lt;li&gt;yrityksen nimi kuten "acme"&lt;/li&gt;
                 &lt;li&gt;yrityksen osasto kuten "hr" tai "myynti" tai "suunnittelu"&lt;/li&gt;
                 &lt;li&gt;projektin nimi kuten "mercury" tai "phoenix"&lt;/li&gt;
             &lt;/ul&gt;

@@ -6,7 +6,7 @@
         <hint>Identifica un gruppo di moduli (ad esempio «acme» o «vendite»). Compare nell'URL del modulo pubblicato; usa solo lettere minuscole.</hint>
         <help>
             &lt;p&gt;Il nome dell'applicazione consente di raggruppare i moduli.&lt;/p&gt;
-            &lt;p&gt;Esempi: un nome aziendale ("orbeon", "acme"), un reparto ("hr", "vendite"), oppure un progetto ("mercury").&lt;/p&gt;
+            &lt;p&gt;Esempi: un nome aziendale ("acme"), un reparto ("hr", "vendite"), oppure un progetto ("mercury").&lt;/p&gt;
             &lt;p&gt;Questo nome compare nell'URL del modulo pubblicato; si consiglia di usare solo minuscole.&lt;/p&gt;
         </help>
         <alert>Utilizza un massimo di 255 lettere ASCII, cifre, "-" o "_"</alert>

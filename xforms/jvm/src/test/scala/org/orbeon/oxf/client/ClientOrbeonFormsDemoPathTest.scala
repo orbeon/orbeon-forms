@@ -28,7 +28,7 @@ trait ClientOrbeonFormsDemoPathTest extends AssertionsForJUnit with FormRunnerOp
       _ <- assert(pageTitle === "Creating forms with Form Builder")
 
       // For Chrome, which in some cases (like this one) is unable to click on the anchor if not visible
-      _ <- executeScript("window.scrollTo(0, $(document).height())")
+      _ <- executeScript("window.scrollTo(0, document.documentElement.scrollHeight)")
       _ <- click on partialLinkText("examples coded")
       _ <- assert(pageTitle === "Creating forms by writing XForms by hand")
 

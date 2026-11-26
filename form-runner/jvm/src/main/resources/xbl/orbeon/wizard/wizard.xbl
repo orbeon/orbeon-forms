@@ -1587,14 +1587,13 @@
                                     <!-- TODO: Move to Scala.js. -->
                                     <xf:action type="javascript" event="fr-section-scroll" target="#observer">
                                         <![CDATA[
-                                        var $ = ORBEON.jQuery;
-                                        var target = event.target;
-                                        var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
+                                        var wizard = event.target.closest('.xbl-fr-wizard');
+                                        var sectionTitle = wizard ? wizard.querySelector('.fr-wizard-body .xforms-case-selected .fr-section-title') : null;
 
                                         if (sectionTitle) {
                                             var r = sectionTitle.getBoundingClientRect();
-                                            if (r.top < 0 || r.bottom > $(window).height()) {
-                                                window.scrollTo($(window).scrollLeft(), $(sectionTitle).offset().top);
+                                            if (r.top < 0 || r.bottom > window.innerHeight) {
+                                                window.scrollTo(window.scrollX, r.top + window.scrollY);
                                             }
                                         }
                                         ]]>

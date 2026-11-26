@@ -650,7 +650,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   // on that the server tells the client, tell the Select2 component that the value has changed
   private def onXFormsSelect1ValueChange(event: ValueChangeInternalEvent): Unit =
     if (containerElem.querySelector(".xforms-select1, .xforms-select") == event.control)
-      $(containerElem).find("select").trigger("change")
+      Option(querySelect).foreach(select => $(select).trigger("change"))
 
   private def onOpen(): Unit = {
     currentSearchTerm   = ""

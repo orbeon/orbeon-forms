@@ -166,7 +166,7 @@ trait ClientXFormsTest extends AssertionsForJUnit with FormRunnerOps {
       // On mouseover, the tooltip with "a" shows
       _ <- moveToWebElement(input)
       _ <- assertJSExpression(s"_.isObject($Tooltips['my-input'])")
-      _ <- assertJSExpression(s"ORBEON.jQuery($Tooltips['my-input'].element).css('visibility') == 'visible'")
+      _ <- assertJSExpression(s"getComputedStyle($Tooltips['my-input'].element).visibility == 'visible'")
     }()
   }
 }

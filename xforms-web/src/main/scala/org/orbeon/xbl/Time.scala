@@ -110,7 +110,6 @@ object Time {
               // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
               // edit value hasn't changed.
               //
-  //            val formId = $(containerElem).parents("form").attr("id").get
               AjaxClient.allEventsProcessedF("time") foreach { _ =>
                 stateOpt.foreach(updateVisibleValue)
               }

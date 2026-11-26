@@ -262,7 +262,7 @@ object Date {
           opts
         }
 
-        val datePicker = $(visibleInputElem).parent().datepicker(options)
+        val datePicker = $(visibleInputElem.parentElement).datepicker(options)
         datePickerOpt = Some(datePicker)
 
         // Register listeners

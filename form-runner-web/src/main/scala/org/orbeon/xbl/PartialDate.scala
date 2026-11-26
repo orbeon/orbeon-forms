@@ -162,7 +162,7 @@ object PartialDate {
           options.format    = dateFormat.generateBootstrapFormatString
         }
 
-        val datePicker = $(inputElem).parent().datepicker(options)
+        val datePicker = $(inputElem.parentElement).datepicker(options)
         datePickerOpt = Some(datePicker)
 
         containerElem.querySelectorOpt(".add-on, .input-group .input-group-addon").foreach { addOnElem =>

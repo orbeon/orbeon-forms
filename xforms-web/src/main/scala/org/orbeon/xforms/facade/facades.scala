@@ -16,7 +16,7 @@ package org.orbeon.xforms.facade
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
-import org.orbeon.xforms.{$, Page}
+import org.orbeon.xforms.Page
 import org.scalajs
 import org.scalajs.dom.{Element, html}
 

@@ -1770,7 +1770,7 @@
         <no-steps>Aucune étape définie pour cette action.</no-steps>
         <add-step>Ajouter une étape</add-step>
         <visual-editor>Visuel</visual-editor>
-        <xml-editor>XML</xml-editor>
+        <code-editor>Code</code-editor>
         <format>Formater</format>
         <xml-definition>
             <label>Étapes XML</label>

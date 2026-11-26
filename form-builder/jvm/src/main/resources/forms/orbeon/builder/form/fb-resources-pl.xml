@@ -1748,7 +1748,7 @@
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
         <visual-editor>Wizualny</visual-editor>
-        <xml-editor>XML</xml-editor>
+        <code-editor>Kod</code-editor>
         <format>Formatuj</format>
         <xml-definition>
             <label>Kroki (XML)</label>

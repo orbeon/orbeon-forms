@@ -1732,7 +1732,7 @@
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
         <visual-editor>Visueel</visual-editor>
-        <xml-editor>XML</xml-editor>
+        <code-editor>Code</code-editor>
         <format>Formatteren</format>
         <xml-definition>
             <label>Stappen (XML)</label>

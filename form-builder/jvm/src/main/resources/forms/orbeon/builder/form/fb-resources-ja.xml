@@ -1743,7 +1743,7 @@
         <no-steps>No steps defined for this action.</no-steps>
         <add-step>Add Step</add-step>
         <visual-editor>ビジュアル</visual-editor>
-        <xml-editor>XML</xml-editor>
+        <code-editor>コード</code-editor>
         <format>フォーマット</format>
         <xml-definition>
             <label>ステップ XML</label>

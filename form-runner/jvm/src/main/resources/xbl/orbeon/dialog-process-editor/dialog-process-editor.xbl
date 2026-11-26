@@ -205,7 +205,7 @@
                             <add-step>Add Step</add-step>
                             <select-action>Select an action…</select-action>
                             <visual-editor>Visual</visual-editor>
-                            <text-editor>Text</text-editor>
+                            <code-editor>Code</code-editor>
                             <format>Format</format>
                             <copy>Copy</copy>
                             <add-parameter>+ Parameter</add-parameter>
@@ -278,7 +278,7 @@
                             <add-step>Ajouter une étape</add-step>
                             <select-action>Sélectionner une action…</select-action>
                             <visual-editor>Visuel</visual-editor>
-                            <text-editor>Texte</text-editor>
+                            <code-editor>Code</code-editor>
                             <format>Formater</format>
                             <copy>Copier</copy>
                             <add-parameter>+ Paramètre</add-parameter>
@@ -351,7 +351,7 @@
                             <add-step>Schritt hinzufügen</add-step>
                             <select-action>Aktion auswählen…</select-action>
                             <visual-editor>Visuell</visual-editor>
-                            <text-editor>Text</text-editor>
+                            <code-editor>Code</code-editor>
                             <format>Formatieren</format>
                             <copy>Kopieren</copy>
                             <add-parameter>+ Parameter</add-parameter>
@@ -424,7 +424,7 @@
                             <add-step>Añadir paso</add-step>
                             <select-action>Seleccionar una acción…</select-action>
                             <visual-editor>Visual</visual-editor>
-                            <text-editor>Texto</text-editor>
+                            <code-editor>Código</code-editor>
                             <format>Formatear</format>
                             <copy>Copiar</copy>
                             <add-parameter>+ Parámetro</add-parameter>
@@ -497,7 +497,7 @@
                             <add-step>Aggiungi passaggio</add-step>
                             <select-action>Seleziona un'azione…</select-action>
                             <visual-editor>Visuale</visual-editor>
-                            <text-editor>Testo</text-editor>
+                            <code-editor>Codice</code-editor>
                             <format>Formatta</format>
                             <copy>Copia</copy>
                             <add-parameter>+ Parametro</add-parameter>
@@ -570,7 +570,7 @@
                             <add-step>Adicionar etapa</add-step>
                             <select-action>Selecionar uma ação…</select-action>
                             <visual-editor>Visual</visual-editor>
-                            <text-editor>Texto</text-editor>
+                            <code-editor>Código</code-editor>
                             <format>Formatar</format>
                             <copy>Copiar</copy>
                             <add-parameter>+ Parâmetro</add-parameter>
@@ -643,7 +643,7 @@
                             <add-step>Lägg till steg</add-step>
                             <select-action>Välj en åtgärd…</select-action>
                             <visual-editor>Visuell</visual-editor>
-                            <text-editor>Text</text-editor>
+                            <code-editor>Kod</code-editor>
                             <format>Formatera</format>
                             <copy>Kopiera</copy>
                             <add-parameter>+ Parameter</add-parameter>
@@ -716,7 +716,7 @@
                             <add-step>Lisää vaihe</add-step>
                             <select-action>Valitse toiminto…</select-action>
                             <visual-editor>Visuaalinen</visual-editor>
-                            <text-editor>Teksti</text-editor>
+                            <code-editor>Koodi</code-editor>
                             <format>Muotoile</format>
                             <copy>Kopioi</copy>
                             <add-parameter>+ Parametri</add-parameter>
@@ -789,7 +789,7 @@
                             <add-step>Stap toevoegen</add-step>
                             <select-action>Selecteer een actie…</select-action>
                             <visual-editor>Visueel</visual-editor>
-                            <text-editor>Tekst</text-editor>
+                            <code-editor>Code</code-editor>
                             <format>Formatteren</format>
                             <copy>Kopiëren</copy>
                             <add-parameter>+ Parameter</add-parameter>
@@ -862,7 +862,7 @@
                             <add-step>Legg til trinn</add-step>
                             <select-action>Velg en handling…</select-action>
                             <visual-editor>Visuell</visual-editor>
-                            <text-editor>Tekst</text-editor>
+                            <code-editor>Kode</code-editor>
                             <format>Formater</format>
                             <copy>Kopier</copy>
                             <add-parameter>+ Parameter</add-parameter>
@@ -935,7 +935,7 @@
                             <add-step>Dodaj krok</add-step>
                             <select-action>Wybierz akcję…</select-action>
                             <visual-editor>Wizualny</visual-editor>
-                            <text-editor>Tekst</text-editor>
+                            <code-editor>Kod</code-editor>
                             <format>Formatuj</format>
                             <copy>Kopiuj</copy>
                             <add-parameter>+ Parametr</add-parameter>
@@ -1008,7 +1008,7 @@
                             <add-step>Добавить шаг</add-step>
                             <select-action>Выберите действие…</select-action>
                             <visual-editor>Визуальный</visual-editor>
-                            <text-editor>Текст</text-editor>
+                            <code-editor>Код</code-editor>
                             <format>Форматировать</format>
                             <copy>Копировать</copy>
                             <add-parameter>+ Параметр</add-parameter>
@@ -1081,7 +1081,7 @@
                             <add-step>ステップを追加</add-step>
                             <select-action>アクションを選択…</select-action>
                             <visual-editor>ビジュアル</visual-editor>
-                            <text-editor>テキスト</text-editor>
+                            <code-editor>コード</code-editor>
                             <format>整形</format>
                             <copy>コピー</copy>
                             <add-parameter>+ パラメータ</add-parameter>
@@ -1154,7 +1154,7 @@
                             <add-step>إضافة خطوة</add-step>
                             <select-action>اختر إجراءً…</select-action>
                             <visual-editor>مرئي</visual-editor>
-                            <text-editor>نص</text-editor>
+                            <code-editor>كود</code-editor>
                             <format>تنسيق</format>
                             <copy>نسخ</copy>
                             <add-parameter>+ معامل</add-parameter>
@@ -1336,7 +1336,7 @@
                                     </xf:input>
                                 </xh:div>
 
-                                <!-- Full-width Visual | Text tabs -->
+                                <!-- Full-width Visual | Code tabs -->
                                 <xh:div class="fr-process-mode-tabs" role="tablist">
                                     <xf:trigger
                                         appearance="minimal"
@@ -1356,7 +1356,7 @@
                                     <xf:trigger
                                         appearance="minimal"
                                         class="fr-process-mode-tab {'fr-process-mode-active'[$view-mode = 'text']}">
-                                        <xf:label><xf:output value="$r/text-editor"/></xf:label>
+                                        <xf:label><xf:output value="$r/code-editor"/></xf:label>
                                         <xf:action event="DOMActivate" if="$view-mode != 'text'">
                                             <xf:var name="proc" value="."/>
                                             <xf:setvalue ref="_text" value="peu:xmlToIndentedProcessString($proc)"/>

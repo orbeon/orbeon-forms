@@ -11,7 +11,9 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 @import (reference) "../../style/form-runner-common";
+@import "../theme-common";
 
+@layer orbeon-theme {
 .orbeon {
 
   // General
@@ -602,32 +604,15 @@
   --orbeon-stripe-color-1: #f5f5f5; // @wellBackground
   --orbeon-stripe-color-2: white;   // @inputBackground
 
-  // Pills: translucent grays for the neutral and muted pills, hue of a status label or of the accent for the others
-  .pill-colors() {
-    --orbeon-pill-tint-color              : color-mix(in oklab, var(--orbeon-accent-color) 50%, var(--orbeon-base-color));
-    --orbeon-pill-background-color        : color-mix(in oklab, var(--orbeon-pill-tint-color) 11%, transparent);
-    --orbeon-pill-border-color            : color-mix(in oklab, var(--orbeon-pill-tint-color) 29%, transparent);
-    --orbeon-pill-color                   : var(--orbeon-base-color);
-    --orbeon-pill-muted-background-color  : color-mix(in oklab, var(--orbeon-base-color)  8%, transparent);
-    --orbeon-pill-muted-border-color      : color-mix(in oklab, var(--orbeon-base-color) 22%, transparent);
-    --orbeon-pill-muted-color             : color-mix(in oklab, var(--orbeon-base-color) 83%, transparent);
-    --orbeon-pill-success-background-color: ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
-    --orbeon-pill-success-border-color    : ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
-    --orbeon-pill-success-color           : ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
-    --orbeon-pill-info-background-color   : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
-    --orbeon-pill-info-border-color       : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
-    --orbeon-pill-info-color              : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
-    --orbeon-pill-warning-background-color: ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
-    --orbeon-pill-warning-border-color    : ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
-    --orbeon-pill-warning-color           : ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
-    --orbeon-pill-active-background-color : ~"oklch(from var(--orbeon-accent-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
-    --orbeon-pill-active-color            : ~"oklch(from var(--orbeon-accent-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
-    --orbeon-pill-hover-overlay-color     : color-mix(in oklab, var(--orbeon-base-color) 6%, transparent);
-  }
   @media screen {
     color-scheme: light;
     .pill-colors();
   }
+}
+}
+
+@layer orbeon-theme-variants {
+.orbeon {
 
   .dark-mode(.dark-color-scheme());
 
@@ -896,4 +881,5 @@
     --orbeon-alert-warning-background-color                  : white;
     --orbeon-alert-warning-border-color                      : #ffecb5;
   }
+}
 }

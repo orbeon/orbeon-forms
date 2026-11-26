@@ -79,10 +79,11 @@ class ThemeVariablesUsageTest extends AnyFunSpec {
     val sources = AssetsDirs.flatMap(d => lessFiles(new File(repoRoot, d)))
     assert(sources.nonEmpty, "no LESS source found")
 
+    def declaredIn(path: String): Set[String] =
+      VariableDeclaration.findAllMatchIn(read(new File(repoRoot, s"$ThemesDir/$path"))).map(_.group(1)).toSet
+
     val declaredByTheme: Map[String, Set[String]] =
-      BuiltInThemes.map { theme =>
-        theme -> VariableDeclaration.findAllMatchIn(read(new File(repoRoot, s"$ThemesDir/$theme/theme.less"))).map(_.group(1)).toSet
-      }.toMap
+      BuiltInThemes.map(theme => theme -> (declaredIn(s"$theme/theme.less") ++ declaredIn("theme-common.less"))).toMap
 
     // Variables a stylesheet declares for its own use, for example the landing page's column counts
     val declaredBySources: Set[String] =

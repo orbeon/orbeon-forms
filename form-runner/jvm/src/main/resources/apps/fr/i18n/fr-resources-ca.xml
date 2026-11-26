@@ -377,13 +377,27 @@
         <hints>
             <upload-max-size-per-file>Els fitxers han de mesurar menys de {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La mida del total de fitxers no pot superar {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>La mida total dels fitxers en el control no pot superar {0} ({1} disponible).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>La mida total dels fitxers en el formulari no pot superar {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>La mida total dels fitxers en el formulari no pot superar {0} ({1} disponible).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Podeu adjuntar fins a {0} fitxers.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Podeu adjuntar fins a {0} fitxers ({1} restants).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Heu d'adjuntar almenys {0} fitxers.</upload-min-files-per-control>
             <upload-mediatypes>Només {0} fitxers.</upload-mediatypes>
             <upload-image>imatge</upload-image>
             <upload-video>vídeo</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} disponible</size-available>
+            <size-remaining>{0} de {1} disponible</size-remaining>
+            <max-size>Màx. {0}</max-size>
+            <max-per-file>Màx. {0} per fitxer</max-per-file>
+            <files-available>Fins a {0} fitxers</files-available>
+            <files-remaining>{0} de {1} fitxers restants</files-remaining>
+            <navbar-label>{0} / {1} lliure</navbar-label>
+            <navbar-title>Adjunts: {0} utilitzats de {1} ({2} disponible)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Vista de només lectura.

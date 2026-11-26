@@ -1,0 +1,263 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:title>Issue #6829: Attachment Quotas</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <static-form-asset filename="bg.png" mediatype="image/png" size="512000">/fr/service/persistence/crud/issue/6829/form/bg.png</static-form-asset>
+                        <single-doc filename="" mediatype="" size=""/>
+                        <multi-docs/>
+                        <quota-docs/>
+                        <unlimited-files-docs/>
+                        <photo/>
+                        <custom-hint-docs/>
+                        <out-format-bytes/>
+                        <out-format-empty/>
+                        <out-form-max/>
+                        <out-form-size/>
+                        <out-form-remaining/>
+                        <out-single-per-file-node/>
+                        <out-single-per-file-name/>
+                        <out-multi-agg/>
+                        <out-multi-size/>
+                        <out-multi-remaining/>
+                        <out-multi-count/>
+                        <out-multi-max-files/>
+                        <out-multi-remaining-files/>
+                        <out-unlimited-max-files/>
+                        <out-unlimited-remaining-files/>
+                        <out-photo-min-files/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="static-form-asset-bind" ref="static-form-asset" name="static-form-asset" type="xf:anyURI"/>
+                    <xf:bind id="single-doc-bind" ref="single-doc" name="single-doc" type="xf:anyURI"
+                             constraint="xxf:upload-max-size-per-file(512000) and xxf:upload-mediatypes('application/pdf')"/>
+                    <xf:bind id="multi-docs-bind" ref="multi-docs" name="multi-docs"
+                             constraint="xxf:upload-max-size-aggregate-per-control(1048576)"/>
+                    <xf:bind id="quota-docs-bind" ref="quota-docs" name="quota-docs"
+                             constraint="xxf:upload-max-files-per-control(2)"/>
+                    <xf:bind id="unlimited-files-docs-bind" ref="unlimited-files-docs" name="unlimited-files-docs"
+                             constraint="xxf:upload-max-files-per-control(-1)"/>
+                    <xf:bind id="photo-bind" ref="photo" name="photo"
+                             constraint="xxf:upload-mediatypes('image/*') and xxf:upload-min-files-per-control(1)"/>
+                    <xf:bind id="custom-hint-docs-bind" ref="custom-hint-docs" name="custom-hint-docs"/>
+
+                    <xf:bind id="out-format-bytes-bind"              ref="out-format-bytes"              name="out-format-bytes"              calculate="xxf:format-bytes(1572864)"/>
+                    <xf:bind id="out-format-empty-bind"              ref="out-format-empty"              name="out-format-empty"              calculate="string(xxf:format-bytes(()))"/>
+                    <xf:bind id="out-form-max-bind"                  ref="out-form-max"                  name="out-form-max"                  calculate="string(fr:attachment-form-max-size())"/>
+                    <xf:bind id="out-form-size-bind"                 ref="out-form-size"                 name="out-form-size"                 calculate="string(fr:attachment-form-size())"/>
+                    <xf:bind id="out-form-remaining-bind"            ref="out-form-remaining"            name="out-form-remaining"            calculate="string(fr:attachment-form-remaining-size())"/>
+                    <xf:bind id="out-single-per-file-node-bind"      ref="out-single-per-file-node"      name="out-single-per-file-node"      calculate="string(fr:attachment-max-size-per-file($single-doc))"/>
+                    <xf:bind id="out-single-per-file-name-bind"      ref="out-single-per-file-name"      name="out-single-per-file-name"      calculate="string(fr:attachment-max-size-per-file('single-doc'))"/>
+                    <xf:bind id="out-multi-agg-bind"                 ref="out-multi-agg"                 name="out-multi-agg"                 calculate="string(fr:attachment-max-size-aggregate($multi-docs))"/>
+                    <xf:bind id="out-multi-size-bind"                ref="out-multi-size"                name="out-multi-size"                calculate="string(fr:attachment-control-size($multi-docs))"/>
+                    <xf:bind id="out-multi-remaining-bind"           ref="out-multi-remaining"           name="out-multi-remaining"           calculate="string(fr:attachment-remaining-size($multi-docs))"/>
+                    <xf:bind id="out-multi-count-bind"               ref="out-multi-count"               name="out-multi-count"               calculate="string(fr:attachment-count($multi-docs))"/>
+                    <xf:bind id="out-multi-max-files-bind"           ref="out-multi-max-files"           name="out-multi-max-files"           calculate="string(fr:attachment-max-files($multi-docs))"/>
+                    <xf:bind id="out-multi-remaining-files-bind"     ref="out-multi-remaining-files"     name="out-multi-remaining-files"     calculate="string(fr:attachment-remaining-files($multi-docs))"/>
+                    <xf:bind id="out-unlimited-max-files-bind"       ref="out-unlimited-max-files"       name="out-unlimited-max-files"       calculate="string(fr:attachment-max-files($unlimited-files-docs))"/>
+                    <xf:bind id="out-unlimited-remaining-files-bind" ref="out-unlimited-remaining-files" name="out-unlimited-remaining-files" calculate="string(fr:attachment-remaining-files($unlimited-files-docs))"/>
+                    <xf:bind id="out-photo-min-files-bind"           ref="out-photo-min-files"           name="out-photo-min-files"           calculate="string(fr:attachment-min-files($photo))"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6829</form-name>
+                    <title xml:lang="en">Attachment Quotas #6829</title>
+                    <title xml:lang="fr">Quotas de pièces jointes #6829</title>
+                    <description xml:lang="en"/>
+                    <description xml:lang="fr"/>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>Attachments</label></section-1>
+                        <single-doc><label>Single Document</label><hint/></single-doc>
+                        <multi-docs><label>Multiple Documents</label><hint/></multi-docs>
+                        <quota-docs><label>Quota Documents</label><hint/></quota-docs>
+                        <unlimited-files-docs><label>Unlimited Files</label><hint/></unlimited-files-docs>
+                        <photo><label>Photos</label><hint/></photo>
+                        <custom-hint-docs><label>Custom Hint Docs</label><hint>Space: {$rem-bytes}, slots: {$rem-files}.</hint></custom-hint-docs>
+                        <out-format-bytes><label>Format Bytes</label></out-format-bytes>
+                        <out-format-empty><label>Format Empty</label></out-format-empty>
+                        <out-form-max><label>Form Max</label></out-form-max>
+                        <out-form-size><label>Form Size</label></out-form-size>
+                        <out-form-remaining><label>Form Remaining</label></out-form-remaining>
+                        <out-single-per-file-node><label>Single Per File Node</label></out-single-per-file-node>
+                        <out-single-per-file-name><label>Single Per File Name</label></out-single-per-file-name>
+                        <out-multi-agg><label>Multi Agg</label></out-multi-agg>
+                        <out-multi-size><label>Multi Size</label></out-multi-size>
+                        <out-multi-remaining><label>Multi Remaining</label></out-multi-remaining>
+                        <out-multi-count><label>Multi Count</label></out-multi-count>
+                        <out-multi-max-files><label>Multi Max Files</label></out-multi-max-files>
+                        <out-multi-remaining-files><label>Multi Remaining Files</label></out-multi-remaining-files>
+                        <out-unlimited-max-files><label>Unlimited Max Files</label></out-unlimited-max-files>
+                        <out-unlimited-remaining-files><label>Unlimited Remaining Files</label></out-unlimited-remaining-files>
+                        <out-photo-min-files><label>Photo Min Files</label></out-photo-min-files>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <section-1><label>Pièces jointes</label></section-1>
+                        <single-doc><label>Document unique</label><hint/></single-doc>
+                        <multi-docs><label>Documents multiples</label><hint/></multi-docs>
+                        <quota-docs><label>Documents quota</label><hint/></quota-docs>
+                        <unlimited-files-docs><label>Fichiers illimités</label><hint/></unlimited-files-docs>
+                        <photo><label>Photos</label><hint/></photo>
+                        <custom-hint-docs><label>Indice personnalisé</label><hint>Espace : {$rem-bytes}, fichiers : {$rem-files}.</hint></custom-hint-docs>
+                        <out-format-bytes><label>Format Bytes</label></out-format-bytes>
+                        <out-format-empty><label>Format Empty</label></out-format-empty>
+                        <out-form-max><label>Form Max</label></out-form-max>
+                        <out-form-size><label>Form Size</label></out-form-size>
+                        <out-form-remaining><label>Form Remaining</label></out-form-remaining>
+                        <out-single-per-file-node><label>Single Per File Node</label></out-single-per-file-node>
+                        <out-single-per-file-name><label>Single Per File Name</label></out-single-per-file-name>
+                        <out-multi-agg><label>Multi Agg</label></out-multi-agg>
+                        <out-multi-size><label>Multi Size</label></out-multi-size>
+                        <out-multi-remaining><label>Multi Remaining</label></out-multi-remaining>
+                        <out-multi-count><label>Multi Count</label></out-multi-count>
+                        <out-multi-max-files><label>Multi Max Files</label></out-multi-max-files>
+                        <out-multi-remaining-files><label>Multi Remaining Files</label></out-multi-remaining-files>
+                        <out-unlimited-max-files><label>Unlimited Max Files</label></out-unlimited-max-files>
+                        <out-unlimited-remaining-files><label>Unlimited Remaining Files</label></out-unlimited-remaining-files>
+                        <out-photo-min-files><label>Photo Min Files</label></out-photo-min-files>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:attachment id="single-doc-control" bind="single-doc-bind" class="fr-attachment">
+                                <xf:label ref="$form-resources/single-doc/label"/>
+                                <xf:hint ref="$form-resources/single-doc/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:attachment id="multi-docs-control" bind="multi-docs-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/multi-docs/label"/>
+                                <xf:hint ref="$form-resources/multi-docs/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="6">
+                            <fr:attachment id="quota-docs-control" bind="quota-docs-bind" multiple="true" show-quota="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/quota-docs/label"/>
+                                <xf:hint ref="$form-resources/quota-docs/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="6">
+                            <fr:attachment id="unlimited-files-docs-control" bind="unlimited-files-docs-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/unlimited-files-docs/label"/>
+                                <xf:hint ref="$form-resources/unlimited-files-docs/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="6">
+                            <fr:image-attachment id="photo-control" bind="photo-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/photo/label"/>
+                                <xf:hint ref="$form-resources/photo/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c y="3" x="7" w="6">
+                            <fr:attachment id="custom-hint-docs-control" bind="custom-hint-docs-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/custom-hint-docs/label"/>
+                                <xf:hint ref="$form-resources/custom-hint-docs/hint">
+                                    <fr:param type="ExpressionParam">
+                                        <fr:name>rem-bytes</fr:name>
+                                        <fr:expr>xxf:format-bytes(fr:attachment-remaining-size($custom-hint-docs))</fr:expr>
+                                    </fr:param>
+                                    <fr:param type="ExpressionParam">
+                                        <fr:name>rem-files</fr:name>
+                                        <fr:expr>fr:attachment-remaining-files('custom-hint-docs')</fr:expr>
+                                    </fr:param>
+                                </xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="4" x="1" w="12">
+                            <xf:output id="out-format-bytes-control" bind="out-format-bytes-bind"><xf:label ref="$form-resources/out-format-bytes/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="5" x="1" w="12">
+                            <xf:output id="out-format-empty-control" bind="out-format-empty-bind"><xf:label ref="$form-resources/out-format-empty/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="6" x="1" w="12">
+                            <xf:output id="out-form-max-control" bind="out-form-max-bind"><xf:label ref="$form-resources/out-form-max/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="7" x="1" w="12">
+                            <xf:output id="out-form-size-control" bind="out-form-size-bind"><xf:label ref="$form-resources/out-form-size/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="8" x="1" w="12">
+                            <xf:output id="out-form-remaining-control" bind="out-form-remaining-bind"><xf:label ref="$form-resources/out-form-remaining/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="9" x="1" w="12">
+                            <xf:output id="out-single-per-file-node-control" bind="out-single-per-file-node-bind"><xf:label ref="$form-resources/out-single-per-file-node/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="10" x="1" w="12">
+                            <xf:output id="out-single-per-file-name-control" bind="out-single-per-file-name-bind"><xf:label ref="$form-resources/out-single-per-file-name/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="11" x="1" w="12">
+                            <xf:output id="out-multi-agg-control" bind="out-multi-agg-bind"><xf:label ref="$form-resources/out-multi-agg/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="12" x="1" w="12">
+                            <xf:output id="out-multi-size-control" bind="out-multi-size-bind"><xf:label ref="$form-resources/out-multi-size/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="13" x="1" w="12">
+                            <xf:output id="out-multi-remaining-control" bind="out-multi-remaining-bind"><xf:label ref="$form-resources/out-multi-remaining/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="14" x="1" w="12">
+                            <xf:output id="out-multi-count-control" bind="out-multi-count-bind"><xf:label ref="$form-resources/out-multi-count/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="15" x="1" w="12">
+                            <xf:output id="out-multi-max-files-control" bind="out-multi-max-files-bind"><xf:label ref="$form-resources/out-multi-max-files/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="16" x="1" w="12">
+                            <xf:output id="out-multi-remaining-files-control" bind="out-multi-remaining-files-bind"><xf:label ref="$form-resources/out-multi-remaining-files/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="17" x="1" w="12">
+                            <xf:output id="out-unlimited-max-files-control" bind="out-unlimited-max-files-bind"><xf:label ref="$form-resources/out-unlimited-max-files/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="18" x="1" w="12">
+                            <xf:output id="out-unlimited-remaining-files-control" bind="out-unlimited-remaining-files-bind"><xf:label ref="$form-resources/out-unlimited-remaining-files/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="19" x="1" w="12">
+                            <xf:output id="out-photo-min-files-control" bind="out-photo-min-files-bind"><xf:label ref="$form-resources/out-photo-min-files/label"/></xf:output>
+                        </fr:c>
+                        <fr:c y="20" x="1" w="12">
+                            <xf:output id="out-context-remaining-control" ref="multi-docs" value="string(fr:attachment-remaining-size())">
+                                <xf:label>Context Remaining</xf:label>
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

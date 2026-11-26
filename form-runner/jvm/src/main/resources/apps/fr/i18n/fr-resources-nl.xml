@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Bestanden moeten kleiner zijn dan {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>De totale bestandsgrootte in dit element moet kleiner zijn dan {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>De totale bestandsgrootte in dit veld moet kleiner zijn dan {0} ({1} resterend).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>De totale bestandsgrootte in het formulier moet kleiner zijn dan {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>De totale bestandsgrootte in het formulier moet kleiner zijn dan {0} ({1} resterend).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>U kunt maximaal {0} bestanden bijvoegen.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>U kunt maximaal {0} bestanden bijvoegen ({1} resterend).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>U moet ten minste {0} bestanden bijvoegen.</upload-min-files-per-control>
             <upload-mediatypes>Alleen bestanden van het type {0} zijn toegestaan.</upload-mediatypes>
             <upload-image>afbeelding</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} beschikbaar</size-available>
+            <size-remaining>{0} van {1} resterend</size-remaining>
+            <max-size>Max. {0}</max-size>
+            <max-per-file>Max. {0} per bestand</max-per-file>
+            <files-available>Tot {0} bestanden</files-available>
+            <files-remaining>{0} van {1} bestanden resterend</files-remaining>
+            <navbar-label>{0} / {1} vrij</navbar-label>
+            <navbar-title>Bijlagen: {0} van {1} gebruikt ({2} resterend)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Dit is een alleen-lezen weergave van uw gegevens.

@@ -234,6 +234,43 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
+    Fun("attachment-form-max-size",       classOf[FRAttachmentFormMaxSize],       op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("attachment-form-size",           classOf[FRAttachmentFormSize],          op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("attachment-form-remaining-size", classOf[FRAttachmentFormRemainingSize], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+
+    Fun("attachment-max-size-per-file", classOf[FRAttachmentMaxSizePerFile], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-max-size-aggregate", classOf[FRAttachmentMaxSizeAggregate], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-control-size", classOf[FRAttachmentControlSize], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-remaining-size", classOf[FRAttachmentRemainingSize], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-count", classOf[FRAttachmentCount], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-max-files", classOf[FRAttachmentMaxFiles], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-min-files", classOf[FRAttachmentMinFiles], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-remaining-files", classOf[FRAttachmentRemainingFiles], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-automatic-hint", classOf[FRAttachmentAutomaticHint], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("attachment-quota-summary", classOf[FRAttachmentQuotaSummary], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    )
+
     Fun("save-state", classOf[FRSaveState], op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE),
@@ -859,6 +896,112 @@ private object FormRunnerFunctions {
     override val attribute = "size"
     override def evaluateItem(xpathContext: XPathContext): Int64Value =
       value(xpathContext).map(string => new Int64Value(string.toLong)).orNull
+  }
+
+  class FRAttachmentFormMaxSize extends DefaultFunctionSupport with AddToPathMap {
+    override def evaluateItem(xpathContext: XPathContext): Int64Value =
+      FRAttachmentQuotaSupport.formMaxSizeOpt(XFormsFunction.context.containingDocument).map(new Int64Value(_)).orNull
+  }
+
+  class FRAttachmentFormSize extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): Int64Value =
+      FRAttachmentQuotaSupport.formCurrentSizeOpt(XFormsFunction.context.containingDocument).map(new Int64Value(_)).orNull
+  }
+
+  class FRAttachmentFormRemainingSize extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): Int64Value =
+      FRAttachmentQuotaSupport.formRemainingSizeOpt(XFormsFunction.context.containingDocument).map(new Int64Value(_)).orNull
+  }
+
+  trait FRAttachmentControlQuotaFunction[R >: Null <: AtomicValue] extends FunctionSupport with RuntimeDependentFunction {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[R]
+
+    override def evaluateItem(xpathContext: XPathContext): R = {
+      implicit val xpc: XPathContext           = xpathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+      FRAttachmentQuotaSupport.resolveAttachmentTarget(itemArgumentOpt(0), None)
+        .map { case (boundNode, isMultiple) => FRAttachmentQuotaSupport.controlQuota(xfc.containingDocument, boundNode, isMultiple) }
+        .flatMap(fromQuota)
+        .orNull
+    }
+  }
+
+  class FRAttachmentMaxSizePerFile extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.maxSizePerFile match {
+        case org.orbeon.datatypes.MaximumSize.LimitedSize(n) => Some(new Int64Value(n))
+        case org.orbeon.datatypes.MaximumSize.UnlimitedSize  => None
+      }
+  }
+
+  class FRAttachmentMaxSizeAggregate extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.maxSizeAggregateControl match {
+        case org.orbeon.datatypes.MaximumSize.LimitedSize(n) => Some(new Int64Value(n))
+        case org.orbeon.datatypes.MaximumSize.UnlimitedSize  => None
+      }
+  }
+
+  class FRAttachmentControlSize extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      Some(new Int64Value(quota.currentSizeControl))
+  }
+
+  class FRAttachmentRemainingSize extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.effectiveRemainingSize match {
+        case org.orbeon.datatypes.MaximumSize.LimitedSize(n) => Some(new Int64Value(n))
+        case org.orbeon.datatypes.MaximumSize.UnlimitedSize  => None
+      }
+  }
+
+  class FRAttachmentCount extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      Some(new Int64Value(quota.currentFiles.toLong))
+  }
+
+  class FRAttachmentMaxFiles extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.maxFiles match {
+        case org.orbeon.datatypes.MaximumFiles.LimitedFiles(n) => Some(new Int64Value(n.toLong))
+        case org.orbeon.datatypes.MaximumFiles.UnlimitedFiles  => None
+      }
+  }
+
+  class FRAttachmentMinFiles extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.minFilesOpt.map(n => new Int64Value(n.toLong))
+  }
+
+  class FRAttachmentRemainingFiles extends FRAttachmentControlQuotaFunction[Int64Value] {
+    protected def fromQuota(quota: FRAttachmentQuotaSupport.ControlQuota): Option[Int64Value] =
+      quota.remainingFilesOpt.map(n => new Int64Value(n.toLong))
+  }
+
+  class FRAttachmentAutomaticHint extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+      implicit val xpc: XPathContext           = xpathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+      FRAttachmentQuotaSupport.resolveAttachmentTarget(itemArgumentOpt(0), booleanArgumentOpt(1))
+        .flatMap { case (boundNode, isMultiple) =>
+          FRAttachmentQuotaSupport.automaticHint(xfc.containingDocument, boundNode, isMultiple)
+        }
+        .map(stringToStringValue)
+        .orNull
+    }
+  }
+
+  class FRAttachmentQuotaSummary extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+      implicit val xpc: XPathContext           = xpathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+      FRAttachmentQuotaSupport.resolveAttachmentTarget(itemArgumentOpt(0), booleanArgumentOpt(1))
+        .flatMap { case (boundNode, isMultiple) =>
+          FRAttachmentQuotaSupport.quotaSummary(xfc.containingDocument, boundNode, isMultiple)
+        }
+        .map(stringToStringValue)
+        .orNull
+    }
   }
 
   class FRSaveState extends FunctionSupport with RuntimeDependentFunction {

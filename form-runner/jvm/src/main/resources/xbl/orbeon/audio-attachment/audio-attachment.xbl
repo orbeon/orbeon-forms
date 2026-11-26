@@ -69,6 +69,7 @@
             <xh:div id="fr-audio-attachment-elem" xxf:control="true">
                 <fr:attachment
                     ref="$binding"
+                    xbl:attr="show-quota"
                     accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'audio/*')[1]}">
 
                     <xf:filename  ref="@filename"  xxbl:scope="outer"/>

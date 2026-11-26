@@ -779,6 +779,7 @@
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.configuration"                 value=""/>
     <property as="xs:boolean" name="oxf.fr.navbar.revision-history.enable.orbeon.configuration" value="false"/>
     <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.orbeon.configuration"   value="false"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.attachment-quota.enable.orbeon.configuration" value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.configuration"                 value="home save-final"/>
     <property as="xs:string"  name="oxf.fr.detail.process.save-final.orbeon.configuration">
         require-uploads

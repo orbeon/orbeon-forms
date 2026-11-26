@@ -388,13 +388,27 @@
         <hints>
             <upload-max-size-per-file>Ficheros por debajo de {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>El tamaño total de ficheros en el control tiene que estar por debajo de {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>El tamaño total de los archivos en el control debe ser inferior a {0} ({1} disponible).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>El tamaño total de los archivos en el formulario debe ser inferior a {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>El tamaño total de los archivos en el formulario debe ser inferior a {0} ({1} disponible).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Puede adjuntar hasta {0} archivos.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Puede adjuntar hasta {0} archivos ({1} restantes).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Debe adjuntar al menos {0} archivos.</upload-min-files-per-control>
             <upload-mediatypes>Solo {0} ficheros son aceptados.</upload-mediatypes>
             <upload-image>imagen</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} disponible</size-available>
+            <size-remaining>{0} de {1} disponible</size-remaining>
+            <max-size>Máx. {0}</max-size>
+            <max-per-file>Máx. {0} por archivo</max-per-file>
+            <files-available>Hasta {0} archivos</files-available>
+            <files-remaining>{0} de {1} archivos restantes</files-remaining>
+            <navbar-label>{0} / {1} libre</navbar-label>
+            <navbar-title>Adjuntos: {0} usados de {1} ({2} disponible)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Vista de lectura solamente.

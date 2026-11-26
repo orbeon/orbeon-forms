@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>يجب أن تكون الملفات أقل من {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>يجب أن يكون إجمالي حجم الملف في عنصر التحكم أقل من {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>يجب أن يكون الحجم الإجمالي للملفات في عنصر التحكم أقل من {0} (متبقٍ {1}).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>يجب أن يكون الحجم الإجمالي للملفات في النموذج أقل من {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>يجب أن يكون الحجم الإجمالي للملفات في النموذج أقل من {0} (متبقٍ {1}).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>يمكنك إرفاق ما يصل إلى {0} ملفات.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>يمكنك إرفاق ما يصل إلى {0} ملفات (متبقٍ {1}).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>يجب عليك إرفاق {0} ملف على الأقل.</upload-min-files-per-control>
             <upload-mediatypes>فقط ملفات {0} مقبولة.</upload-mediatypes>
             <upload-image>صورة</upload-image>
             <upload-video>فيديو</upload-video>
             <upload-audio>صوت</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} متاح</size-available>
+            <size-remaining>متبقٍ {0} من {1}</size-remaining>
+            <max-size>الحد الأقصى {0}</max-size>
+            <max-per-file>الحد الأقصى {0} لكل ملف</max-per-file>
+            <files-available>حتى {0} ملفات</files-available>
+            <files-remaining>متبقٍ {0} من {1} ملفات</files-remaining>
+            <navbar-label>متبقٍ {0} / {1}</navbar-label>
+            <navbar-title>المرفقات: تم استخدام {0} من أصل {1} (متبقٍ {2})</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 هذا عرض للقراءة فقط لبياناتك.

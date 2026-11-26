@@ -167,6 +167,8 @@
     <property as="xs:boolean" name="oxf.fr.navbar.revision-history.enable.orbeon.builder"          value="false"/><!-- explicitly disable for Form Builder so that it must be explicitly enabled -->
     <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.*.*"                       value="false"/>
     <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.orbeon.builder"            value="false"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.attachment-quota.enable.*.*"                     value="false"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.attachment-quota.enable.orbeon.builder"          value="false"/>
     <property as="xs:boolean" name="oxf.fr.navbar.search-navigation.enable.*.*"                    value="true"/>
     <property as="xs:boolean" name="oxf.fr.navbar.search-navigation.enable.orbeon.builder"         value="false"/>
 
@@ -931,6 +933,7 @@
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"             value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*"      value="dialog"/> <!-- dialog | inline -->
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.attachment.show-quota.*.*"                   value="false"/>
 
     <!-- Process for the publish API -->
     <property as="xs:string"  name="oxf.fr.detail.process.before-publish.*.*"/>

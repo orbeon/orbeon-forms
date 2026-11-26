@@ -351,13 +351,27 @@
         <hints>
             <upload-max-size-per-file>ファイルサイズは{0}以下にしてください。</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>このコントロールの合計ファイルサイズは{0}以下にしてください。</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>このコントロール内の合計ファイルサイズは {0} 未満である必要があります（残り {1}）。</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>フォーム全体の合計ファイルサイズは {0} 未満である必要があります。</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>フォーム全体の合計ファイルサイズは {0} 未満である必要があります（残り {1}）。</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>最大{0}個のファイルを添付できます。</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>最大 {0} 個のファイルを添付できます（残り {1} 個）。</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>少なくとも{0}個のファイルを添付する必要があります。</upload-min-files-per-control>
             <upload-mediatypes>{0}ファイルのみ受け付けます。</upload-mediatypes>
             <upload-image>画像</upload-image>
             <upload-video>動画</upload-video>
             <upload-audio>音声</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>残り {0}</size-available>
+            <size-remaining>残り {0} / {1}</size-remaining>
+            <max-size>最大 {0}</max-size>
+            <max-per-file>1ファイル最大 {0}</max-per-file>
+            <files-available>最大 {0} ファイル</files-available>
+            <files-remaining>残り {0} / {1} ファイル</files-remaining>
+            <navbar-label>残り {0} / {1}</navbar-label>
+            <navbar-title>添付ファイル: {1} 中 {0} 使用済み（残り {2}）</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 これはデータの読み取り専用ビューです。

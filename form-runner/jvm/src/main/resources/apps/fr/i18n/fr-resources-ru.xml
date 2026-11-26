@@ -357,13 +357,27 @@
         <hints>
             <upload-max-size-per-file>Размер файлов должен быть меньше {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Суммарный размер файлов в элементе должен быть меньше {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Общий размер файлов в элементе управления не должен превышать {0} (осталось {1}).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Общий размер файлов в форме не должен превышать {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Общий размер файлов в форме не должен превышать {0} (осталось {1}).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Вы можете прикрепить до {0} файлов.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Можно прикрепить до {0} файлов (осталось {1}).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Вы должны прикрепить минимум {0} файлов.</upload-min-files-per-control>
             <upload-mediatypes>Допускаются только файлы типов {0}.</upload-mediatypes>
             <upload-image>изображение</upload-image>
             <upload-video>видео</upload-video>
             <upload-audio>аудио</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>Доступно {0}</size-available>
+            <size-remaining>Осталось {0} из {1}</size-remaining>
+            <max-size>Макс. {0}</max-size>
+            <max-per-file>Макс. {0} на файл</max-per-file>
+            <files-available>До {0} файлов</files-available>
+            <files-remaining>Осталось {0} из {1} файлов</files-remaining>
+            <navbar-label>Осталось {0} / {1}</navbar-label>
+            <navbar-title>Вложения: использовано {0} из {1} (осталось {2})</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Это версия только для чтения.

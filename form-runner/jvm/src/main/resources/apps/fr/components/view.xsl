@@ -537,6 +537,9 @@
                                 <fr:navbar-workflow-stage/>
                             </xh:li>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:navbar-attachment-quota/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:share-icon/>
                             </xh:li>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
@@ -1077,6 +1080,56 @@
             ref="fr:workflow-stage-value()[xxf:non-blank()]">
             <xf:label ref="xxf:r('detail.workflow-stage.label', '|fr-fr-resources|')"/>
         </xf:output>
+    </xsl:template>
+
+    <xsl:template match="fr:navbar-attachment-quota[$allow-navbar-attachment-quota]">
+        <xf:var name="max-bytes" value="fr:attachment-form-max-size()"/>
+        <xf:group
+            class="fr-navbar-attachment-quota"
+            ref=".[
+                not(fr:is-embedded()) and
+                not(fr:is-form-builder()) and
+                fr:mode() = ('new', 'edit', 'test') and
+                exists($max-bytes)
+            ]">
+            <xf:var name="used-bytes"      value="(fr:attachment-form-size(), 0)[1]"/>
+            <xf:var name="remaining-bytes" value="(fr:attachment-form-remaining-size(), 0)[1]"/>
+            <xf:var
+                name="used-pct"
+                value="
+                    if ($max-bytes gt 0) then
+                        min((100, xs:integer(round(($used-bytes * 100) div $max-bytes))))
+                    else
+                        100"/>
+            <xf:var name="is-exhausted" value="$remaining-bytes le 0"/>
+            <xh:span
+                class="fr-navbar-attachment-quota-inner{{if ($is-exhausted) then ' fr-navbar-attachment-quota-exhausted' else ''}}"
+                title="{{
+                    xxf:format-message(
+                        xxf:r('detail.attachment-quota.navbar-title', '|fr-fr-resources|'),
+                        (
+                            xxf:format-bytes($used-bytes),
+                            xxf:format-bytes($max-bytes),
+                            xxf:format-bytes($remaining-bytes)
+                        )
+                    )
+                }}">
+                <xh:i class="fa fa-fw fa-paperclip" aria-hidden="true"/>
+                <xh:span class="fr-navbar-attachment-quota-bar" aria-hidden="true">
+                    <xh:span class="fr-navbar-attachment-quota-fill" style="width: {{$used-pct}}%"/>
+                </xh:span>
+                <xf:output
+                    class="fr-navbar-attachment-quota-text"
+                    value="
+                        xxf:format-message(
+                            xxf:r('detail.attachment-quota.navbar-label', '|fr-fr-resources|'),
+                            (
+                                xxf:format-bytes($remaining-bytes),
+                                xxf:format-bytes($max-bytes)
+                            )
+                        )"/>
+            </xh:span>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:revision-history-icon[$allow-revision-history]">

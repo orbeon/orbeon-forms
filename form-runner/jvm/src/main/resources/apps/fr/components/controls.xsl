@@ -499,14 +499,48 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:attachment/xf:hint[exists(@ref) and empty(text())]" mode="within-grid">
-        <xsl:param name="binds-root" tunnel="yes"/>
+    <xsl:template match="*[p:has-class('fr-attachment')]/xf:hint[exists(@ref) and empty(text()[p:non-blank()])]" mode="within-grid" priority="10">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
+            <xsl:if test="exists(fr:param)">
+                <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
+                <xsl:namespace name="map" select="'http://www.w3.org/2005/xpath-functions/map'"/>
+            </xsl:if>
             <xsl:apply-templates select="@* except (@ref, @fr:automatic)" mode="#current"/>
-            <xsl:variable name="control" select=".."/>
-            <xsl:variable name="bind-id" select="$control/@bind"/>
-            <xsl:variable name="bind"    select="$binds-root//xf:bind[@id = $bind-id]"/>
-            <xsl:variable name="xpaths"  select="$bind/@constraint, $bind/xf:constraint/@value"/>
+            <xsl:variable name="control"     select=".."/>
+            <xsl:variable name="is-multiple" select="$control/@multiple = 'true'"/>
+
+            <xsl:variable
+                name="base-ref"
+                as="xs:string"
+                select="
+                    if (exists(fr:param)) then
+                        let
+                            $without-prefix := substring-after(@ref, '$form-resources/'),
+                            $dot            := replace($without-prefix, '/', '.'),
+                            $indexed        := replace($dot, '\[(\d+)\]', '.$1'),
+                            $split-on-dot   := tokenize($indexed, '\.'),
+                            $adjust-index   := for $part in $split-on-dot return
+                                               if ($part castable as xs:integer)
+                                               then string(xs:integer($part) - 1)
+                                               else $part,
+                            $merge          := string-join($adjust-index, '.')
+                        return
+                            concat(
+                                'xxf:r(''',
+                                    $merge,
+                                    ''',''fr-form-resources'',',
+                                    fr:build-template-param-map(
+                                        fr:param,
+                                        $library-name,
+                                        false(),                  (: for-pdf :)
+                                        @mediatype = 'text/html', (: for-text-html-mediatype :)
+                                        ()
+                                    ),
+                                ')'
+                            )
+                    else
+                        @ref"/>
 
             <xsl:variable
                 name="automatic-hint-enabled"
@@ -518,34 +552,25 @@
                         (
                             $fr-form-metadata/automatic-hints = 'true' or (
                                 not($fr-form-metadata/automatic-hints = 'false') and
-                                p:property(string-join(('oxf.fr.detail.hint.automatic', $app, $form), '.')) = true()
+                                p:property(string-join(('oxf.fr.detail.hint.automatic', $app, $form), '.'), $property-profile-opt) = true()
                             )
                         )
                     )"/>
 
-            <!-- XPath for the automatic hint, or empty string if it shouldn't be used  -->
-            <xsl:variable
-                name="automatic-hint-xpath"
-                as="xs:string"
-                select="
-                    if   ($automatic-hint-enabled)
-                    then frf:knownConstraintsToAutomaticHint($xpaths)
-                    else ''"/>
-
-            <!-- Generate `@ref` possibly combining form author provided hint with automatic hint -->
+            <!-- Generate `@ref` possibly combining dynamic automatic hint with form author provided hint -->
             <xsl:attribute
                 name="ref"
                 select="
-                    if   (p:non-blank($automatic-hint-xpath))
-                    then
+                    if ($automatic-hint-enabled) then
                         concat(
-                            'string-join((',
-                            $automatic-hint-xpath,
-                            ', ',
-                            @ref,
-                            '), '' '')'
+                            'string-join((fr:attachment-automatic-hint(., ',
+                            $is-multiple,
+                            '()), ',
+                            $base-ref,
+                            ')[xxf:non-blank()], '' '')'
                         )
-                    else @ref"/>
+                    else
+                        $base-ref"/>
         </xsl:copy>
     </xsl:template>
 

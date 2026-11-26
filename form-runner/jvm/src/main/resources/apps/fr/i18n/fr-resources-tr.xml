@@ -362,13 +362,27 @@
         <hints>
             <upload-max-size-per-file>Dosyalar {0} altında olmalıdır.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Kontroldeki toplam dosya boyutu {0} altında olmalıdır.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Kontroldeki toplam dosya boyutu {0} altında olmalıdır ({1} kaldı).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Formdaki toplam dosya boyutu {0} altında olmalıdır.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Formdaki toplam dosya boyutu {0} altında olmalıdır ({1} kaldı).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>{0} dosyaya kadar ekleyebilirsiniz.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>En fazla {0} dosya ekleyebilirsiniz ({1} kaldı).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>En az {0} dosya eklemelisiniz.</upload-min-files-per-control>
             <upload-mediatypes>Sadece {0} dosyaları kabul edilir.</upload-mediatypes>
             <upload-image>resim</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>ses</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} kullanılabilir</size-available>
+            <size-remaining>{0} / {1} kaldı</size-remaining>
+            <max-size>Maks. {0}</max-size>
+            <max-per-file>Dosya başına maks. {0}</max-per-file>
+            <files-available>En fazla {0} dosya</files-available>
+            <files-remaining>{0} / {1} dosya kaldı</files-remaining>
+            <navbar-label>{0} / {1} kaldı</navbar-label>
+            <navbar-title>Ekler: {1} içinden {0} kullanıldı ({2} kaldı)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Bu, verilerinizin salt okunur bir görünümüdür.

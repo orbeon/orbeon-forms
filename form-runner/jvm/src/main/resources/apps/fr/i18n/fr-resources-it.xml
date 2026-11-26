@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>I file devono essere inferiori a {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La dimensione totale dei file in questo controllo deve essere inferiore a {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>La dimensione totale dei file in questo controllo deve essere inferiore a {0} ({1} disponibile).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>La dimensione totale dei file nel modulo deve essere inferiore a {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>La dimensione totale dei file nel modulo deve essere inferiore a {0} ({1} disponibile).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>È possibile allegare fino a {0} file.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>È possibile allegare fino a {0} file ({1} rimanenti).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>È necessario allegare almeno {0} file.</upload-min-files-per-control>
             <upload-mediatypes>Sono accettati solo file {0}.</upload-mediatypes>
             <upload-image>immagine</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} disponibile</size-available>
+            <size-remaining>{0} di {1} disponibile</size-remaining>
+            <max-size>Max {0}</max-size>
+            <max-per-file>Max {0} per file</max-per-file>
+            <files-available>Fino a {0} file</files-available>
+            <files-remaining>{0} di {1} file rimanenti</files-remaining>
+            <navbar-label>{0} / {1} liberi</navbar-label>
+            <navbar-title>Allegati: {0} usati su {1} ({2} disponibile)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Questa è una vista di sola lettura dei dati.

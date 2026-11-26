@@ -13,7 +13,8 @@
   */
 package org.orbeon.oxf.xforms.upload
 
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.{MaximumFiles, MaximumSize}
+import org.orbeon.datatypes.MaximumFiles.{LimitedFiles, UnlimitedFiles}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.scalatest.funspec.AnyFunSpec
@@ -29,12 +30,15 @@ class UploadCheckerLogicTest extends AnyFunSpec {
     currentUploadSizeAggregateForForm               : Option[Long],
     uploadMaxSizePerFileProperty                    : MaximumSize,
     uploadMaxSizeAggregatePerControlProperty        : MaximumSize,
-    uploadMaxSizeAggregatePerFormProperty           : MaximumSize
+    uploadMaxSizeAggregatePerFormProperty           : MaximumSize,
+    controlIdToCurrentUploadFilesForControl         : Map[String, Int] = Map.empty,
+    override val uploadMaxFilesPerControlProperty   : MaximumFiles     = UnlimitedFiles
   ) extends UploadCheckerLogic {
     def attachmentMaxSizeValidationMipFor(controlEffectiveId: String, validationFunctionName: String): Option[String] =
       validationFunctionName match {
         case ValidationFunctionNames.UploadMaxSizePerFile             => controlIdToMaxSizePerFile            .get(controlEffectiveId) map (_.toString)
         case ValidationFunctionNames.UploadMaxSizeAggregatePerControl => controlIdToMaxSizeAggregatePerControl.get(controlEffectiveId) map (_.toString)
+        case ValidationFunctionNames.UploadMaxFilesPerControl         => controlIdToMaxFilesPerControl        .get(controlEffectiveId) map (_.toString)
         case _                                                        => throw new IllegalArgumentException(s"Unexpected validation function name: $validationFunctionName")
       }
 
@@ -42,7 +46,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
       controlIdToCurrentUploadSizeAggregateForControl.get(controlEffectiveId)
 
     def currentUploadFilesForControl(controlEffectiveId: String): Option[Int] =
-      controlIdToMaxFilesPerControl.get(controlEffectiveId)
+      controlIdToCurrentUploadFilesForControl.get(controlEffectiveId)
   }
 
   describe("With `upload.max-size-per-file` property only") {
@@ -229,6 +233,52 @@ class UploadCheckerLogicTest extends AnyFunSpec {
           uploadMaxSizeAggregatePerFormProperty           = LimitedSize(4000L)
         ).uploadMaxSizeForControl(controlId))
       }
+    }
+  }
+
+  describe("Remaining size and file count helpers") {
+
+    it("must compute remaining size per control and per form and clamp at zero") {
+      val checker = TestUploadCheckerLogic(
+        controlIdToMaxSizePerFile                       = Map.empty,
+        controlIdToMaxSizeAggregatePerControl           = Map("control1" -> 1000L, "control2" -> 500L),
+        controlIdToMaxFilesPerControl                   = Map.empty,
+        controlIdToCurrentUploadSizeAggregateForControl = Map("control1" -> 350L, "control2" -> 700L, "control3" -> 200L),
+        currentUploadSizeAggregateForForm               = Some(1250L),
+        uploadMaxSizePerFileProperty                    = UnlimitedSize,
+        uploadMaxSizeAggregatePerControlProperty        = UnlimitedSize,
+        uploadMaxSizeAggregatePerFormProperty           = LimitedSize(2000L)
+      )
+
+      assert(checker.uploadRemainingSizeForControl("control1") == LimitedSize(650L))
+      assert(checker.uploadRemainingSizeForControl("control2") == LimitedSize(0L))
+      assert(checker.uploadRemainingSizeForControl("control3") == UnlimitedSize)
+      assert(checker.uploadRemainingSizeForForm                 == LimitedSize(750L))
+    }
+
+    it("must compute max files and remaining files with property fallback and -1 unlimited override") {
+      val checker = TestUploadCheckerLogic(
+        controlIdToMaxSizePerFile                       = Map.empty,
+        controlIdToMaxSizeAggregatePerControl           = Map.empty,
+        controlIdToMaxFilesPerControl                   = Map("control-mip" -> 5, "control-unlimited" -> -1, "control-exhausted" -> 2),
+        controlIdToCurrentUploadSizeAggregateForControl = Map.empty,
+        currentUploadSizeAggregateForForm               = Some(0L),
+        uploadMaxSizePerFileProperty                    = UnlimitedSize,
+        uploadMaxSizeAggregatePerControlProperty        = UnlimitedSize,
+        uploadMaxSizeAggregatePerFormProperty           = UnlimitedSize,
+        controlIdToCurrentUploadFilesForControl         = Map("control-default" -> 1, "control-mip" -> 2, "control-unlimited" -> 4, "control-exhausted" -> 3),
+        uploadMaxFilesPerControlProperty                = LimitedFiles(3)
+      )
+
+      assert(checker.uploadMaxFilesForControl("control-default")   == LimitedFiles(3))
+      assert(checker.uploadMaxFilesForControl("control-mip")       == LimitedFiles(5))
+      assert(checker.uploadMaxFilesForControl("control-unlimited") == UnlimitedFiles)
+      assert(checker.uploadMaxFilesForControl("control-exhausted") == LimitedFiles(2))
+
+      assert(checker.uploadRemainingFilesForControl("control-default").contains(2))
+      assert(checker.uploadRemainingFilesForControl("control-mip").contains(3))
+      assert(checker.uploadRemainingFilesForControl("control-unlimited").isEmpty)
+      assert(checker.uploadRemainingFilesForControl("control-exhausted").contains(0))
     }
   }
 }

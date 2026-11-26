@@ -365,13 +365,27 @@
         <hints>
             <upload-max-size-per-file>Pliki muszą mieć rozmiar poniżej {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Łączny rozmiar plików w tej kontrolce musi być mniejszy niż {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Łączny rozmiar plików w tej kontrolce musi być mniejszy niż {0} (pozostało {1}).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Łączny rozmiar plików w formularzu musi być mniejszy niż {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Łączny rozmiar plików w formularzu musi być mniejszy niż {0} (pozostało {1}).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Możesz załączyć maksymalnie {0} plików.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Możesz załączyć maksymalnie {0} plików (pozostało {1}).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Musisz dołączyć co najmniej {0} pliki.</upload-min-files-per-control>
             <upload-mediatypes>Akceptowane są tylko pliki typu {0}.</upload-mediatypes>
             <upload-image>obraz</upload-image>
             <upload-video>wideo</upload-video>
             <upload-audio>dźwięk</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>Dostępne {0}</size-available>
+            <size-remaining>Pozostało {0} z {1}</size-remaining>
+            <max-size>Maks. {0}</max-size>
+            <max-per-file>Maks. {0} na plik</max-per-file>
+            <files-available>Maks. {0} plików</files-available>
+            <files-remaining>Pozostało {0} z {1} plików</files-remaining>
+            <navbar-label>Pozostało {0} / {1}</navbar-label>
+            <navbar-title>Załączniki: wykorzystano {0} z {1} (pozostało {2})</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 To jest podgląd Twoich danych w trybie tylko do odczytu.

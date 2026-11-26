@@ -1,14 +1,12 @@
 package org.orbeon.oxf.fr
 
 import org.log4s.Logger
-import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ByteSizeUtils, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Mediatypes}
-import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.EmptySet
@@ -162,92 +160,6 @@ trait FormRunnerComponentsCompileTime {
     profileOpt      = profileOrNull.trimAllToOpt,
     functionLibrary = componentsFunctionLibrary
   )(newIndentedLogger).getOrElse("") // xxx should be null, so result is empty sequence, right?
-
-  // Called from XSLT only
-  //@XPathFunction
-  def knownConstraintsToAutomaticHint(
-    attributesWithXPath : Array[NodeInfo]
-  ): String = {
-
-    val constraints = attributesWithXPath.toList.flatMap (attributeWithXPath =>
-      FormRunnerCommonConstraint.analyzeKnownConstraint(
-        attributeWithXPath.getStringValue,
-        namespaceMappingForNode(attributeWithXPath),
-        componentsFunctionLibrary
-      )(newIndentedLogger)
-    )
-
-    def hintResourceXPath(key: String): String =
-      s"xxf:r('detail.hints.$key', '|fr-fr-resources|')"
-    def hintMessageXPath(constraintName: String, displayValueXPath: String): String = {
-      val template = hintResourceXPath(constraintName)
-      s"xxf:format-message($template, $displayValueXPath)"
-    }
-
-    val hints = constraints.flatMap {
-      case (constraintName @ (ValidationFunctionNames.UploadMaxSizePerFile |
-                              ValidationFunctionNames.UploadMaxSizeAggregatePerControl |
-                              // Backward compatibility
-                              ValidationFunctionNames.UploadMaxSize), Some(value)) =>
-        val displaySizeOpt = value.toLongOption.map(ByteSizeUtils.byteCountToCompactDisplaySize)
-        displaySizeOpt.map { displaySize =>
-          hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$displaySize'")
-        }
-
-      case (constraintName @ ValidationFunctionNames.UploadMaxFilesPerControl, Some(max)) =>
-        Some(hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$max'"))
-
-      case (constraintName @ ValidationFunctionNames.UploadMinFilesPerControl, Some(min)) =>
-        Some(hintMessageXPath(ValidationFunctionNames.currentName(constraintName), s"'$min'"))
-
-      case (constraintName @ ValidationFunctionNames.UploadMediatypes, Some(mediatypesStr)) =>
-        val mediatypes        = mediatypesStr.splitTo[List]()
-        val displayMediatypes = mediatypes.flatMap { mediatype =>
-
-          def labelFromKnownMediatypes: Option[String] =
-            Mediatypes
-              .findLabelForMediatype(mediatype)
-              .map(l => s"'$l'")
-
-          def labelFromMediaStar: Option[String] =
-            if (mediatype.endsWith("/*")) {
-              val prefix = mediatype.substring(0, mediatype.length - 2)
-              Set("image", "video", "audio")(prefix).option(hintResourceXPath(s"upload-$prefix"))
-            } else None
-
-          def labelUsingHeuristic: Option[String] = {
-            // Take the part before the plus sign, and uppercase it, e.g. `image/svg+xml` → `SVG`
-            val slashPosition  = mediatype.indexOf('/')
-            val mediatypeRight = mediatype.substring(slashPosition + 1)
-            val beforePlus     = mediatypeRight.substringBeforeOpt("+").getOrElse(mediatypeRight)
-            val toUpper        = beforePlus.toUpperCase
-            val toXPath        = s"'$toUpper'"
-            Some(toXPath)
-          }
-
-          labelFromKnownMediatypes orElse
-            labelFromMediaStar     orElse
-            labelUsingHeuristic
-        }.distinct
-
-        displayMediatypes match {
-          case Nil => None
-          case _   =>
-            val combined = displayMediatypes.mkString(", ")
-            Some(hintMessageXPath(constraintName, s"string-join(($combined), ', ')"))
-        }
-
-      case _ => None
-    }
-
-    hints match {
-      case Nil         => ""
-      case hint :: Nil => hint
-      case _           =>
-        val params = hints.mkString(", ' ', ")
-        s"concat($params)"
-    }
-  }
 
   // Used by:
   //

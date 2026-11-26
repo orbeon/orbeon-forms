@@ -16,34 +16,51 @@ trait UploadCheckerLogic {
   def uploadMaxSizePerFileProperty                                                                 : MaximumSize
   def uploadMaxSizeAggregatePerControlProperty                                                     : MaximumSize
   def uploadMaxSizeAggregatePerFormProperty                                                        : MaximumSize
+  def uploadMaxFilesPerControlProperty                                                             : MaximumFiles = MaximumFiles.UnlimitedFiles
+
+  def uploadMaxSizePerFileForControl(controlEffectiveId: String): MaximumSize =
+    attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizePerFile)
+      .flatMap(MaximumSize.unapply)
+      .getOrElse(uploadMaxSizePerFileProperty)
+
+  def uploadMaxSizeAggregateForControl(controlEffectiveId: String): MaximumSize =
+    attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizeAggregatePerControl)
+      .flatMap(MaximumSize.unapply)
+      .getOrElse(uploadMaxSizeAggregatePerControlProperty)
+
+  def uploadRemainingSizeForControl(controlEffectiveId: String): MaximumSize =
+    uploadMaxSizeAggregateForControl(controlEffectiveId).minus(
+      currentUploadSizeAggregateForControl(controlEffectiveId).getOrElse {
+        throw new IllegalArgumentException(s"Could not determine current aggregate upload size for control $controlEffectiveId")
+      }
+    )
+
+  def uploadRemainingSizeForForm: MaximumSize =
+    uploadMaxSizeAggregatePerFormProperty.minus(
+      currentUploadSizeAggregateForForm.getOrElse {
+        throw new IllegalArgumentException("Could not determine current aggregate upload size for form")
+      }
+    )
 
   def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
-
-    val maximumSizePerFile =
-      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizePerFile)
-        .flatMap(MaximumSize.unapply)
-        .getOrElse(uploadMaxSizePerFileProperty)
-
-    lazy val maximumSizeAggregatePerControl: MaximumSize =
-      attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxSizeAggregatePerControl)
-        .flatMap(MaximumSize.unapply)
-        .getOrElse(uploadMaxSizeAggregatePerControlProperty)
-        .minus(
-          currentUploadSizeAggregateForControl(controlEffectiveId).getOrElse {
-            throw new IllegalArgumentException(s"Could not determine current aggregate upload size for control $controlEffectiveId")
-          }
-        )
-
-    lazy val maximumSizeAggregatePerForm: MaximumSize =
-      uploadMaxSizeAggregatePerFormProperty.minus(
-        currentUploadSizeAggregateForForm.getOrElse {
-          throw new IllegalArgumentException("Could not determine current aggregate upload size for form")
-        }
-      )
+    val maximumSizePerFile              = uploadMaxSizePerFileForControl(controlEffectiveId)
+    lazy val maximumSizeAggregatePerControl = uploadRemainingSizeForControl(controlEffectiveId)
+    lazy val maximumSizeAggregatePerForm    = uploadRemainingSizeForForm
 
     // Do not evaluate aggregate sizes unless needed
     MaximumSize.min(maximumSizePerFile #:: maximumSizeAggregatePerControl #:: maximumSizeAggregatePerForm #:: LazyList.empty)
   }
+
+  def uploadMaxFilesForControl(controlEffectiveId: String): MaximumFiles =
+    attachmentMaxSizeValidationMipFor(controlEffectiveId, ValidationFunctionNames.UploadMaxFilesPerControl)
+      .flatMap(MaximumFiles.unapply)
+      .getOrElse(uploadMaxFilesPerControlProperty)
+
+  def uploadRemainingFilesForControl(controlEffectiveId: String): Option[Int] =
+    uploadMaxFilesForControl(controlEffectiveId) match {
+      case LimitedFiles(max) => Some(math.max(0, max - currentUploadFilesForControl(controlEffectiveId).getOrElse(0)))
+      case UnlimitedFiles    => None
+    }
 }
 
 object UploadCheckerLogic {

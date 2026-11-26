@@ -340,6 +340,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     MessageFormatter.format(MessageFormatCache(template), args map SequenceTool.convertToJava toVector)
 
   @XPathFunction
+  def formatBytes(bytesOpt: Option[Long]): Option[String] =
+    bytesOpt.map(org.orbeon.oxf.util.ByteSizeUtils.byteCountToCompactDisplaySize)
+
+  @XPathFunction
   def lang()(implicit xfc: XFormsFunction.Context): Option[String] =
     elementAnalysisForSource flatMap (XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, _))
 
@@ -681,7 +685,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def uploadMaxFilesPerControl(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
     // For now, don't actually validate
-    evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSizePerFile, constraintOpt, _ => true)
+    evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxFilesPerControl, constraintOpt, _ => true)
   }
 
   @XPathFunction

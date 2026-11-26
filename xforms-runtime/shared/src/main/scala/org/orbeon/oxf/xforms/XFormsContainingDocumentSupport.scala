@@ -312,6 +312,10 @@ trait ContainingDocumentUpload {
     def uploadMaxSizePerFileProperty: MaximumSize             = staticState.uploadMaxSizePerFile
     def uploadMaxSizeAggregatePerControlProperty: MaximumSize = staticState.uploadMaxSizeAggregatePerControl
     def uploadMaxSizeAggregatePerFormProperty: MaximumSize    = staticState.uploadMaxSizeAggregatePerForm
+    override def uploadMaxFilesPerControlProperty: MaximumFiles =
+      staticState.staticStringProperty(UploadMaxFilesPerControlProperty).trimAllToOpt
+        .flatMap(MaximumFiles.unapply)
+        .getOrElse(MaximumFiles.UnlimitedFiles)
   }
 
   def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, MaximumCurrentFiles, AllowedMediatypes) = {
@@ -331,30 +335,14 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    val allowedFiles = {
-
-      def fromCommonConstraint = {
-        customMipForControl(controlEffectiveId, ValidationFunctionNames.UploadMaxFilesPerControl) flatMap
-          MaximumFiles.unapply
-      }
-
-      def fromFormSetting =
-        staticState.staticStringProperty(UploadMaxFilesPerControlProperty).trimAllToOpt flatMap
-          MaximumFiles.unapply
-
-      val maxFilesConstraint =
-        fromCommonConstraint orElse
-          fromFormSetting    getOrElse
-          MaximumFiles.UnlimitedFiles
-
-      maxFilesConstraint match {
+    val allowedFiles =
+      UploadChecker.uploadMaxFilesForControl(controlEffectiveId) match {
         case MaximumFiles.LimitedFiles(max) =>
           val currentFiles = UploadChecker.currentUploadFilesForControl(controlEffectiveId)
           MaximumCurrentFiles.LimitedFiles(currentFiles.getOrElse(0), max)
         case MaximumFiles.UnlimitedFiles    =>
           MaximumCurrentFiles.UnlimitedFiles
       }
-    }
 
     (
       UploadChecker.uploadMaxSizeForControl(controlEffectiveId),

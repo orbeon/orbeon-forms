@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Files must be under {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Total file size in control must be under {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Total file size in control must be under {0} ({1} remaining).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Total file size in form must be under {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Total file size in form must be under {0} ({1} remaining).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>You can attach up to {0} files.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>You can attach up to {0} files ({1} remaining).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>You must attach at least {0} files.</upload-min-files-per-control>
             <upload-mediatypes>Only {0} files are accepted.</upload-mediatypes>
             <upload-image>image</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} available</size-available>
+            <size-remaining>{0} of {1} remaining</size-remaining>
+            <max-size>Max {0}</max-size>
+            <max-per-file>Max {0} per file</max-per-file>
+            <files-available>Up to {0} files</files-available>
+            <files-remaining>{0} of {1} files remaining</files-remaining>
+            <navbar-label>{0} / {1} left</navbar-label>
+            <navbar-title>Attachments: {0} used of {1} ({2} remaining)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 This is a read-only view of your data.

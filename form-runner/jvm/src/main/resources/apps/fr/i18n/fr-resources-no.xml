@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Filer må være under {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Total filstørrelse i kontrollen må være under {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Total filstørrelse i kontrollen må være under {0} ({1} gjenstår).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Total filstørrelse i skjemaet må være under {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Total filstørrelse i skjemaet må være under {0} ({1} gjenstår).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Du kan legge ved opptil {0} filer.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Du kan legge ved opptil {0} filer ({1} gjenstår).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Du må legge ved minst {0} filer.</upload-min-files-per-control>
             <upload-mediatypes>Bare filer av typen {0} godtas.</upload-mediatypes>
             <upload-image>bilde</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>lyd</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} tilgjengelig</size-available>
+            <size-remaining>{0} av {1} gjenstår</size-remaining>
+            <max-size>Maks {0}</max-size>
+            <max-per-file>Maks {0} per fil</max-per-file>
+            <files-available>Opptil {0} filer</files-available>
+            <files-remaining>{0} av {1} filer gjenstår</files-remaining>
+            <navbar-label>{0} / {1} igjen</navbar-label>
+            <navbar-title>Vedlegg: {0} brukt av {1} ({2} gjenstår)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Dette er en skrivebeskyttet versjon av dine data.

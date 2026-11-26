@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Tiedostojen on oltava kooltaan alle {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Kaikkien tähän kenttään liitettyjen tiedostojen yhteiskoon on oltava alle {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Tiedostojen kokonaiskoon tässä kentässä on oltava alle {0} ({1} jäljellä).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Tiedostojen kokonaiskoon lomakkeella on oltava alle {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Tiedostojen kokonaiskoon lomakkeella on oltava alle {0} ({1} jäljellä).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Voit liittää enintään {0} tiedostoa.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Voit liittää enintään {0} tiedostoa ({1} jäljellä).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Sinun on liitettävä vähintään {0} tiedostoa.</upload-min-files-per-control>
             <upload-mediatypes>Vain {0}-tyyppiset tiedostot hyväksytään.</upload-mediatypes>
             <upload-image>kuva</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>ääni</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} käytettävissä</size-available>
+            <size-remaining>{0} / {1} jäljellä</size-remaining>
+            <max-size>Enint. {0}</max-size>
+            <max-per-file>Enint. {0} / tiedosto</max-per-file>
+            <files-available>Enintään {0} tiedostoa</files-available>
+            <files-remaining>{0} / {1} tiedostoa jäljellä</files-remaining>
+            <navbar-label>{0} / {1} jäljellä</navbar-label>
+            <navbar-title>Liitteet: {0} / {1} käytetty ({2} jäljellä)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Tämä on kirjoitussuojattu näkymä tiedoistasi.

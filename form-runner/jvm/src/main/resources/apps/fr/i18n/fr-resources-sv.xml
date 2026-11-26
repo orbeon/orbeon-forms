@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Filer måste vara mindre än {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Den totala filstorleken i kontrollen får inte överstiga {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Den totala filstorleken i kontrollen måste vara under {0} ({1} återstår).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Den totala filstorleken i formuläret måste vara under {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Den totala filstorleken i formuläret måste vara under {0} ({1} återstår).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Du kan bifoga upp till {0} filer.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Du kan bifoga upp till {0} filer ({1} återstår).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Du måste bifoga minst {0} filer.</upload-min-files-per-control>
             <upload-mediatypes>Endast filer av typen {0} accepteras.</upload-mediatypes>
             <upload-image>bild</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>ljud</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} tillgängligt</size-available>
+            <size-remaining>{0} av {1} återstår</size-remaining>
+            <max-size>Max {0}</max-size>
+            <max-per-file>Max {0} per fil</max-per-file>
+            <files-available>Upp till {0} filer</files-available>
+            <files-remaining>{0} av {1} filer återstår</files-remaining>
+            <navbar-label>{0} / {1} kvar</navbar-label>
+            <navbar-title>Bilagor: {0} använt av {1} ({2} återstår)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Detta är en skrivskyddad visning av data

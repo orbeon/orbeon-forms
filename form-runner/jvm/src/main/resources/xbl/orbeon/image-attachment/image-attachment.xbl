@@ -1489,7 +1489,7 @@
                 </xf:group>
                 <fr:attachment
                     ref="$binding"
-                    xbl:attr="multiple"
+                    xbl:attr="multiple show-quota"
                     image-preview="true"
                     accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
 

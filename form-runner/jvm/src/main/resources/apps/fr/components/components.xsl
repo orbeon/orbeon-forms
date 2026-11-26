@@ -316,7 +316,7 @@
         name="valid-attachment-max-size-per-file-or-empty"
         as="xs:string?"
         select="
-            (
+            for $v in (
                 (: Backward compatibility :)
                 p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
@@ -326,22 +326,24 @@
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ]
-            )[1]"/>
+            )[1]
+            return string($v)"/>
 
     <xsl:variable
         name="valid-attachment-max-size-aggregate-per-control-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-control', $app, $form), '.'), $property-profile-opt)[
+            for $v in p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-control', $app, $form), '.'), $property-profile-opt)[
                 (: Allow -1 to mean 'unlimited' :)
                 . castable as xs:integer and xs:integer(.) ge -1
-            ]"/>
+            ][1]
+            return string($v)"/>
 
     <xsl:variable
         name="valid-attachment-max-size-aggregate-per-form-or-empty"
         as="xs:string?"
         select="
-            (
+            for $v in (
                 (: Backward compatibility :)
                 p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
@@ -351,15 +353,18 @@
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ]
-            )[1]"/>
+            )[1]
+            return string($v)"/>
 
     <xsl:variable
         name="valid-attachment-max-files-per-control-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-files-per-control', $app, $form), '.'), $property-profile-opt)[
-                . castable as xs:integer and xs:integer(.) ge 1
-            ]"/>
+            for $v in p:property(string-join(('oxf.fr.detail.attachment.max-files-per-control', $app, $form), '.'), $property-profile-opt)[
+                (: Allow -1 to mean 'unlimited' :)
+                . castable as xs:integer and (xs:integer(.) ge 1 or xs:integer(.) = -1)
+            ][1]
+            return string($v)"/>
 
     <xsl:variable
         name="attachment-mediatypes"
@@ -710,6 +715,13 @@
             $is-detail and
             p:property(string-join(('oxf.fr.navbar.workflow-stage.enable', $app, $form), '.'), $property-profile-opt)"/>
 
+    <xsl:variable
+        name="allow-navbar-attachment-quota"
+        as="xs:boolean"
+        select="
+            $is-detail and
+            p:property(string-join(('oxf.fr.navbar.attachment-quota.enable', $app, $form), '.'), $property-profile-opt)"/>
+
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"
@@ -1035,6 +1047,17 @@
                 <xsl:when test="exists($valid-attachment-max-size-aggregate-per-form-or-empty)">
                     <!-- Else use Form Runner property if specified and valid -->
                     <xsl:attribute name="xxf:upload.max-size-aggregate-per-form" select="$valid-attachment-max-size-aggregate-per-form-or-empty"/>
+                </xsl:when>
+            </xsl:choose>
+
+            <xsl:choose>
+                <xsl:when test="exists(@xxf:upload.max-files-per-control)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-files-per-control"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-files-per-control-or-empty)">
+                    <!-- Else use Form Runner property if specified and valid -->
+                    <xsl:attribute name="xxf:upload.max-files-per-control" select="$valid-attachment-max-files-per-control-or-empty"/>
                 </xsl:when>
             </xsl:choose>
 

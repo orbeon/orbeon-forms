@@ -387,5 +387,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("format-bytes", classOf[XXFormsFormatBytes], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+    )
   }
 }

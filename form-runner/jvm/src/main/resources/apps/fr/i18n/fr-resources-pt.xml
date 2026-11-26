@@ -364,13 +364,27 @@
         <hints>
             <upload-max-size-per-file>Os ficheiros devem ser menores que {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>O tamanho total dos ficheiros no controlo deve ser inferior a {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>O tamanho total dos arquivos neste controle deve ser inferior a {0} ({1} restante).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>O tamanho total dos arquivos no formulário deve ser inferior a {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>O tamanho total dos arquivos no formulário deve ser inferior a {0} ({1} restante).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Você pode anexar até {0} arquivos.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Você pode anexar até {0} arquivos ({1} restantes).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Você deve anexar pelo menos {0} arquivos.</upload-min-files-per-control>
             <upload-mediatypes>Somente ficheiros {0} são aceites.</upload-mediatypes>
             <upload-image>imagem</upload-image>
             <upload-video>vídeo</upload-video>
             <upload-audio>áudio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} disponível</size-available>
+            <size-remaining>{0} de {1} restante</size-remaining>
+            <max-size>Máx. {0}</max-size>
+            <max-per-file>Máx. {0} por arquivo</max-per-file>
+            <files-available>Até {0} arquivos</files-available>
+            <files-remaining>{0} de {1} arquivos restantes</files-remaining>
+            <navbar-label>{0} / {1} livre</navbar-label>
+            <navbar-title>Anexos: {0} usados de {1} ({2} restante)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Esta é uma vista só de leitura dos seus dados.

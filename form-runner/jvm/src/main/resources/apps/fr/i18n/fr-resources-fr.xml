@@ -367,13 +367,27 @@
         <hints>
             <upload-max-size-per-file>La taille des fichiers doit être inférieurs à {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>La taille totale des fichiers pour ce contrôle doit être inférieure à {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>La taille totale des fichiers pour ce contrôle doit être inférieure à {0} ({1} restant).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>La taille totale des fichiers dans le formulaire doit être inférieure à {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>La taille totale des fichiers dans le formulaire doit être inférieure à {0} ({1} restant).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Vous pouvez joindre jusqu'à {0} fichiers.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Vous pouvez joindre jusqu'à {0} fichiers ({1} restants).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Vous devez joindre au moins {0} fichiers.</upload-min-files-per-control>
             <upload-mediatypes>Seuls les {0} sont acceptés.</upload-mediatypes>
             <upload-image>image</upload-image>
             <upload-video>vidéo</upload-video>
             <upload-audio>audio</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} disponible</size-available>
+            <size-remaining>{0} sur {1} restant</size-remaining>
+            <max-size>Max. {0}</max-size>
+            <max-per-file>Max. {0} par fichier</max-per-file>
+            <files-available>Jusqu'à {0} fichiers</files-available>
+            <files-remaining>{0} sur {1} fichiers restants</files-remaining>
+            <navbar-label>{0} / {1} restant</navbar-label>
+            <navbar-title>Pièces jointes : {0} utilisés sur {1} ({2} restant)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Ceci est une vue en lecture seule de vos données.

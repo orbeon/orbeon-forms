@@ -358,13 +358,27 @@
         <hints>
             <upload-max-size-per-file>Filer skal være mindre end {0}.</upload-max-size-per-file>
             <upload-max-size-aggregate-per-control>Den samlede filstørrelse skal være mindre end {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control-remaining>Den samlede filstørrelse i feltet skal være under {0} ({1} tilbage).</upload-max-size-aggregate-per-control-remaining>
+            <upload-max-size-aggregate-per-form>Den samlede filstørrelse i formularen skal være under {0}.</upload-max-size-aggregate-per-form>
+            <upload-max-size-aggregate-per-form-remaining>Den samlede filstørrelse i formularen skal være under {0} ({1} tilbage).</upload-max-size-aggregate-per-form-remaining>
             <upload-max-files-per-control>Du kan vedhæfte op til {0} filer.</upload-max-files-per-control>
+            <upload-max-files-per-control-remaining>Du kan vedhæfte op til {0} filer ({1} tilbage).</upload-max-files-per-control-remaining>
             <upload-min-files-per-control>Du skal vedhæfte mindst {0} filer.</upload-min-files-per-control>
             <upload-mediatypes>Kun {0}-filer accepteres.</upload-mediatypes>
             <upload-image>billede</upload-image>
             <upload-video>video</upload-video>
             <upload-audio>lyd</upload-audio>
         </hints>
+        <attachment-quota>
+            <size-available>{0} tilgængelig</size-available>
+            <size-remaining>{0} af {1} tilbage</size-remaining>
+            <max-size>Maks. {0}</max-size>
+            <max-per-file>Maks. {0} pr. fil</max-per-file>
+            <files-available>Op til {0} filer</files-available>
+            <files-remaining>{0} af {1} filer tilbage</files-remaining>
+            <navbar-label>{0} / {1} tilbage</navbar-label>
+            <navbar-title>Vedhæftninger: {0} brugt af {1} ({2} tilbage)</navbar-title>
+        </attachment-quota>
         <view>
             <explanation>
                 Dette er en skrivebeskyttet version af dine data.

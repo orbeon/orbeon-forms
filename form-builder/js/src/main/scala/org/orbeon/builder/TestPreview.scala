@@ -72,8 +72,8 @@ object TestPreview {
       val Default: PreviewState = PreviewState(
         mode        = "responsive",
         deviceId    = None,
-        width       = 393,
-        height      = 852,
+        width       = 402,
+        height      = 874,
         zoom        = "fit",
         colorScheme = "system",
         maximized   = false
@@ -254,7 +254,7 @@ object TestPreview {
     def defaultDeviceForCategory(cat: PreviewDeviceCategory): Option[PreviewDevice] = {
       val inCat = devices.filter(_.category == cat)
       cat match {
-        case PreviewDeviceCategory.Mobile  => inCat.find(_.id == "iphone-16").orElse(inCat.headOption)
+        case PreviewDeviceCategory.Mobile  => inCat.find(_.id == "iphone-18-pro").orElse(inCat.headOption)
         case PreviewDeviceCategory.Tablet  => inCat.find(_.id == "ipad-air").orElse(inCat.headOption)
         case PreviewDeviceCategory.Desktop => inCat.find(_.id == "desktop").orElse(inCat.headOption)
       }

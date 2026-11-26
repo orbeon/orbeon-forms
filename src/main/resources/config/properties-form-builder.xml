@@ -171,16 +171,17 @@
     <!-- Preview devices for Form Builder Test dialog (#2362) -->
     <property as="xs:string"  name="oxf.fb.test.devices">
         [
-            {"id": "iphone-se",    "name": "iPhone SE",         "width": 375,  "height": 667,  "category": "mobile"},
-            {"id": "iphone-16",    "name": "iPhone 16",         "width": 393,  "height": 852,  "category": "mobile"},
-            {"id": "iphone-16-pm", "name": "iPhone 16 Pro Max", "width": 440,  "height": 956,  "category": "mobile"},
-            {"id": "pixel-9",      "name": "Pixel 9",           "width": 412,  "height": 915,  "category": "mobile"},
-            {"id": "galaxy-s24",   "name": "Galaxy S24",        "width": 360,  "height": 780,  "category": "mobile"},
-            {"id": "ipad-mini",    "name": "iPad Mini",         "width": 744,  "height": 1133, "category": "tablet"},
-            {"id": "ipad-air",     "name": "iPad Air",          "width": 820,  "height": 1180, "category": "tablet"},
-            {"id": "ipad-pro-13",  "name": "iPad Pro 13\"",     "width": 1024, "height": 1366, "category": "tablet"},
-            {"id": "laptop",       "name": "Laptop",            "width": 1280, "height": 800,  "category": "desktop"},
-            {"id": "desktop",      "name": "Desktop",           "width": 1440, "height": 900,  "category": "desktop"}
+            {"id": "iphone-18-pro",       "name": "iPhone 18 Pro",          "width": 402,  "height": 874,  "category": "mobile"},
+            {"id": "iphone-18-pro-max",   "name": "iPhone 18 Pro Max",      "width": 440,  "height": 956,  "category": "mobile"},
+            {"id": "iphone-duo-folded",   "name": "iPhone Duo (Folded)",    "width": 382,  "height": 618,  "category": "mobile"},
+            {"id": "pixel-11",            "name": "Pixel 11",               "width": 412,  "height": 924,  "category": "mobile"},
+            {"id": "galaxy-s26",          "name": "Galaxy S26",             "width": 360,  "height": 780,  "category": "mobile"},
+            {"id": "iphone-duo-unfolded", "name": "iPhone Duo (Unfolded)",  "width": 669,  "height": 902,  "category": "tablet"},
+            {"id": "ipad-mini",           "name": "iPad Mini",              "width": 744,  "height": 1133, "category": "tablet"},
+            {"id": "ipad-air",            "name": "iPad Air",               "width": 820,  "height": 1180, "category": "tablet"},
+            {"id": "ipad-pro-13",         "name": "iPad Pro 13\"",          "width": 1024, "height": 1366, "category": "tablet"},
+            {"id": "laptop",              "name": "Laptop",                 "width": 1280, "height": 800,  "category": "desktop"},
+            {"id": "desktop",             "name": "Desktop",                "width": 1440, "height": 900,  "category": "desktop"}
         ]
     </property>
 

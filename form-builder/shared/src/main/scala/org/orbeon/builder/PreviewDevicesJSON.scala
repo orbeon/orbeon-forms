@@ -51,16 +51,17 @@ object PreviewDevicesJSON {
   val MediumBreakpointMaxPx  = 980
 
   val DefaultDevices: List[PreviewDevice] = List(
-    PreviewDevice("iphone-se",    "iPhone SE",         375,  667,  PreviewDeviceCategory.Mobile),
-    PreviewDevice("iphone-16",    "iPhone 16",         393,  852,  PreviewDeviceCategory.Mobile),
-    PreviewDevice("iphone-16-pm", "iPhone 16 Pro Max", 440,  956,  PreviewDeviceCategory.Mobile),
-    PreviewDevice("pixel-9",      "Pixel 9",           412,  915,  PreviewDeviceCategory.Mobile),
-    PreviewDevice("galaxy-s24",   "Galaxy S24",        360,  780,  PreviewDeviceCategory.Mobile),
-    PreviewDevice("ipad-mini",    "iPad Mini",         744,  1133, PreviewDeviceCategory.Tablet),
-    PreviewDevice("ipad-air",     "iPad Air",          820,  1180, PreviewDeviceCategory.Tablet),
-    PreviewDevice("ipad-pro-13",  "iPad Pro 13\"",     1024, 1366, PreviewDeviceCategory.Tablet),
-    PreviewDevice("laptop",       "Laptop",            1280, 800,  PreviewDeviceCategory.Desktop),
-    PreviewDevice("desktop",      "Desktop",           1440, 900,  PreviewDeviceCategory.Desktop)
+    PreviewDevice("iphone-18-pro",       "iPhone 18 Pro",         402,  874,  PreviewDeviceCategory.Mobile),
+    PreviewDevice("iphone-18-pro-max",   "iPhone 18 Pro Max",     440,  956,  PreviewDeviceCategory.Mobile),
+    PreviewDevice("iphone-duo-folded",   "iPhone Duo (Folded)",   382,  618,  PreviewDeviceCategory.Mobile),
+    PreviewDevice("pixel-11",            "Pixel 11",              412,  924,  PreviewDeviceCategory.Mobile),
+    PreviewDevice("galaxy-s26",          "Galaxy S26",            360,  780,  PreviewDeviceCategory.Mobile),
+    PreviewDevice("iphone-duo-unfolded", "iPhone Duo (Unfolded)", 669,  902,  PreviewDeviceCategory.Tablet),
+    PreviewDevice("ipad-mini",           "iPad Mini",             744,  1133, PreviewDeviceCategory.Tablet),
+    PreviewDevice("ipad-air",            "iPad Air",              820,  1180, PreviewDeviceCategory.Tablet),
+    PreviewDevice("ipad-pro-13",         "iPad Pro 13\"",         1024, 1366, PreviewDeviceCategory.Tablet),
+    PreviewDevice("laptop",              "Laptop",                1280, 800,  PreviewDeviceCategory.Desktop),
+    PreviewDevice("desktop",             "Desktop",               1440, 900,  PreviewDeviceCategory.Desktop)
   )
 
   implicit val previewDeviceEncoder: Encoder[PreviewDevice] = Encoder.instance { device =>

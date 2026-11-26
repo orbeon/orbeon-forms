@@ -4,7 +4,7 @@ import cats.syntax.option.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
-import org.apache.pdfbox.text.{PDFTextStripper, TextPosition}
+import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.http.StatusCode
@@ -15,7 +15,6 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.File
 import java.nio.file.Files
-import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.IterableHasAsScala
 import scala.sys.process.*
 import scala.util.chaining.*
@@ -57,23 +56,17 @@ class PdfProductionTest
 
   // Horizontal space, in points, between each required star and the closest glyph to its right on the same line, the
   // first one of the label. Don't rely on the order of the glyphs in the PDF.
-  private def requiredStarGaps(pdf: Array[Byte]): List[Float] =
-    useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
-      val positions = ListBuffer[TextPosition]()
-      new PDFTextStripper {
-        override protected def processTextPosition(text: TextPosition): Unit =
-          positions += text
-      }.getText(pdd)
-      val all = positions.toList
-      all.filter(_.getUnicode.exists(isRequiredStar)).flatMap { star =>
-        val starEnd = star.getXDirAdj + star.getWidthDirAdj
-        // Start from the middle of the star, so that a label which overlaps the star still counts, with a negative gap
-        all
-          .filter(p => (p ne star) && ! p.getUnicode.isBlank && math.abs(p.getYDirAdj - star.getYDirAdj) < 3f && p.getXDirAdj >= star.getXDirAdj + star.getWidthDirAdj / 2)
-          .map(_.getXDirAdj - starEnd)
-          .minOption
-      }
+  private def requiredStarGaps(pdf: Array[Byte]): List[Float] = {
+    val all = pdfTextPositions(pdf)
+    all.filter(_.getUnicode.exists(isRequiredStar)).flatMap { star =>
+      val starEnd = star.getXDirAdj + star.getWidthDirAdj
+      // Start from the middle of the star, so that a label which overlaps the star still counts, with a negative gap
+      all
+        .filter(p => (p ne star) && ! p.getUnicode.isBlank && math.abs(p.getYDirAdj - star.getYDirAdj) < 3f && p.getXDirAdj >= star.getXDirAdj + star.getWidthDirAdj / 2)
+        .map(_.getXDirAdj - starEnd)
+        .minOption
     }
+  }
 
   describe("Form Runner PDF production") {
 

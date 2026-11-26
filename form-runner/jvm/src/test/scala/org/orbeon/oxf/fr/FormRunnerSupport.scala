@@ -15,6 +15,9 @@ package org.orbeon.oxf.fr
 
 import cats.data.NonEmptyList
 import org.apache.commons.io.IOUtils
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.RandomAccessReadBuffer
+import org.apache.pdfbox.text.{PDFTextStripper, TextPosition}
 import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.fr.FormRunnerPath
 import org.orbeon.io.CharsetNames
@@ -37,6 +40,7 @@ import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
 
 import java.sql.{Connection, DriverManager}
+import scala.collection.mutable.ListBuffer
 
 
 object FormRunnerSupport {
@@ -55,6 +59,16 @@ trait FormRunnerSupport extends DocumentTestBase {
           disposeDocument()
         }
       }
+    }
+
+  def pdfTextPositions(pdf: Array[Byte]): List[TextPosition] =
+    useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+      val positions = ListBuffer[TextPosition]()
+      new PDFTextStripper {
+        override protected def processTextPosition(position: TextPosition): Unit =
+          positions += position
+      }.getText(pdd)
+      positions.toList
     }
 
   def withTempSQLite[T](thunk: Connection => T): T = {

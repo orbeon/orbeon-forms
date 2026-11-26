@@ -535,6 +535,7 @@ object FormRunnerApp extends App {
     val AutoHiddenClass  = "fr-card-auto-hidden"
     val TabStorageKey    = "orbeon.fr.landing.tab"
 
+    val containerOpt      = Option(document.getElementById("fr-landing-container")).collect { case e: html.Element => e }
     val tablistOpt        = toolbarElem.querySelectorOpt("#fr-landing-tablist")
     val tabButtons        = tablistOpt.toList.flatMap(_.querySelectorAllT("button[role='tab']"))
     val workspacePanelOpt = Option(document.getElementById("fr-landing-panel-workspace")).collect { case e: html.Element => e }
@@ -567,8 +568,10 @@ object FormRunnerApp extends App {
 
     def confirmedNonEmptyDemoCards(panelElem: html.Element): List[html.Element] =
       availableCardsInPanel(panelElem).filter { card =>
-        card.attValueOpt("data-has-loaded").contains("true") &&
-          card.querySelectorOpt(".fr-card-state-error:not(.xforms-disabled)").isEmpty
+        val hasLoaded =
+          card.attValueOpt("data-has-loaded").contains("true") ||
+            card.querySelectorOpt(".fr-card-skeleton:not(.xforms-disabled)").isEmpty
+        hasLoaded && card.querySelectorOpt(".fr-card-state-error:not(.xforms-disabled)").isEmpty
       }
 
     def setPanelTabSemantics(panelElem: html.Element, enabled: Boolean): Unit =
@@ -635,6 +638,11 @@ object FormRunnerApp extends App {
     def updateMatchSummary(): Unit = {
       val (tabbedMode, activePanelOpt) = syncTabsAndPanels()
       val noResultsOpt                 = document.querySelectorOpt(".orbeon .fr-landing-no-results")
+
+      containerOpt.foreach { c =>
+        val isWide = activePanelOpt.exists(p => availableCardsInPanel(p).size >= 3)
+        c.toggleClass("fr-landing-container-wide", isWide)
+      }
 
       List(workspacePanelOpt, demosPanelOpt).flatten.foreach { panel =>
         panel.querySelectorOpt(".fr-landing-grid").foreach { grid =>

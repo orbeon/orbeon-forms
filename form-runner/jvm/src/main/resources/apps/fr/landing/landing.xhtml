@@ -167,7 +167,6 @@
     <xh:body>
         <fr:view fluid="true">
             <fr:navbar/>
-            <fr:config-check/>
             <xf:var
                 name="workspace-cards"
                 value="
@@ -212,14 +211,20 @@
                 name="new-form-label"
                 value="xxf:r('landing.buttons.new-form', '|fr-fr-resources|')"/>
 
-            <xh:p class="fr-sr-status" role="status">
-                <xf:output value="instance('fr-landing-ui-instance')/@refresh-announcement"/>
-            </xh:p>
-
             <xh:div
-                class="fr-landing-toolbar"
-                data-matching-template="{xxf:r('landing.messages.matching-cards', '|fr-fr-resources|')}"
+                id="fr-landing-container"
+                class="fr-landing-container {'fr-landing-container-wide'[count($workspace-cards) ge 3]}"
             >
+                <fr:config-check/>
+
+                <xh:p class="fr-sr-status" role="status">
+                    <xf:output value="instance('fr-landing-ui-instance')/@refresh-announcement"/>
+                </xh:p>
+
+                <xh:div
+                    class="fr-landing-toolbar"
+                    data-matching-template="{xxf:r('landing.messages.matching-cards', '|fr-fr-resources|')}"
+                >
                 <xh:div
                     id="fr-landing-tablist"
                     class="fr-landing-tablist xforms-hidden"
@@ -505,14 +510,15 @@
                     </xh:div>
                 </xh:div>
             </xh:div>
-            <xh:div class="fr-landing-no-results xforms-hidden" role="status">
-                <xh:i class="fa fa-magnifying-glass fr-landing-no-results-icon" aria-hidden="true"/>
-                <xh:p class="fr-landing-no-results-text">
-                    <xf:output value="xxf:r('landing.messages.no-matches', '|fr-fr-resources|')"/>
-                </xh:p>
-                <xh:button type="button" class="btn btn-secondary fr-landing-filter-reset">
-                    <xf:output value="xxf:r('landing.buttons.clear-filter', '|fr-fr-resources|')"/>
-                </xh:button>
+                <xh:div class="fr-landing-no-results xforms-hidden" role="status">
+                    <xh:i class="fa fa-magnifying-glass fr-landing-no-results-icon" aria-hidden="true"/>
+                    <xh:p class="fr-landing-no-results-text">
+                        <xf:output value="xxf:r('landing.messages.no-matches', '|fr-fr-resources|')"/>
+                    </xh:p>
+                    <xh:button type="button" class="btn btn-secondary fr-landing-filter-reset">
+                        <xf:output value="xxf:r('landing.buttons.clear-filter', '|fr-fr-resources|')"/>
+                    </xh:button>
+                </xh:div>
             </xh:div>
         </fr:view>
     </xh:body>

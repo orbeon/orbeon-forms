@@ -414,6 +414,7 @@ def jUnitTestOptions =
 lazy val DebugTest         = config("debug-test") extend Test
 lazy val DatabaseTest      = config("db")         extend Test
 lazy val DebugDatabaseTest = config("debug-db")   extend Test
+lazy val FipsTest          = config("fips")       extend Test
 
 lazy val unmanagedJarsSettings = Seq(
 
@@ -961,11 +962,12 @@ lazy val formRunnerJVM = formRunner.jvm
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings*)
-  .configs(DatabaseTest, DebugDatabaseTest, DebugTest)
+  .configs(DatabaseTest, DebugDatabaseTest, DebugTest, FipsTest)
   .settings(scala2CommonSettings*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings)*)
   .settings(inConfig(DebugDatabaseTest)(Defaults.testSettings)*)
   .settings(inConfig(DebugTest)(Defaults.testSettings)*)
+  .settings(inConfig(FipsTest)(Defaults.testSettings)*)
   .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions*)
   .settings(s3TestSettings)
@@ -978,8 +980,19 @@ lazy val formRunnerJVM = formRunner.jvm
     DebugTest / javaOptions             += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
 
     DebugDatabaseTest / sourceDirectory := (DatabaseTest / sourceDirectory).value,
-    DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+    DebugDatabaseTest / javaOptions     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
+
+    FipsTest / javaOptions              += "-Dorg.bouncycastle.fips.approved_only=true",
+    FipsTest / dependencyClasspath      := (FipsTest / dependencyClasspath).value.filterNot { attributed =>
+      val name = attributed.data.getName
+      name.startsWith("bcprov-") || name.startsWith("bcpkix-jdk") || name.startsWith("bcutil-jdk")
+    }
   ).settings(
+    libraryDependencies ++= Seq(
+      "org.bouncycastle" % "bc-fips"     % "2.1.2"  % FipsTest,
+      "org.bouncycastle" % "bcutil-fips" % "2.1.8"  % FipsTest,
+      "org.bouncycastle" % "bcpkix-fips" % "2.1.13" % FipsTest
+    ),
     libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
     libraryDependencies += "javax.portlet"        % "portlet-api"               % JavaxPortletApiVersion   % Provided,

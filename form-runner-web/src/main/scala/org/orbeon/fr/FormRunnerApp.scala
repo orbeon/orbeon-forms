@@ -507,10 +507,12 @@ object FormRunnerApp extends App {
     val workspacePanelOpt = Option(document.getElementById("fr-landing-panel-workspace")).collect { case e: html.Element => e }
     val demosPanelOpt     = Option(document.getElementById("fr-landing-panel-demos")).collect { case e: html.Element => e }
 
+    val filterBoxOpt = toolbarElem.querySelectorOpt(".fr-landing-filter-box")
     val inputOpt     = toolbarElem.querySelectorOpt(".fr-landing-filter-input").map(_.asInstanceOf[html.Input])
     val clearBtnOpt  = toolbarElem.querySelectorOpt(".fr-landing-filter-clear")
     val kbdHintOpt   = toolbarElem.querySelectorOpt(".fr-landing-filter-kbd")
     val countElemOpt = toolbarElem.querySelectorOpt(".fr-landing-filter-count")
+    val srStatusOpt  = toolbarElem.querySelectorOpt(".fr-landing-filter-sr-status")
     val formElemOpt  = toolbarElem.closestOpt("form").map(_.asInstanceOf[html.Form])
 
     var lastSentQuery : String = ""
@@ -627,23 +629,28 @@ object FormRunnerApp extends App {
       if (lastSentQuery.isEmpty) {
         countElemOpt.foreach { el =>
           el.textContent = ""
+          el.removeAttribute("title")
           el.classList.add(HiddenClass)
         }
+        srStatusOpt.foreach(_.textContent = "")
         noResultsOpt.foreach(_.classList.add(HiddenClass))
       } else {
         activePanelOpt.foreach { panel =>
           val availableCards = availableCardsInPanel(panel)
           val matchingCards  = availableCards.filterNot(_.hasClass(FilteredOutClass))
           val anyLoading     = availableCards.exists(c => c.querySelectorOpt(".fr-card-is-refreshing, .fr-card-skeleton:not(.xforms-disabled)").isDefined)
+          val template       = toolbarElem.attValueOpt("data-matching-template").flatMap(_.trimAllToOpt).getOrElse("{0} / {1}")
+          val fullSummary    =
+            template
+              .replace("{0}", matchingCards.size.toString)
+              .replace("{1}", availableCards.size.toString)
 
           countElemOpt.foreach { el =>
-            val template = toolbarElem.attValueOpt("data-matching-template").flatMap(_.trimAllToOpt).getOrElse("{0} / {1}")
-            el.textContent =
-              template
-                .replace("{0}", matchingCards.size.toString)
-                .replace("{1}", availableCards.size.toString)
+            el.textContent = s"${matchingCards.size} / ${availableCards.size}"
+            el.setAttribute("title", fullSummary)
             el.classList.remove(HiddenClass)
           }
+          srStatusOpt.foreach(_.textContent = fullSummary)
 
           noResultsOpt.foreach(_.toggleClass(HiddenClass, matchingCards.nonEmpty || anyLoading))
         }
@@ -784,6 +791,16 @@ object FormRunnerApp extends App {
       })
 
       clearBtnOpt.foreach(_.addEventListener("click", (_: dom.MouseEvent) => clearFilterAndFocus()))
+
+      filterBoxOpt.foreach(_.addEventListener("click", (e: dom.MouseEvent) => {
+        val clickedInteractive =
+          e.target match {
+            case el: dom.Element => el.closestOpt("input, button").isDefined
+            case _               => false
+          }
+        if (!clickedInteractive)
+          inputElem.focus()
+      }))
 
       document
         .querySelectorOpt(".orbeon .fr-landing-no-results .fr-landing-filter-reset")

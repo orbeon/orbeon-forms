@@ -140,7 +140,7 @@ object LandingCardsJSON {
       title       = LocalizedString.ByResource("landing.titles.published-forms"),
       description = Some(LocalizedString.ByResource("landing.descriptions.published-forms")),
       thumbnail   = Some("/apps/fr/style/images/orbeon/book.svg"),
-      excludeApps = List("orbeon", "orbeon-features"),
+      excludeApps = List("orbeon", "orbeon-features", "orbeon-screenshots"),
       linkTo      = List(LinkTo.Summary, LinkTo.New),
       sort        = Some((SortBy.LastModified, None))
     )

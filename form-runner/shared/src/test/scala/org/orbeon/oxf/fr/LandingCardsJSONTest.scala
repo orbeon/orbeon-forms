@@ -347,7 +347,7 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.AdminCard))
       assert(! LandingCardsJSON.DefaultCards.contains(LandingCardsJSON.BookshelfCard))
       assert(LandingCardsJSON.DefaultCards.head == LandingCardsJSON.DemoFormsCard)
-      assert(LandingCardsJSON.PublishedFormsCard.excludeApps == List("orbeon", "orbeon-features"))
+      assert(LandingCardsJSON.PublishedFormsCard.excludeApps == List("orbeon", "orbeon-features", "orbeon-screenshots"))
       assert(LandingCardsJSON.FormBuilderFormsCard.titleFields == List("title", "form-name"))
       assert(LandingCardsJSON.FormBuilderFormsCard.pillField.contains("application-name"))
     }

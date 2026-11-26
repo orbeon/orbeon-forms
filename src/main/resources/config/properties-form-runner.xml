@@ -850,7 +850,7 @@
           "title": "landing.titles.published-forms",
           "description": "landing.descriptions.published-forms",
           "thumbnail": "/apps/fr/style/images/orbeon/book.svg",
-          "exclude-apps": "orbeon orbeon-features",
+          "exclude-apps": "orbeon orbeon-features orbeon-screenshots",
           "sort-by": "last-modified",
           "link-to": "summary new"
         },

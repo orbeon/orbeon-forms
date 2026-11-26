@@ -110,41 +110,46 @@ class FieldEncryptionTest
       }
     }
 
-    it("must re-encrypt form data as Version 1 in FIPS mode and remain readable in both FIPS and non-FIPS modes") {
-      val encryptedXmlInFips =
-        withProperties("oxf:/ops/unit-tests/properties-encryption-fips-1.xml") {
-          val dom = TransformerUtils.readOrbeonDom(
-            new ByteArrayInputStream(
-              """<form><section><clear>42</clear><encrypted>Sensitive FIPS data</encrypted></section></form>""".getBytes(CharsetNames.Utf8)
-            ),
-            null,
-            false,
-            false
-          )
-          val docInfo = new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
-          FieldEncryption.encryptMutableFormData(
-            List(List(PathElem("section"), PathElem("encrypted"))),
-            docInfo
-          )
-
-          val encryptedText = dom.getRootElement.element("section").element("encrypted").getStringValue
-          val rawBytes      = JBase64.getDecoder.decode(encryptedText)
-          assert(rawBytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
-          assert(rawBytes.length == 8 + 16 + 12 + "Sensitive FIPS data".getBytes(CharsetNames.Utf8).length + 16)
-
-          dom.getRootElement.serializeToString()
-        }
-
-      for (propertiesUrl <- List(
-        "oxf:/ops/unit-tests/properties-encryption-fips-1.xml",
-        "oxf:/ops/unit-tests/properties-encryption-fips-2.xml",
+    it("must write Version 1 by default in both non-FIPS and FIPS modes and remain readable across all modes and rotated passwords") {
+      for (writePropertiesUrl <- List(
         "oxf:/ops/unit-tests/properties-encryption-1.xml",
-        "oxf:/ops/unit-tests/properties-encryption-2.xml"
+        "oxf:/ops/unit-tests/properties-encryption-fips-1.xml"
       )) {
-        withProperties(propertiesUrl) {
-          val decrypted = decryptXml(encryptedXmlInFips)
-          assert(decrypted.getRootElement.element("section").element("clear").getStringValue     == "42")
-          assert(decrypted.getRootElement.element("section").element("encrypted").getStringValue == "Sensitive FIPS data")
+        val encryptedXml =
+          withProperties(writePropertiesUrl) {
+            val dom = TransformerUtils.readOrbeonDom(
+              new ByteArrayInputStream(
+                """<form><section><clear>42</clear><encrypted>Sensitive data</encrypted></section></form>""".getBytes(CharsetNames.Utf8)
+              ),
+              null,
+              false,
+              false
+            )
+            val docInfo = new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
+            FieldEncryption.encryptMutableFormData(
+              List(List(PathElem("section"), PathElem("encrypted"))),
+              docInfo
+            )
+
+            val encryptedText = dom.getRootElement.element("section").element("encrypted").getStringValue
+            val rawBytes      = JBase64.getDecoder.decode(encryptedText)
+            assert(rawBytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
+            assert(rawBytes.length == 8 + 16 + 12 + "Sensitive data".getBytes(CharsetNames.Utf8).length + 16)
+
+            dom.getRootElement.serializeToString()
+          }
+
+        for (readPropertiesUrl <- List(
+          "oxf:/ops/unit-tests/properties-encryption-fips-1.xml",
+          "oxf:/ops/unit-tests/properties-encryption-fips-2.xml",
+          "oxf:/ops/unit-tests/properties-encryption-1.xml",
+          "oxf:/ops/unit-tests/properties-encryption-2.xml"
+        )) {
+          withProperties(readPropertiesUrl) {
+            val decrypted = decryptXml(encryptedXml)
+            assert(decrypted.getRootElement.element("section").element("clear").getStringValue     == "42")
+            assert(decrypted.getRootElement.element("section").element("encrypted").getStringValue == "Sensitive data")
+          }
         }
       }
     }

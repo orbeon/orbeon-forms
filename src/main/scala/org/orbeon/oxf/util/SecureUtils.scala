@@ -242,7 +242,7 @@ object SecureUtils extends SecureUtilsTrait {
       }
     }
 
-    private def extractV1IterationsOpt(ciphertext: Array[Byte]): Option[Int] =
+    private[oxf] def extractV1IterationsOpt(ciphertext: Array[Byte]): Option[Int] =
       if (
         ciphertext.length >= AesGcmV1MinLength &&
         ciphertext(0) == AesGcmV1Magic0        &&
@@ -273,11 +273,12 @@ object SecureUtils extends SecureUtilsTrait {
       }
     }
 
-    private def encryptV1WithPassword(
+    private[oxf] def encryptV1WithPassword(
       password  : String,
       plaintext : Array[Byte],
       iterations: Int,
-      saltOpt   : Option[Array[Byte]] = None
+      saltOpt   : Option[Array[Byte]] = None,
+      aadOpt    : Option[Array[Byte]] = None
     ): Array[Byte] = {
       if (iterations < MinKdfIterations || iterations > MaxKdfIterations)
         throw new ConfigurationException(
@@ -289,6 +290,7 @@ object SecureUtils extends SecureUtilsTrait {
       val secretKey = getOrComputeV1SecretKey(password, salt, iterations)
       withAesGcmCipher { cipher =>
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+        aadOpt.foreach(cipher.updateAAD)
         val encrypted = cipher.doFinal(plaintext)
         val out       = new Array[Byte](AesGcmV1HeaderSize + AesGcmSaltSize + AesGcmIvSize + encrypted.length)
         out(0) = AesGcmV1Magic0
@@ -316,13 +318,19 @@ object SecureUtils extends SecureUtilsTrait {
       }
     }
 
-    private def decryptV1WithPassword(password: String, ciphertext: Array[Byte], iterations: Int): Array[Byte] = {
+    private[oxf] def decryptV1WithPassword(
+      password  : String,
+      ciphertext: Array[Byte],
+      iterations: Int,
+      aadOpt    : Option[Array[Byte]] = None
+    ): Array[Byte] = {
       val salt       = java.util.Arrays.copyOfRange(ciphertext, AesGcmV1HeaderSize, AesGcmV1HeaderSize + AesGcmSaltSize)
       val ivOffset   = AesGcmV1HeaderSize + AesGcmSaltSize
       val dataOffset = ivOffset + AesGcmIvSize
       val secretKey  = getOrComputeV1SecretKey(password, salt, iterations)
       withAesGcmCipher { cipher =>
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, ciphertext, ivOffset, AesGcmIvSize))
+        aadOpt.foreach(cipher.updateAAD)
         cipher.doFinal(ciphertext, dataOffset, ciphertext.length - dataOffset)
       }
     }
@@ -336,7 +344,8 @@ object SecureUtils extends SecureUtilsTrait {
     def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken | KeyUsage.FieldEncryption =>
-          encryptWithPassword(getPassword(keyUsage), plaintext, fipsMode = isFipsMode, iterations = getKdfIterations)
+          // Starting with 2026.1, always write the self-describing Version 1 envelope by default
+          encryptV1WithPassword(getPassword(keyUsage), plaintext, iterations = getKdfIterations)
         case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM encryption: `$keyUsage`")
       }
@@ -395,35 +404,43 @@ object SecureUtils extends SecureUtilsTrait {
     def decrypt(ciphertext: String, keyUsage: KeyUsage): String =
       new String(decrypt(decodeBase64(ciphertext), keyUsage), CharsetNames.Utf8)
 
-    private[util] def encryptWithPassword(
-      password  : String,
-      plaintext : Array[Byte],
-      fipsMode  : Boolean             = isFipsMode,
-      iterations: Int                 = getKdfIterations,
-      saltOpt   : Option[Array[Byte]] = None
+    private[oxf] def encryptWithPassword(
+      password   : String,
+      plaintext  : Array[Byte],
+      useVersion1: Boolean             = true,
+      iterations : Int                 = getKdfIterations,
+      saltOpt    : Option[Array[Byte]] = None,
+      aadOpt     : Option[Array[Byte]] = None
     ): Array[Byte] =
-      if (fipsMode)
-        encryptV1WithPassword(password, plaintext, iterations, saltOpt)
-      else
+      if (useVersion1)
+        encryptV1WithPassword(password, plaintext, iterations, saltOpt, aadOpt)
+      else {
+        require(aadOpt.isEmpty, "Version 0 AES-GCM does not support AAD")
         encryptV0WithPassword(password, plaintext)
+      }
 
-    private[util] def decryptWithPassword(
+    private[oxf] def decryptWithPassword(
       password  : String,
-      ciphertext: Array[Byte]
+      ciphertext: Array[Byte],
+      aadOpt    : Option[Array[Byte]] = None
     ): Array[Byte] =
       extractV1IterationsOpt(ciphertext) match {
         case Some(headerIterations) =>
           try {
-            decryptV1WithPassword(password, ciphertext, headerIterations)
+            decryptV1WithPassword(password, ciphertext, headerIterations, aadOpt)
           } catch {
-            case _: GeneralSecurityException =>
+            case _: GeneralSecurityException if aadOpt.isEmpty =>
               decryptV0WithPassword(password, ciphertext)
+            case e: GeneralSecurityException =>
+              throw e
           }
-        case None =>
+        case None if aadOpt.isEmpty =>
           decryptV0WithPassword(password, ciphertext)
+        case None =>
+          throw new GeneralSecurityException("Expected Version 1 AES-GCM header when AAD is provided")
       }
 
-    private[util] def decryptWithPassword(password: String, ciphertext: String): String =
+    private[oxf] def decryptWithPassword(password: String, ciphertext: String): String =
       new String(decryptWithPassword(password, decodeBase64(ciphertext)), CharsetNames.Utf8)
     private[util] def cachedPbkdf2KeyCount: Int =
       pbkdf2KeyCache.synchronized(pbkdf2KeyCache.size())

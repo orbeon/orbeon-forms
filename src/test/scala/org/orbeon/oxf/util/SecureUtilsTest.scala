@@ -161,18 +161,21 @@ class SecureUtilsTest
     it("must round-trip encrypt and decrypt Version 0 across sizes") {
       for (size <- Sizes) {
         val bytes     = randomBytes(size)
-        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = false)
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, useVersion1 = false)
         val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)
         assert(bytes sameElements decrypted)
         assert(encrypted.length == 12 + size + 16)
       }
     }
 
-    it("must round-trip encrypt and decrypt Version 1 (PBKDF2WithHmacSHA256) across sizes and preserve embedded iterations") {
+    it("must round-trip encrypt and decrypt Version 1 (PBKDF2WithHmacSHA256) across sizes, preserve embedded iterations, and verify AAD") {
+      val aad1 = "name=oxf.fr.field-encryption.password".getBytes(org.orbeon.io.CharsetNames.Utf8)
+      val aad2 = "name=oxf.fr.access-token.password".getBytes(org.orbeon.io.CharsetNames.Utf8)
+
       for (size <- Sizes) {
         val bytes      = randomBytes(size)
-        val encrypted1 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 10000)
-        val encrypted2 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 25000)
+        val encrypted1 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, useVersion1 = true, iterations = 10000)
+        val encrypted2 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, useVersion1 = true, iterations = 25000)
         assert(encrypted1.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
         assert(encrypted1.slice(4, 8) sameElements Array[Byte](0x00, 0x00, 0x27, 0x10)) // 10000 big-endian
         assert(encrypted2.slice(4, 8) sameElements Array[Byte](0x00, 0x00, 0x61, 0xA8.toByte)) // 25000 big-endian
@@ -181,6 +184,12 @@ class SecureUtilsTest
         // Both ciphertexts decrypt without passing iterations, even though they used different iteration counts
         assert(bytes sameElements SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted1))
         assert(bytes sameElements SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted2))
+
+        // Associated data (AAD) must authenticate and reject mismatched or missing AAD
+        val encryptedWithAad = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, useVersion1 = true, iterations = 10000, aadOpt = Some(aad1))
+        assert(bytes sameElements SecureUtils.AesGcm.decryptWithPassword(TestPassword, encryptedWithAad, aadOpt = Some(aad1)))
+        assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encryptedWithAad, aadOpt = Some(aad2))).isFailure)
+        assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encryptedWithAad, aadOpt = None)).isFailure)
       }
     }
 
@@ -200,14 +209,22 @@ class SecureUtilsTest
     }
 
     it("must fail when tampering with Version 0 or Version 1 AES-GCM ciphertext") {
-      for (fipsMode <- List(false, true)) {
-        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64), fipsMode = fipsMode, iterations = 10000)
+      for (useVersion1 <- List(false, true)) {
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64), useVersion1 = useVersion1, iterations = 10000)
         encrypted(encrypted.length - 1) = (encrypted(encrypted.length - 1) ^ 0x01).toByte
         assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)).isFailure)
       }
     }
 
-    it("must honor oxf.crypto.fips-mode for AesGcm, ephemeral encrypt/decrypt, provider lookup, and password length") {
+    it("must write Version 1 by default in non-FIPS mode and honor oxf.crypto.fips-mode for ephemeral crypto, provider lookup, and password length") {
+      withProperties("oxf:/ops/unit-tests/properties-encryption-1.xml") {
+        assert(! SecureUtils.isFipsMode)
+        val nonFipsEncrypted = SecureUtils.AesGcm.encrypt("Default Version 1 secret")
+        val nonFipsBytes     = java.util.Base64.getDecoder.decode(nonFipsEncrypted)
+        assert(nonFipsBytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
+        assert(SecureUtils.AesGcm.decrypt(nonFipsEncrypted) == "Default Version 1 secret")
+      }
+
       val v1FromFirstPassword =
         withProperties("oxf:/ops/unit-tests/properties-encryption-fips-1.xml") {
           assert(SecureUtils.isFipsMode)
@@ -252,10 +269,10 @@ class SecureUtilsTest
 
     it("must reject out-of-range KDF iterations and bound LRU PBKDF2 key cache under concurrent load (> 256 salts)") {
       intercept[org.orbeon.oxf.common.ConfigurationException] {
-        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), fipsMode = true, iterations = 999)
+        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), useVersion1 = true, iterations = 999)
       }
       intercept[org.orbeon.oxf.common.ConfigurationException] {
-        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), fipsMode = true, iterations = 10000001)
+        SecureUtils.AesGcm.encryptWithPassword(TestPassword, Array[Byte](1, 2, 3), useVersion1 = true, iterations = 10000001)
       }
 
       // 320 distinct 16-byte salts (> Pbkdf2KeyCacheMaxSize = 256) encrypted and decrypted concurrently
@@ -263,11 +280,11 @@ class SecureUtilsTest
       distinctSalts.par.foreach { salt =>
         val payload   = randomBytes(96)
         val encrypted = SecureUtils.AesGcm.encryptWithPassword(
-          password   = TestPassword,
-          plaintext  = payload,
-          fipsMode   = true,
-          iterations = 1000,
-          saltOpt    = Some(salt)
+          password    = TestPassword,
+          plaintext   = payload,
+          useVersion1 = true,
+          iterations  = 1000,
+          saltOpt     = Some(salt)
         )
         val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)
         assert(decrypted sameElements payload)

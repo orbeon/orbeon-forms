@@ -1286,7 +1286,7 @@ class ConfigurationPropertiesTest
             val customValueControl    = resolveObject[XFormsValueControl]("custom-property-value-control").get
             val customProfilesControl = resolveObject[org.orbeon.oxf.xforms.control.XFormsControl]("custom-property-profiles-control").get
             assert(customNameControl.getHint(EventCollector.Throw).contains("e.g. oxf.custom.my-property"))
-            assert(customProfilesControl.getHint(EventCollector.Throw).contains("Optional"))
+            assert(customProfilesControl.getHint(EventCollector.Throw).isEmpty)
             for (ctrl <- List(customNameControl, customTypeControl, customValueControl, customProfilesControl))
               assert(ctrl.getHelp(EventCollector.Throw).exists(_.trim.nonEmpty))
             assert(customNameControl.isValid)

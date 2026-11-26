@@ -997,10 +997,6 @@
             .orbeon .fr-config-custom-props-grid .fr-grid-head .fr-grid-th &gt; .xforms-label {
                 padding-top: 0;
             }
-            .orbeon .fr-config-custom-props-grid .fr-grid-head .xforms-hint {
-                font-size: 0.85em;
-                line-height: 1.25;
-            }
         </xh:style>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:xpath-analysis="false">
 
@@ -5314,7 +5310,7 @@
                                         <fr:c x="1" y="1" w="4">
                                             <xf:input id="custom-property-name-control" ref="@name">
                                                 <xf:label ref="$form-resources/custom-properties-section/name"/>
-                                                <xf:hint ref="$form-resources/custom-properties-section/name-hint"/>
+                                                <xf:hint appearance="minimal" ref="$form-resources/custom-properties-section/name-hint"/>
                                                 <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/name-help"/>
                                             </xf:input>
                                         </fr:c>
@@ -5351,9 +5347,12 @@
                                             </xf:textarea>
                                         </fr:c>
                                         <fr:c x="11" y="1" w="2">
-                                            <fr:tags-input id="custom-property-profiles-control" ref="@profiles" validation-type="pattern" pattern="^[A-Za-z0-9._\-:]+$">
+                                            <fr:tags-input
+                                                id="custom-property-profiles-control"
+                                                ref="@profiles"
+                                                validation-type="pattern"
+                                                pattern="^[A-Za-z0-9._\-:]+$">
                                                 <xf:label ref="$form-resources/custom-properties-section/profiles"/>
-                                                <xf:hint ref="$form-resources/custom-properties-section/profiles-hint"/>
                                                 <xf:help mediatype="text/html" ref="$form-resources/custom-properties-section/profiles-help"/>
                                             </fr:tags-input>
                                         </fr:c>

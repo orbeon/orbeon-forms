@@ -545,9 +545,11 @@
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:revision-history-icon/>
                             </xh:li>
-                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
-                                <fr:status-icons/>
-                            </xh:li>
+                            <xsl:if test="not($is-form-configuration)">
+                                <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                    <fr:status-icons/>
+                                </xh:li>
+                            </xsl:if>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:user-nav/>
                             </xh:li>
@@ -1547,6 +1549,7 @@
     <xsl:template match="fr:status-icons" name="fr-status-icons">
         <!-- Status icons for detail page -->
 
+        <xsl:if test="not($is-form-configuration)">
         <xf:group
             model="fr-form-model"
             ref=".[not($fr-mode = ('summary', 'home', 'landing', 'console', 'analytics'))]"
@@ -1622,6 +1625,7 @@
                 </xf:group>
             </xsl:if>
         </xf:group>
+        </xsl:if>
     </xsl:template>
 
     <!-- Success and ephemeral error messages -->

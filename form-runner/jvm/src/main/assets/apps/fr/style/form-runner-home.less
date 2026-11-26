@@ -30,11 +30,21 @@
         .fr-admin-actions {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
             gap: 8px;
             min-inline-size: 0;
 
-            > .btn-group {
+            .fr-admin-actions-start,
+            .fr-admin-actions-end {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                min-inline-size: 0;
+            }
+
+            .btn-group {
                 margin: 0;
 
                 &.btn-group-empty {

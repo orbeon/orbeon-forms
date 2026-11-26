@@ -1140,6 +1140,7 @@
                                 class="btn-toolbar fr-admin-actions"
                                 xmlns="http://www.w3.org/1999/xhtml"
                                 xxf:element="div">
+                                <div class="fr-admin-actions-start">
                                 <div class="btn-group">
 
                                     <button id="select-button" class="btn dropdown-toggle" data-orbeon-bs-toggle="dropdown" aria-expanded="false">
@@ -1409,7 +1410,9 @@
                                         </xf:select1>
                                     </xf:group>
                                 </xh:div>
+                                </div>
 
+                                <div class="fr-admin-actions-end">
                                 <!-- Buttons for reindexing -->
                                 <xf:group ref="instance('fr-reindex-instance')" xxf:internal="true" class="btn-group">
 
@@ -1438,6 +1441,7 @@
                                         frf:invalidatePersistencePropertiesCache()
                                     </xf:action>
                                 </xf:trigger>
+                                </div>
                             </xf:group>
 
                             <!-- Progress bars for reindexing -->

@@ -404,16 +404,16 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     .fr-form-header-card {
         display: flex;
         align-items: center;
-        gap: 16px;
-        margin-bottom: 16px;
-        padding: 12px 16px;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 8px 12px;
         background-color: var(--orbeon-form-background-color);
         border: 1px solid var(--orbeon-base-border-color);
         border-radius: var(--orbeon-body-decorations-border-radius);
         color: var(--orbeon-base-color);
 
         .fr-form-header-thumbnail {
-            flex: 0 0 180px;
+            flex: 0 0 88px;
             aspect-ratio: 16 / 9;
             overflow: hidden;
             border-radius: var(--orbeon-body-decorations-border-radius);
@@ -440,17 +440,17 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         }
 
         .fr-form-header-title {
-            margin: 0 0 4px 0;
-            font-size: 1.25em;
+            margin: 0 0 2px 0;
+            font-size: 1.1em;
             font-weight: 600;
-            line-height: 1.3;
+            line-height: 1.25;
             color: var(--orbeon-base-color);
         }
 
         .fr-form-header-description {
             margin: 0;
-            font-size: 0.95em;
-            line-height: 1.45;
+            font-size: 0.92em;
+            line-height: 1.35;
             color: var(--orbeon-hint-color);
 
             p:last-child {
@@ -459,15 +459,21 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         }
 
         &.fr-summary-header-card {
-            padding: 10px 14px;
-            gap: 14px;
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            gap: 10px;
 
             .fr-form-header-thumbnail {
-                flex-basis: 140px;
+                flex-basis: 72px;
             }
 
             .fr-form-header-title {
-                font-size: 1.14em;
+                margin: 0 0 1px 0;
+                font-size: 1.02em;
+            }
+
+            .fr-form-header-description {
+                font-size: 0.9em;
             }
         }
 

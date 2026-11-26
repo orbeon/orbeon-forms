@@ -573,13 +573,18 @@ object ConsoleChart {
       else f"${b / (1024.0 * 1024.0 * 1024.0)}%.2f GB"
     }
 
+    private def formatIntegerValue(value: Long): String = {
+      val langOpt = Option(dom.document.documentElement).flatMap(el => Option(el.getAttribute("lang"))).flatMap(_.trimAllToOpt)
+      new dom.intl.NumberFormat(langOpt.orUndefined).format(value.toDouble)
+    }
+
     private def formatUnitCompact(value: Double, unit: String): String =
       unit match {
         case "bytes"       => formatBytesValue(value)
-        case "rate"        => if (value == 0.0) "0/s" else if (value < 10.0) f"$value%.1f/s" else f"${value.round}/s"
+        case "rate"        => if (value == 0.0) "0/s" else if (value < 10.0) f"$value%.1f/s" else s"${formatIntegerValue(value.round)}/s"
         case "duration-ms" => if (value < 1000.0) f"${value.round} ms" else f"${value / 1000.0}%.1fs"
         case "percent"     => f"${value.round}%%"
-        case _             => f"${value.round}"
+        case _             => formatIntegerValue(value.round)
       }
 
     private def formatUnitDetail(value: Double, unit: String): String =
@@ -588,7 +593,7 @@ object ConsoleChart {
         case "rate"        => f"$value%.1f/s"
         case "duration-ms" => if (value < 1000.0) f"${value.round} ms" else f"${value / 1000.0}%.2fs"
         case "percent"     => f"$value%.1f%%"
-        case _             => f"${value.round}"
+        case _             => formatIntegerValue(value.round)
       }
   }
 }

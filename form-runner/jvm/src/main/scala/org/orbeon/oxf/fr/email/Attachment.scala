@@ -172,10 +172,20 @@ object Attachment {
         Nil
     }
 
-    val singleAttachments   = attachmentHolders      .filter(_.hasAtt("filename"))
+    attachmentsFromHolders(attachmentHolders)
+  }
+
+  def attachmentsFromHolders(
+    attachmentHolders       : Iterable[NodeInfo]
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
+    formRunnerParams        : FormRunnerParams
+  ): List[Attachment] = {
+    val singleAttachments   = attachmentHolders      .filter(h => ! h.hasChildElement && h.hasAtt("filename"))
     val multipleAttachments = (attachmentHolders / *).filter(_.hasAtt("filename"))
 
-    (singleAttachments ++ multipleAttachments).flatMap(attachmentFromHolder)
+    (singleAttachments ++ multipleAttachments).flatMap(attachmentFromHolder).toList
   }
 
   def attachmentFromHolder(

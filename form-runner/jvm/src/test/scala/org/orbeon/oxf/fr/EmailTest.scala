@@ -15,8 +15,9 @@ package org.orbeon.oxf.fr
 
 import cats.data.NonEmptyList
 import com.icegreen.greenmail.util.{GreenMail, ServerSetup}
-import jakarta.mail.Message
+import jakarta.mail.{Message, Session}
 import jakarta.mail.internet.InternetAddress
+import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunnerCommon.*
@@ -27,7 +28,7 @@ import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.properties.{CombinedPropertyStore, PropertyLoader, PropertySet, SimplePropertyStore}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.TransformerUtils
@@ -38,9 +39,11 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.orbeon.xforms.XFormsNames
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.io.ByteArrayOutputStream
 import java.net.{ServerSocket, Socket, URI}
 import java.nio.charset.StandardCharsets
 import java.security.cert.X509Certificate
+import java.util.Properties as JProperties
 import javax.net.ssl.{SSLContext, SSLEngine, TrustManager, X509ExtendedTrustManager}
 
 class EmailTest
@@ -625,6 +628,72 @@ class EmailTest
           }
         }
       }
+    }
+  }
+  describe("Attachment holders with empty metadata attributes") {
+
+    implicit val logger                  : IndentedLogger               = new IndentedLogger(LoggerFactory.createLogger(classOf[EmailTest]))
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+    implicit val formRunnerParams        : FormRunnerParams             = FormRunnerParams(AppForm("acme", "order"), "email")
+
+    it("must ignore empty attributes on a multiple-attachment container holder") {
+      val emptyMultipleHolder = NodeConversions.elemToNodeInfo(
+        <security-docs filename="" mediatype="" size=""/>
+      )
+      assert(Attachment.attachmentsFromHolders(List(emptyMultipleHolder)).isEmpty)
+
+      val singleChildMultipleHolder = NodeConversions.elemToNodeInfo(
+        <security-docs filename="" mediatype="" size="">
+          <_ filename="contract.pdf" mediatype="application/pdf" size="440424">
+            /fr/service/persistence/crud/acme/order/data/5a3a478b39095dcb5ff0a667c99f86fa15e11d5b/55d6e8ce9a03835e15bc1f.bin
+          </_>
+        </security-docs>
+      )
+      val singleChildAttachments = Attachment.attachmentsFromHolders(List(singleChildMultipleHolder))
+      assert(singleChildAttachments.map(a => a.filename -> a.contentType) == List("contract.pdf" -> "application/pdf"))
+
+      val multiChildMultipleHolder = NodeConversions.elemToNodeInfo(
+        <security-docs filename="" mediatype="" size="">
+          <_ filename="first.pdf" mediatype="application/pdf" size="100">
+            /fr/service/persistence/crud/acme/order/data/5a3a478b39095dcb5ff0a667c99f86fa15e11d5b/first.bin
+          </_>
+          <_ filename="second.jpg" mediatype="image/jpeg" size="200">
+            /fr/service/persistence/crud/acme/order/data/5a3a478b39095dcb5ff0a667c99f86fa15e11d5b/second.bin
+          </_>
+        </security-docs>
+      )
+      val multiChildAttachments = Attachment.attachmentsFromHolders(List(multiChildMultipleHolder))
+      assert(
+        multiChildAttachments.map(a => a.filename -> a.contentType) ==
+          List("first.pdf" -> "application/pdf", "second.jpg" -> "image/jpeg")
+      )
+    }
+
+    it("must fall back to `application/octet-stream` and path filename when `@mediatype` and `@filename` are blank") {
+      val singleHolderWithEmptyAtts = NodeConversions.elemToNodeInfo(
+        <doc filename="" mediatype="" size="">
+          /fr/service/persistence/crud/acme/order/data/5a3a478b39095dcb5ff0a667c99f86fa15e11d5b/55d6e8ce9a03835e15bc1f.bin
+        </doc>
+      )
+      val attachments = Attachment.attachmentsFromHolders(List(singleHolderWithEmptyAtts))
+      assert(
+        attachments.map(a => a.filename -> a.contentType) ==
+          List("55d6e8ce9a03835e15bc1f.bin" -> ContentTypes.OctetStreamContentType)
+      )
+
+      val inMemoryAttachment = attachments.head.copy(
+        contentFactory = () => StreamedContent.fromBytes(Array[Byte](1, 2, 3), Some(attachments.head.contentType))
+      )
+      val emailContent = EmailContent(
+        headers        = List(HeaderName.From -> "from@localhost", HeaderName.To -> "to@localhost"),
+        subject        = "Attachment with blank mediatype",
+        messageContent = MessageContent("Body", html = false),
+        attachments    = List(inMemoryAttachment)
+      )
+      val bytes = new ByteArrayOutputStream
+      SMTP.mimeMessage(Session.getInstance(new JProperties), emailContent).writeTo(bytes)
+      val serialized = bytes.toString(StandardCharsets.UTF_8)
+      assert(serialized.contains("Content-Type: application/octet-stream"))
     }
   }
 }

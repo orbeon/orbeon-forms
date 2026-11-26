@@ -2602,27 +2602,6 @@ body.orbeon {
             .dialog-scrollable();
         }
 
-        .fb-xml-tok-keyword {
-            color: var(--orbeon-syntax-keyword-color);
-            font-weight: 600;
-        }
-
-        .fb-xml-tok-tag {
-            color: var(--orbeon-syntax-function-color);
-        }
-
-        .fb-xml-tok-attr {
-            color: var(--orbeon-syntax-parameter-color);
-        }
-
-        .fb-xml-tok-string {
-            color: var(--orbeon-syntax-string-color);
-        }
-
-        .fb-xml-tok-punct {
-            color: var(--orbeon-syntax-punctuation-color);
-        }
-
         .xbl-fr-grid .fr-grid .fr-grid-td .fb-action-mode-tabs,
         .fb-action-mode-tabs {
             display: flex;
@@ -2695,127 +2674,81 @@ body.orbeon {
         }
 
         .fb-action-xml-editor {
-            .fb-action-xml-wrapper {
-                position: relative;
+            position: relative;
+
+            .fb-action-xml-code-mirror {
                 display: block;
-                width: 100%;
-                background-color: var(--orbeon-control-background-color);
-                border-radius: var(--orbeon-control-border-radius);
 
-                > .fb-action-xml-backdrop {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    overflow: hidden;
-                    pointer-events: none;
-                    z-index: 1;
-                    box-sizing: border-box;
-
-                    .fb-action-xml-highlights {
-                        box-sizing: border-box;
-                        border: none !important;
-                        margin: 0;
-                        width: 100%;
-                        color: var(--orbeon-base-color);
-                        font-family: monospace;
-                        font-size: 13px;
-                        line-height: 1.5;
-                        white-space: pre-wrap;
-                        word-wrap: break-word;
-                        overflow-wrap: break-word;
-                    }
+                .CodeMirror {
+                    height: auto;
+                    min-height: 220px;
+                    font-family: var(--orbeon-code-font-family);
+                    font-size: var(--orbeon-code-font-size);
+                    border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-control-border-radius);
                 }
 
-                .fb-action-xml-textarea {
-                    display: block;
-                    width: 100%;
-
-                    > .xforms-label {
-                        display: none;
-                    }
-
-                    textarea {
-                        position: relative;
-                        z-index: 2;
-                        display: block;
-                        width: 100%;
-                        min-height: 220px;
-                        margin: 0;
-                        padding: 10px 36px 10px 12px;
-                        box-sizing: border-box;
-                        background: transparent !important;
-                        color: transparent !important;
-                        caret-color: var(--orbeon-base-color);
-                        font-family: monospace;
-                        font-size: 13px;
-                        line-height: 1.5;
-                        resize: vertical;
-
-                        &::selection {
-                            background-color: color-mix(in oklab, var(--orbeon-accent-color) 25%, transparent);
-                            color: transparent;
-                        }
-                    }
-
-                    &.xforms-visited.xforms-invalid textarea {
-                        border-color: var(--orbeon-error-color);
-                    }
+                .CodeMirror-scroll {
+                    min-height: 220px;
+                    max-height: 400px;
                 }
 
-                > .fb-action-xml-buttons {
-                    position: absolute;
-                    top: 6px;
-                    right: 8px;
-                    z-index: 3;
+                &.xforms-visited.xforms-invalid .CodeMirror {
+                    border-color: var(--orbeon-error-color);
+                }
+            }
+
+            > .fb-action-xml-buttons {
+                position: absolute;
+                top: 6px;
+                right: 8px;
+                z-index: 7;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .xforms-trigger {
+                    margin: 0;
+                }
+
+                button {
+                    width: 22px;
+                    height: 22px;
+                    padding: 0;
                     display: flex;
-                    flex-direction: column;
-                    gap: 4px;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-add-on-border-radius);
+                    background-color: var(--orbeon-control-background-color);
+                    color: var(--orbeon-hint-color);
+                    cursor: pointer;
+                    opacity: 0.45;
+                    font-size: 11px;
+                    line-height: 1;
+                    text-decoration: none;
+                    transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
-                    .xforms-trigger {
-                        margin: 0;
-                    }
-
-                    button {
-                        width: 22px;
-                        height: 22px;
-                        padding: 0;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border: 1px solid var(--orbeon-control-border-color);
-                        border-radius: var(--orbeon-add-on-border-radius);
-                        background-color: var(--orbeon-control-background-color);
-                        color: var(--orbeon-hint-color);
-                        cursor: pointer;
-                        opacity: 0.45;
-                        font-size: 11px;
-                        line-height: 1;
+                    &:hover,
+                    &:focus {
+                        opacity: 1;
+                        color: var(--orbeon-base-color);
+                        border-color: var(--orbeon-focus-border-color);
+                        outline: none;
                         text-decoration: none;
-                        transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+                    }
 
-                        &:hover,
-                        &:focus {
-                            opacity: 1;
-                            color: var(--orbeon-base-color);
-                            border-color: var(--orbeon-focus-border-color);
-                            outline: none;
-                            text-decoration: none;
-                        }
-
-                        &.fb-action-copy-success {
-                            color: var(--orbeon-button-success-background-color);
-                            border-color: var(--orbeon-button-success-background-color);
-                            opacity: 1;
-                        }
+                    &.fb-action-copy-success {
+                        color: var(--orbeon-button-success-background-color);
+                        border-color: var(--orbeon-button-success-background-color);
+                        opacity: 1;
                     }
                 }
+            }
 
-                &:hover > .fb-action-xml-buttons button,
-                &:focus-within > .fb-action-xml-buttons button {
-                    opacity: 0.85;
-                }
+            &:hover > .fb-action-xml-buttons button,
+            &:focus-within > .fb-action-xml-buttons button {
+                opacity: 0.85;
             }
         }
 

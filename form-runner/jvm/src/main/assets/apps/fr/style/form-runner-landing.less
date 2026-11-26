@@ -528,19 +528,19 @@
 
     .fr-landing-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 26.5em), 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, max(28em, calc((100% - 2.5em) / 3))), 1fr));
         gap: 1.15em;
         padding: 0.75em 0.25em 2em;
 
         // Keep a lone visible card at its normal column width rather than stretching full-bleed
         &.fr-landing-grid-single {
-            @media (min-width: 56em) {
+            @media (min-width: 59em) {
                 grid-template-columns: minmax(0, calc((100% - 1.15em) / 2));
             }
         }
 
         .fr-landing-container-wide &.fr-landing-grid-single {
-            @media (min-width: 84em) {
+            @media (min-width: 88em) {
                 grid-template-columns: minmax(0, calc((100% - 2.3em) / 3));
             }
         }

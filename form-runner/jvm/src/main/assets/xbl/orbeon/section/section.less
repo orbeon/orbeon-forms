@@ -107,11 +107,12 @@
                 .xforms-help {
                     .help-icon();
                     flex-shrink: 0; // so long title doesn't make it disappear
-                    order: 1;       // place help icon after the section title (avoids crowding the open/close caret)
+                    order: var(--orbeon-help-icon-order);
                 }
 
                 .xforms-help:not(:empty) {
-                    margin-inline-start: var(--orbeon-section-help-icon-gap); // Space between section title and help icon
+                    margin-inline-start: var(--orbeon-section-help-icon-margin-start);
+                    margin-inline-end: var(--orbeon-section-help-icon-margin-end);
                 }
 
                 // `<button>` for collapsible section, `<output>` for non-collapsible

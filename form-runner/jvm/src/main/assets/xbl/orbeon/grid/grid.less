@@ -45,6 +45,7 @@
         .fr-grid-head .fr-grid-th {
             display: table-cell;
             text-align: left;
+            vertical-align: top;
 
             .xforms-output {
                 // We want the block for the label in the header to "go around" its content, so the help
@@ -237,7 +238,7 @@
 
                 .fr-grid-head {
                     .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
-                        vertical-align: middle;
+                        vertical-align: top;
                     }
                 }
 
@@ -473,7 +474,7 @@
                     }
 
                     .fr-grid-repeat-top-row .fr-grid-head .fr-grid-th {
-                        align-self: flex-end; // align the header row content at the bottom
+                        align-self: flex-start; // align the header row content at the top
                     }
 
                     .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
@@ -589,17 +590,44 @@
                 }
 
                 .xforms-help {
-                    float: left;
-
-                    // Vertically center help image on first line
-                    margin-top: ((@fixedLineHeight - 14px) / 2 + 1px);
-                    @media screen {
-                        margin-top: ~"calc((@{fluidLineHeight} - 14px) / 2 + 1px)";
-                    }
-
-                    margin-right: var(--orbeon-help-icon-gap);
-
                     .help-icon();
+
+                    // Vertically center help image on first line (accounting for label top margin)
+                    &:not(:empty) {
+                        margin-top: ((@fixedLineHeight - 14px) / 2 + 2px);
+                        @media screen {
+                            margin-top: ~"calc((@{fluidLineHeight} - 14px) / 2 + 2px)";
+                        }
+                    }
+                }
+
+                @media screen {
+                    .fr-grid-td {
+                        & > .xforms-control,
+                        & > .xbl-component,
+                        & > .xforms-group {
+                            &:has(> .xforms-help:not(:empty)):has(> .xforms-label:not(:empty)) {
+                                display: grid;
+                                grid-template-columns: var(--orbeon-help-icon-grid-columns);
+                                column-gap: var(--orbeon-help-icon-gap);
+                                align-items: start;
+
+                                & > .xforms-help {
+                                    grid-row: 1;
+                                    grid-column: var(--orbeon-help-icon-grid-column);
+                                }
+
+                                & > .xforms-label {
+                                    grid-row: 1;
+                                    grid-column: var(--orbeon-label-grid-column);
+                                }
+
+                                & > :not(.xforms-help):not(.xforms-label) {
+                                    grid-column: 1 / -1;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 .xforms-label {
@@ -775,6 +803,33 @@
                         // Keep top margin low even with more spacious densities
                         margin-top: @frGridDensityMarginCompactTopBottom;
                         margin-left: @densityMarginLeftRight;
+                    }
+
+                    @media screen {
+                        &:has(> .xforms-help:not(:empty)):has(> .xforms-label:not(:empty)) {
+                            display: grid;
+                            grid-template-columns: var(--orbeon-help-icon-grid-columns);
+                            column-gap: var(--orbeon-help-icon-gap);
+                            align-items: start;
+                            padding-inline: @densityMarginLeftRight;
+
+                            & > .xforms-help {
+                                grid-row: 1;
+                                grid-column: var(--orbeon-help-icon-grid-column);
+                                margin-inline: 0;
+                            }
+
+                            & > .xforms-label {
+                                grid-row: 1;
+                                grid-column: var(--orbeon-label-grid-column);
+                                margin-inline: 0;
+                            }
+
+                            & > :not(.xforms-help):not(.xforms-label) {
+                                grid-column: 1 / -1;
+                                margin-inline: 0;
+                            }
+                        }
                     }
                 }
 

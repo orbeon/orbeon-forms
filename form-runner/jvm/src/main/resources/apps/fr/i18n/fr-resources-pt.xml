@@ -437,6 +437,18 @@
                 <title>Sem erros</title>
                 <body>Este formulário não contém erros ou avisos de validação.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#erro|1&lt;erros}</title>
+                <body>Este formulário contém {0,number,integer} {0,choice,1#erro|1&lt;erros} de validação.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#aviso|1&lt;avisos}</title>
+                <body>Este formulário contém {0,number,integer} {0,choice,1#aviso|1&lt;avisos} de validação.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#mensagem informativa|1&lt;mensagens informativas}</title>
+                <body>Este formulário contém {0,number,integer} {0,choice,1#mensagem informativa|1&lt;mensagens informativas}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

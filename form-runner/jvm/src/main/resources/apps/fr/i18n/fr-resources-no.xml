@@ -437,6 +437,18 @@
                 <title>Ingen feil</title>
                 <body>Dette skjemaet inneholder ingen valideringsfeil eller advarsler.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} feil</title>
+                <body>Dette skjemaet inneholder {0,number,integer} valideringsfeil.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#advarsel|1&lt;advarsler}</title>
+                <body>Dette skjemaet inneholder {0,number,integer} {0,choice,1#valideringsadvarsel|1&lt;valideringsadvarsler}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#informasjonsmelding|1&lt;informasjonsmeldinger}</title>
+                <body>Dette skjemaet inneholder {0,number,integer} {0,choice,1#informasjonsmelding|1&lt;informasjonsmeldinger}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

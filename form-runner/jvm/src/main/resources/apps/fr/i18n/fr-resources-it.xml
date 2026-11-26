@@ -437,6 +437,18 @@
                 <title>Nessun errore</title>
                 <body>Questo modulo non contiene errori o avvisi di convalida.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#errore|1&lt;errori}</title>
+                <body>Questo modulo contiene {0,number,integer} {0,choice,1#errore|1&lt;errori} di convalida.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#avviso|1&lt;avvisi}</title>
+                <body>Questo modulo contiene {0,number,integer} {0,choice,1#avviso|1&lt;avvisi} di convalida.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#messaggio informativo|1&lt;messaggi informativi}</title>
+                <body>Questo modulo contiene {0,number,integer} {0,choice,1#messaggio informativo|1&lt;messaggi informativi}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

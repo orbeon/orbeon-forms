@@ -109,7 +109,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog"               , initSessionExpirationDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
-      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon, .orbeon .fr-validity-badge", initStatusIconPopover)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-toolbar"                         , initLandingQuickFilter)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon [data-fr-filter-shortcut]"                   , initQuickFilterShortcut)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
@@ -147,9 +147,16 @@ object FormRunnerApp extends App {
 
   private def initStatusIconPopover(statusIconElem: html.Element): Unit = {
 
+    val InitializedAttr = "data-orbeon-status-popover-initialized"
+    if (statusIconElem.hasAttribute(InitializedAttr))
+      return
+    statusIconElem.setAttribute(InitializedAttr, "true")
+
     def activeStatusIconOpt: Option[html.Element] =
-      if (statusIconElem.classList.contains("xforms-disabled"))
+      if (! statusIconElem.isConnected || statusIconElem.closestOpt(".xforms-disabled").isDefined)
         None
+      else if (statusIconElem.classList.contains("fr-validity-badge"))
+        Some(statusIconElem)
       else if (statusIconElem.classList.contains("fr-validity-icon"))
         statusIconElem.querySelectorOpt(".fr-status-valid")
       else if (statusIconElem.closestOpt("form.fr-client-data-dirty").isDefined)
@@ -165,7 +172,17 @@ object FormRunnerApp extends App {
       else
         None
 
-    var lastActiveIconOpt: Option[html.Element] = None
+    def activePopoverStateOpt: Option[(html.Element, String, String)] =
+      activeStatusIconOpt.flatMap { iconElem =>
+        val title   = Option(iconElem.getAttribute("data-orbeon-title")).getOrElse("")
+        val content = Option(iconElem.getAttribute("data-orbeon-content")).getOrElse("")
+        if (title.nonEmpty || content.nonEmpty)
+          Some((iconElem, title, content))
+        else
+          None
+      }
+
+    var lastPopoverStateOpt: Option[(html.Element, String, String)] = None
 
     def currentPopoverElemOpt: Option[html.Element] =
       Option(statusIconElem.getAttribute("aria-describedby"))
@@ -177,7 +194,7 @@ object FormRunnerApp extends App {
       currentPopoverElemOpt.isDefined
 
     def hidePopover(): Unit = {
-      lastActiveIconOpt = None
+      lastPopoverStateOpt = None
       statusIconElem.classList.remove("show")
       Bootstrap.getPopover(statusIconElem).foreach(_.destroy())
     }
@@ -187,25 +204,21 @@ object FormRunnerApp extends App {
         hidePopover()
       } else {
         hidePopover()
-        activeStatusIconOpt.foreach { iconElem =>
-          val title   = Option(iconElem.getAttribute("data-orbeon-title")).getOrElse("")
-          val content = Option(iconElem.getAttribute("data-orbeon-content")).getOrElse("")
-          if (title.nonEmpty || content.nonEmpty) {
-            val popoverConfig = js.Dynamic.literal(
-              placement = "bottom",
-              trigger   = "manual",
-              title     = title,
-              content   = content,
-              html      = false,
-              animation = false
-            )
-            val popoverHandle = Bootstrap.newPopover(statusIconElem, popoverConfig)
-            popoverHandle.show()
-            lastActiveIconOpt = Some(iconElem)
-            statusIconElem.classList.add("show")
-            popoverHandle.tipElementOpt.map(_.asInstanceOf[html.Element]).foreach { popover =>
-              popover.classList.add("fr-data-status-popover")
-            }
+        activePopoverStateOpt.foreach { case state @ (_, title, content) =>
+          val popoverConfig = js.Dynamic.literal(
+            placement = "bottom",
+            trigger   = "manual",
+            title     = title,
+            content   = content,
+            html      = false,
+            animation = false
+          )
+          val popoverHandle = Bootstrap.newPopover(statusIconElem, popoverConfig)
+          popoverHandle.show()
+          lastPopoverStateOpt = Some(state)
+          statusIconElem.classList.add("show")
+          popoverHandle.tipElementOpt.map(_.asInstanceOf[html.Element]).foreach { popover =>
+            popover.classList.add("fr-data-status-popover")
           }
         }
       }
@@ -225,7 +238,7 @@ object FormRunnerApp extends App {
       }
     )
 
-    def hideIfTargetOutside(e: dom.Event): Unit =
+    val hideIfTargetOutside: js.Function1[dom.Event, Unit] = (e: dom.Event) =>
       if (isPopoverShown) {
         val target          = e.target.asInstanceOf[dom.Node]
         val isInsidePopover = currentPopoverElemOpt.exists(_.contains(target))
@@ -233,24 +246,44 @@ object FormRunnerApp extends App {
           hidePopover()
       }
 
-    document.addEventListener("click"  , hideIfTargetOutside _)
-    document.addEventListener("focusin", hideIfTargetOutside _)
-
-    document.addEventListener("keyup", (e: dom.KeyboardEvent) =>
+    val hideOnEscape: js.Function1[dom.KeyboardEvent, Unit] = (e: dom.KeyboardEvent) =>
       if (e.key == "Escape" && isPopoverShown)
         hidePopover()
+
+    document.addEventListener("click"  , hideIfTargetOutside)
+    document.addEventListener("focusin", hideIfTargetOutside)
+    document.addEventListener("keyup"  , hideOnEscape)
+
+    lazy val observer: MutationObserver = new MutationObserver((_, _) =>
+      if (! statusIconElem.isConnected) {
+        hidePopover()
+        statusIconElem.removeAttribute(InitializedAttr)
+        observer.disconnect()
+        document.removeEventListener("click"  , hideIfTargetOutside)
+        document.removeEventListener("focusin", hideIfTargetOutside)
+        document.removeEventListener("keyup"  , hideOnEscape)
+      } else if (isPopoverShown && activePopoverStateOpt != lastPopoverStateOpt) {
+        showOrUpdatePopover(toggleIfShown = false)
+      }
     )
 
-    val observer = new MutationObserver((_, _) =>
-      if (isPopoverShown && activeStatusIconOpt != lastActiveIconOpt)
-        showOrUpdatePopover(toggleIfShown = false)
-    )
-    val options = new MutationObserverInit {
+    val selfOptions = new MutationObserverInit {
+      attributes      = true
+      attributeFilter = js.Array("class", "data-orbeon-title", "data-orbeon-content")
+    }
+    val containerOptions = new MutationObserverInit {
+      childList       = true
+      subtree         = true
       attributes      = true
       attributeFilter = js.Array("class")
     }
-    observer.observe(statusIconElem, options)
-    statusIconElem.closestOpt("form").foreach(observer.observe(_, options))
+    val formOptions = new MutationObserverInit {
+      attributes      = true
+      attributeFilter = js.Array("class")
+    }
+    observer.observe(statusIconElem, selfOptions)
+    statusIconElem.closestOpt(".fr-status-icons").foreach(observer.observe(_, containerOptions))
+    statusIconElem.closestOpt("form").foreach(observer.observe(_, formOptions))
   }
 
   private def initColorSchemeSelector(navElem: html.Element): Unit = {

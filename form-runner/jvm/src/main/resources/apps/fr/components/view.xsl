@@ -1502,8 +1502,20 @@
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">
                 <!-- Form has error or warning messages -->
                 <xf:repeat ref="visible-counts/(@error, @warning, @info)[. gt 0]">
-                    <xh:span class="badge badge-{{if (name() = 'error') then 'important' else if (name() = 'warning') then 'warning' else 'info'}}">
-                        <xf:output value="."/>
+                    <xf:var name="level" value="name()"/>
+                    <xf:var name="count" value="xs:integer(.)"/>
+                    <xf:var name="title" value="xxf:format-message(xxf:r(concat('detail.validity-status.', $level, '.title'), '|fr-fr-resources|'), ($count))"/>
+                    <xf:var name="body"  value="xxf:format-message(xxf:r(concat('detail.validity-status.', $level, '.body'),  '|fr-fr-resources|'), ($count))"/>
+                    <xh:span
+                        class="fr-validity-badge"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$title}}"
+                        data-orbeon-title="{{$title}}"
+                        data-orbeon-content="{{$body}}">
+                        <xh:span class="badge badge-{{if ($level = 'error') then 'important' else if ($level = 'warning') then 'warning' else 'info'}}">
+                            <xf:output value="$count"/>
+                        </xh:span>
                     </xh:span>
                 </xf:repeat>
             </xf:group>

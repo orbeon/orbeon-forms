@@ -450,6 +450,18 @@
                 <title>Cap error</title>
                 <body>Aquest formulari no conté errors ni advertiments de validació.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#error|1&lt;errors}</title>
+                <body>Aquest formulari conté {0,number,integer} {0,choice,1#error|1&lt;errors} de validació.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#advertiment|1&lt;advertiments}</title>
+                <body>Aquest formulari conté {0,number,integer} {0,choice,1#advertiment|1&lt;advertiments} de validació.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#missatge informatiu|1&lt;missatges informatius}</title>
+                <body>Aquest formulari conté {0,number,integer} {0,choice,1#missatge informatiu|1&lt;missatges informatius}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

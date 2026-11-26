@@ -440,6 +440,18 @@
                 <title>Aucune erreur</title>
                 <body>Ce formulaire ne contient aucune erreur ni aucun avertissement de validation.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#erreur|1&lt;erreurs}</title>
+                <body>Ce formulaire contient {0,number,integer} {0,choice,1#erreur|1&lt;erreurs} de validation.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#avertissement|1&lt;avertissements}</title>
+                <body>Ce formulaire contient {0,number,integer} {0,choice,1#avertissement|1&lt;avertissements} de validation.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#message d''information|1&lt;messages d''information}</title>
+                <body>Ce formulaire contient {0,number,integer} {0,choice,1#message d''information|1&lt;messages d''information}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

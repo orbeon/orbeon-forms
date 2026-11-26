@@ -437,6 +437,18 @@
                 <title>Geen fouten</title>
                 <body>Dit formulier bevat geen validatiefouten of waarschuwingen.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#fout|1&lt;fouten}</title>
+                <body>Dit formulier bevat {0,number,integer} {0,choice,1#validatiefout|1&lt;validatiefouten}.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#waarschuwing|1&lt;waarschuwingen}</title>
+                <body>Dit formulier bevat {0,number,integer} {0,choice,1#validatiewaarschuwing|1&lt;validatiewaarschuwingen}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#informatiemelding|1&lt;informatiemeldingen}</title>
+                <body>Dit formulier bevat {0,number,integer} {0,choice,1#informatiemelding|1&lt;informatiemeldingen}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

@@ -432,6 +432,18 @@
                 <title>无错误</title>
                 <body>此表单不包含任何验证错误或警告。</body>
             </valid>
+            <error>
+                <title>{0,number,integer} 个错误</title>
+                <body>此表单包含 {0,number,integer} 个验证错误。</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} 个警告</title>
+                <body>此表单包含 {0,number,integer} 个验证警告。</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} 条信息消息</title>
+                <body>此表单包含 {0,number,integer} 条信息消息。</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

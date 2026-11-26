@@ -1064,6 +1064,43 @@ class FormRunnerFunctionsTest
       }
     }
 
+    it("must have valid validity-status resources in all fr-resources-*.xml files") {
+      val languages = List(
+        "ar", "ca", "da", "de", "en", "es", "fi", "fr", "hu", "it",
+        "ja", "nl", "no", "pl", "pt", "ru", "sv", "tr", "zh-Hans", "zh-Hant"
+      )
+      for (lang <- languages) {
+        val resourcePath = s"/apps/fr/i18n/fr-resources-$lang.xml"
+        val is = getClass.getResourceAsStream(resourcePath)
+        assert(is ne null, s"Missing resource file $resourcePath")
+        val doc =
+          try
+            TransformerUtils.readTinyTree(org.orbeon.oxf.util.XPath.GlobalConfiguration, is, resourcePath, false, false)
+          finally
+            is.close()
+
+        val validityStatus = doc.descendant("detail") / "validity-status"
+        for (field <- List("title", "body")) {
+          val validText = (validityStatus / "valid" / field).headOption.map(_.stringValue)
+          assert(validText.exists(_.nonEmpty), s"Missing or empty detail/validity-status/valid/$field in $resourcePath")
+        }
+
+        for {
+          level <- List("error", "warning", "info")
+          field <- List("title", "body")
+        } {
+          val templateOpt = (validityStatus / level / field).headOption.map(_.stringValue)
+          assert(templateOpt.exists(_.nonEmpty), s"Missing or empty detail/validity-status/$level/$field in $resourcePath")
+          val template = templateOpt.get
+          for (count <- List(1, 2, 5)) {
+            val formatted = new java.text.MessageFormat(template).format(Array[AnyRef](java.lang.Integer.valueOf(count)))
+            assert(formatted.contains(count.toString), s"Formatted $level/$field ($count) missing count in $resourcePath: $formatted")
+            assert(! formatted.contains("{") && ! formatted.contains("}"), s"Unexpanded placeholder in $level/$field ($count) in $resourcePath: $formatted")
+          }
+        }
+      }
+    }
+
     it("must dynamically update import section titles when steps complete") {
       withTestExternalContext { _ =>
         val source: dom.Document =

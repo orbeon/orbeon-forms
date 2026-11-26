@@ -437,6 +437,18 @@
                 <title>Ei virheitä</title>
                 <body>Tässä lomakkeessa ei ole tarkistusvirheitä tai varoituksia.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#virhe|1&lt;virhettä}</title>
+                <body>Tässä lomakkeessa on {0,number,integer} {0,choice,1#tarkistusvirhe|1&lt;tarkistusvirhettä}.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#varoitus|1&lt;varoitusta}</title>
+                <body>Tässä lomakkeessa on {0,number,integer} {0,choice,1#tarkistusvaroitus|1&lt;tarkistusvaroitusta}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#tiedottava viesti|1&lt;tiedottavaa viestiä}</title>
+                <body>Tässä lomakkeessa on {0,number,integer} {0,choice,1#tiedottava viesti|1&lt;tiedottavaa viestiä}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

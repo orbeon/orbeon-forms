@@ -155,6 +155,7 @@
     white-space: nowrap;
 
     .fr-validity-icon:not(.xforms-disabled),
+    .fr-validity-badge:not(.xforms-disabled),
     .fr-data-icon:not(.xforms-disabled) {
       display      : inline-block;
       padding      : 5px 15px;
@@ -166,6 +167,10 @@
         margin-left: 0;
         outline    : 0;
         box-shadow : none;
+      }
+
+      .badge {
+        margin-left: 0;
       }
 
       &:hover:not(.show) {
@@ -180,6 +185,10 @@
         background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
         box-shadow      : none;
       }
+    }
+
+    .fr-validity-badge:not(.xforms-disabled) {
+      padding: 5px 10px;
     }
   }
 

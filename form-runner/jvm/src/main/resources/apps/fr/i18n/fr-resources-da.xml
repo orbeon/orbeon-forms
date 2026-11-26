@@ -431,6 +431,18 @@
                 <title>Ingen fejl</title>
                 <body>Denne formular indeholder ingen valideringsfejl eller advarsler.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} fejl</title>
+                <body>Denne formular indeholder {0,number,integer} valideringsfejl.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#advarsel|1&lt;advarsler}</title>
+                <body>Denne formular indeholder {0,number,integer} {0,choice,1#valideringsadvarsel|1&lt;valideringsadvarsler}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#informationsmeddelelse|1&lt;informationsmeddelelser}</title>
+                <body>Denne formular indeholder {0,number,integer} {0,choice,1#informationsmeddelelse|1&lt;informationsmeddelelser}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

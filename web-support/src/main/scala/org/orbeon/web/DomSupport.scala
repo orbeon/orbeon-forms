@@ -502,7 +502,7 @@ object DomSupport {
       mutations.foreach { mutation =>
         mutation.addedNodes.foreach {
           case element: html.Element =>
-            element.queryNestedElems(selector, includeSelf = true).foreach(listener)
+            element.queryNestedElems[html.Element](selector, includeSelf = true).foreach(listener)
           case _ =>
         }
       }

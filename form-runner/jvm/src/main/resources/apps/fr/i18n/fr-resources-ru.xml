@@ -430,6 +430,18 @@
                 <title>Нет ошибок</title>
                 <body>Эта форма не содержит ошибок или предупреждений проверки.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#ошибка|2#ошибки|5#ошибок}</title>
+                <body>Эта форма содержит {0,number,integer} {0,choice,1#ошибку|2#ошибки|5#ошибок} проверки.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#предупреждение|2#предупреждения|5#предупреждений}</title>
+                <body>Эта форма содержит {0,number,integer} {0,choice,1#предупреждение|2#предупреждения|5#предупреждений} проверки.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#информационное сообщение|2#информационных сообщения|5#информационных сообщений}</title>
+                <body>Эта форма содержит {0,number,integer} {0,choice,1#информационное сообщение|2#информационных сообщения|5#информационных сообщений}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

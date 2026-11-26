@@ -438,6 +438,18 @@
                 <title>Brak błędów</title>
                 <body>Ten formularz nie zawiera błędów ani ostrzeżeń walidacji.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#błąd|2#błędy|5#błędów}</title>
+                <body>Ten formularz zawiera {0,number,integer} {0,choice,1#błąd|2#błędy|5#błędów} walidacji.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#ostrzeżenie|2#ostrzeżenia|5#ostrzeżeń}</title>
+                <body>Ten formularz zawiera {0,number,integer} {0,choice,1#ostrzeżenie|2#ostrzeżenia|5#ostrzeżeń} walidacji.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#komunikat informacyjny|2#komunikaty informacyjne|5#komunikatów informacyjnych}</title>
+                <body>Ten formularz zawiera {0,number,integer} {0,choice,1#komunikat informacyjny|2#komunikaty informacyjne|5#komunikatów informacyjnych}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

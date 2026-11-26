@@ -437,6 +437,18 @@
                 <title>Keine Fehler</title>
                 <body>Dieses Formular enthält keine Validierungsfehler oder Warnungen.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} Fehler</title>
+                <body>Dieses Formular enthält {0,number,integer} Validierungsfehler.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#Warnung|1&lt;Warnungen}</title>
+                <body>Dieses Formular enthält {0,number,integer} {0,choice,1#Validierungswarnung|1&lt;Validierungswarnungen}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#Informationsmeldung|1&lt;Informationsmeldungen}</title>
+                <body>Dieses Formular enthält {0,number,integer} {0,choice,1#Informationsmeldung|1&lt;Informationsmeldungen}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

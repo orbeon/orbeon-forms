@@ -437,6 +437,18 @@
                 <title>No errors</title>
                 <body>This form contains no validation errors or warnings.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#error|1&lt;errors}</title>
+                <body>This form contains {0,number,integer} validation {0,choice,1#error|1&lt;errors}.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#warning|1&lt;warnings}</title>
+                <body>This form contains {0,number,integer} validation {0,choice,1#warning|1&lt;warnings}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#informational message|1&lt;informational messages}</title>
+                <body>This form contains {0,number,integer} {0,choice,1#informational message|1&lt;informational messages}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

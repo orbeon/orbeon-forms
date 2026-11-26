@@ -437,6 +437,18 @@
                 <title>Nincs hiba</title>
                 <body>Ez az űrlap nem tartalmaz érvényesítési hibákat vagy figyelmeztetéseket.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} hiba</title>
+                <body>Ez az űrlap {0,number,integer} érvényesítési hibát tartalmaz.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} figyelmeztetés</title>
+                <body>Ez az űrlap {0,number,integer} érvényesítési figyelmeztetést tartalmaz.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} információs üzenet</title>
+                <body>Ez az űrlap {0,number,integer} információs üzenetet tartalmaz.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

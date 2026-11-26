@@ -437,6 +437,18 @@
                 <title>Inga fel</title>
                 <body>Detta formulär innehåller inga valideringsfel eller varningar.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} fel</title>
+                <body>Detta formulär innehåller {0,number,integer} valideringsfel.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#varning|1&lt;varningar}</title>
+                <body>Detta formulär innehåller {0,number,integer} {0,choice,1#valideringsvarning|1&lt;valideringsvarningar}.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#informationsmeddelande|1&lt;informationsmeddelanden}</title>
+                <body>Detta formulär innehåller {0,number,integer} {0,choice,1#informationsmeddelande|1&lt;informationsmeddelanden}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

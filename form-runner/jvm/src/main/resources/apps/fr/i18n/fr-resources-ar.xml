@@ -437,6 +437,18 @@
                 <title>لا توجد أخطاء</title>
                 <body>لا يحتوي هذا النموذج على أي أخطاء أو تحذيرات في التحقق من الصحة.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} {0,choice,1#خطأ|1&lt;أخطاء}</title>
+                <body>يحتوي هذا النموذج على {0,number,integer} {0,choice,1#خطأ|1&lt;أخطاء} في التحقق من الصحة.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} {0,choice,1#تحذير|1&lt;تحذيرات}</title>
+                <body>يحتوي هذا النموذج على {0,number,integer} {0,choice,1#تحذير|1&lt;تحذيرات} في التحقق من الصحة.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} {0,choice,1#رسالة توضيحية|1&lt;رسائل توضيحية}</title>
+                <body>يحتوي هذا النموذج على {0,number,integer} {0,choice,1#رسالة توضيحية|1&lt;رسائل توضيحية}.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

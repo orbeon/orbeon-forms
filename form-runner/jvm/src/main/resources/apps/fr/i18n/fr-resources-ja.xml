@@ -424,6 +424,18 @@
                 <title>エラーなし</title>
                 <body>このフォームには入力検証のエラーや警告はありません。</body>
             </valid>
+            <error>
+                <title>エラー {0,number,integer}件</title>
+                <body>このフォームには入力検証のエラーが{0,number,integer}件あります。</body>
+            </error>
+            <warning>
+                <title>警告 {0,number,integer}件</title>
+                <body>このフォームには入力検証の警告が{0,number,integer}件あります。</body>
+            </warning>
+            <info>
+                <title>情報メッセージ {0,number,integer}件</title>
+                <body>このフォームには情報メッセージが{0,number,integer}件あります。</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

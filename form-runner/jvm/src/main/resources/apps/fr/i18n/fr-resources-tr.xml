@@ -435,6 +435,18 @@
                 <title>Hata yok</title>
                 <body>Bu formda doğrulama hatası veya uyarı bulunmamaktadır.</body>
             </valid>
+            <error>
+                <title>{0,number,integer} hata</title>
+                <body>Bu formda {0,number,integer} doğrulama hatası bulunuyor.</body>
+            </error>
+            <warning>
+                <title>{0,number,integer} uyarı</title>
+                <body>Bu formda {0,number,integer} doğrulama uyarısı bulunuyor.</body>
+            </warning>
+            <info>
+                <title>{0,number,integer} bilgi mesajı</title>
+                <body>Bu formda {0,number,integer} bilgi mesajı bulunuyor.</body>
+            </info>
         </validity-status>
     </detail>
     <share-dialog>

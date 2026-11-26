@@ -18,3 +18,6 @@ libraryDependencies += "io.github.java-diff-utils"  % "java-diff-utils"         
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")
 resolvers += Resolver.sonatypeCentralSnapshots
+
+// LESS 4.2.0, which sbt-less 2.0.1 depends on, drops the selector of a rule in a nested @layer
+dependencyOverrides += "org.webjars.npm" % "less" % "4.9.1"

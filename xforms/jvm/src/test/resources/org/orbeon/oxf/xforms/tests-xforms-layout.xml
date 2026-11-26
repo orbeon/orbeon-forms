@@ -2469,11 +2469,11 @@
                     <xh:i>Description Hint</xh:i>
                 </xh:span>
                 <xh:span  id="my-gaga-hint" class="xforms-control xforms-hint">Gaga Hint</xh:span>
-                <xh:button id="my-input-help" class="xforms-control xforms-help" type="button">Name Help</xh:button>
-                <xh:button id="my-textarea-help" class="xforms-control xforms-help xforms-mediatype-text-html xforms-mediatype-text" type="button">
+                <xh:button id="my-input-help" class="xforms-control xforms-help" type="button" data-orbeon-label-id="my-input-label">Name Help</xh:button>
+                <xh:button id="my-textarea-help" class="xforms-control xforms-help xforms-mediatype-text-html xforms-mediatype-text" type="button" data-orbeon-label-id="my-textarea-label">
                     <xh:i>Description Help</xh:i>
                 </xh:button>
-                <xh:button  id="my-gaga-help" class="xforms-control xforms-help" type="button">Gaga Help</xh:button>
+                <xh:button  id="my-gaga-help" class="xforms-control xforms-help" type="button" data-orbeon-label-id="my-gaga-label">Gaga Help</xh:button>
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>

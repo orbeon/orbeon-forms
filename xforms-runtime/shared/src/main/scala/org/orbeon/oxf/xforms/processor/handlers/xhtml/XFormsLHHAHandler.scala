@@ -82,7 +82,7 @@ class XFormsLHHAHandler(
         // 2020-11-13: This seems to happen.
         // 2022-06-08: still happens! `currentControl eq null`
         // 2024-11-25: This can be called for some local labels, like `<xf:label>` nested inside a `<xf:group>`. This shouldn't happen, right?
-      case LhhaPlacementType.External(_, _, Some(_)) =>
+      case LhhaPlacementType.External(directTargetControl, _, Some(_)) =>
 
         // In this case, we handle our own value and don't ask it to the (repeated) controls, since there might be
         // zero, one, or several of them. We also currently don't handle constraint classes.
@@ -104,6 +104,18 @@ class XFormsLHHAHandler(
 
           if (elementName == "button")
             containerAtts.addOrReplace("type", "button")
+
+          if (elementAnalysis.lhhaType == LHHA.Help)
+            directTargetControl
+              .allDirectLhha(LHHA.Label)
+              .find(l => ! l.isLocal && ! l.isPlaceholder && l.ancestorRepeats == elementAnalysis.ancestorRepeats)
+              .foreach { labelLhha =>
+                val lhhaRepeatIndices = XFormsId.getEffectiveIdSuffixParts(lhhaEffectiveId)
+                containerAtts.addOrReplace(
+                  "data-orbeon-label-id",
+                  containingDocument.namespaceId(XFormsId.buildEffectiveId(labelLhha.prefixedId, lhhaRepeatIndices))
+                )
+              }
 
           withElement(
             localName = elementName,

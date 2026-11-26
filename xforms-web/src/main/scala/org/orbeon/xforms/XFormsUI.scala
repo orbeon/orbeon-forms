@@ -152,7 +152,10 @@ object XFormsUI {
     else if (control.hasClass("xforms-group-appearance-xxforms-fieldset"))
       control.childrenT.headOption.map(_.innerHTML).getOrElse("")
     else
-      findControlLHHA(control, "label").map(_.innerHTML).getOrElse("")
+      findControlLHHA(control, "label")
+        .orElse(control.attValueOpt("data-orbeon-label-id").flatMap(dom.document.getElementByIdOpt))
+        .map(_.innerHTML)
+        .getOrElse("")
 
   def setLabelMessage(control: html.Element, message: String): Unit =
     if (control.hasAnyClass("xforms-trigger", "xforms-submit"))

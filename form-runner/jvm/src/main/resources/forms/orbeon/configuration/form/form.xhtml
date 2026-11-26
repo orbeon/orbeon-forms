@@ -32,10 +32,14 @@
                 max-inline-size: 112em;
                 margin-inline: auto;
             }
+            .orbeon .container-fluid:has(.fr-config-global-wrapper) .row-fluid:has(&gt; .span12 &gt; .fr-form-description),
+            .orbeon .container-fluid:has(.fr-config-global-wrapper) .row:has(&gt; .span12 &gt; .fr-form-description) {
+                display: none;
+            }
             .orbeon .fr-view .fr-view-appearance-full:has(.fr-config-global-wrapper) {
                 overflow: visible;
             }
-            /* Quick Filter Bar */
+            /* Top Toolbar (Intro + Quick Filter) */
             .orbeon .fr-config-sr-only {
                 position: absolute;
                 clip-path: inset(50%);
@@ -47,19 +51,56 @@
                 border: 0;
                 white-space: nowrap;
             }
-            .orbeon .fr-config-filter-bar {
+            .orbeon .fr-config-toolbar {
                 display: flex;
                 flex-wrap: wrap;
                 align-items: center;
-                gap: 0.75em;
+                justify-content: space-between;
+                gap: 0.75em 1.5em;
                 margin-bottom: 16px;
+            }
+            .orbeon .fr-config-intro {
+                display: inline-flex;
+                align-items: baseline;
+                gap: 0.45em;
+                margin: 0;
+                flex: 1 1 24em;
+                min-inline-size: 0;
+                font-size: 0.93em;
+                color: var(--orbeon-hint-color);
+                line-height: 1.45;
+            }
+            .orbeon .fr-config-intro-icon {
+                flex-shrink: 0;
+                font-size: 0.95em;
+                opacity: 0.85;
+            }
+            .orbeon .fr-config-intro .xforms-output,
+            .orbeon .fr-config-intro .xforms-output-output {
+                display: inline;
+            }
+            .orbeon .fr-config-intro code {
+                display: inline-block;
+                padding: 1px 5px;
+                font-size: 0.92em;
+                border-radius: 3px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                color: inherit;
+                white-space: nowrap;
+            }
+            .orbeon .fr-config-filter-bar {
+                display: flex;
+                align-items: center;
+                flex: 0 1 22em;
+                min-inline-size: min(100%, 16em);
+                margin: 0;
+                margin-inline-start: auto;
             }
             .orbeon .fr-config-filter-box {
                 position: relative;
                 display: flex;
                 align-items: center;
-                flex: 0 1 24em;
-                min-inline-size: min(100%, 16em);
+                inline-size: 100%;
             }
             .orbeon .fr-config-filter-box .fr-config-filter-icon {
                 position: absolute;
@@ -463,6 +504,9 @@
                 box-sizing: border-box;
             }
             @media (max-width: 992px) {
+                .orbeon .fr-config-filter-bar {
+                    flex: 1 1 100%;
+                }
                 .orbeon .fr-config-three-pane {
                     flex-direction: column;
                     align-items: stretch;
@@ -1254,45 +1298,45 @@
                     <application-name>orbeon</application-name>
                     <form-name>configuration</form-name>
                     <title xml:lang="en">Orbeon Forms Configuration</title>
-                    <description xml:lang="en" mediatype="text/html">Configure global settings, application or form overrides, and custom properties. Settings saved here take effect immediately and take precedence over &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="en" mediatype="text/html">Settings saved here take effect immediately and take precedence over &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="fr">Configuration Orbeon Forms</title>
-                    <description xml:lang="fr" mediatype="text/html">Configurez les paramètres globaux, les surcharges par application ou formulaire et les propriétés personnalisées. Les paramètres enregistrés ici prennent effet immédiatement et ont priorité sur &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="fr" mediatype="text/html">Les paramètres enregistrés ici prennent effet immédiatement et ont priorité sur &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="ar">تكوين Orbeon Forms</title>
-                    <description xml:lang="ar" mediatype="text/html">تكوين الإعدادات العامة وتجاوزات التطبيقات أو النماذج والخصائص المخصصة. تسري الإعدادات المحفوظة هنا فورًا وتكون لها الأولوية على &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="ar" mediatype="text/html">تسري الإعدادات المحفوظة هنا فورًا وتكون لها الأولوية على &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="ca">Configuració d'Orbeon Forms</title>
-                    <description xml:lang="ca" mediatype="text/html">Configureu els paràmetres globals, les redefinicions per aplicació o formulari i les propietats personalitzades. Els paràmetres desats aquí tenen efecte immediatament i tenen prioritat sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="ca" mediatype="text/html">Els paràmetres desats aquí tenen efecte immediatament i tenen prioritat sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="da">Orbeon Forms-konfiguration</title>
-                    <description xml:lang="da" mediatype="text/html">Konfigurer globale indstillinger, tilsidesættelser for applikationer eller blanketter samt brugerdefinerede egenskaber. Indstillinger, der gemmes her, træder i kraft med det samme og har forrang frem for &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="da" mediatype="text/html">Indstillinger, der gemmes her, træder i kraft med det samme og har forrang frem for &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="de">Orbeon Forms-Konfiguration</title>
-                    <description xml:lang="de" mediatype="text/html">Konfigurieren Sie globale Einstellungen, Anwendungs- oder Formular-Überschreibungen sowie benutzerdefinierte Eigenschaften. Hier gespeicherte Einstellungen werden sofort wirksam und haben Vorrang vor &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="de" mediatype="text/html">Hier gespeicherte Einstellungen werden sofort wirksam und haben Vorrang vor &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="es">Configuración de Orbeon Forms</title>
-                    <description xml:lang="es" mediatype="text/html">Configure los parámetros globales, las redefiniciones por aplicación o formulario y las propiedades personalizadas. Los parámetros guardados aquí surten efecto inmediatamente y tienen prioridad sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="es" mediatype="text/html">Los parámetros guardados aquí surten efecto inmediatamente y tienen prioridad sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="fi">Orbeon Forms -asetukset</title>
-                    <description xml:lang="fi" mediatype="text/html">Määritä globaalit asetukset, sovellus- tai lomakekohtaiset korvaukset sekä mukautetut ominaisuudet. Täällä tallennetut asetukset tulevat voimaan välittömästi ja ovat ensisijaisia tiedostoon &lt;code&gt;properties-local.xml&lt;/code&gt; nähden.</description>
+                    <description xml:lang="fi" mediatype="text/html">Täällä tallennetut asetukset tulevat voimaan välittömästi ja ovat ensisijaisia tiedostoon &lt;code&gt;properties-local.xml&lt;/code&gt; nähden.</description>
                     <title xml:lang="hu">Orbeon Forms konfiguráció</title>
-                    <description xml:lang="hu" mediatype="text/html">Állítsa be a globális beállításokat, az alkalmazás- vagy űrlapszintű felülbírálásokat és az egyéni tulajdonságokat. Az itt mentett beállítások azonnal életbe lépnek, és elsőbbséget élveznek a &lt;code&gt;properties-local.xml&lt;/code&gt; fájllal szemben.</description>
+                    <description xml:lang="hu" mediatype="text/html">Az itt mentett beállítások azonnal életbe lépnek, és elsőbbséget élveznek a &lt;code&gt;properties-local.xml&lt;/code&gt; fájllal szemben.</description>
                     <title xml:lang="it">Configurazione di Orbeon Forms</title>
-                    <description xml:lang="it" mediatype="text/html">Configura le impostazioni globali, le sovrascritture per applicazione o modulo e le proprietà personalizzate. Le impostazioni salvate qui hanno effetto immediato e hanno la precedenza su &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="it" mediatype="text/html">Le impostazioni salvate qui hanno effetto immediato e hanno la precedenza su &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="ja">Orbeon Forms 設定</title>
-                    <description xml:lang="ja" mediatype="text/html">グローバル設定、アプリケーションやフォームごとのオーバーライド、およびカスタムプロパティを設定します。ここで保存した設定は即座に反映され、&lt;code&gt;properties-local.xml&lt;/code&gt; よりも優先されます。</description>
+                    <description xml:lang="ja" mediatype="text/html">ここで保存した設定は即座に反映され、&lt;code&gt;properties-local.xml&lt;/code&gt; よりも優先されます。</description>
                     <title xml:lang="nl">Orbeon Forms-configuratie</title>
-                    <description xml:lang="nl" mediatype="text/html">Configureer globale instellingen, overschrijvingen per applicatie of formulier en aangepaste eigenschappen. Hier opgeslagen instellingen zijn direct van kracht en hebben voorrang op &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="nl" mediatype="text/html">Hier opgeslagen instellingen zijn direct van kracht en hebben voorrang op &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="no">Orbeon Forms-konfigurasjon</title>
-                    <description xml:lang="no" mediatype="text/html">Konfigurer globale innstillinger, overstyringer for applikasjoner eller skjema samt tilpassede egenskaper. Innstillinger som lagres her trer i kraft umiddelbart og har forrang fremfor &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="no" mediatype="text/html">Innstillinger som lagres her trer i kraft umiddelbart og har forrang fremfor &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="pl">Konfiguracja Orbeon Forms</title>
-                    <description xml:lang="pl" mediatype="text/html">Skonfiguruj ustawienia globalne, nadpisania na poziomie aplikacji lub formularza oraz właściwości niestandardowe. Ustawienia zapisane w tym miejscu zaczynają obowiązywać natychmiast i mają pierwszeństwo przed plikiem &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="pl" mediatype="text/html">Ustawienia zapisane w tym miejscu zaczynają obowiązywać natychmiast i mają pierwszeństwo przed plikiem &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="pt">Configuração do Orbeon Forms</title>
-                    <description xml:lang="pt" mediatype="text/html">Configure as definições globais, as redefinições por aplicação ou formulário e as propriedades personalizadas. As definições guardadas aqui entram em vigor imediatamente e têm precedência sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="pt" mediatype="text/html">As definições guardadas aqui entram em vigor imediatamente e têm precedência sobre &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="ru">Конфигурация Orbeon Forms</title>
-                    <description xml:lang="ru" mediatype="text/html">Настройка глобальных параметров, переопределений для приложений или форм и пользовательских свойств. Сохранённые здесь параметры вступают в силу немедленно и имеют приоритет над &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="ru" mediatype="text/html">Сохранённые здесь параметры вступают в силу немедленно и имеют приоритет над &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="sv">Orbeon Forms-konfiguration</title>
-                    <description xml:lang="sv" mediatype="text/html">Konfigurera globala inställningar, åsidosättningar för applikationer eller formulär samt anpassade egenskaper. Inställningar som sparas här träder i kraft omedelbart och har företräde framför &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
+                    <description xml:lang="sv" mediatype="text/html">Inställningar som sparas här träder i kraft omedelbart och har företräde framför &lt;code&gt;properties-local.xml&lt;/code&gt;.</description>
                     <title xml:lang="tr">Orbeon Forms Yapılandırması</title>
-                    <description xml:lang="tr" mediatype="text/html">Genel ayarları, uygulama veya form geçersiz kılmalarını ve özel özellikleri yapılandırın. Burada kaydedilen ayarlar hemen geçerli olur ve &lt;code&gt;properties-local.xml&lt;/code&gt; dosyasına göre önceliklidir.</description>
+                    <description xml:lang="tr" mediatype="text/html">Burada kaydedilen ayarlar hemen geçerli olur ve &lt;code&gt;properties-local.xml&lt;/code&gt; dosyasına göre önceliklidir.</description>
                     <title xml:lang="zh-Hans">Orbeon Forms 配置</title>
-                    <description xml:lang="zh-Hans" mediatype="text/html">配置全局设置、应用程序或表单覆盖以及自定义属性。此处保存的设置立即生效，并优先于 &lt;code&gt;properties-local.xml&lt;/code&gt;。</description>
+                    <description xml:lang="zh-Hans" mediatype="text/html">此处保存的设置立即生效，并优先于 &lt;code&gt;properties-local.xml&lt;/code&gt;。</description>
                     <title xml:lang="zh-Hant">Orbeon Forms 設定</title>
-                    <description xml:lang="zh-Hant" mediatype="text/html">設定全域設定、應用程式或表單覆寫以及自訂屬性。此處保存的設定會立即生效，並優先於 &lt;code&gt;properties-local.xml&lt;/code&gt;。</description>
+                    <description xml:lang="zh-Hant" mediatype="text/html">此處保存的設定會立即生效，並優先於 &lt;code&gt;properties-local.xml&lt;/code&gt;。</description>
                     <singleton>true</singleton>
                 </metadata>
             </xf:instance>
@@ -1397,35 +1441,47 @@
                         {'fr-config-filtering'[xxf:non-blank(instance('fr-configuration-ui-instance')/filter)]}
                         {'fr-config-override-scope'[not($is-global-scope)]}
                     ">
-                            <!-- Quick Filter Bar -->
-                            <xh:search class="fr-config-filter-bar">
-                                <xh:div
-                                    class="fr-config-filter-box"
-                                    data-fr-filter-shortcut="true"
-                                    title="{$form-resources/filter/hint}">
-                                    <xh:i class="fa fa-magnifying-glass fr-config-filter-icon" aria-hidden="true"/>
-                                    <xf:input id="filter-settings-control" ref="instance('fr-configuration-ui-instance')/filter" incremental="true" class="fr-config-filter-input">
-                                        <xf:label ref="$form-resources/filter/label"/>
-                                        <xf:hint appearance="minimal" value="concat($form-resources/filter/label, '…')"/>
-                                    </xf:input>
-                                    <xh:kbd class="fr-config-filter-kbd" aria-hidden="true">/</xh:kbd>
-                                    <xf:trigger
-                                        id="clear-filter-button"
-                                        appearance="minimal"
-                                        ref="instance('fr-configuration-ui-instance')/filter[xxf:non-blank()]"
-                                        class="fr-config-filter-clear">
-                                        <xf:label>
-                                            <xh:i class="fa fa-xmark" aria-hidden="true"/>
-                                            <xh:span class="fr-config-sr-only"><xf:output ref="$form-resources/filter/clear"/></xh:span>
-                                        </xf:label>
-                                        <xf:hint ref="$form-resources/filter/clear"/>
-                                        <xf:action event="DOMActivate">
-                                            <xf:setvalue ref="instance('fr-configuration-ui-instance')/filter" value="''"/>
-                                            <xf:setfocus control="filter-settings-control"/>
-                                        </xf:action>
-                                    </xf:trigger>
+                            <!-- Top Toolbar: Info Hint + Quick Filter -->
+                            <xh:div class="fr-config-toolbar">
+                                <xh:div class="fr-config-intro">
+                                    <xh:i class="fa fa-circle-info fr-config-intro-icon" aria-hidden="true"/>
+                                    <xf:output
+                                        mediatype="text/html"
+                                        value="
+                                            (
+                                                instance('fr-form-metadata')/description[@xml:lang = (xxf:instance('fr-language-instance'), xxf:lang())[1]],
+                                                instance('fr-form-metadata')/description
+                                            )[1]"/>
                                 </xh:div>
-                            </xh:search>
+                                <xh:search class="fr-config-filter-bar">
+                                    <xh:div
+                                        class="fr-config-filter-box"
+                                        data-fr-filter-shortcut="true"
+                                        title="{$form-resources/filter/hint}">
+                                        <xh:i class="fa fa-magnifying-glass fr-config-filter-icon" aria-hidden="true"/>
+                                        <xf:input id="filter-settings-control" ref="instance('fr-configuration-ui-instance')/filter" incremental="true" class="fr-config-filter-input">
+                                            <xf:label ref="$form-resources/filter/label"/>
+                                            <xf:hint appearance="minimal" value="concat($form-resources/filter/label, '…')"/>
+                                        </xf:input>
+                                        <xh:kbd class="fr-config-filter-kbd" aria-hidden="true">/</xh:kbd>
+                                        <xf:trigger
+                                            id="clear-filter-button"
+                                            appearance="minimal"
+                                            ref="instance('fr-configuration-ui-instance')/filter[xxf:non-blank()]"
+                                            class="fr-config-filter-clear">
+                                            <xf:label>
+                                                <xh:i class="fa fa-xmark" aria-hidden="true"/>
+                                                <xh:span class="fr-config-sr-only"><xf:output ref="$form-resources/filter/clear"/></xh:span>
+                                            </xf:label>
+                                            <xf:hint ref="$form-resources/filter/clear"/>
+                                            <xf:action event="DOMActivate">
+                                                <xf:setvalue ref="instance('fr-configuration-ui-instance')/filter" value="''"/>
+                                                <xf:setfocus control="filter-settings-control"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </xh:div>
+                                </xh:search>
+                            </xh:div>
 
                             <!-- 3-Pane Standard Settings Body: Scope Tree | Category List | Settings Panel -->
                             <xh:div class="fr-config-three-pane">

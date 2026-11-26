@@ -1787,6 +1787,30 @@
     <dialog-test>
         <label>Lomakkeen esikatselu</label>
         <console>Konsoli</console>
+        <preview-toolbar>Esikatselun säätimet</preview-toolbar>
+        <viewport-group>Näkymä</viewport-group>
+        <responsive>Responsiivinen</responsive>
+        <desktop>Työpöytä</desktop>
+        <tablet>Tabletti</tablet>
+        <mobile>Mobiili</mobile>
+        <custom>Mukautettu</custom>
+        <device-group>Laite ja mitat</device-group>
+        <device>Laite</device>
+        <width>Leveys (px)</width>
+        <height>Korkeus (px)</height>
+        <rotate>Käännä suunta</rotate>
+        <zoom>Zoomaus</zoom>
+        <fit>Sovita</fit>
+        <color-scheme-group>Väriteema</color-scheme-group>
+        <color-scheme-light>Vaalea tila</color-scheme-light>
+        <color-scheme-dark>Tumma tila</color-scheme-dark>
+        <color-scheme-system>Järjestelmän väriteema</color-scheme-system>
+        <view-group>Ikkunan koko</view-group>
+        <maximize>Suurenna esikatselu</maximize>
+        <restore>Palauta esikatselun koko</restore>
+        <breakpoint-compact>Tiivis</breakpoint-compact>
+        <breakpoint-medium>Keskitaso</breakpoint-medium>
+        <breakpoint-wide>Leveä</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Testaa PDF-tuotanto</label>

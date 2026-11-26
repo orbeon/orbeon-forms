@@ -1811,6 +1811,30 @@
     <dialog-test>
         <label>Form Preview</label>
         <console>Console</console>
+        <preview-toolbar>Preview controls</preview-toolbar>
+        <viewport-group>Viewport</viewport-group>
+        <responsive>Responsive</responsive>
+        <desktop>Desktop</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Mobile</mobile>
+        <custom>Custom</custom>
+        <device-group>Device and dimensions</device-group>
+        <device>Device</device>
+        <width>Width (px)</width>
+        <height>Height (px)</height>
+        <rotate>Rotate orientation</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Fit</fit>
+        <color-scheme-group>Color scheme</color-scheme-group>
+        <color-scheme-light>Light mode</color-scheme-light>
+        <color-scheme-dark>Dark mode</color-scheme-dark>
+        <color-scheme-system>System color scheme</color-scheme-system>
+        <view-group>Window size</view-group>
+        <maximize>Maximize preview</maximize>
+        <restore>Restore preview size</restore>
+        <breakpoint-compact>Compact</breakpoint-compact>
+        <breakpoint-medium>Medium</breakpoint-medium>
+        <breakpoint-wide>Wide</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test PDF Production</label>

@@ -1774,6 +1774,30 @@
     <dialog-test>
         <label>Skjemaforhåndsvisning</label>
         <console>Konsoll</console>
+        <preview-toolbar>Forhåndsvisningskontroller</preview-toolbar>
+        <viewport-group>Visningsområde</viewport-group>
+        <responsive>Responsiv</responsive>
+        <desktop>Skrivebord</desktop>
+        <tablet>Nettbrett</tablet>
+        <mobile>Mobil</mobile>
+        <custom>Tilpasset</custom>
+        <device-group>Enhet og mål</device-group>
+        <device>Enhet</device>
+        <width>Bredde (px)</width>
+        <height>Høyde (px)</height>
+        <rotate>Roter orientering</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Tilpass</fit>
+        <color-scheme-group>Fargetema</color-scheme-group>
+        <color-scheme-light>Lys modus</color-scheme-light>
+        <color-scheme-dark>Mørk modus</color-scheme-dark>
+        <color-scheme-system>Systemets fargetema</color-scheme-system>
+        <view-group>Vindusstørrelse</view-group>
+        <maximize>Maksimer forhåndsvisning</maximize>
+        <restore>Gjenopprett forhåndsvisningsstørrelse</restore>
+        <breakpoint-compact>Kompakt</breakpoint-compact>
+        <breakpoint-medium>Middels</breakpoint-medium>
+        <breakpoint-wide>Bred</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test PDF-produksjon</label>

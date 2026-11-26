@@ -1812,6 +1812,30 @@
     <dialog-test>
         <label>Test du formulaire</label>
         <console>Console</console>
+        <preview-toolbar>Contrôles d'aperçu</preview-toolbar>
+        <viewport-group>Affichage</viewport-group>
+        <responsive>Adaptatif</responsive>
+        <desktop>Bureau</desktop>
+        <tablet>Tablette</tablet>
+        <mobile>Mobile</mobile>
+        <custom>Personnalisé</custom>
+        <device-group>Appareil et dimensions</device-group>
+        <device>Appareil</device>
+        <width>Largeur (px)</width>
+        <height>Hauteur (px)</height>
+        <rotate>Pivoter l'orientation</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Ajuster</fit>
+        <color-scheme-group>Thème de couleurs</color-scheme-group>
+        <color-scheme-light>Mode clair</color-scheme-light>
+        <color-scheme-dark>Mode sombre</color-scheme-dark>
+        <color-scheme-system>Thème système</color-scheme-system>
+        <view-group>Taille de la fenêtre</view-group>
+        <maximize>Agrandir l'aperçu</maximize>
+        <restore>Restaurer la taille de l'aperçu</restore>
+        <breakpoint-compact>Compact</breakpoint-compact>
+        <breakpoint-medium>Moyen</breakpoint-medium>
+        <breakpoint-wide>Large</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test de la production PDF</label>

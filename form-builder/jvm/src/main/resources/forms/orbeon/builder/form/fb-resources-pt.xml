@@ -1773,6 +1773,30 @@
     <dialog-test>
         <label>Previsualização do formulário</label>
         <console>Consola</console>
+        <preview-toolbar>Controlos de pré-visualização</preview-toolbar>
+        <viewport-group>Área de visualização</viewport-group>
+        <responsive>Responsivo</responsive>
+        <desktop>Computador</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Telemóvel</mobile>
+        <custom>Personalizado</custom>
+        <device-group>Dispositivo e dimensões</device-group>
+        <device>Dispositivo</device>
+        <width>Largura (px)</width>
+        <height>Altura (px)</height>
+        <rotate>Rodar orientação</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Ajustar</fit>
+        <color-scheme-group>Esquema de cores</color-scheme-group>
+        <color-scheme-light>Modo claro</color-scheme-light>
+        <color-scheme-dark>Modo escuro</color-scheme-dark>
+        <color-scheme-system>Esquema do sistema</color-scheme-system>
+        <view-group>Tamanho da janela</view-group>
+        <maximize>Maximizar pré-visualização</maximize>
+        <restore>Restaurar tamanho da pré-visualização</restore>
+        <breakpoint-compact>Compacto</breakpoint-compact>
+        <breakpoint-medium>Médio</breakpoint-medium>
+        <breakpoint-wide>Largo</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Testar Produção de PDF</label>

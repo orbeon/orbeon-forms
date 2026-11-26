@@ -1785,6 +1785,30 @@
     <dialog-test>
         <label>フォームプレビュー</label>
         <console>コンソール</console>
+        <preview-toolbar>プレビューコントロール</preview-toolbar>
+        <viewport-group>ビューポート</viewport-group>
+        <responsive>レスポンシブ</responsive>
+        <desktop>デスクトップ</desktop>
+        <tablet>タブレット</tablet>
+        <mobile>モバイル</mobile>
+        <custom>カスタム</custom>
+        <device-group>デバイスとサイズ</device-group>
+        <device>デバイス</device>
+        <width>幅 (px)</width>
+        <height>高さ (px)</height>
+        <rotate>向きを回転</rotate>
+        <zoom>ズーム</zoom>
+        <fit>合わせる</fit>
+        <color-scheme-group>配色</color-scheme-group>
+        <color-scheme-light>ライトモード</color-scheme-light>
+        <color-scheme-dark>ダークモード</color-scheme-dark>
+        <color-scheme-system>システムの配色</color-scheme-system>
+        <view-group>ウィンドウサイズ</view-group>
+        <maximize>プレビューを最大化</maximize>
+        <restore>プレビューサイズを元に戻す</restore>
+        <breakpoint-compact>コンパクト</breakpoint-compact>
+        <breakpoint-medium>中</breakpoint-medium>
+        <breakpoint-wide>ワイド</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>PDF生成テスト</label>

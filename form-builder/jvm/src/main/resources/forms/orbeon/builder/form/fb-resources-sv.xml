@@ -1821,6 +1821,30 @@
     <dialog-test>
         <label>Förhandsvisa formulär</label>
         <console>Konsol</console>
+        <preview-toolbar>Förhandsvisningskontroller</preview-toolbar>
+        <viewport-group>Visningsyta</viewport-group>
+        <responsive>Responsiv</responsive>
+        <desktop>Skrivbord</desktop>
+        <tablet>Surfplatta</tablet>
+        <mobile>Mobil</mobile>
+        <custom>Anpassad</custom>
+        <device-group>Enhet och mått</device-group>
+        <device>Enhet</device>
+        <width>Bredd (px)</width>
+        <height>Höjd (px)</height>
+        <rotate>Rotera orientering</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Anpassa</fit>
+        <color-scheme-group>Färgschema</color-scheme-group>
+        <color-scheme-light>Ljust läge</color-scheme-light>
+        <color-scheme-dark>Mörkt läge</color-scheme-dark>
+        <color-scheme-system>Systemets färgschema</color-scheme-system>
+        <view-group>Fönsterstorlek</view-group>
+        <maximize>Maximera förhandsvisning</maximize>
+        <restore>Återställ förhandsvisningsstorlek</restore>
+        <breakpoint-compact>Kompakt</breakpoint-compact>
+        <breakpoint-medium>Medel</breakpoint-medium>
+        <breakpoint-wide>Bred</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Testa PDF-produktion</label>

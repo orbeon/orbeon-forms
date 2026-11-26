@@ -1773,6 +1773,30 @@
     <dialog-test>
         <label>Предварительный просмотр формы</label>
         <console>Консоль</console>
+        <preview-toolbar>Элементы управления просмотром</preview-toolbar>
+        <viewport-group>Область просмотра</viewport-group>
+        <responsive>Адаптивный</responsive>
+        <desktop>Компьютер</desktop>
+        <tablet>Планшет</tablet>
+        <mobile>Мобильный</mobile>
+        <custom>Пользовательский</custom>
+        <device-group>Устройство и размеры</device-group>
+        <device>Устройство</device>
+        <width>Ширина (px)</width>
+        <height>Высота (px)</height>
+        <rotate>Повернуть ориентацию</rotate>
+        <zoom>Масштаб</zoom>
+        <fit>По размеру</fit>
+        <color-scheme-group>Цветовая схема</color-scheme-group>
+        <color-scheme-light>Светлая тема</color-scheme-light>
+        <color-scheme-dark>Тёмная тема</color-scheme-dark>
+        <color-scheme-system>Системная тема</color-scheme-system>
+        <view-group>Размер окна</view-group>
+        <maximize>Развернуть предпросмотр</maximize>
+        <restore>Восстановить размер предпросмотра</restore>
+        <breakpoint-compact>Компактный</breakpoint-compact>
+        <breakpoint-medium>Средний</breakpoint-medium>
+        <breakpoint-wide>Широкий</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Тестирование PDF</label>

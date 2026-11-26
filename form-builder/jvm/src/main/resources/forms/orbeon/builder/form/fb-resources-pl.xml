@@ -1790,6 +1790,30 @@
     <dialog-test>
         <label>Podgląd formularza</label>
         <console>Konsola</console>
+        <preview-toolbar>Elementy sterujące podglądu</preview-toolbar>
+        <viewport-group>Widok</viewport-group>
+        <responsive>Responsywny</responsive>
+        <desktop>Komputer</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Telefon</mobile>
+        <custom>Niestandardowy</custom>
+        <device-group>Urządzenie i wymiary</device-group>
+        <device>Urządzenie</device>
+        <width>Szerokość (px)</width>
+        <height>Wysokość (px)</height>
+        <rotate>Obróć orientację</rotate>
+        <zoom>Powiększenie</zoom>
+        <fit>Dopasuj</fit>
+        <color-scheme-group>Schemat kolorów</color-scheme-group>
+        <color-scheme-light>Tryb jasny</color-scheme-light>
+        <color-scheme-dark>Tryb ciemny</color-scheme-dark>
+        <color-scheme-system>Schemat systemowy</color-scheme-system>
+        <view-group>Rozmiar okna</view-group>
+        <maximize>Maksymalizuj podgląd</maximize>
+        <restore>Przywróć rozmiar podglądu</restore>
+        <breakpoint-compact>Kompaktowy</breakpoint-compact>
+        <breakpoint-medium>Średni</breakpoint-medium>
+        <breakpoint-wide>Szeroki</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test generowania PDF</label>

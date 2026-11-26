@@ -1787,6 +1787,30 @@
     <dialog-test>
         <label>Vista Previa del Formulario</label>
         <console>Consola</console>
+        <preview-toolbar>Controles de vista previa</preview-toolbar>
+        <viewport-group>Área de visualización</viewport-group>
+        <responsive>Adaptable</responsive>
+        <desktop>Escritorio</desktop>
+        <tablet>Tableta</tablet>
+        <mobile>Móvil</mobile>
+        <custom>Personalizado</custom>
+        <device-group>Dispositivo y dimensiones</device-group>
+        <device>Dispositivo</device>
+        <width>Ancho (px)</width>
+        <height>Alto (px)</height>
+        <rotate>Rotar orientación</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Ajustar</fit>
+        <color-scheme-group>Esquema de color</color-scheme-group>
+        <color-scheme-light>Modo claro</color-scheme-light>
+        <color-scheme-dark>Modo oscuro</color-scheme-dark>
+        <color-scheme-system>Esquema del sistema</color-scheme-system>
+        <view-group>Tamaño de ventana</view-group>
+        <maximize>Maximizar vista previa</maximize>
+        <restore>Restaurar tamaño de vista previa</restore>
+        <breakpoint-compact>Compacto</breakpoint-compact>
+        <breakpoint-medium>Medio</breakpoint-medium>
+        <breakpoint-wide>Ancho</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Probar generación de PDF</label>

@@ -1774,6 +1774,30 @@
     <dialog-test>
         <label>Form voorvertoning</label>
         <console>Console</console>
+        <preview-toolbar>Voorvertoningsbediening</preview-toolbar>
+        <viewport-group>Weergavegebied</viewport-group>
+        <responsive>Responsief</responsive>
+        <desktop>Desktop</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Mobiel</mobile>
+        <custom>Aangepast</custom>
+        <device-group>Apparaat en afmetingen</device-group>
+        <device>Apparaat</device>
+        <width>Breedte (px)</width>
+        <height>Hoogte (px)</height>
+        <rotate>Oriëntatie draaien</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Passend</fit>
+        <color-scheme-group>Kleurenschema</color-scheme-group>
+        <color-scheme-light>Lichte modus</color-scheme-light>
+        <color-scheme-dark>Donkere modus</color-scheme-dark>
+        <color-scheme-system>Systeemkleurenschema</color-scheme-system>
+        <view-group>Venstergrootte</view-group>
+        <maximize>Voorvertoning maximaliseren</maximize>
+        <restore>Grootte van voorvertoning herstellen</restore>
+        <breakpoint-compact>Compact</breakpoint-compact>
+        <breakpoint-medium>Gemiddeld</breakpoint-medium>
+        <breakpoint-wide>Breed</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test PDF-productie</label>

@@ -598,6 +598,7 @@
             <save-as/>
             <other/>
             <test-pdf/>
+            <test-preview-toolbar/>
         </_>
     </xf:instance>
 
@@ -611,6 +612,7 @@
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
         <xf:bind ref="save-as" readonly="$mode != 'edit'" calculate="$mode"/>
         <xf:bind ref="test-pdf" relevant=". = 'true'"/>
+        <xf:bind ref="test-preview-toolbar" relevant=". = 'true'"/>
     </xf:bind>
 
     <xf:instance id="fb-static-upload">
@@ -951,21 +953,24 @@
     <!-- Dispatched from the client, see above action -->
     <xf:action event="fb-test-form-show-dialog">
         <xxf:show dialog="fb-test-dialog">
-            <xf:property name="show-test-pdf" value="true()"/>
+            <xf:property name="show-test-pdf"        value="true()"/>
+            <xf:property name="show-preview-toolbar" value="true()"/>
         </xxf:show>
         <xf:send submission="fb-test-form-submission"/>
     </xf:action>
 
     <xf:action event="fb-test-formulas-show-dialog">
         <xxf:show dialog="fb-test-dialog">
-            <xf:property name="show-test-pdf" value="false()"/>
+            <xf:property name="show-test-pdf"        value="false()"/>
+            <xf:property name="show-preview-toolbar" value="true()"/>
         </xxf:show>
         <xf:send submission="fb-test-formulas-form-submission"/>
     </xf:action>
 
     <xf:action event="fb-test-offline-show-dialog">
         <xxf:show dialog="fb-test-dialog">
-            <xf:property name="show-test-pdf" value="false()"/>
+            <xf:property name="show-test-pdf"        value="false()"/>
+            <xf:property name="show-preview-toolbar" value="false()"/>
         </xxf:show>
         <xf:send submission="fb-test-offline-submission"/>
     </xf:action>

@@ -22,14 +22,186 @@
 
     <xf:label ref="xxf:r('dialog-test.label')"/>
 
-    <!-- Set value that controls whether the "Test PDF" button shows -->
-    <xf:setvalue
-        event="xxforms-dialog-open"
-        ref="instance('fb-triggers-instance')/test-pdf"
-        value="event('show-test-pdf')"/>
+    <!-- Set values that control whether "Test PDF" and the responsive preview toolbar show -->
+    <xf:action event="xxforms-dialog-open">
+        <xf:setvalue
+            ref="instance('fb-triggers-instance')/test-pdf"
+            value="event('show-test-pdf')"/>
+        <xf:setvalue
+            ref="instance('fb-triggers-instance')/test-preview-toolbar"
+            value="event('show-preview-toolbar')"/>
+    </xf:action>
+
+    <xf:group ref="instance('fb-triggers-instance')/test-preview-toolbar" class="fb-test-preview-toolbar-container">
+        <xh:div
+            class="fb-test-preview-toolbar"
+            role="toolbar"
+            focusgroup="toolbar wrap"
+            aria-label="{xxf:r('dialog-test.preview-toolbar')}"
+            aria-controls="fb-test-iframe"
+            data-fb-test-devices="{xxf:property('oxf.fb.test.devices')}"
+            data-label-responsive="{xxf:r('dialog-test.responsive')}"
+            data-label-custom="{xxf:r('dialog-test.custom')}"
+            data-label-mobile="{xxf:r('dialog-test.mobile')}"
+            data-label-tablet="{xxf:r('dialog-test.tablet')}"
+            data-label-desktop="{xxf:r('dialog-test.desktop')}"
+            data-label-fit="{xxf:r('dialog-test.fit')}"
+            data-label-maximize="{xxf:r('dialog-test.maximize')}"
+            data-label-restore="{xxf:r('dialog-test.restore')}"
+            data-label-bp-compact="{xxf:r('dialog-test.breakpoint-compact')}"
+            data-label-bp-medium="{xxf:r('dialog-test.breakpoint-medium')}"
+            data-label-bp-wide="{xxf:r('dialog-test.breakpoint-wide')}">
+
+            <!-- Viewport mode segmented buttons -->
+            <xh:div class="fb-test-toolbar-group fb-test-mode-group" role="group" aria-label="{xxf:r('dialog-test.viewport-group')}">
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-mode-btn"
+                    data-preview-mode="responsive"
+                    aria-pressed="true"
+                    aria-label="{xxf:r('dialog-test.responsive')}"
+                    title="{xxf:r('dialog-test.responsive')}">
+                    <xh:i class="fa fa-fw fa-arrows-left-right-to-line" aria-hidden="true"/>
+                </xh:button>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-mode-btn"
+                    data-preview-mode="desktop"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.desktop')}"
+                    title="{xxf:r('dialog-test.desktop')}">
+                    <xh:i class="fa fa-fw fa-desktop" aria-hidden="true"/>
+                </xh:button>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-mode-btn"
+                    data-preview-mode="tablet"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.tablet')}"
+                    title="{xxf:r('dialog-test.tablet')}">
+                    <xh:i class="fa fa-fw fa-tablet-screen-button" aria-hidden="true"/>
+                </xh:button>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-mode-btn"
+                    data-preview-mode="mobile"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.mobile')}"
+                    title="{xxf:r('dialog-test.mobile')}">
+                    <xh:i class="fa fa-fw fa-mobile-screen-button" aria-hidden="true"/>
+                </xh:button>
+            </xh:div>
+
+            <xh:span class="fb-test-toolbar-separator" role="separator" aria-orientation="vertical"/>
+
+            <!-- Device preset & editable dimensions -->
+            <xh:div class="fb-test-toolbar-group fb-test-device-group" role="group" aria-label="{xxf:r('dialog-test.device-group')}">
+                <xh:select class="fb-test-device-select" aria-label="{xxf:r('dialog-test.device')}"/>
+                <xh:div class="fb-test-dimensions">
+                    <xh:input
+                        type="number"
+                        class="fb-test-dim-input fb-test-width-input"
+                        min="240"
+                        max="3840"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="{xxf:r('dialog-test.width')}"
+                        title="{xxf:r('dialog-test.width')}"/>
+                    <xh:span class="fb-test-dim-sep" aria-hidden="true">×</xh:span>
+                    <xh:input
+                        type="number"
+                        class="fb-test-dim-input fb-test-height-input"
+                        min="240"
+                        max="2160"
+                        step="1"
+                        inputmode="numeric"
+                        aria-label="{xxf:r('dialog-test.height')}"
+                        title="{xxf:r('dialog-test.height')}"/>
+                </xh:div>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-rotate-btn"
+                    aria-disabled="true"
+                    aria-label="{xxf:r('dialog-test.rotate')}"
+                    title="{xxf:r('dialog-test.rotate')}">
+                    <xh:i class="fa fa-fw fa-rotate" aria-hidden="true"/>
+                </xh:button>
+            </xh:div>
+
+            <xh:span class="fb-test-toolbar-separator" role="separator" aria-orientation="vertical"/>
+
+            <!-- Scale / Zoom -->
+            <xh:div class="fb-test-toolbar-group fb-test-zoom-group" role="group" aria-label="{xxf:r('dialog-test.zoom')}">
+                <xh:select class="fb-test-zoom-select" aria-label="{xxf:r('dialog-test.zoom')}" title="{xxf:r('dialog-test.zoom')}">
+                    <xh:option value="fit">Fit</xh:option>
+                    <xh:option value="0.5">50%</xh:option>
+                    <xh:option value="0.75">75%</xh:option>
+                    <xh:option value="1">100%</xh:option>
+                    <xh:option value="1.25">125%</xh:option>
+                </xh:select>
+            </xh:div>
+
+            <xh:span class="fb-test-toolbar-separator" role="separator" aria-orientation="vertical"/>
+
+            <!-- Color scheme & dialog maximize -->
+            <xh:div class="fb-test-toolbar-group fb-test-env-group" role="group" aria-label="{xxf:r('dialog-test.color-scheme-group')}">
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-scheme-btn"
+                    data-color-scheme="light"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.color-scheme-light')}"
+                    title="{xxf:r('dialog-test.color-scheme-light')}">
+                    <xh:i class="fa fa-fw fa-sun" aria-hidden="true"/>
+                </xh:button>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-scheme-btn"
+                    data-color-scheme="dark"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.color-scheme-dark')}"
+                    title="{xxf:r('dialog-test.color-scheme-dark')}">
+                    <xh:i class="fa fa-fw fa-moon" aria-hidden="true"/>
+                </xh:button>
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-scheme-btn"
+                    data-color-scheme="system"
+                    aria-pressed="true"
+                    aria-label="{xxf:r('dialog-test.color-scheme-system')}"
+                    title="{xxf:r('dialog-test.color-scheme-system')}">
+                    <xh:i class="fa fa-fw fa-circle-half-stroke" aria-hidden="true"/>
+                </xh:button>
+            </xh:div>
+
+            <xh:div class="fb-test-toolbar-group fb-test-window-group" role="group" aria-label="{xxf:r('dialog-test.view-group')}">
+                <xh:button
+                    type="button"
+                    class="fb-test-toolbar-btn fb-test-maximize-btn"
+                    aria-pressed="false"
+                    aria-label="{xxf:r('dialog-test.maximize')}"
+                    title="{xxf:r('dialog-test.maximize')}">
+                    <xh:i class="fa fa-fw fa-expand" aria-hidden="true"/>
+                </xh:button>
+            </xh:div>
+        </xh:div>
+        <xh:span class="fb-test-status visually-hidden" role="status" aria-live="polite"/>
+    </xf:group>
 
     <xh:div class="fb-test-dialog-form">
-        <xh:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
+        <xh:div class="fb-test-stage" data-preview-mode="responsive">
+            <xh:div class="fb-test-viewport-wrapper">
+                <xh:div class="fb-test-viewport-frame">
+                    <xh:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
+                    <xh:div class="fb-test-drag-shield"/>
+                </xh:div>
+                <xh:div class="fb-test-resize-handle fb-test-resize-handle-left"   data-resize-edge="left"   aria-hidden="true"/>
+                <xh:div class="fb-test-resize-handle fb-test-resize-handle-right"  data-resize-edge="right"  aria-hidden="true"/>
+                <xh:div class="fb-test-resize-handle fb-test-resize-handle-bottom" data-resize-edge="bottom" aria-hidden="true"/>
+                <xh:div class="fb-test-resize-handle fb-test-resize-handle-corner" data-resize-edge="corner" aria-hidden="true"/>
+                <xh:div class="fb-test-resize-badge" aria-hidden="true"/>
+            </xh:div>
+        </xh:div>
     </xh:div>
     <xh:div class="fb-test-dialog-console">
         <xh:div class="fb-console-title">
@@ -57,7 +229,7 @@
 
             <xf:trigger appearance="xxf:primary">
                 <xf:label mediatype="text/html" value="$fr-resources/buttons/close"/>
-                <xxf:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
+                <xxf:hide event="DOMActivate" dialog="fb-test-dialog"/>
             </xf:trigger>
         </xh:span>
     </xh:div>

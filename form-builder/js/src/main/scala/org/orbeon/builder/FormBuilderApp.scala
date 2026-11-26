@@ -66,6 +66,7 @@ object FormBuilderApp extends App {
     GridWallDnD
     FormSettings
     DialogControlSettings
+    TestPreview.init()
 
     BrowserCheck.checkSupportedBrowser()
   }

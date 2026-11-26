@@ -1793,6 +1793,30 @@
     <dialog-test>
         <label>معاينة النموذج</label>
         <console>وحدة التحكم</console>
+        <preview-toolbar>عناصر التحكم في المعاينة</preview-toolbar>
+        <viewport-group>منطقة العرض</viewport-group>
+        <responsive>متجاوب</responsive>
+        <desktop>سطح المكتب</desktop>
+        <tablet>جهاز لوحي</tablet>
+        <mobile>هاتف محمول</mobile>
+        <custom>مخصص</custom>
+        <device-group>الجهاز والأبعاد</device-group>
+        <device>الجهاز</device>
+        <width>العرض (بكسل)</width>
+        <height>الارتفاع (بكسل)</height>
+        <rotate>تدوير الاتجاه</rotate>
+        <zoom>التكبير</zoom>
+        <fit>ملاءمة</fit>
+        <color-scheme-group>نظام الألوان</color-scheme-group>
+        <color-scheme-light>الوضع الفاتح</color-scheme-light>
+        <color-scheme-dark>الوضع الداكن</color-scheme-dark>
+        <color-scheme-system>نظام ألوان الجهاز</color-scheme-system>
+        <view-group>حجم النافذة</view-group>
+        <maximize>تكبير المعاينة</maximize>
+        <restore>استعادة حجم المعاينة</restore>
+        <breakpoint-compact>مضغوط</breakpoint-compact>
+        <breakpoint-medium>متوسط</breakpoint-medium>
+        <breakpoint-wide>عريض</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>اختبار إنتاج PDF</label>

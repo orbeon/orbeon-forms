@@ -1746,6 +1746,30 @@
     <dialog-test>
         <label>Anteprima del modulo</label>
         <console>Console</console>
+        <preview-toolbar>Controlli di anteprima</preview-toolbar>
+        <viewport-group>Area di visualizzazione</viewport-group>
+        <responsive>Adattivo</responsive>
+        <desktop>Desktop</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Mobile</mobile>
+        <custom>Personalizzato</custom>
+        <device-group>Dispositivo e dimensioni</device-group>
+        <device>Dispositivo</device>
+        <width>Larghezza (px)</width>
+        <height>Altezza (px)</height>
+        <rotate>Ruota orientamento</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Adatta</fit>
+        <color-scheme-group>Schema di colori</color-scheme-group>
+        <color-scheme-light>Modalità chiara</color-scheme-light>
+        <color-scheme-dark>Modalità scura</color-scheme-dark>
+        <color-scheme-system>Schema di sistema</color-scheme-system>
+        <view-group>Dimensione finestra</view-group>
+        <maximize>Ingrandisci anteprima</maximize>
+        <restore>Ripristina dimensione anteprima</restore>
+        <breakpoint-compact>Compatto</breakpoint-compact>
+        <breakpoint-medium>Medio</breakpoint-medium>
+        <breakpoint-wide>Ampio</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test della produzione PDF</label>

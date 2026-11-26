@@ -1743,6 +1743,30 @@
     <dialog-test>
         <label>Formularvorschau</label>
         <console>Konsole</console>
+        <preview-toolbar>Vorschausteuerung</preview-toolbar>
+        <viewport-group>Ansichtsfenster</viewport-group>
+        <responsive>Responsiv</responsive>
+        <desktop>Desktop</desktop>
+        <tablet>Tablet</tablet>
+        <mobile>Mobil</mobile>
+        <custom>Benutzerdefiniert</custom>
+        <device-group>Gerät und Abmessungen</device-group>
+        <device>Gerät</device>
+        <width>Breite (px)</width>
+        <height>Höhe (px)</height>
+        <rotate>Ausrichtung drehen</rotate>
+        <zoom>Zoom</zoom>
+        <fit>Anpassen</fit>
+        <color-scheme-group>Farbschema</color-scheme-group>
+        <color-scheme-light>Heller Modus</color-scheme-light>
+        <color-scheme-dark>Dunkler Modus</color-scheme-dark>
+        <color-scheme-system>Systemfarbschema</color-scheme-system>
+        <view-group>Fenstergröße</view-group>
+        <maximize>Vorschau maximieren</maximize>
+        <restore>Vorschaugröße wiederherstellen</restore>
+        <breakpoint-compact>Kompakt</breakpoint-compact>
+        <breakpoint-medium>Mittel</breakpoint-medium>
+        <breakpoint-wide>Breit</breakpoint-wide>
     </dialog-test>
     <dialog-test-pdf>
         <label>Test der PDF-Erzeugung</label>

@@ -168,6 +168,22 @@
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
     <property as="xs:string"  name="oxf.fb.tinymce.config"                                      value=""/>
 
+    <!-- Preview devices for Form Builder Test dialog (#2362) -->
+    <property as="xs:string"  name="oxf.fb.test.devices">
+        [
+            {"id": "iphone-se",    "name": "iPhone SE",         "width": 375,  "height": 667,  "category": "mobile"},
+            {"id": "iphone-16",    "name": "iPhone 16",         "width": 393,  "height": 852,  "category": "mobile"},
+            {"id": "iphone-16-pm", "name": "iPhone 16 Pro Max", "width": 440,  "height": 956,  "category": "mobile"},
+            {"id": "pixel-9",      "name": "Pixel 9",           "width": 412,  "height": 915,  "category": "mobile"},
+            {"id": "galaxy-s24",   "name": "Galaxy S24",        "width": 360,  "height": 780,  "category": "mobile"},
+            {"id": "ipad-mini",    "name": "iPad Mini",         "width": 744,  "height": 1133, "category": "tablet"},
+            {"id": "ipad-air",     "name": "iPad Air",          "width": 820,  "height": 1180, "category": "tablet"},
+            {"id": "ipad-pro-13",  "name": "iPad Pro 13\"",     "width": 1024, "height": 1366, "category": "tablet"},
+            {"id": "laptop",       "name": "Laptop",            "width": 1280, "height": 800,  "category": "desktop"},
+            {"id": "desktop",      "name": "Desktop",           "width": 1440, "height": 900,  "category": "desktop"}
+        ]
+    </property>
+
     <!-- Form Builder detail page buttons -->
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="modal"/>

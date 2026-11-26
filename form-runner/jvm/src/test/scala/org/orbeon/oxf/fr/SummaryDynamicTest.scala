@@ -1423,7 +1423,7 @@ class SummaryDynamicTest
       assert(varsByName("first-col")  == "details/(detail[@path = 'main/first-col'], detail[2])[1]")
     }
 
-    it("must build card-mode dynamic tables with `.fr-col-primary`, `target-id='fr-sortable-th'`, and binary attachment/signature controls excluded") {
+    it("must build card-mode dynamic tables with `.fr-col-primary`, `target-id='{$order-by-target-id}'`, and binary attachment/signature controls excluded") {
       val cardForm =
         <xh:html
           xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -1554,7 +1554,7 @@ class SummaryDynamicTest
 
       // `cover-image` (`fr:image-attachment`) is excluded in `cardMode`, leaving `title`, `amount`, and `rating`
       assert(sortableThs.map(_.attributeValue("column")) == List("main/title", "main/amount", "main/rating"))
-      assert(sortableThs.forall(_.attributeValue("target-id") == "fr-sortable-th"))
+      assert(sortableThs.forall(_.attributeValue("target-id") == "{$order-by-target-id}"))
       assert(sortableThs.head.attributeValueOpt("class").contains("fr-col-primary"))
       assert(sortableThs(1).attributeValueOpt("class").contains("fr-align-right"))
       assert(sortableThs(2).attributeValueOpt("class").isEmpty)

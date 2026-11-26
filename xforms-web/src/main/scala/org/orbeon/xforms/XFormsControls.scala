@@ -37,12 +37,18 @@ object XFormsControls {
     } else if (isStaticReadonly && control.hasClass("xforms-textarea")) {
       // textarea in "static readonly" mode
       control.childrenT("pre").head.innerText = newControlValue
-    } else if (isStaticReadonly && control.hasClass("xforms-select1-appearance-full")) {
-      // Radio buttons in "static readonly" mode
+    } else if (isStaticReadonly && control.hasClass("xforms-select1-appearance-full") && control.childrenT(".xforms-items").nonEmpty) {
+      // Radio buttons in "static readonly" mode (`xxf:readonly-appearance.static.select1="full"`)
       control.querySelectorAllT(".xforms-selected, .xforms-deselected").foreach { item =>
-        val selected = item.querySelector(".radio > span").innerText == newControlValue
+        val labelSpan = item.querySelectorOpt(".radio > span")
+        val selected  = labelSpan.exists { s =>
+          s.innerHTML == newControlValue ||
+            s.asInstanceOf[js.Dynamic].innerText.asInstanceOf[js.UndefOr[String]].toOption.orElse(Option(s.textContent)).contains(newControlValue)
+        }
         item.toggleClass("xforms-selected",   selected)
         item.toggleClass("xforms-deselected", ! selected)
+        if (item.hasAttribute("aria-checked"))
+          item.setAttribute("aria-checked", selected.toString)
       }
     } else if (control.matches(".xforms-label, .xforms-hint, .xforms-help, .xforms-alert")) {
       // External LHH
@@ -62,7 +68,7 @@ object XFormsControls {
             media.toggleClass("empty-source", newControlValue == "")
             media.load()
           }
-        case elem if control.hasClass("xforms-mediatype-text-html") =>
+        case elem if control.hasClass("xforms-mediatype-text-html") || (isStaticReadonly && control.hasAnyClass("xforms-select1", "xforms-select")) =>
           elem.innerHTML = newControlValue
         case elem =>
           // We want to use `textContent`, not `innerText`, as we don't want the browser to add any `<br>`.

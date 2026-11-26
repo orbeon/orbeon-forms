@@ -53,6 +53,7 @@
                         unfiltered-total=""
                         submitted-query=""
                         sort-announcement=""
+                        model-absolute-id=""
                     />
                 </xf:instance>
 
@@ -136,8 +137,9 @@
                             <xf:var name="app"               value="string(xxf:instance('fr-state-instance')/@app)"/>
                             <xf:var name="form"              value="string(xxf:instance('fr-state-instance')/@form)"/>
                             <xf:var name="global-operations" value="xxf:split(xxf:instance('fr-state-instance')/@operations)"/>
-                            <xf:var name="sort-supported"    value="frf:isSortSupported($app, $form)"/>
-                            <xf:var name="page-size"         value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
+                            <xf:var name="sort-supported"     value="frf:isSortSupported($app, $form)"/>
+                            <xf:var name="order-by-target-id" value="string(xxf:instance('fr-state-instance')/@model-absolute-id)"/>
+                            <xf:var name="page-size"          value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
                             <xf:group ref="instance('fr-form-instance')[exists(document)]">
                                 <xh:div class="fr-search-results-wrap">
@@ -207,10 +209,11 @@
                     </xf:header>
 
                     <xf:action event="xforms-submit">
-                        <xf:setvalue ref="instance('fr-state-instance')/@app"            value="$app"/>
-                        <xf:setvalue ref="instance('fr-state-instance')/@form"           value="$form"/>
-                        <xf:setvalue ref="instance('fr-state-instance')/@form-not-found" value="'false'"/>
-                        <xf:setvalue ref="instance('fr-state-instance')/@state"          value="'loading'"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@app"               value="$app"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@form"              value="$form"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@model-absolute-id" value="xxf:absolute-id('model')"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@form-not-found"    value="'false'"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@state"             value="'loading'"/>
                     </xf:action>
 
                     <xf:action event="xforms-submit-done">
@@ -416,6 +419,60 @@
                     <!-- Query initial list of documents -->
                     <xf:send submission="fr-search-submission"/>
 
+                </xf:action>
+
+                <!-- Event dispatched by `fr:sortable-th` inside `<xxf:dynamic>` -->
+                <xf:action event="fr-order-by">
+                    <xf:var name="target-col"  value="string(event('column'))"/>
+                    <xf:var name="col-label"   value="string(event('label'))"/>
+                    <xf:var name="current-col" value="string(instance('fr-order-by')/column)"/>
+                    <xf:var name="current-dir" value="string(instance('fr-order-by')/direction)"/>
+                    <xf:var name="next-col" value="
+                        if ($current-col = $target-col and $current-dir = 'desc') then
+                            'last-modified'
+                        else
+                            $target-col
+                    "/>
+                    <xf:var name="next-dir" value="
+                        if ($current-col = $target-col) then
+                            'desc'
+                        else
+                            'asc'
+                    "/>
+                    <xf:var name="announce-col-label" value="
+                        if ($next-col = 'last-modified') then
+                            xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
+                        else
+                            $col-label
+                    "/>
+
+                    <xf:setvalue ref="instance('fr-order-by')/column"    value="$next-col"/>
+                    <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
+                    <xf:setvalue
+                        ref="instance('fr-state-instance')/@sort-announcement"
+                        value="
+                            if ($next-dir = 'asc') then
+                                xxf:format-message(
+                                    xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
+                                    $announce-col-label
+                                )
+                            else
+                                xxf:format-message(
+                                    xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
+                                    $announce-col-label
+                                )"/>
+
+                    <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
+
+                    <xf:insert
+                        context="
+                            if ($next-col = 'last-modified') then
+                                instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
+                            else
+                                instance('fr-search-instance')/query[@path = $next-col][1]"
+                        origin="xf:attribute('sort', $next-dir)"/>
+
+                    <xf:send submission="fr-search-submission"/>
                 </xf:action>
             </xf:model>
         </xbl:implementation>
@@ -741,60 +798,7 @@
                 </fr:card-thumbnail>
 
                 <fr:card-table>
-                    <xxf:dynamic id="fr-card-summary-dynamic" ref="instance('fr-dynamic-instance')[not($is-list-mode)]">
-                        <xf:action event="fr-order-by">
-                            <xf:var name="target-col"  value="string(event('column'))"/>
-                            <xf:var name="col-label"   value="string(event('label'))"/>
-                            <xf:var name="current-col" value="string(instance('fr-order-by')/column)"/>
-                            <xf:var name="current-dir" value="string(instance('fr-order-by')/direction)"/>
-                            <xf:var name="next-col" value="
-                                if ($current-col = $target-col and $current-dir = 'desc') then
-                                    'last-modified'
-                                else
-                                    $target-col
-                            "/>
-                            <xf:var name="next-dir" value="
-                                if ($current-col = $target-col) then
-                                    'desc'
-                                else
-                                    'asc'
-                            "/>
-                            <xf:var name="announce-col-label" value="
-                                if ($next-col = 'last-modified') then
-                                    xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
-                                else
-                                    $col-label
-                            "/>
-
-                            <xf:setvalue ref="instance('fr-order-by')/column"    value="$next-col"/>
-                            <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
-                            <xf:setvalue
-                                ref="instance('fr-state-instance')/@sort-announcement"
-                                value="
-                                    if ($next-dir = 'asc') then
-                                        xxf:format-message(
-                                            xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
-                                            $announce-col-label
-                                        )
-                                    else
-                                        xxf:format-message(
-                                            xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
-                                            $announce-col-label
-                                        )"/>
-
-                            <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
-
-                            <xf:insert
-                                context="
-                                    if ($next-col = 'last-modified') then
-                                        instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
-                                    else
-                                        instance('fr-search-instance')/query[@path = $next-col]"
-                                origin="xf:attribute('sort', $next-dir)"/>
-
-                            <xf:send submission="fr-search-submission"/>
-                        </xf:action>
-                    </xxf:dynamic>
+                    <xxf:dynamic id="fr-card-summary-dynamic" ref="instance('fr-dynamic-instance')[not($is-list-mode)]"/>
                 </fr:card-table>
 
                 <fr:rows>

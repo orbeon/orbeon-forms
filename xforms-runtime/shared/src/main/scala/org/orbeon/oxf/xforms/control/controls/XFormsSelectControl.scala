@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
-import org.orbeon.oxf.xforms.itemset.{Item, StaticItemsetSupport}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
@@ -118,6 +118,8 @@ class XFormsSelectControl(
     val updatedValue =
       if (selectedItems.isEmpty) {
         ""
+      } else if (isStaticReadonly && ! containingDocument.isReadonlyAppearanceStaticSelectFull) {
+        selectedItems.iterator.map(i => ItemsetSupport.htmlValue(i.label)).mkString(" - ")
       } else {
 
         val localMustEncodeValues = mustEncodeValues

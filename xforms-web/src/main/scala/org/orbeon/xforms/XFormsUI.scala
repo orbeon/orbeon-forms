@@ -593,12 +593,14 @@ object XFormsUI {
       // Simple input
       control.queryNestedElems[html.Input]("input", includeSelf = true).head.value
     } else if (
-      control.hasAnyClass(
-        "xforms-select-appearance-full",
-        "xforms-select1-appearance-full",
-        "xforms-type-boolean"
-      ) ||
-        control.hasAllClasses("xforms-input", "xforms-type-boolean")
+      ! control.hasClass("xforms-static") && (
+        control.hasAnyClass(
+          "xforms-select-appearance-full",
+          "xforms-select1-appearance-full",
+          "xforms-type-boolean"
+        ) ||
+          control.hasAllClasses("xforms-input", "xforms-type-boolean")
+      )
     ) {
       // Checkboxes, radio buttons, boolean input
       val spanValue =
@@ -613,6 +615,7 @@ object XFormsUI {
       else
         spanValue
     } else if (
+      ! control.hasClass("xforms-static") &&
       control.hasAnyClass(
         "xforms-select-appearance-compact",
         "xforms-select1-appearance-minimal",
@@ -636,9 +639,10 @@ object XFormsUI {
       // Text area
       control.queryNestedElems[html.TextArea]("textarea", includeSelf = true).head.value
     } else if (
-      control.hasClass("xforms-output")                      ||
-      control.hasAllClasses("xforms-input", "xforms-static") ||
-      control.hasAllClasses("xforms-textarea", "xforms-static")
+      control.hasClass("xforms-output")                                                    ||
+      control.hasAllClasses("xforms-input", "xforms-static")                               ||
+      control.hasAllClasses("xforms-textarea", "xforms-static")                            ||
+      (control.hasClass("xforms-static") && control.querySelectorOpt(".xforms-field").isDefined)
     ) {
       // Output and static input
       control.querySelectorOpt(".xforms-output-output, .xforms-field") match {

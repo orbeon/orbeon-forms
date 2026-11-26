@@ -476,7 +476,7 @@ trait FormRunnerSummary {
         sortableTh.addAttribute("instance",       "xxf:instance('fr-order-by')")
         sortableTh.addAttribute("column",         col.columnKey)
         if (cardMode)
-          sortableTh.addAttribute("target-id", "fr-sortable-th")
+          sortableTh.addAttribute("target-id", "{$order-by-target-id}")
       }
     }
 

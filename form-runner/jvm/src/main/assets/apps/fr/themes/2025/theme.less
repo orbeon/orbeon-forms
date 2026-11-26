@@ -14,872 +14,872 @@
 @import "../theme-common";
 
 @layer orbeon-theme {
-.orbeon {
+  .orbeon {
 
-  // General
-  --orbeon-page-background-color         : white;
-  --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
-  --orbeon-form-background-color         : white;
-  --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
-  --orbeon-view-border                   : 1px solid var(--orbeon-base-border-color);
-  --orbeon-view-background-color         : var(--orbeon-form-background-color);
+    // General
+    --orbeon-page-background-color         : white;
+    --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
+    --orbeon-form-background-color         : white;
+    --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
+    --orbeon-view-border                   : 1px solid var(--orbeon-base-border-color);
+    --orbeon-view-background-color         : var(--orbeon-form-background-color);
 
-  // Max width of the (non-fluid) form view: keep this theme at Bootstrap 2's fixed 940px; a future theme can go wider.
-  // Fluid views remain full-width.
-  --orbeon-view-max-width: 940px;
+    // Max width of the (non-fluid) form view: keep this theme at Bootstrap 2's fixed 940px; a future theme can go wider.
+    // Fluid views remain full-width.
+    --orbeon-view-max-width: 940px;
 
-  // Base font
-  --orbeon-base-font-size  : 13px;
-  --orbeon-base-font-family: @frBaseFontFamily;
-  --orbeon-base-font-weight: normal;
-  --orbeon-base-color      : #333; // @grayDark, darker than Bootstrap default of #555
+    // Base font
+    --orbeon-base-font-size  : 13px;
+    --orbeon-base-font-family: @frBaseFontFamily;
+    --orbeon-base-font-weight: normal;
+    --orbeon-base-color      : #333; // @grayDark, darker than Bootstrap default of #555
 
-  // Accent and links
-  --orbeon-accent-color    : @btnPrimaryBackground;
-  --orbeon-link-color      : #08c;
-  --orbeon-link-hover-color: darken(#08c, 15%);
+    // Accent and links
+    --orbeon-accent-color    : @btnPrimaryBackground;
+    --orbeon-link-color      : #08c;
+    --orbeon-link-hover-color: darken(#08c, 15%);
 
-  // Labels
-  --orbeon-label-font-size      : 1.00em; // label and .xforms-label
-  --orbeon-label-font-family    : @frBaseFontFamily;
-  --orbeon-label-font-weight    : 600; // Help label stand out
-  --orbeon-label-color          : var(--orbeon-base-color);
-  --orbeon-label-read-only-color: @minGrayText;
-  --orbeon-label-letter-spacing : normal;
-  --orbeon-label-text-transform : none;
-  --orbeon-label-margin         : 0;
-  --orbeon-label-padding        : 0;
-  --orbeon-cell-label-padding-top: 5px; // 4px control top padding + 1px border
+    // Labels
+    --orbeon-label-font-size      : 1.00em; // label and .xforms-label
+    --orbeon-label-font-family    : @frBaseFontFamily;
+    --orbeon-label-font-weight    : 600; // Help label stand out
+    --orbeon-label-color          : var(--orbeon-base-color);
+    --orbeon-label-read-only-color: @minGrayText;
+    --orbeon-label-letter-spacing : normal;
+    --orbeon-label-text-transform : none;
+    --orbeon-label-margin         : 0;
+    --orbeon-label-padding        : 0;
+    --orbeon-cell-label-padding-top: 5px; // 4px control top padding + 1px border
 
-  // Hints
-  --orbeon-hint-font-size  : smaller;
-  --orbeon-hint-font-family: @frBaseFontFamily;
-  --orbeon-hint-font-weight: var(--orbeon-base-font-weight);
-  --orbeon-hint-color      : @minGrayText;
+    // Hints
+    --orbeon-hint-font-size  : smaller;
+    --orbeon-hint-font-family: @frBaseFontFamily;
+    --orbeon-hint-font-weight: var(--orbeon-base-font-weight);
+    --orbeon-hint-color      : @minGrayText;
 
-  // Help
-  --orbeon-help-icon-font-size              : 0.86em;
-  --orbeon-help-icon-color                  : black;
-  --orbeon-help-icon-content                : "\f05a"; // FontAwesome question-circle
-  --orbeon-help-icon-font-family            : FontAwesome;
-  --orbeon-help-icon-font-weight            : normal;
-  --orbeon-help-icon-background-color       : transparent;
-  --orbeon-help-icon-hover-background-color : transparent;
-  --orbeon-help-icon-active-background-color: transparent;
-  --orbeon-help-icon-border-radius          : 50%;
-  --orbeon-help-icon-focus-outline          : 0;
-  --orbeon-help-icon-focus-ring             : var(--orbeon-focus-ring);
-  --orbeon-help-icon-gap                    : 3px;
-  --orbeon-section-help-icon-gap            : 5px;
-  --orbeon-help-font-family                 : @frBaseFontFamily;
-  --orbeon-help-background-color            : white;
-  --orbeon-help-border-color                : rgba(0, 0, 0, 0.2);
-  --orbeon-help-border-radius               : 6.5px;
-  --orbeon-help-box-shadow                  : 0 8px 24px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
-  --orbeon-help-content-font-size           : 1.00em;
-  --orbeon-help-content-font-weight         : var(--orbeon-base-font-weight);
-  --orbeon-help-content-color               : var(--orbeon-base-color);
-  --orbeon-help-title-font-size             : 1.08em;
-  --orbeon-help-title-font-weight           : var(--orbeon-base-font-weight);
-  --orbeon-help-title-color                 : var(--orbeon-base-color);
-  --orbeon-help-title-background-color      : #f7f7f7;
-  --orbeon-help-title-border-color          : #ebebeb;
-  --orbeon-help-close-color                 : black;
-  --orbeon-help-close-text-shadow-color     : rgba(255,255,255,1);
+    // Help
+    --orbeon-help-icon-font-size              : 0.86em;
+    --orbeon-help-icon-color                  : black;
+    --orbeon-help-icon-content                : "\f05a"; // FontAwesome question-circle
+    --orbeon-help-icon-font-family            : FontAwesome;
+    --orbeon-help-icon-font-weight            : normal;
+    --orbeon-help-icon-background-color       : transparent;
+    --orbeon-help-icon-hover-background-color : transparent;
+    --orbeon-help-icon-active-background-color: transparent;
+    --orbeon-help-icon-border-radius          : 50%;
+    --orbeon-help-icon-focus-outline          : 0;
+    --orbeon-help-icon-focus-ring             : var(--orbeon-focus-ring);
+    --orbeon-help-icon-gap                    : 3px;
+    --orbeon-section-help-icon-gap            : 5px;
+    --orbeon-help-font-family                 : @frBaseFontFamily;
+    --orbeon-help-background-color            : white;
+    --orbeon-help-border-color                : rgba(0, 0, 0, 0.2);
+    --orbeon-help-border-radius               : 6.5px;
+    --orbeon-help-box-shadow                  : 0 8px 24px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
+    --orbeon-help-content-font-size           : 1.00em;
+    --orbeon-help-content-font-weight         : var(--orbeon-base-font-weight);
+    --orbeon-help-content-color               : var(--orbeon-base-color);
+    --orbeon-help-title-font-size             : 1.08em;
+    --orbeon-help-title-font-weight           : var(--orbeon-base-font-weight);
+    --orbeon-help-title-color                 : var(--orbeon-base-color);
+    --orbeon-help-title-background-color      : #f7f7f7;
+    --orbeon-help-title-border-color          : #ebebeb;
+    --orbeon-help-close-color                 : black;
+    --orbeon-help-close-text-shadow-color     : rgba(255,255,255,1);
 
-  // Controls
-  --orbeon-control-font-size                 : 1em;
-  --orbeon-control-font-family               : @frBaseFontFamily;
-  --orbeon-control-font-weight               : var(--orbeon-base-font-weight);
-  --orbeon-control-color                     : black;   // Make text inside the fields stand out, as this is the most important information
-  --orbeon-control-placeholder-color         : #999;    // Bootstrap 2 default (the browser default is darker)
-  --orbeon-control-background-color          : white;
-  --orbeon-control-read-only-background-color: #f2f2f2; // darken(@inputBackground, 5%);
-  --orbeon-control-border-color              : #ccc;    // Slightly darker than base border color
-  @media (prefers-contrast: more) {
-    --orbeon-control-border-color            : #949494;
-  }
-  --orbeon-control-border-radius             : @inputBorderRadius;
-  --orbeon-control-border-width              : 1px;
-  --orbeon-control-border-style              : solid;
-  --orbeon-control-padding                   : 4px 6px;  // Bootstrap 2 default
+    // Controls
+    --orbeon-control-font-size                 : 1em;
+    --orbeon-control-font-family               : @frBaseFontFamily;
+    --orbeon-control-font-weight               : var(--orbeon-base-font-weight);
+    --orbeon-control-color                     : black;   // Make text inside the fields stand out, as this is the most important information
+    --orbeon-control-placeholder-color         : #999;    // Bootstrap 2 default (the browser default is darker)
+    --orbeon-control-background-color          : white;
+    --orbeon-control-read-only-background-color: #f2f2f2; // darken(@inputBackground, 5%);
+    --orbeon-control-border-color              : #ccc;    // Slightly darker than base border color
+    @media (prefers-contrast: more) {
+      --orbeon-control-border-color            : #949494;
+    }
+    --orbeon-control-border-radius             : @inputBorderRadius;
+    --orbeon-control-border-width              : 1px;
+    --orbeon-control-border-style              : solid;
+    --orbeon-control-padding                   : 4px 6px;  // Bootstrap 2 default
 
-  // Specific controls
-  --orbeon-add-on-color                                    : var(--orbeon-base-color);
-  --orbeon-add-on-background-color                         : #eee;
-  --orbeon-add-on-text-shadow-color                        : white;
-  --orbeon-add-on-border-radius                            : var(--orbeon-control-border-radius);
-  --orbeon-add-on-gap                                      : -1px;  // -1px = fused
-  --orbeon-add-on-inner-border-radius                      : 0;
-  --orbeon-attachment-drop-color                           : @minGrayText;
-  --orbeon-attachment-drop-hover-background-color          : #f9f9f9;
-  --orbeon-attachment-drop-border-style                    : dashed;
-  --orbeon-attachment-empty-border-style                   : solid;
-  --orbeon-attachment-dragover-color                       : white;
-  --orbeon-attachment-dragover-background-color            : #ccc;
-  --orbeon-dropdown-caret-color                            : var(--orbeon-button-color);
-  --orbeon-dropdown-search-caret-color                     : #888;
-  --orbeon-dropdown-selected-background-color              : #ddd;
-  --orbeon-handwritten-signature-background-color          : white;
-  --orbeon-handwritten-signature-read-only-background-color: #eee;
-  --orbeon-image-attachment-background-color               : #eee;
-  --orbeon-textarea-resize                                 : vertical;
+    // Specific controls
+    --orbeon-add-on-color                                    : var(--orbeon-base-color);
+    --orbeon-add-on-background-color                         : #eee;
+    --orbeon-add-on-text-shadow-color                        : white;
+    --orbeon-add-on-border-radius                            : var(--orbeon-control-border-radius);
+    --orbeon-add-on-gap                                      : -1px;  // -1px = fused
+    --orbeon-add-on-inner-border-radius                      : 0;
+    --orbeon-attachment-drop-color                           : @minGrayText;
+    --orbeon-attachment-drop-hover-background-color          : #f9f9f9;
+    --orbeon-attachment-drop-border-style                    : dashed;
+    --orbeon-attachment-empty-border-style                   : solid;
+    --orbeon-attachment-dragover-color                       : white;
+    --orbeon-attachment-dragover-background-color            : #ccc;
+    --orbeon-dropdown-caret-color                            : var(--orbeon-button-color);
+    --orbeon-dropdown-search-caret-color                     : #888;
+    --orbeon-dropdown-selected-background-color              : #ddd;
+    --orbeon-handwritten-signature-background-color          : white;
+    --orbeon-handwritten-signature-read-only-background-color: #eee;
+    --orbeon-image-attachment-background-color               : #eee;
+    --orbeon-textarea-resize                                 : vertical;
 
-  // Control heights
-  --orbeon-control-height          : @fixedControlHeight;
-  --orbeon-textarea-height         : @fixedTextareaHeight;
-  --orbeon-multiple-select-height  : @fixedMultipleSelectHeight;
-  @media screen {
-    --orbeon-control-height        : @fluidControlHeight;
-    --orbeon-textarea-height       : @fluidTextareaHeight;
-    --orbeon-multiple-select-height: @fluidMultipleSelectHeight;
-  }
+    // Control heights
+    --orbeon-control-height          : @fixedControlHeight;
+    --orbeon-textarea-height         : @fixedTextareaHeight;
+    --orbeon-multiple-select-height  : @fixedMultipleSelectHeight;
+    @media screen {
+      --orbeon-control-height        : @fluidControlHeight;
+      --orbeon-textarea-height       : @fluidTextareaHeight;
+      --orbeon-multiple-select-height: @fluidMultipleSelectHeight;
+    }
 
-  // Focus
-  --orbeon-focus-border-color   : #3396ff; // Blueish
-  --orbeon-focus-highlight-color: rgba(0,123,255,.25);
-  --orbeon-focus-ring           : 0 0 0 3px var(--orbeon-focus-highlight-color); // was 0.2rem (16px root), rounded
-  --orbeon-control-focus-ring   : var(--orbeon-focus-ring);
+    // Focus
+    --orbeon-focus-border-color   : #3396ff; // Blueish
+    --orbeon-focus-highlight-color: rgba(0,123,255,.25);
+    --orbeon-focus-ring           : 0 0 0 3px var(--orbeon-focus-highlight-color); // was 0.2rem (16px root), rounded
+    --orbeon-control-focus-ring   : var(--orbeon-focus-ring);
 
-  // Motion
-  --orbeon-transition-duration       : 0.15s;
-  --orbeon-transition-timing-function: ease-in-out;
+    // Motion
+    --orbeon-transition-duration       : 0.15s;
+    --orbeon-transition-timing-function: ease-in-out;
 
-  // Checkable controls (checkbox, radio)
-  --orbeon-checkable-background-color         : white;           // resting state (unchecked, enabled)
-  --orbeon-checkable-border-color             : rgba(0,0,0,.25); // resting state (unchecked, enabled)
-  --orbeon-checkable-checked-background-color : var(--orbeon-button-primary-background-color);
-  --orbeon-checkable-checked-border-color     : var(--orbeon-button-primary-background-color);
-  --orbeon-checkable-disabled-background-color: var(--orbeon-checkable-background-color); // unchecked and disabled
-  --orbeon-checkable-disabled-border-color    : var(--orbeon-checkable-border-color);     // unchecked and disabled
-  --orbeon-checkable-focus-ring               : var(--orbeon-focus-ring);
+    // Checkable controls (checkbox, radio)
+    --orbeon-checkable-background-color         : white;           // resting state (unchecked, enabled)
+    --orbeon-checkable-border-color             : rgba(0,0,0,.25); // resting state (unchecked, enabled)
+    --orbeon-checkable-checked-background-color : var(--orbeon-button-primary-background-color);
+    --orbeon-checkable-checked-border-color     : var(--orbeon-button-primary-background-color);
+    --orbeon-checkable-disabled-background-color: var(--orbeon-checkable-background-color); // unchecked and disabled
+    --orbeon-checkable-disabled-border-color    : var(--orbeon-checkable-border-color);     // unchecked and disabled
+    --orbeon-checkable-focus-ring               : var(--orbeon-focus-ring);
 
-  // Buttons
-  --orbeon-button-font-size                         : 1.00em; // button and .btn
-  --orbeon-button-border-radius                     : @baseBorderRadius;
-  --orbeon-button-inner-border-radius               : 0;         // 0 = fused look
-  --orbeon-button-padding                           : 4px 12px;  // Bootstrap 2 default
-  --orbeon-button-toggle-padding                    : 4px 8px;   // Bootstrap 2 default
-  --orbeon-button-toggle-box-shadow                 : inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-  --orbeon-button-compact-padding                   : 0 6px;     // for compact buttons (e.g. grid/repeater menu carets); Bootstrap 2 .btn-mini default
-  --orbeon-button-small-padding                     : 2px 10px;  // Bootstrap 2 .btn-small default
-  --orbeon-button-large-padding                     : 11px 19px; // Bootstrap 2 .btn-large default
-  --orbeon-buttons-bar-width                        : 100%;
-  --orbeon-buttons-bar-margin-left                  : 0;
-  --orbeon-buttons-bar-margin-right                 : 0;
-  --orbeon-buttons-bar-border-radius                : var(--orbeon-body-decorations-border-radius);
-  --orbeon-buttons-bar-box-shadow                   : none;
-  --orbeon-button-focus-ring                        : var(--orbeon-focus-ring);
-  --orbeon-button-font-family                       : @frBaseFontFamily;
-  --orbeon-button-font-weight                       : normal;
-  --orbeon-button-color                             : var(--orbeon-base-color);
-  --orbeon-button-background-color                  : #e8e8e8; // darken(@wellBackground, 5%)
-  --orbeon-button-highlight-background-color        : #e6e6e6;
-  --orbeon-button-disabled-color                    : var(--orbeon-button-color);
-  --orbeon-button-disabled-background-color         : var(--orbeon-button-background-color);
-  --orbeon-button-primary-color                     : white;
-  --orbeon-button-primary-background-color          : @btnPrimaryBackground;
-  --orbeon-button-primary-highlight-background-color: @btnPrimaryBackgroundHighlight;
-  --orbeon-button-primary-disabled-color            : var(--orbeon-button-primary-color);
-  --orbeon-button-primary-disabled-background-color : var(--orbeon-button-primary-background-color);
-  --orbeon-button-warning-color                     : white;
-  --orbeon-button-warning-background-color          : @btnWarningBackground;
-  --orbeon-button-warning-highlight-background-color: @btnWarningBackgroundHighlight;
-  --orbeon-button-warning-disabled-color            : var(--orbeon-button-warning-color);
-  --orbeon-button-warning-disabled-background-color : var(--orbeon-button-warning-background-color);
-  --orbeon-button-danger-color                      : white;
-  --orbeon-button-danger-background-color           : @btnDangerBackground;
-  --orbeon-button-danger-highlight-background-color : @btnDangerBackgroundHighlight;
-  --orbeon-button-danger-disabled-color             : var(--orbeon-button-danger-color);
-  --orbeon-button-danger-disabled-background-color  : var(--orbeon-button-danger-background-color);
-  --orbeon-button-success-color                     : white;
-  --orbeon-button-success-background-color          : @btnSuccessBackground;
-  --orbeon-button-success-highlight-background-color: @btnSuccessBackgroundHighlight;
-  --orbeon-button-success-disabled-color            : var(--orbeon-button-success-color);
-  --orbeon-button-success-disabled-background-color : var(--orbeon-button-success-background-color);
-  --orbeon-button-info-color                        : white;
-  --orbeon-button-info-background-color             : @btnInfoBackground;
-  --orbeon-button-info-highlight-background-color   : @btnInfoBackgroundHighlight;
-  --orbeon-button-info-disabled-color               : var(--orbeon-button-info-color);
-  --orbeon-button-info-disabled-background-color    : var(--orbeon-button-info-background-color);
-  --orbeon-button-inverse-color                     : white;
-  --orbeon-button-inverse-background-color          : @btnInverseBackground;
-  --orbeon-button-inverse-highlight-background-color: @btnInverseBackgroundHighlight;
-  --orbeon-button-inverse-disabled-color            : var(--orbeon-button-inverse-color);
-  --orbeon-button-inverse-disabled-background-color : var(--orbeon-button-inverse-background-color);
+    // Buttons
+    --orbeon-button-font-size                         : 1.00em; // button and .btn
+    --orbeon-button-border-radius                     : @baseBorderRadius;
+    --orbeon-button-inner-border-radius               : 0;         // 0 = fused look
+    --orbeon-button-padding                           : 4px 12px;  // Bootstrap 2 default
+    --orbeon-button-toggle-padding                    : 4px 8px;   // Bootstrap 2 default
+    --orbeon-button-toggle-box-shadow                 : inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    --orbeon-button-compact-padding                   : 0 6px;     // for compact buttons (e.g. grid/repeater menu carets); Bootstrap 2 .btn-mini default
+    --orbeon-button-small-padding                     : 2px 10px;  // Bootstrap 2 .btn-small default
+    --orbeon-button-large-padding                     : 11px 19px; // Bootstrap 2 .btn-large default
+    --orbeon-buttons-bar-width                        : 100%;
+    --orbeon-buttons-bar-margin-left                  : 0;
+    --orbeon-buttons-bar-margin-right                 : 0;
+    --orbeon-buttons-bar-border-radius                : var(--orbeon-body-decorations-border-radius);
+    --orbeon-buttons-bar-box-shadow                   : none;
+    --orbeon-button-focus-ring                        : var(--orbeon-focus-ring);
+    --orbeon-button-font-family                       : @frBaseFontFamily;
+    --orbeon-button-font-weight                       : normal;
+    --orbeon-button-color                             : var(--orbeon-base-color);
+    --orbeon-button-background-color                  : #e8e8e8; // darken(@wellBackground, 5%)
+    --orbeon-button-highlight-background-color        : #e6e6e6;
+    --orbeon-button-disabled-color                    : var(--orbeon-button-color);
+    --orbeon-button-disabled-background-color         : var(--orbeon-button-background-color);
+    --orbeon-button-primary-color                     : white;
+    --orbeon-button-primary-background-color          : @btnPrimaryBackground;
+    --orbeon-button-primary-highlight-background-color: @btnPrimaryBackgroundHighlight;
+    --orbeon-button-primary-disabled-color            : var(--orbeon-button-primary-color);
+    --orbeon-button-primary-disabled-background-color : var(--orbeon-button-primary-background-color);
+    --orbeon-button-warning-color                     : white;
+    --orbeon-button-warning-background-color          : @btnWarningBackground;
+    --orbeon-button-warning-highlight-background-color: @btnWarningBackgroundHighlight;
+    --orbeon-button-warning-disabled-color            : var(--orbeon-button-warning-color);
+    --orbeon-button-warning-disabled-background-color : var(--orbeon-button-warning-background-color);
+    --orbeon-button-danger-color                      : white;
+    --orbeon-button-danger-background-color           : @btnDangerBackground;
+    --orbeon-button-danger-highlight-background-color : @btnDangerBackgroundHighlight;
+    --orbeon-button-danger-disabled-color             : var(--orbeon-button-danger-color);
+    --orbeon-button-danger-disabled-background-color  : var(--orbeon-button-danger-background-color);
+    --orbeon-button-success-color                     : white;
+    --orbeon-button-success-background-color          : @btnSuccessBackground;
+    --orbeon-button-success-highlight-background-color: @btnSuccessBackgroundHighlight;
+    --orbeon-button-success-disabled-color            : var(--orbeon-button-success-color);
+    --orbeon-button-success-disabled-background-color : var(--orbeon-button-success-background-color);
+    --orbeon-button-info-color                        : white;
+    --orbeon-button-info-background-color             : @btnInfoBackground;
+    --orbeon-button-info-highlight-background-color   : @btnInfoBackgroundHighlight;
+    --orbeon-button-info-disabled-color               : var(--orbeon-button-info-color);
+    --orbeon-button-info-disabled-background-color    : var(--orbeon-button-info-background-color);
+    --orbeon-button-inverse-color                     : white;
+    --orbeon-button-inverse-background-color          : @btnInverseBackground;
+    --orbeon-button-inverse-highlight-background-color: @btnInverseBackgroundHighlight;
+    --orbeon-button-inverse-disabled-color            : var(--orbeon-button-inverse-color);
+    --orbeon-button-inverse-disabled-background-color : var(--orbeon-button-inverse-background-color);
 
-  // Disabled buttons (in light mode, use same colors as enabled with reduced opacity)
-  --orbeon-button-disabled-opacity     : 0.65;
-  --orbeon-button-disabled-icon-opacity: 0.4;
+    // Disabled buttons (in light mode, use same colors as enabled with reduced opacity)
+    --orbeon-button-disabled-opacity     : 0.65;
+    --orbeon-button-disabled-icon-opacity: 0.4;
 
-  // Status labels (.label), e.g. character counters, draft labels: white text on a solid color
-  --orbeon-status-color                    : white;
-  --orbeon-status-text-shadow-color        : rgba(0, 0, 0, 0.25);
-  --orbeon-status-background-color         : #999;     // default (e.g. unavailable)
-  --orbeon-status-success-background-color : #468847;  // e.g. available
-  --orbeon-status-info-background-color    : #3a87ad;
-  --orbeon-status-warning-background-color : #f89406;
-  --orbeon-status-error-background-color   : #b94a48;  // Bootstrap 2 .label-important
-  --orbeon-status-border-radius            : 3px;
+    // Status labels (.label), e.g. character counters, draft labels: white text on a solid color
+    --orbeon-status-color                    : white;
+    --orbeon-status-text-shadow-color        : rgba(0, 0, 0, 0.25);
+    --orbeon-status-background-color         : #999;     // default (e.g. unavailable)
+    --orbeon-status-success-background-color : #468847;  // e.g. available
+    --orbeon-status-info-background-color    : #3a87ad;
+    --orbeon-status-warning-background-color : #f89406;
+    --orbeon-status-error-background-color   : #b94a48;  // Bootstrap 2 .label-important
+    --orbeon-status-border-radius            : 3px;
 
-  // Pills (.fr-table-pill), e.g. table filters and statuses: lightness and maximum chroma of the colored pills
-  --orbeon-pill-background-lightness: 0.96;
-  --orbeon-pill-background-chroma   : 0.018;
-  --orbeon-pill-border-lightness    : 0.86;
-  --orbeon-pill-border-chroma       : 0.055;
-  --orbeon-pill-color-lightness     : 0.43;
-  --orbeon-pill-color-chroma        : 0.13;
+    // Pills (.fr-table-pill), e.g. table filters and statuses: lightness and maximum chroma of the colored pills
+    --orbeon-pill-background-lightness: 0.96;
+    --orbeon-pill-background-chroma   : 0.018;
+    --orbeon-pill-border-lightness    : 0.86;
+    --orbeon-pill-border-chroma       : 0.055;
+    --orbeon-pill-color-lightness     : 0.43;
+    --orbeon-pill-color-chroma        : 0.13;
 
-  // Badges (.badge), e.g. selection counts
-  --orbeon-badge-border-radius: 9px;
-  --orbeon-badge-padding      : 2px 9px;
-  --orbeon-badge-in-button-top: -1px;
+    // Badges (.badge), e.g. selection counts
+    --orbeon-badge-border-radius: 9px;
+    --orbeon-badge-padding      : 2px 9px;
+    --orbeon-badge-in-button-top: -1px;
 
-  // Dropdowns
-  --orbeon-dropdown-open-toggle-background-color  : var(--orbeon-button-highlight-background-color);
-  --orbeon-dropdown-menu-color                    : #333; // @grayDark
-  --orbeon-dropdown-menu-background-color         : white;
-  --orbeon-dropdown-menu-hover-color              : white;
-  --orbeon-dropdown-menu-hover-background-color   : @btnPrimaryBackground;
-  --orbeon-dropdown-menu-selected-color           : white;
-  --orbeon-dropdown-menu-selected-background-color: @btnPrimaryBackground;
-  --orbeon-dropdown-menu-disabled-color           : #999;
-  --orbeon-dropdown-menu-border-color             : rgba(0, 0, 0, 0.15);
-  --orbeon-dropdown-menu-border-width             : 1px;
-  --orbeon-dropdown-menu-divider-color            : #e5e5e5;
-  --orbeon-dropdown-menu-item-padding             : 3px 20px;
-  --orbeon-dropdown-menu-border-radius            : 4.875px;
+    // Dropdowns
+    --orbeon-dropdown-open-toggle-background-color  : var(--orbeon-button-highlight-background-color);
+    --orbeon-dropdown-menu-color                    : #333; // @grayDark
+    --orbeon-dropdown-menu-background-color         : white;
+    --orbeon-dropdown-menu-hover-color              : white;
+    --orbeon-dropdown-menu-hover-background-color   : @btnPrimaryBackground;
+    --orbeon-dropdown-menu-selected-color           : white;
+    --orbeon-dropdown-menu-selected-background-color: @btnPrimaryBackground;
+    --orbeon-dropdown-menu-disabled-color           : #999;
+    --orbeon-dropdown-menu-border-color             : rgba(0, 0, 0, 0.15);
+    --orbeon-dropdown-menu-border-width             : 1px;
+    --orbeon-dropdown-menu-divider-color            : #e5e5e5;
+    --orbeon-dropdown-menu-item-padding             : 3px 20px;
+    --orbeon-dropdown-menu-border-radius            : 4.875px;
 
-  // Sections
-  --orbeon-section-border                       : none;              // top-level sections all in the bordered view
-  --orbeon-section-hover-border-color           : transparent;
-  --orbeon-section-hover-box-shadow             : none;
-  --orbeon-section-border-radius                : 0px;               // unit needed, as used in calc()
-  --orbeon-section-background-color             : transparent;
-  --orbeon-section-title-font-size              : 1.38em;            // 18px
-  --orbeon-section-repetition-label-font-size   : 0.89em;            // 18px * 0.8 * 0.8
-  --orbeon-subsection-title-font-size           : 1.11em;            // 18px * 0.8
-  --orbeon-subsection-repetition-label-font-size: 0.89em;            // 18px * 0.8 * 0.8
-  --orbeon-section-title-font-family            : @frBaseFontFamily;
-  --orbeon-section-title-font-weight            : normal;
-  --orbeon-section-title-color                  : #555;
-  --orbeon-section-title-background-color       : #eee;              // @grayLighter;
-  --orbeon-section-title-border-radius          : @baseBorderRadius; // used by sub-sections and iteration titles of repeated sections
-  --orbeon-section-gap                          : 20px;              // between consecutive sections
-  --orbeon-section-untitled-gap                 : 0;                 // before a top-level section without a title (#6616)
-  --orbeon-section-content-padding              : 10px 16px;         // 16px = @frSectionTitleLeftPadding - @frGridCellPadding (LESS computation not possible here)
-  --orbeon-section-iteration-title-margin       : 5px 0 0 0;
-  --orbeon-section-iteration-title-padding      : 0 0 0 10px;
-  --orbeon-section-title-border-top             : none;
-  --orbeon-section-title-border-bottom          : none;
-  --orbeon-subsection-title-border              : none;
-  --orbeon-section-iteration-title-border       : none;
-  --orbeon-repeater-add-button-font-size        : 1.00em;
-  --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
-  --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
-  --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
-  --orbeon-repeater-add-button-padding          : 4px;
-  --orbeon-repeater-top-buttons-padding-bottom  : 4px;
-  --orbeon-repeater-top-buttons-border-bottom   : 3px solid var(--orbeon-base-border-color);
-  --orbeon-repeater-iteration-border            : none;
-  --orbeon-repeater-iteration-border-bottom     : 3px solid var(--orbeon-base-border-color);
-  --orbeon-repeater-iteration-border-radius     : 0;
-  --orbeon-repeater-iteration-margin-top        : 0;
-  --orbeon-repeater-content-padding             : 0 0 4px 5px;
-  --orbeon-repeat-menu-background-color         : #f5f5f5;           // @wellBackground
-  --orbeon-repeat-menu-border-left              : 1px solid var(--orbeon-base-border-color);
-  --orbeon-repeat-border-width                  : 1px;               // full-appearance row/column dividers
-  --orbeon-repeat-border-style                  : solid;
-  --orbeon-repeat-separator-width               : 2px;               // minimal-appearance row separator
-  --orbeon-repeat-separator-style               : solid;
+    // Sections
+    --orbeon-section-border                       : none;              // top-level sections all in the bordered view
+    --orbeon-section-hover-border-color           : transparent;
+    --orbeon-section-hover-box-shadow             : none;
+    --orbeon-section-border-radius                : 0px;               // unit needed, as used in calc()
+    --orbeon-section-background-color             : transparent;
+    --orbeon-section-title-font-size              : 1.38em;            // 18px
+    --orbeon-section-repetition-label-font-size   : 0.89em;            // 18px * 0.8 * 0.8
+    --orbeon-subsection-title-font-size           : 1.11em;            // 18px * 0.8
+    --orbeon-subsection-repetition-label-font-size: 0.89em;            // 18px * 0.8 * 0.8
+    --orbeon-section-title-font-family            : @frBaseFontFamily;
+    --orbeon-section-title-font-weight            : normal;
+    --orbeon-section-title-color                  : #555;
+    --orbeon-section-title-background-color       : #eee;              // @grayLighter;
+    --orbeon-section-title-border-radius          : @baseBorderRadius; // used by sub-sections and iteration titles of repeated sections
+    --orbeon-section-gap                          : 20px;              // between consecutive sections
+    --orbeon-section-untitled-gap                 : 0;                 // before a top-level section without a title (#6616)
+    --orbeon-section-content-padding              : 10px 16px;         // 16px = @frSectionTitleLeftPadding - @frGridCellPadding (LESS computation not possible here)
+    --orbeon-section-iteration-title-margin       : 5px 0 0 0;
+    --orbeon-section-iteration-title-padding      : 0 0 0 10px;
+    --orbeon-section-title-border-top             : none;
+    --orbeon-section-title-border-bottom          : none;
+    --orbeon-subsection-title-border              : none;
+    --orbeon-section-iteration-title-border       : none;
+    --orbeon-repeater-add-button-font-size        : 1.00em;
+    --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
+    --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
+    --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
+    --orbeon-repeater-add-button-padding          : 4px;
+    --orbeon-repeater-top-buttons-padding-bottom  : 4px;
+    --orbeon-repeater-top-buttons-border-bottom   : 3px solid var(--orbeon-base-border-color);
+    --orbeon-repeater-iteration-border            : none;
+    --orbeon-repeater-iteration-border-bottom     : 3px solid var(--orbeon-base-border-color);
+    --orbeon-repeater-iteration-border-radius     : 0;
+    --orbeon-repeater-iteration-margin-top        : 0;
+    --orbeon-repeater-content-padding             : 0 0 4px 5px;
+    --orbeon-repeat-menu-background-color         : #f5f5f5;           // @wellBackground
+    --orbeon-repeat-menu-border-left              : 1px solid var(--orbeon-base-border-color);
+    --orbeon-repeat-border-width                  : 1px;               // full-appearance row/column dividers
+    --orbeon-repeat-border-style                  : solid;
+    --orbeon-repeat-separator-width               : 2px;               // minimal-appearance row separator
+    --orbeon-repeat-separator-style               : solid;
 
-  // Grids
-  --orbeon-grid-label-margin                   : 2px 0 @frGridCellPadding 0;
-  --orbeon-repetition-number-font-size         : smaller;
-  --orbeon-repetition-number-font-family       : var(--orbeon-base-font-family);
-  --orbeon-repetition-number-font-weight       : bold;
-  --orbeon-repetition-number-color             : white;
-  --orbeon-repetition-number-background-color  : #999;
-  --orbeon-repetition-number-text-shadow-color : rgba(0, 0, 0, 0.25);
-  --orbeon-repetition-selected-background-color: #eee; // @grayLighter
+    // Grids
+    --orbeon-grid-label-margin                   : 2px 0 @frGridCellPadding 0;
+    --orbeon-repetition-number-font-size         : smaller;
+    --orbeon-repetition-number-font-family       : var(--orbeon-base-font-family);
+    --orbeon-repetition-number-font-weight       : bold;
+    --orbeon-repetition-number-color             : white;
+    --orbeon-repetition-number-background-color  : #999;
+    --orbeon-repetition-number-text-shadow-color : rgba(0, 0, 0, 0.25);
+    --orbeon-repetition-selected-background-color: #eee; // @grayLighter
 
-  // Regular and wizard table of contents (TOC)
-  --orbeon-toc-color                          : #0d6efd;
-  --orbeon-toc-subsection-color               : #0d6efd;
-  --orbeon-toc-hover-color                    : #0d6efd;
-  --orbeon-toc-disabled-color                 : #999;
-  --orbeon-toc-background-color               : white;
-  --orbeon-toc-hover-background-color         : #eee; // @grayLighter;
-  --orbeon-toc-active-parent-color            : #0d6efd;
-  --orbeon-toc-active-parent-background-color : transparent;
-  --orbeon-toc-selected-color                 : white;
-  --orbeon-toc-selected-background-color      : #0d6efd;
-  --orbeon-toc-selected-border-color          : transparent;
-  --orbeon-toc-error-color                    : var(--orbeon-error-color);
-  --orbeon-toc-error-background-color         : transparent;
-  --orbeon-toc-selected-error-color           : white;
-  --orbeon-toc-selected-error-background-color: var(--orbeon-error-color);
-  --orbeon-toc-selected-error-border-color    : transparent;
-  --orbeon-toc-guide-color                    : var(--orbeon-base-border-color);
+    // Regular and wizard table of contents (TOC)
+    --orbeon-toc-color                          : #0d6efd;
+    --orbeon-toc-subsection-color               : #0d6efd;
+    --orbeon-toc-hover-color                    : #0d6efd;
+    --orbeon-toc-disabled-color                 : #999;
+    --orbeon-toc-background-color               : white;
+    --orbeon-toc-hover-background-color         : #eee; // @grayLighter;
+    --orbeon-toc-active-parent-color            : #0d6efd;
+    --orbeon-toc-active-parent-background-color : transparent;
+    --orbeon-toc-selected-color                 : white;
+    --orbeon-toc-selected-background-color      : #0d6efd;
+    --orbeon-toc-selected-border-color          : transparent;
+    --orbeon-toc-error-color                    : var(--orbeon-error-color);
+    --orbeon-toc-error-background-color         : transparent;
+    --orbeon-toc-selected-error-color           : white;
+    --orbeon-toc-selected-error-background-color: var(--orbeon-error-color);
+    --orbeon-toc-selected-error-border-color    : transparent;
+    --orbeon-toc-guide-color                    : var(--orbeon-base-border-color);
 
-  // Navbar
-  --orbeon-navbar-color                                : white;
-  --orbeon-navbar-title-color                          : rgba(255, 255, 255, 0.5); // Bootstrap's .text-white-50
-  --orbeon-navbar-background-color                     : rgb(33, 37, 41);          // temporary, copied from the default Bootstrap 5 theme
-  --orbeon-navbar-border-bottom                        : none;
-  // Form Builder top header bar (Bootstrap 2's light navbar background)
-  --orbeon-fb-navbar-background-color                  : #fafafa;
-  --orbeon-navbar-heading-font-size                    : 1.54em;                   // 20px
-  --orbeon-navbar-heading-font-weight                  : 300;
-  --orbeon-navbar-heading-color                        : #909395;
-  --orbeon-navbar-dropdown-open-toggle-background-color: #111;
-  --orbeon-navbar-hover-background-color               : rgba(255, 255, 255, 0.08);
-  --orbeon-navbar-language-dropdown-color              : #999999;
-  --orbeon-navbar-language-dropdown-hover-color        : var(--orbeon-navbar-color);
-  --orbeon-navbar-search-navigation-background-color   : rgba(255, 255, 255, 0.08);
-  --orbeon-navbar-search-navigation-border-color       : rgba(255, 255, 255, 0.16);
+    // Navbar
+    --orbeon-navbar-color                                : white;
+    --orbeon-navbar-title-color                          : rgba(255, 255, 255, 0.5); // Bootstrap's .text-white-50
+    --orbeon-navbar-background-color                     : rgb(33, 37, 41);          // temporary, copied from the default Bootstrap 5 theme
+    --orbeon-navbar-border-bottom                        : none;
+    // Form Builder top header bar (Bootstrap 2's light navbar background)
+    --orbeon-fb-navbar-background-color                  : #fafafa;
+    --orbeon-navbar-heading-font-size                    : 1.54em;                   // 20px
+    --orbeon-navbar-heading-font-weight                  : 300;
+    --orbeon-navbar-heading-color                        : #909395;
+    --orbeon-navbar-dropdown-open-toggle-background-color: #111;
+    --orbeon-navbar-hover-background-color               : rgba(255, 255, 255, 0.08);
+    --orbeon-navbar-language-dropdown-color              : #999999;
+    --orbeon-navbar-language-dropdown-hover-color        : var(--orbeon-navbar-color);
+    --orbeon-navbar-search-navigation-background-color   : rgba(255, 255, 255, 0.08);
+    --orbeon-navbar-search-navigation-border-color       : rgba(255, 255, 255, 0.16);
 
-  // Form Builder
-  --orbeon-fb-background-color                    : #999;
-  --orbeon-fb-form-area-background-color          : #f5f5f5;
-  --orbeon-fb-hover-background-color              : #eee;
-  --orbeon-fb-editable-hover-background-color     : #ddd;
-  --orbeon-fb-selected-background-color           : transparent;
-  --orbeon-fb-selected-box-shadow                 : 0 0 0 2px var(--orbeon-focus-border-color), 0 0 0 5px var(--orbeon-focus-highlight-color);
-  --orbeon-fb-placeholder-color                   : #bbb;
-  --orbeon-fb-dnd-background-color                : #ccc;
-  --orbeon-fb-navbar-color                        : #777;
-  --orbeon-fb-navbar-hover-color                  : #333;
-  --orbeon-fb-empty-message-color                 : #999;
-  --orbeon-fb-cell-message-color                  : #777;
-  --orbeon-fb-muted-color                         : #999;
-  --orbeon-fb-dialog-language-dropdown-color      : #777;
-  --orbeon-fb-dialog-language-dropdown-hover-color: #333;
-  --orbeon-fb-active-color                        : #0081c7;
-  --orbeon-fb-active-text-color                   : white;
-  --orbeon-fb-console-title-color                 : var(--orbeon-base-color);
-  --orbeon-fb-console-title-background-color      : #fabb01;
+    // Form Builder
+    --orbeon-fb-background-color                    : #999;
+    --orbeon-fb-form-area-background-color          : #f5f5f5;
+    --orbeon-fb-hover-background-color              : #eee;
+    --orbeon-fb-editable-hover-background-color     : #ddd;
+    --orbeon-fb-selected-background-color           : transparent;
+    --orbeon-fb-selected-box-shadow                 : 0 0 0 2px var(--orbeon-focus-border-color), 0 0 0 5px var(--orbeon-focus-highlight-color);
+    --orbeon-fb-placeholder-color                   : #bbb;
+    --orbeon-fb-dnd-background-color                : #ccc;
+    --orbeon-fb-navbar-color                        : #777;
+    --orbeon-fb-navbar-hover-color                  : #333;
+    --orbeon-fb-empty-message-color                 : #999;
+    --orbeon-fb-cell-message-color                  : #777;
+    --orbeon-fb-muted-color                         : #999;
+    --orbeon-fb-dialog-language-dropdown-color      : #777;
+    --orbeon-fb-dialog-language-dropdown-hover-color: #333;
+    --orbeon-fb-active-color                        : #0081c7;
+    --orbeon-fb-active-text-color                   : white;
+    --orbeon-fb-console-title-color                 : var(--orbeon-base-color);
+    --orbeon-fb-console-title-background-color      : #fabb01;
 
-  // Form Builder XPath syntax highlighting
-  --orbeon-fb-xpath-keyword-color             : #7928ca;
-  --orbeon-fb-xpath-variable-color            : #0070c1;
-  --orbeon-fb-xpath-string-color              : #22863a;
-  --orbeon-fb-xpath-number-color              : #098658;
-  --orbeon-fb-xpath-function-color            : #795e26;
-  --orbeon-fb-xpath-axis-color                : #9c27b0;
-  --orbeon-fb-xpath-node-test-color           : #001080;
-  --orbeon-fb-xpath-operator-color            : #d73a49;
-  --orbeon-fb-xpath-punctuation-color         : #555555;
-  --orbeon-fb-xpath-comment-color             : #6a737d;
-  --orbeon-fb-xpath-selection-background-color: rgba(0, 120, 215, 0.3);
-  --orbeon-fb-xpath-expanded-box-shadow       : 0 4px 16px rgba(0, 0, 0, 0.2);
+    // Form Builder XPath syntax highlighting
+    --orbeon-fb-xpath-keyword-color             : #7928ca;
+    --orbeon-fb-xpath-variable-color            : #0070c1;
+    --orbeon-fb-xpath-string-color              : #22863a;
+    --orbeon-fb-xpath-number-color              : #098658;
+    --orbeon-fb-xpath-function-color            : #795e26;
+    --orbeon-fb-xpath-axis-color                : #9c27b0;
+    --orbeon-fb-xpath-node-test-color           : #001080;
+    --orbeon-fb-xpath-operator-color            : #d73a49;
+    --orbeon-fb-xpath-punctuation-color         : #555555;
+    --orbeon-fb-xpath-comment-color             : #6a737d;
+    --orbeon-fb-xpath-selection-background-color: rgba(0, 120, 215, 0.3);
+    --orbeon-fb-xpath-expanded-box-shadow       : 0 4px 16px rgba(0, 0, 0, 0.2);
 
-  // Code syntax highlighting (Form Runner)
-  --orbeon-syntax-keyword-color               : #7928ca;
-  --orbeon-syntax-function-color              : #795e26;
-  --orbeon-syntax-parameter-color             : #0070c1;
-  --orbeon-syntax-string-color                : #22863a;
-  --orbeon-syntax-punctuation-color           : #555555;
+    // Code syntax highlighting (Form Runner)
+    --orbeon-syntax-keyword-color               : #7928ca;
+    --orbeon-syntax-function-color              : #795e26;
+    --orbeon-syntax-parameter-color             : #0070c1;
+    --orbeon-syntax-string-color                : #22863a;
+    --orbeon-syntax-punctuation-color           : #555555;
 
-  // Tables
-  --orbeon-table-background-color          : white;
-  --orbeon-table-striped-background-color  : #f9f9f9;
-  --orbeon-table-hover-background-color    : #ededed;
-  --orbeon-table-border-color              : #ddd;
-  --orbeon-table-frame-box-shadow          : none;
-  --orbeon-table-action-background-color   : var(--orbeon-button-background-color);
-  --orbeon-table-header-background-color   : var(--orbeon-table-background-color);
-  --orbeon-table-header-border-color       : var(--orbeon-table-border-color);
-  --orbeon-table-header-font-weight        : 500;
-  --orbeon-table-header-sorted-color       : var(--orbeon-base-color);
-  --orbeon-table-header-sorted-border-color: transparent;
+    // Tables
+    --orbeon-table-background-color          : white;
+    --orbeon-table-striped-background-color  : #f9f9f9;
+    --orbeon-table-hover-background-color    : #ededed;
+    --orbeon-table-border-color              : #ddd;
+    --orbeon-table-frame-box-shadow          : none;
+    --orbeon-table-action-background-color   : var(--orbeon-button-background-color);
+    --orbeon-table-header-background-color   : var(--orbeon-table-background-color);
+    --orbeon-table-header-border-color       : var(--orbeon-table-border-color);
+    --orbeon-table-header-font-weight        : 500;
+    --orbeon-table-header-sorted-color       : var(--orbeon-base-color);
+    --orbeon-table-header-sorted-border-color: transparent;
 
-  // Tabs
-  --orbeon-tab-background-color     : white;
-  --orbeon-tab-bar-background-color : #eee;
-  --orbeon-tab-inactive-color       : #666;
-  --orbeon-tab-inactive-hover-color : #333;
-  --orbeon-tab-border-color         : #ddd;
-  --orbeon-tab-border-width         : 1px;
-  --orbeon-tab-padding              : 10px;
+    // Tabs
+    --orbeon-tab-background-color     : white;
+    --orbeon-tab-bar-background-color : #eee;
+    --orbeon-tab-inactive-color       : #666;
+    --orbeon-tab-inactive-hover-color : #333;
+    --orbeon-tab-border-color         : #ddd;
+    --orbeon-tab-border-width         : 1px;
+    --orbeon-tab-padding              : 10px;
 
-  // Search
-  --orbeon-search-free-input-read-only-background-color: #e8e8e8; // darken(@wellBackground, 5%);
+    // Search
+    --orbeon-search-free-input-read-only-background-color: #e8e8e8; // darken(@wellBackground, 5%);
 
-  // Revision history
-  --orbeon-revision-history-pane-title-font-size      : 1.11em;
-  --orbeon-revision-history-pane-head-background-color: #fafafa;
-  --orbeon-revision-history-entry-background-color    : #eee;
-  --orbeon-revision-history-entry-border-color        : #ccc;
+    // Revision history
+    --orbeon-revision-history-pane-title-font-size      : 1.11em;
+    --orbeon-revision-history-pane-head-background-color: #fafafa;
+    --orbeon-revision-history-entry-background-color    : #eee;
+    --orbeon-revision-history-entry-border-color        : #ccc;
 
-  // HTML elements
-  --orbeon-blockquote-font-size  : 1.35em; // 18px
-  --orbeon-blockquote-font-family: var(--orbeon-base-font-family);
-  --orbeon-blockquote-font-weight: 300;
-  --orbeon-blockquote-color      : var(--orbeon-base-color);
-  --orbeon-code-font-size        : 0.92em; // 12px; code and CodeMirror
-  --orbeon-code-font-family      : monospace;
-  --orbeon-code-font-weight      : var(--orbeon-base-font-weight);
-  --orbeon-code-color            : var(--orbeon-base-color);
-  --orbeon-pre-font-size         : 1.00em;
-  --orbeon-pre-font-family       : monospace;
-  --orbeon-pre-font-weight       : var(--orbeon-base-font-weight);
-  --orbeon-pre-color             : var(--orbeon-base-color);
-  --orbeon-sub-sup-font-size     : 0.75em;
+    // HTML elements
+    --orbeon-blockquote-font-size  : 1.35em; // 18px
+    --orbeon-blockquote-font-family: var(--orbeon-base-font-family);
+    --orbeon-blockquote-font-weight: 300;
+    --orbeon-blockquote-color      : var(--orbeon-base-color);
+    --orbeon-code-font-size        : 0.92em; // 12px; code and CodeMirror
+    --orbeon-code-font-family      : monospace;
+    --orbeon-code-font-weight      : var(--orbeon-base-font-weight);
+    --orbeon-code-color            : var(--orbeon-base-color);
+    --orbeon-pre-font-size         : 1.00em;
+    --orbeon-pre-font-family       : monospace;
+    --orbeon-pre-font-weight       : var(--orbeon-base-font-weight);
+    --orbeon-pre-color             : var(--orbeon-base-color);
+    --orbeon-sub-sup-font-size     : 0.75em;
 
-  // Icons
-  --orbeon-search-caret-font-size : 0.70em;
-  --orbeon-section-caret-font-size: 0.75em;
-  --orbeon-dialog-icon-font-size  : 50px;
-  --orbeon-fa-icon-font-size      : 0.92em; // 12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
-  --orbeon-required-icon-font-size: 0.60em; // Font Awesome star is large
+    // Icons
+    --orbeon-search-caret-font-size : 0.70em;
+    --orbeon-section-caret-font-size: 0.75em;
+    --orbeon-dialog-icon-font-size  : 50px;
+    --orbeon-fa-icon-font-size      : 0.92em; // 12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
+    --orbeon-required-icon-font-size: 0.60em; // Font Awesome star is large
 
-  // Form description
-  --orbeon-form-description-background-color: var(--orbeon-alert-background-color);
-  --orbeon-form-description-color           : var(--orbeon-alert-color);
-  --orbeon-form-description-border-left     : 1px solid var(--orbeon-alert-border-color);
-  --orbeon-form-description-padding         : 8px 1em;
-  --orbeon-form-description-font-weight     : var(--orbeon-base-font-weight);
+    // Form description
+    --orbeon-form-description-background-color: var(--orbeon-alert-background-color);
+    --orbeon-form-description-color           : var(--orbeon-alert-color);
+    --orbeon-form-description-border-left     : 1px solid var(--orbeon-alert-border-color);
+    --orbeon-form-description-padding         : 8px 1em;
+    --orbeon-form-description-font-weight     : var(--orbeon-base-font-weight);
 
-  // Alerts
-  --orbeon-active-alert-font-size        : 1em;
-  --orbeon-active-alert-font-family      : sans-serif;
-  --orbeon-active-alert-font-weight      : var(--orbeon-base-font-weight);
-  --orbeon-active-alert-color            : white;
-  --orbeon-active-alert-padding          : 2px 8px;
-  --orbeon-active-alert-margin-top       : 10px;
-  --orbeon-active-alert-border-radius    : 5px;
-  --orbeon-active-alert-border-width     : 1px;
-  --orbeon-active-alert-border-style     : solid;
-  --orbeon-active-alert-pointer-display  : block;
-  --orbeon-active-alert-icon-display     : none;
-  --orbeon-invalid-alert-color           : var(--orbeon-active-alert-color);
-  --orbeon-invalid-alert-background-color: var(--orbeon-error-color);
-  --orbeon-invalid-alert-border-color    : var(--orbeon-error-color);
-  --orbeon-invalid-alert-pointer-color   : var(--orbeon-error-color);
-  --orbeon-warning-alert-color           : var(--orbeon-active-alert-color);
-  --orbeon-warning-alert-background-color: var(--orbeon-warning-color);
-  --orbeon-warning-alert-border-color    : var(--orbeon-warning-color);
-  --orbeon-warning-alert-pointer-color   : var(--orbeon-warning-color);
-  --orbeon-info-alert-color              : var(--orbeon-active-alert-color);
-  --orbeon-info-alert-background-color   : var(--orbeon-info-color);
-  --orbeon-info-alert-border-color       : var(--orbeon-info-color);
-  --orbeon-info-alert-pointer-color      : var(--orbeon-info-color);
-  --orbeon-alert-color                   : #555;    // @gray
-  --orbeon-alert-background-color        : white;
-  --orbeon-alert-border-color            : #e3e3e3; // darken(@wellBackground, 7%);
-  --orbeon-alert-text-shadow-color       : rgba(255,255,255,.5);
-  --orbeon-alert-border-radius           : 4px;
-  --orbeon-alert-padding                 : 8px 1em;
-  --orbeon-alert-error-color             : #842029;
-  --orbeon-alert-error-background-color  : #f8d7da;
-  --orbeon-alert-error-border-color      : #f5c2c7;
-  --orbeon-alert-error-icon-color        : var(--orbeon-alert-error-color);
-  --orbeon-alert-success-color           : #0f5132;
-  --orbeon-alert-success-background-color: #d1e7dd;
-  --orbeon-alert-success-border-color    : #badbcc;
-  --orbeon-alert-success-icon-color      : var(--orbeon-alert-success-color);
-  --orbeon-alert-warning-color           : #664d03;
-  --orbeon-alert-warning-background-color: #fff3cd;
-  --orbeon-alert-warning-border-color    : #ffecb5;
+    // Alerts
+    --orbeon-active-alert-font-size        : 1em;
+    --orbeon-active-alert-font-family      : sans-serif;
+    --orbeon-active-alert-font-weight      : var(--orbeon-base-font-weight);
+    --orbeon-active-alert-color            : white;
+    --orbeon-active-alert-padding          : 2px 8px;
+    --orbeon-active-alert-margin-top       : 10px;
+    --orbeon-active-alert-border-radius    : 5px;
+    --orbeon-active-alert-border-width     : 1px;
+    --orbeon-active-alert-border-style     : solid;
+    --orbeon-active-alert-pointer-display  : block;
+    --orbeon-active-alert-icon-display     : none;
+    --orbeon-invalid-alert-color           : var(--orbeon-active-alert-color);
+    --orbeon-invalid-alert-background-color: var(--orbeon-error-color);
+    --orbeon-invalid-alert-border-color    : var(--orbeon-error-color);
+    --orbeon-invalid-alert-pointer-color   : var(--orbeon-error-color);
+    --orbeon-warning-alert-color           : var(--orbeon-active-alert-color);
+    --orbeon-warning-alert-background-color: var(--orbeon-warning-color);
+    --orbeon-warning-alert-border-color    : var(--orbeon-warning-color);
+    --orbeon-warning-alert-pointer-color   : var(--orbeon-warning-color);
+    --orbeon-info-alert-color              : var(--orbeon-active-alert-color);
+    --orbeon-info-alert-background-color   : var(--orbeon-info-color);
+    --orbeon-info-alert-border-color       : var(--orbeon-info-color);
+    --orbeon-info-alert-pointer-color      : var(--orbeon-info-color);
+    --orbeon-alert-color                   : #555;    // @gray
+    --orbeon-alert-background-color        : white;
+    --orbeon-alert-border-color            : #e3e3e3; // darken(@wellBackground, 7%);
+    --orbeon-alert-text-shadow-color       : rgba(255,255,255,.5);
+    --orbeon-alert-border-radius           : 4px;
+    --orbeon-alert-padding                 : 8px 1em;
+    --orbeon-alert-error-color             : #842029;
+    --orbeon-alert-error-background-color  : #f8d7da;
+    --orbeon-alert-error-border-color      : #f5c2c7;
+    --orbeon-alert-error-icon-color        : var(--orbeon-alert-error-color);
+    --orbeon-alert-success-color           : #0f5132;
+    --orbeon-alert-success-background-color: #d1e7dd;
+    --orbeon-alert-success-border-color    : #badbcc;
+    --orbeon-alert-success-icon-color      : var(--orbeon-alert-success-color);
+    --orbeon-alert-warning-color           : #664d03;
+    --orbeon-alert-warning-background-color: #fff3cd;
+    --orbeon-alert-warning-border-color    : #ffecb5;
 
-  // Inline save messages
-  --orbeon-message-width       : 100%;
-  --orbeon-message-margin-top  : 0;
-  --orbeon-message-padding     : var(--orbeon-alert-padding);
-  --orbeon-message-icon-display: none;
+    // Inline save messages
+    --orbeon-message-width       : 100%;
+    --orbeon-message-margin-top  : 0;
+    --orbeon-message-padding     : var(--orbeon-alert-padding);
+    --orbeon-message-icon-display: none;
 
-  // Toast messages
-  --orbeon-toast-close-filter       : none;
-  --orbeon-toast-close-opacity      : 0.5;
-  --orbeon-toast-close-hover-opacity: 0.75;
+    // Toast messages
+    --orbeon-toast-close-filter       : none;
+    --orbeon-toast-close-opacity      : 0.5;
+    --orbeon-toast-close-hover-opacity: 0.75;
 
-  // Errors and error summary
-  --orbeon-error-summary-display                         : block;
-  --orbeon-error-summary-title-color                     : white;
-  --orbeon-error-summary-title-bottom-border-color       : #e5e5e5;
-  --orbeon-error-summary-item-background-color           : white;
-  --orbeon-error-summary-item-hover-background-color     : #f7f7f7;
-  --orbeon-error-summary-item-divider-color              : #eeeeee;
-  --orbeon-error-summary-alert-color                     : var(--orbeon-base-color);
-  --orbeon-error-summary-number-color                    : var(--orbeon-hint-color);
-  --orbeon-error-summary-error-header-background-color   : var(--orbeon-error-color);
-  --orbeon-error-summary-warning-header-background-color : var(--orbeon-warning-color);
-  --orbeon-error-summary-info-header-background-color    : var(--orbeon-info-color);
-  --orbeon-error-summary-error-icon-color                : var(--orbeon-error-summary-title-color);
-  --orbeon-error-summary-warning-icon-color              : var(--orbeon-error-summary-title-color);
-  --orbeon-error-summary-info-icon-color                 : var(--orbeon-error-summary-title-color);
-  --orbeon-error-summary-error-border-color              : var(--orbeon-error-color);
-  --orbeon-error-summary-warning-border-color            : var(--orbeon-warning-color);
-  --orbeon-error-summary-info-border-color               : var(--orbeon-info-color);
-  --orbeon-error-summary-border-radius                   : @baseBorderRadius;
-  --orbeon-info-color                                    : @info;
-  --orbeon-warning-color                                 : @warning;
-  --orbeon-error-color                                   : @error;
+    // Errors and error summary
+    --orbeon-error-summary-display                         : block;
+    --orbeon-error-summary-title-color                     : white;
+    --orbeon-error-summary-title-bottom-border-color       : #e5e5e5;
+    --orbeon-error-summary-item-background-color           : white;
+    --orbeon-error-summary-item-hover-background-color     : #f7f7f7;
+    --orbeon-error-summary-item-divider-color              : #eeeeee;
+    --orbeon-error-summary-alert-color                     : var(--orbeon-base-color);
+    --orbeon-error-summary-number-color                    : var(--orbeon-hint-color);
+    --orbeon-error-summary-error-header-background-color   : var(--orbeon-error-color);
+    --orbeon-error-summary-warning-header-background-color : var(--orbeon-warning-color);
+    --orbeon-error-summary-info-header-background-color    : var(--orbeon-info-color);
+    --orbeon-error-summary-error-icon-color                : var(--orbeon-error-summary-title-color);
+    --orbeon-error-summary-warning-icon-color              : var(--orbeon-error-summary-title-color);
+    --orbeon-error-summary-info-icon-color                 : var(--orbeon-error-summary-title-color);
+    --orbeon-error-summary-error-border-color              : var(--orbeon-error-color);
+    --orbeon-error-summary-warning-border-color            : var(--orbeon-warning-color);
+    --orbeon-error-summary-info-border-color               : var(--orbeon-info-color);
+    --orbeon-error-summary-border-radius                   : @baseBorderRadius;
+    --orbeon-info-color                                    : @info;
+    --orbeon-warning-color                                 : @warning;
+    --orbeon-error-color                                   : @error;
 
-  // Invalid state
-  --orbeon-invalid-label-color         : var(--orbeon-label-color);
-  --orbeon-invalid-control-border-color: var(--orbeon-error-color);
-  --orbeon-invalid-control-border-width: 1px;
+    // Invalid state
+    --orbeon-invalid-label-color         : var(--orbeon-label-color);
+    --orbeon-invalid-control-border-color: var(--orbeon-error-color);
+    --orbeon-invalid-control-border-width: 1px;
 
-  // Required icon (left)
-  --orbeon-required-icon-display-before: inline;
-  --orbeon-required-icon-display-after : none;
+    // Required icon (left)
+    --orbeon-required-icon-display-before: inline;
+    --orbeon-required-icon-display-after : none;
 
-  /*
-  // Required icon (right)
-  --orbeon-required-icon-display-before: none;
-  --orbeon-required-icon-display-after : inline;
-  */
+    /*
+    // Required icon (right)
+    --orbeon-required-icon-display-before: none;
+    --orbeon-required-icon-display-after : inline;
+    */
 
-  // Dialogs
-  --orbeon-dialog-background-color      : white;
-  --orbeon-dialog-title-font-size       : 1.11em; // 2022-12-11: larger font size for dialog title looks better
-  --orbeon-dialog-title-color           : black;
-  --orbeon-dialog-title-background-color: #fafafa;
-  --orbeon-dialog-border-radius         : 8px;
+    // Dialogs
+    --orbeon-dialog-background-color      : white;
+    --orbeon-dialog-title-font-size       : 1.11em; // 2022-12-11: larger font size for dialog title looks better
+    --orbeon-dialog-title-color           : black;
+    --orbeon-dialog-title-background-color: #fafafa;
+    --orbeon-dialog-border-radius         : 8px;
   --orbeon-dialog-backdrop-color        : rgba(0, 0, 0, 0.5);
 
-  // Image lightbox
-  --orbeon-lightbox-backdrop-color               : rgba(0, 0, 0, 0.90);
-  --orbeon-lightbox-chrome-background-color      : rgba(23, 23, 23, 0.82);
-  --orbeon-lightbox-chrome-border-color          : rgba(255, 255, 255, 0.10);
-  --orbeon-lightbox-chrome-color                 : rgba(255, 255, 255, 0.92);
-  --orbeon-lightbox-chrome-muted-color           : rgba(255, 255, 255, 0.60);
-  --orbeon-lightbox-button-background-color      : rgba(255, 255, 255, 0.10);
-  --orbeon-lightbox-button-hover-background-color: rgba(255, 255, 255, 0.20);
-  --orbeon-lightbox-focus-outline-color          : rgba(255, 255, 255, 0.85);
-  --orbeon-lightbox-image-border-radius          : 8px;
-  --orbeon-lightbox-image-box-shadow             : 0 20px 60px rgba(0, 0, 0, 0.55);
+    // Image lightbox
+    --orbeon-lightbox-backdrop-color               : rgba(0, 0, 0, 0.90);
+    --orbeon-lightbox-chrome-background-color      : rgba(23, 23, 23, 0.82);
+    --orbeon-lightbox-chrome-border-color          : rgba(255, 255, 255, 0.10);
+    --orbeon-lightbox-chrome-color                 : rgba(255, 255, 255, 0.92);
+    --orbeon-lightbox-chrome-muted-color           : rgba(255, 255, 255, 0.60);
+    --orbeon-lightbox-button-background-color      : rgba(255, 255, 255, 0.10);
+    --orbeon-lightbox-button-hover-background-color: rgba(255, 255, 255, 0.20);
+    --orbeon-lightbox-focus-outline-color          : rgba(255, 255, 255, 0.85);
+    --orbeon-lightbox-image-border-radius          : 8px;
+    --orbeon-lightbox-image-box-shadow             : 0 20px 60px rgba(0, 0, 0, 0.55);
 
-  // Misc
-  --orbeon-header-footer-font-size: 1.10em;
-  --orbeon-kbd-hint-display       : inline-block;
-  --orbeon-kbd-hint-font-size     : 0.82em; // 8pt
-  --orbeon-kbd-background-color   : #eee;
-  --orbeon-kbd-border-color       : #ddd;
-  --orbeon-kbd-color              : #333;
-  --orbeon-kbd-muted-color        : #666;
-  --orbeon-version-color          : @minGrayText;
+    // Misc
+    --orbeon-header-footer-font-size: 1.10em;
+    --orbeon-kbd-hint-display       : inline-block;
+    --orbeon-kbd-hint-font-size     : 0.82em; // 8pt
+    --orbeon-kbd-background-color   : #eee;
+    --orbeon-kbd-border-color       : #ddd;
+    --orbeon-kbd-color              : #333;
+    --orbeon-kbd-muted-color        : #666;
+    --orbeon-version-color          : @minGrayText;
 
-  // Headings
-  --orbeon-h1-font-size: 2.96em; // 38px = 296% * 13px = 275% * 14px
-  --orbeon-h2-font-size: 2.42em; // 32px = 242% * 13px = 225% * 14px
-  --orbeon-h3-font-size: 1.88em; // 24px = 188% * 13px = 175% * 14px
-  --orbeon-h4-font-size: 1.35em; // 18px = 135% * 13px = 125% * 14px
-  --orbeon-h5-font-size: 1.08em; // 14px = 108% * 13px = 100% * 14px
-  --orbeon-h6-font-size: 0.92em; // 12px =  92% * 13px =  85% * 14px
+    // Headings
+    --orbeon-h1-font-size: 2.96em; // 38px = 296% * 13px = 275% * 14px
+    --orbeon-h2-font-size: 2.42em; // 32px = 242% * 13px = 225% * 14px
+    --orbeon-h3-font-size: 1.88em; // 24px = 188% * 13px = 175% * 14px
+    --orbeon-h4-font-size: 1.35em; // 18px = 135% * 13px = 125% * 14px
+    --orbeon-h5-font-size: 1.08em; // 14px = 108% * 13px = 100% * 14px
+    --orbeon-h6-font-size: 0.92em; // 12px =  92% * 13px =  85% * 14px
 
-  // Tooltips (e.g. tabs tooltips)
-  --orbeon-tooltip-font-size       : 0.85em; // 11px
-  --orbeon-tooltip-color           : #fff;   // @tooltipColor;
-  --orbeon-tooltip-background-color: #000;   // @tooltipBackground;
-  --orbeon-tooltip-border-radius   : 4.875px;
+    // Tooltips (e.g. tabs tooltips)
+    --orbeon-tooltip-font-size       : 0.85em; // 11px
+    --orbeon-tooltip-color           : #fff;   // @tooltipColor;
+    --orbeon-tooltip-background-color: #000;   // @tooltipBackground;
+    --orbeon-tooltip-border-radius   : 4.875px;
 
-  // Progress bars (upload, import, reindex): track and filled bar
-  --orbeon-progress-background-color    : #f7f7f7;
-  --orbeon-progress-bar-background-color: #149bdf; // Bootstrap 2's blue
+    // Progress bars (upload, import, reindex): track and filled bar
+    --orbeon-progress-background-color    : #f7f7f7;
+    --orbeon-progress-bar-background-color: #149bdf; // Bootstrap 2's blue
 
-  // Landing page
-  --orbeon-landing-card-border-color           : #ddd;
-  --orbeon-landing-card-border-radius          : 4.875px;
-  --orbeon-landing-card-image-border           : #eee;            // @grayLighter
-  --orbeon-landing-card-header-color           : #22251f;
-  --orbeon-landing-card-header-background-color: #f7f7f7;
-  --orbeon-landing-card-footer-color           : #6c757d;
-  --orbeon-landing-card-footer-background-color: rgb(0 0 0 / 3%); // Bootstrap 2
-  --orbeon-landing-card-hover-background-color : #f9f9f9;         // @frRowHoverBackground
-  --orbeon-landing-card-link-color             : #08c;
-  --orbeon-landing-card-link-hover-color       : darken(#08c, 15%);
-  --orbeon-landing-tile-border-radius          : 10px;
+    // Landing page
+    --orbeon-landing-card-border-color           : #ddd;
+    --orbeon-landing-card-border-radius          : 4.875px;
+    --orbeon-landing-card-image-border           : #eee;            // @grayLighter
+    --orbeon-landing-card-header-color           : #22251f;
+    --orbeon-landing-card-header-background-color: #f7f7f7;
+    --orbeon-landing-card-footer-color           : #6c757d;
+    --orbeon-landing-card-footer-background-color: rgb(0 0 0 / 3%); // Bootstrap 2
+    --orbeon-landing-card-hover-background-color : #f9f9f9;         // @frRowHoverBackground
+    --orbeon-landing-card-link-color             : #08c;
+    --orbeon-landing-card-link-hover-color       : darken(#08c, 15%);
+    --orbeon-landing-tile-border-radius          : 10px;
 
-  // Captcha
-  --orbeon-friendly-captcha-font-size    : 1.08em; // 14px
-  --orbeon-on-premise-captcha-label-color: var(--orbeon-base-color);
+    // Captcha
+    --orbeon-friendly-captcha-font-size    : 1.08em; // 14px
+    --orbeon-on-premise-captcha-label-color: var(--orbeon-base-color);
 
-  // XForms inspector (by default, keep the font size absolute)
-  --orbeon-inspector-font-size: 13px;
+    // XForms inspector (by default, keep the font size absolute)
+    --orbeon-inspector-font-size: 13px;
 
-  // Diagonal stripes background
-  --orbeon-stripe-color-1: #f5f5f5; // @wellBackground
-  --orbeon-stripe-color-2: white;   // @inputBackground
+    // Diagonal stripes background
+    --orbeon-stripe-color-1: #f5f5f5; // @wellBackground
+    --orbeon-stripe-color-2: white;   // @inputBackground
 
-  @media screen {
-    color-scheme: light;
-    .pill-colors();
+    @media screen {
+      color-scheme: light;
+      .pill-colors();
+    }
   }
-}
 }
 
 @layer orbeon-theme-variants {
-.orbeon {
-
-  .dark-mode(.dark-color-scheme());
-
-  .dark-color-scheme() {
-
-    color-scheme: dark;
-
-    // TODO: simplify dark palette with oklch function instead of hls
-    // TODO: (when widely available) use light-dark function to simplify light/dark palette definition
-
-    @base-blue: 217;
-
-    // We'll use very slightly blueish grays
-    @dark-hue: @base-blue;
-    @dark-sat: 8%;  // Almost completely desaturated
-
-    // Gray palette
-    @navbar-bg : hsl(@dark-hue, @dark-sat, 2%);  /*= #050506*/ // Used for: navbar
-    @base-bg   : hsl(@dark-hue, @dark-sat, 10%); /*= #17191c*/ // Used for: main backgrounds (page, controls, help, tables, TOC, alerts), inverse/contrast text
-    @gray-16   : hsl(@dark-hue, @dark-sat, 16%); /*= #26282c*/ // Used for: subtle elevation (help titles, repeat menus, table stripes)
-    @gray-20   : hsl(@dark-hue, @dark-sat, 20%); /*= #2f3237*/ // Used for: elevated surfaces (sections, read-only fields, row hover states, card headers, add-ons, etc.)
-    @gray-27   : hsl(@dark-hue, @dark-sat, 27%); /*= #3f444a*/ // Used for: borders, default button backgrounds, selected dropdown item, attachment dragover
-    @gray-46   : hsl(@dark-hue, @dark-sat, 46%); /*= #6c737f*/ // Used for: disabled button text
-    @gray-53   : hsl(@dark-hue, @dark-sat, 53%); /*= #7e8591*/ // Used for: muted text (hints, read-only labels, alerts), secondary UI
-    @gray-80   : hsl(@dark-hue, @dark-sat, 80%); /*= #c8cbd0*/ // Used for: section titles, signature read-only backgrounds
-    @text-light: hsl(@dark-hue, @dark-sat, 95%); /*= #f1f2f3*/ // Used for: primary text, button labels, icons, signature backgrounds
-
-    @primary-hue: @base-blue;
-    @warning-hue: 35;
-    @error-hue  : 358;
-    @success-hue: 120;
-    @info-hue   : 197;
-    @inverse-hue: 0;
-
-    @info   : hsl(@info-hue   , 50%, 61%);
-    @warning: hsl(@warning-hue, 95%, 48%);
-    @error  : hsl(@error-hue  , 45%, 62%);
-
-    --orbeon-page-background-color                           : @base-bg;
-    --orbeon-form-background-color                           : @base-bg;
-    --orbeon-base-border-color                               : @gray-27;
-    --orbeon-base-color                                      : @text-light;
-    --orbeon-accent-color                                    : hsl(@primary-hue, 98%, 63%);
-    --orbeon-link-hover-color                                : lighten(#08c, 15%);
-    --orbeon-label-read-only-color                           : @gray-53;
-    --orbeon-hint-color                                      : @gray-53;
-    --orbeon-help-icon-color                                 : @text-light;
-    --orbeon-help-background-color                           : @base-bg;
-    --orbeon-help-border-color                               : @gray-27;
-    --orbeon-help-box-shadow                                 : 0 10px 28px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
-    --orbeon-help-title-background-color                     : @gray-16;
-    --orbeon-help-title-border-color                         : @gray-27;
-    --orbeon-help-close-color                                : white;
-    --orbeon-help-close-text-shadow-color                    : transparent;
-    --orbeon-control-color                                   : @text-light;
-    --orbeon-control-background-color                        : @base-bg;
-    --orbeon-control-read-only-background-color              : @gray-20;
-    --orbeon-control-border-color                            : @gray-27;
-    --orbeon-add-on-background-color                         : @gray-20;
-    --orbeon-add-on-text-shadow-color                        : transparent;
-    --orbeon-dropdown-caret-color                            : @text-light;
-    --orbeon-dropdown-search-caret-color                     : @text-light;
-    --orbeon-dropdown-selected-background-color              : @gray-27;
-    --orbeon-attachment-drop-color                           : @gray-53;
-    --orbeon-attachment-drop-hover-background-color          : @gray-20;
-    --orbeon-attachment-dragover-color                       : @base-bg;
-    --orbeon-attachment-dragover-background-color            : @gray-27;
-    --orbeon-handwritten-signature-background-color          : @text-light;
-    --orbeon-handwritten-signature-read-only-background-color: @gray-80;
-    --orbeon-image-attachment-background-color               : @gray-20;
-    --orbeon-button-color                                    : @text-light;
-    --orbeon-button-background-color                         : @gray-27;
-    --orbeon-button-highlight-background-color               : @gray-27;
-    --orbeon-button-disabled-color                           : @gray-46;
-    --orbeon-button-disabled-background-color                : hsl(@dark-hue, 22%, 15%);
-    --orbeon-button-primary-color                            : @text-light;
-    --orbeon-button-primary-background-color                 : hsl(@primary-hue, 98%, 63%);
-    --orbeon-button-primary-highlight-background-color       : hsl(@primary-hue, 98%, 70%);
-    --orbeon-button-primary-disabled-color                   : @gray-46;
-    --orbeon-button-primary-disabled-background-color        : hsl(@primary-hue, 52%, 25%);
-    --orbeon-button-warning-color                            : @text-light;
-    --orbeon-button-warning-background-color                 : hsl(@warning-hue, 95%, 48%);
-    --orbeon-button-warning-highlight-background-color       : hsl(@warning-hue, 95%, 55%);
-    --orbeon-button-warning-disabled-color                   : @gray-46;
-    --orbeon-button-warning-disabled-background-color        : hsl(@warning-hue, 85%, 18%);
-    --orbeon-button-danger-color                             : @text-light;
-    --orbeon-button-danger-background-color                  : hsl(@error-hue, 68%, 52%);
-    --orbeon-button-danger-highlight-background-color        : hsl(@error-hue, 68%, 59%);
-    --orbeon-button-danger-disabled-color                    : @gray-46;
-    --orbeon-button-danger-disabled-background-color         : hsl(@error-hue, 44%, 21%);
-    --orbeon-button-success-color                            : @text-light;
-    --orbeon-button-success-background-color                 : hsl(@success-hue, 37%, 52%);
-    --orbeon-button-success-highlight-background-color       : hsl(@success-hue, 37%, 59%);
-    --orbeon-button-success-disabled-color                   : @gray-46;
-    --orbeon-button-success-disabled-background-color        : hsl(@success-hue, 44%, 21%);
-    --orbeon-button-info-color                               : @text-light;
-    --orbeon-button-info-background-color                    : hsl(@info-hue, 57%, 51%);
-    --orbeon-button-info-highlight-background-color          : hsl(@info-hue, 57%, 58%);
-    --orbeon-button-info-disabled-color                      : @gray-46;
-    --orbeon-button-info-disabled-background-color           : hsl(@info-hue, 50%, 20%);
-    --orbeon-button-inverse-color                            : @base-bg;
-    --orbeon-button-inverse-background-color                 : hsl(@inverse-hue, 0%, 85%);
-    --orbeon-button-inverse-highlight-background-color       : hsl(@inverse-hue, 0%, 100%);
-    --orbeon-button-inverse-disabled-color                   : @base-bg;
-    --orbeon-button-inverse-disabled-background-color        : hsl(@inverse-hue, 0%, 29%);
-    --orbeon-button-disabled-opacity                         : 1;
-    --orbeon-button-disabled-icon-opacity                    : 1;
-    --orbeon-dropdown-menu-color                             : @text-light;
-    --orbeon-dropdown-menu-background-color                  : @gray-16;
-    --orbeon-dropdown-menu-hover-color                       : @text-light;
-    --orbeon-dropdown-menu-hover-background-color            : var(--orbeon-button-primary-background-color);
-    --orbeon-dropdown-menu-selected-color                    : @text-light;
-    --orbeon-dropdown-menu-selected-background-color         : var(--orbeon-dropdown-menu-hover-background-color);
-    --orbeon-dropdown-menu-disabled-color                    : @gray-46;
-    --orbeon-dropdown-menu-border-color                      : fade(@gray-27, 75%);
-    --orbeon-dropdown-menu-divider-color                     : @gray-27;
-    --orbeon-section-title-color                             : @gray-80;
-    --orbeon-section-title-background-color                  : @gray-20;
-    --orbeon-repeater-add-button-color                       : @text-light;
-    --orbeon-repeat-menu-background-color                    : @gray-16;
-    --orbeon-repetition-number-color                         : @base-bg;
-    --orbeon-repetition-number-background-color              : @gray-53;
-    --orbeon-repetition-number-text-shadow-color             : transparent;
-    --orbeon-repetition-selected-background-color            : @gray-20;
-    --orbeon-toc-color                                       : hsl(@primary-hue, 98%, 63%);
-    --orbeon-toc-subsection-color                            : var(--orbeon-toc-color);
-    --orbeon-toc-hover-color                                 : var(--orbeon-toc-color);
-    --orbeon-toc-disabled-color                              : @gray-46;
-    --orbeon-toc-background-color                            : @base-bg;
-    --orbeon-toc-hover-background-color                      : @gray-20;
-    --orbeon-toc-active-parent-color                         : var(--orbeon-toc-color);
-    --orbeon-toc-selected-color                              : @base-bg;
-    --orbeon-toc-selected-background-color                   : var(--orbeon-toc-color);
-    --orbeon-toc-selected-error-color                        : @base-bg;
-    --orbeon-navbar-background-color                         : @navbar-bg;
-    --orbeon-fb-navbar-background-color                      : @navbar-bg;
-    --orbeon-fb-background-color                             : @base-bg;
-    --orbeon-fb-form-area-background-color                   : @gray-16;
-    --orbeon-fb-hover-background-color                       : @gray-20;
-    --orbeon-fb-editable-hover-background-color              : @gray-27;
-    --orbeon-fb-placeholder-color                            : @gray-46;
-    --orbeon-fb-dnd-background-color                         : @gray-46;
-    --orbeon-fb-navbar-color                                 : @gray-53;
-    --orbeon-fb-navbar-hover-color                           : @text-light;
-    --orbeon-fb-empty-message-color                          : @gray-46;
-    --orbeon-fb-cell-message-color                           : @gray-53;
-    --orbeon-kbd-background-color                            : @gray-27;
-    --orbeon-kbd-border-color                                : @gray-46;
-    --orbeon-kbd-color                                       : @text-light;
-    --orbeon-kbd-muted-color                                 : @gray-80;
-    --orbeon-fb-dialog-language-dropdown-color               : @gray-53;
-    --orbeon-fb-dialog-language-dropdown-hover-color         : @text-light;
-    --orbeon-fb-console-title-color                          : @base-bg;
-    --orbeon-fb-xpath-keyword-color                          : #c586c0;
-    --orbeon-fb-xpath-variable-color                         : #4fc1ff;
-    --orbeon-fb-xpath-string-color                           : #ce9178;
-    --orbeon-fb-xpath-number-color                           : #b5cea8;
-    --orbeon-fb-xpath-function-color                         : #dcdcaa;
-    --orbeon-fb-xpath-axis-color                             : #c586c0;
-    --orbeon-fb-xpath-node-test-color                        : #9cdcfe;
-    --orbeon-fb-xpath-operator-color                         : #ff7b72;
-    --orbeon-fb-xpath-punctuation-color                      : #a6adb5;
-    --orbeon-fb-xpath-comment-color                          : #8b949e;
-    --orbeon-fb-xpath-expanded-box-shadow                    : 0 4px 16px rgba(0, 0, 0, 0.5);
-    --orbeon-syntax-keyword-color                            : #c586c0;
-    --orbeon-syntax-function-color                           : #dcdcaa;
-    --orbeon-syntax-parameter-color                          : #9cdcfe;
-    --orbeon-syntax-string-color                             : #ce9178;
-    --orbeon-syntax-punctuation-color                        : #a6adb5;
-    --orbeon-table-background-color                          : @base-bg;
-    --orbeon-table-striped-background-color                  : @gray-16;
-    --orbeon-table-hover-background-color                    : @gray-20;
-    --orbeon-table-border-color                              : @gray-27;
-    --orbeon-tab-background-color                            : @base-bg;
-    --orbeon-tab-bar-background-color                        : @gray-16;
-    --orbeon-tab-inactive-color                              : @gray-53;
-    --orbeon-tab-inactive-hover-color                        : @text-light;
-    --orbeon-tab-border-color                                : @gray-27;
-    --orbeon-search-free-input-read-only-background-color    : @gray-20;
-    --orbeon-revision-history-pane-head-background-color     : @gray-16;
-    --orbeon-revision-history-entry-background-color         : @gray-20;
-    --orbeon-revision-history-entry-border-color             : @gray-27;
-    --orbeon-active-alert-color                              : @base-bg;
-    --orbeon-alert-color                                     : @gray-53;
-    --orbeon-alert-background-color                          : @base-bg;
-    --orbeon-alert-border-color                              : @gray-27;
-    --orbeon-alert-text-shadow-color                         : transparent;
-    --orbeon-alert-error-color                               : hsl(@error-hue, 81%, 81%);
-    --orbeon-alert-error-background-color                    : hsl(@error-hue, 26%, 20%);
-    --orbeon-alert-error-border-color                        : hsl(@error-hue, 24%, 25%);
-    --orbeon-alert-success-color                             : hsl(@success-hue, 64%, 68%);
-    --orbeon-alert-success-background-color                  : hsl(@success-hue, 16%, 20%);
-    --orbeon-alert-success-border-color                      : hsl(@success-hue, 18%, 25%);
-    --orbeon-alert-warning-color                             : hsl(@warning-hue, 48%, 61%);
-    --orbeon-alert-warning-background-color                  : hsl(@warning-hue, 32%, 20%);
-    --orbeon-alert-warning-border-color                      : hsl(@warning-hue, 33%, 25%);
-    --orbeon-toast-close-filter                              : invert(1) grayscale(100%) brightness(200%);
-    --orbeon-error-summary-title-color                       : @base-bg;
-    --orbeon-error-summary-title-bottom-border-color         : transparent;
-    --orbeon-error-summary-item-background-color             : @base-bg;
-    --orbeon-error-summary-item-hover-background-color       : @gray-20;
-    --orbeon-error-summary-item-divider-color                : @gray-27;
-    --orbeon-info-color                                      : @info;
-    --orbeon-warning-color                                   : @warning;
-    --orbeon-error-color                                     : @error;
-    --orbeon-pill-background-lightness                       : 0.27;
-    --orbeon-pill-background-chroma                          : 0.035;
-    --orbeon-pill-border-lightness                           : 0.42;
-    --orbeon-pill-border-chroma                              : 0.07;
-    --orbeon-pill-color-lightness                            : 0.85;
-    --orbeon-pill-color-chroma                               : 0.11;
-    .pill-colors();
-    --orbeon-landing-card-border-color                       : @gray-27;
-    --orbeon-landing-card-image-border                       : @gray-27;
-    --orbeon-landing-card-header-color                       : @text-light;
-    --orbeon-landing-card-header-background-color            : @gray-20;
-    --orbeon-landing-card-hover-background-color             : @gray-20;
-    --orbeon-landing-card-link-color                         : hsl(@base-blue, 93%, 62%);
-    --orbeon-landing-card-link-hover-color                   : var(--orbeon-landing-card-link-color);
-    --orbeon-dialog-background-color                         : @gray-20;
-    --orbeon-dialog-title-color                              : @text-light;
-    --orbeon-dialog-title-background-color                   : @gray-16;
-    --orbeon-version-color                                   : @gray-53;
-    --orbeon-on-premise-captcha-label-color                  : @gray-16;
-    --orbeon-stripe-color-1                                  : @gray-20;
-    --orbeon-stripe-color-2                                  : @base-bg;
-  }
-}
-
-@media print {
   .orbeon {
-    // For CSS debugging with "Preview" and the relevant .fr-pdf-color-mode-* classes
-    &:has(.fr-pdf-color-mode-black-and-white), &:has(.fr-pdf-color-mode-keep-field-colors) {
-      // Use !important instead of more complex selectors to win over .orbeon:not(:has(.fb-main)), etc.
-      --orbeon-page-background-color: white !important;
-    }
 
-    --orbeon-base-font-size                                  : 13px;
-    --orbeon-page-background-color                           : white;
-    --orbeon-form-background-color                           : white;
-    --orbeon-base-border-color                               : #e3e3e3;
-    --orbeon-base-font-family                                : @frPrintBaseFontFamily;
-    --orbeon-base-color                                      : black;
-    --orbeon-control-read-only-background-color              : white;
-    --orbeon-control-border-color                            : #ccc;
-    --orbeon-handwritten-signature-read-only-background-color: white;
-    --orbeon-section-title-color                             : black;
-    --orbeon-section-title-background-color                  : white;
-    --orbeon-repeat-menu-background-color                    : white;
-    --orbeon-toc-color                                       : black;
-    --orbeon-toc-subsection-color                            : black;
-    --orbeon-navbar-background-color                         : white;
-    --orbeon-navbar-heading-font-size                        : 1.85em;
-    --orbeon-navbar-heading-color                            : black;
-    --orbeon-navbar-title-color                              : black;
-    --orbeon-alert-color                                     : black;
-    --orbeon-alert-background-color                          : white;
-    --orbeon-alert-border-color                              : #e3e3e3;
-    --orbeon-alert-error-color                               : black;
-    --orbeon-alert-error-background-color                    : white;
-    --orbeon-alert-error-border-color                        : #f5c2c7;
-    --orbeon-alert-success-color                             : black;
-    --orbeon-alert-success-background-color                  : white;
-    --orbeon-alert-success-border-color                      : #badbcc;
-    --orbeon-alert-warning-color                             : black;
-    --orbeon-alert-warning-background-color                  : white;
-    --orbeon-alert-warning-border-color                      : #ffecb5;
+    .dark-mode(.dark-color-scheme());
+
+    .dark-color-scheme() {
+
+      color-scheme: dark;
+
+      // TODO: simplify dark palette with oklch function instead of hls
+      // TODO: (when widely available) use light-dark function to simplify light/dark palette definition
+
+      @base-blue: 217;
+
+      // We'll use very slightly blueish grays
+      @dark-hue: @base-blue;
+      @dark-sat: 8%;  // Almost completely desaturated
+
+      // Gray palette
+      @navbar-bg : hsl(@dark-hue, @dark-sat, 2%);  /*= #050506*/ // Used for: navbar
+      @base-bg   : hsl(@dark-hue, @dark-sat, 10%); /*= #17191c*/ // Used for: main backgrounds (page, controls, help, tables, TOC, alerts), inverse/contrast text
+      @gray-16   : hsl(@dark-hue, @dark-sat, 16%); /*= #26282c*/ // Used for: subtle elevation (help titles, repeat menus, table stripes)
+      @gray-20   : hsl(@dark-hue, @dark-sat, 20%); /*= #2f3237*/ // Used for: elevated surfaces (sections, read-only fields, row hover states, card headers, add-ons, etc.)
+      @gray-27   : hsl(@dark-hue, @dark-sat, 27%); /*= #3f444a*/ // Used for: borders, default button backgrounds, selected dropdown item, attachment dragover
+      @gray-46   : hsl(@dark-hue, @dark-sat, 46%); /*= #6c737f*/ // Used for: disabled button text
+      @gray-53   : hsl(@dark-hue, @dark-sat, 53%); /*= #7e8591*/ // Used for: muted text (hints, read-only labels, alerts), secondary UI
+      @gray-80   : hsl(@dark-hue, @dark-sat, 80%); /*= #c8cbd0*/ // Used for: section titles, signature read-only backgrounds
+      @text-light: hsl(@dark-hue, @dark-sat, 95%); /*= #f1f2f3*/ // Used for: primary text, button labels, icons, signature backgrounds
+
+      @primary-hue: @base-blue;
+      @warning-hue: 35;
+      @error-hue  : 358;
+      @success-hue: 120;
+      @info-hue   : 197;
+      @inverse-hue: 0;
+
+      @info   : hsl(@info-hue   , 50%, 61%);
+      @warning: hsl(@warning-hue, 95%, 48%);
+      @error  : hsl(@error-hue  , 45%, 62%);
+
+      --orbeon-page-background-color                           : @base-bg;
+      --orbeon-form-background-color                           : @base-bg;
+      --orbeon-base-border-color                               : @gray-27;
+      --orbeon-base-color                                      : @text-light;
+      --orbeon-accent-color                                    : hsl(@primary-hue, 98%, 63%);
+      --orbeon-link-hover-color                                : lighten(#08c, 15%);
+      --orbeon-label-read-only-color                           : @gray-53;
+      --orbeon-hint-color                                      : @gray-53;
+      --orbeon-help-icon-color                                 : @text-light;
+      --orbeon-help-background-color                           : @base-bg;
+      --orbeon-help-border-color                               : @gray-27;
+      --orbeon-help-box-shadow                                 : 0 10px 28px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+      --orbeon-help-title-background-color                     : @gray-16;
+      --orbeon-help-title-border-color                         : @gray-27;
+      --orbeon-help-close-color                                : white;
+      --orbeon-help-close-text-shadow-color                    : transparent;
+      --orbeon-control-color                                   : @text-light;
+      --orbeon-control-background-color                        : @base-bg;
+      --orbeon-control-read-only-background-color              : @gray-20;
+      --orbeon-control-border-color                            : @gray-27;
+      --orbeon-add-on-background-color                         : @gray-20;
+      --orbeon-add-on-text-shadow-color                        : transparent;
+      --orbeon-dropdown-caret-color                            : @text-light;
+      --orbeon-dropdown-search-caret-color                     : @text-light;
+      --orbeon-dropdown-selected-background-color              : @gray-27;
+      --orbeon-attachment-drop-color                           : @gray-53;
+      --orbeon-attachment-drop-hover-background-color          : @gray-20;
+      --orbeon-attachment-dragover-color                       : @base-bg;
+      --orbeon-attachment-dragover-background-color            : @gray-27;
+      --orbeon-handwritten-signature-background-color          : @text-light;
+      --orbeon-handwritten-signature-read-only-background-color: @gray-80;
+      --orbeon-image-attachment-background-color               : @gray-20;
+      --orbeon-button-color                                    : @text-light;
+      --orbeon-button-background-color                         : @gray-27;
+      --orbeon-button-highlight-background-color               : @gray-27;
+      --orbeon-button-disabled-color                           : @gray-46;
+      --orbeon-button-disabled-background-color                : hsl(@dark-hue, 22%, 15%);
+      --orbeon-button-primary-color                            : @text-light;
+      --orbeon-button-primary-background-color                 : hsl(@primary-hue, 98%, 63%);
+      --orbeon-button-primary-highlight-background-color       : hsl(@primary-hue, 98%, 70%);
+      --orbeon-button-primary-disabled-color                   : @gray-46;
+      --orbeon-button-primary-disabled-background-color        : hsl(@primary-hue, 52%, 25%);
+      --orbeon-button-warning-color                            : @text-light;
+      --orbeon-button-warning-background-color                 : hsl(@warning-hue, 95%, 48%);
+      --orbeon-button-warning-highlight-background-color       : hsl(@warning-hue, 95%, 55%);
+      --orbeon-button-warning-disabled-color                   : @gray-46;
+      --orbeon-button-warning-disabled-background-color        : hsl(@warning-hue, 85%, 18%);
+      --orbeon-button-danger-color                             : @text-light;
+      --orbeon-button-danger-background-color                  : hsl(@error-hue, 68%, 52%);
+      --orbeon-button-danger-highlight-background-color        : hsl(@error-hue, 68%, 59%);
+      --orbeon-button-danger-disabled-color                    : @gray-46;
+      --orbeon-button-danger-disabled-background-color         : hsl(@error-hue, 44%, 21%);
+      --orbeon-button-success-color                            : @text-light;
+      --orbeon-button-success-background-color                 : hsl(@success-hue, 37%, 52%);
+      --orbeon-button-success-highlight-background-color       : hsl(@success-hue, 37%, 59%);
+      --orbeon-button-success-disabled-color                   : @gray-46;
+      --orbeon-button-success-disabled-background-color        : hsl(@success-hue, 44%, 21%);
+      --orbeon-button-info-color                               : @text-light;
+      --orbeon-button-info-background-color                    : hsl(@info-hue, 57%, 51%);
+      --orbeon-button-info-highlight-background-color          : hsl(@info-hue, 57%, 58%);
+      --orbeon-button-info-disabled-color                      : @gray-46;
+      --orbeon-button-info-disabled-background-color           : hsl(@info-hue, 50%, 20%);
+      --orbeon-button-inverse-color                            : @base-bg;
+      --orbeon-button-inverse-background-color                 : hsl(@inverse-hue, 0%, 85%);
+      --orbeon-button-inverse-highlight-background-color       : hsl(@inverse-hue, 0%, 100%);
+      --orbeon-button-inverse-disabled-color                   : @base-bg;
+      --orbeon-button-inverse-disabled-background-color        : hsl(@inverse-hue, 0%, 29%);
+      --orbeon-button-disabled-opacity                         : 1;
+      --orbeon-button-disabled-icon-opacity                    : 1;
+      --orbeon-dropdown-menu-color                             : @text-light;
+      --orbeon-dropdown-menu-background-color                  : @gray-16;
+      --orbeon-dropdown-menu-hover-color                       : @text-light;
+      --orbeon-dropdown-menu-hover-background-color            : var(--orbeon-button-primary-background-color);
+      --orbeon-dropdown-menu-selected-color                    : @text-light;
+      --orbeon-dropdown-menu-selected-background-color         : var(--orbeon-dropdown-menu-hover-background-color);
+      --orbeon-dropdown-menu-disabled-color                    : @gray-46;
+      --orbeon-dropdown-menu-border-color                      : fade(@gray-27, 75%);
+      --orbeon-dropdown-menu-divider-color                     : @gray-27;
+      --orbeon-section-title-color                             : @gray-80;
+      --orbeon-section-title-background-color                  : @gray-20;
+      --orbeon-repeater-add-button-color                       : @text-light;
+      --orbeon-repeat-menu-background-color                    : @gray-16;
+      --orbeon-repetition-number-color                         : @base-bg;
+      --orbeon-repetition-number-background-color              : @gray-53;
+      --orbeon-repetition-number-text-shadow-color             : transparent;
+      --orbeon-repetition-selected-background-color            : @gray-20;
+      --orbeon-toc-color                                       : hsl(@primary-hue, 98%, 63%);
+      --orbeon-toc-subsection-color                            : var(--orbeon-toc-color);
+      --orbeon-toc-hover-color                                 : var(--orbeon-toc-color);
+      --orbeon-toc-disabled-color                              : @gray-46;
+      --orbeon-toc-background-color                            : @base-bg;
+      --orbeon-toc-hover-background-color                      : @gray-20;
+      --orbeon-toc-active-parent-color                         : var(--orbeon-toc-color);
+      --orbeon-toc-selected-color                              : @base-bg;
+      --orbeon-toc-selected-background-color                   : var(--orbeon-toc-color);
+      --orbeon-toc-selected-error-color                        : @base-bg;
+      --orbeon-navbar-background-color                         : @navbar-bg;
+      --orbeon-fb-navbar-background-color                      : @navbar-bg;
+      --orbeon-fb-background-color                             : @base-bg;
+      --orbeon-fb-form-area-background-color                   : @gray-16;
+      --orbeon-fb-hover-background-color                       : @gray-20;
+      --orbeon-fb-editable-hover-background-color              : @gray-27;
+      --orbeon-fb-placeholder-color                            : @gray-46;
+      --orbeon-fb-dnd-background-color                         : @gray-46;
+      --orbeon-fb-navbar-color                                 : @gray-53;
+      --orbeon-fb-navbar-hover-color                           : @text-light;
+      --orbeon-fb-empty-message-color                          : @gray-46;
+      --orbeon-fb-cell-message-color                           : @gray-53;
+      --orbeon-kbd-background-color                            : @gray-27;
+      --orbeon-kbd-border-color                                : @gray-46;
+      --orbeon-kbd-color                                       : @text-light;
+      --orbeon-kbd-muted-color                                 : @gray-80;
+      --orbeon-fb-dialog-language-dropdown-color               : @gray-53;
+      --orbeon-fb-dialog-language-dropdown-hover-color         : @text-light;
+      --orbeon-fb-console-title-color                          : @base-bg;
+      --orbeon-fb-xpath-keyword-color                          : #c586c0;
+      --orbeon-fb-xpath-variable-color                         : #4fc1ff;
+      --orbeon-fb-xpath-string-color                           : #ce9178;
+      --orbeon-fb-xpath-number-color                           : #b5cea8;
+      --orbeon-fb-xpath-function-color                         : #dcdcaa;
+      --orbeon-fb-xpath-axis-color                             : #c586c0;
+      --orbeon-fb-xpath-node-test-color                        : #9cdcfe;
+      --orbeon-fb-xpath-operator-color                         : #ff7b72;
+      --orbeon-fb-xpath-punctuation-color                      : #a6adb5;
+      --orbeon-fb-xpath-comment-color                          : #8b949e;
+      --orbeon-fb-xpath-expanded-box-shadow                    : 0 4px 16px rgba(0, 0, 0, 0.5);
+      --orbeon-syntax-keyword-color                            : #c586c0;
+      --orbeon-syntax-function-color                           : #dcdcaa;
+      --orbeon-syntax-parameter-color                          : #9cdcfe;
+      --orbeon-syntax-string-color                             : #ce9178;
+      --orbeon-syntax-punctuation-color                        : #a6adb5;
+      --orbeon-table-background-color                          : @base-bg;
+      --orbeon-table-striped-background-color                  : @gray-16;
+      --orbeon-table-hover-background-color                    : @gray-20;
+      --orbeon-table-border-color                              : @gray-27;
+      --orbeon-tab-background-color                            : @base-bg;
+      --orbeon-tab-bar-background-color                        : @gray-16;
+      --orbeon-tab-inactive-color                              : @gray-53;
+      --orbeon-tab-inactive-hover-color                        : @text-light;
+      --orbeon-tab-border-color                                : @gray-27;
+      --orbeon-search-free-input-read-only-background-color    : @gray-20;
+      --orbeon-revision-history-pane-head-background-color     : @gray-16;
+      --orbeon-revision-history-entry-background-color         : @gray-20;
+      --orbeon-revision-history-entry-border-color             : @gray-27;
+      --orbeon-active-alert-color                              : @base-bg;
+      --orbeon-alert-color                                     : @gray-53;
+      --orbeon-alert-background-color                          : @base-bg;
+      --orbeon-alert-border-color                              : @gray-27;
+      --orbeon-alert-text-shadow-color                         : transparent;
+      --orbeon-alert-error-color                               : hsl(@error-hue, 81%, 81%);
+      --orbeon-alert-error-background-color                    : hsl(@error-hue, 26%, 20%);
+      --orbeon-alert-error-border-color                        : hsl(@error-hue, 24%, 25%);
+      --orbeon-alert-success-color                             : hsl(@success-hue, 64%, 68%);
+      --orbeon-alert-success-background-color                  : hsl(@success-hue, 16%, 20%);
+      --orbeon-alert-success-border-color                      : hsl(@success-hue, 18%, 25%);
+      --orbeon-alert-warning-color                             : hsl(@warning-hue, 48%, 61%);
+      --orbeon-alert-warning-background-color                  : hsl(@warning-hue, 32%, 20%);
+      --orbeon-alert-warning-border-color                      : hsl(@warning-hue, 33%, 25%);
+      --orbeon-toast-close-filter                              : invert(1) grayscale(100%) brightness(200%);
+      --orbeon-error-summary-title-color                       : @base-bg;
+      --orbeon-error-summary-title-bottom-border-color         : transparent;
+      --orbeon-error-summary-item-background-color             : @base-bg;
+      --orbeon-error-summary-item-hover-background-color       : @gray-20;
+      --orbeon-error-summary-item-divider-color                : @gray-27;
+      --orbeon-info-color                                      : @info;
+      --orbeon-warning-color                                   : @warning;
+      --orbeon-error-color                                     : @error;
+      --orbeon-pill-background-lightness                       : 0.27;
+      --orbeon-pill-background-chroma                          : 0.035;
+      --orbeon-pill-border-lightness                           : 0.42;
+      --orbeon-pill-border-chroma                              : 0.07;
+      --orbeon-pill-color-lightness                            : 0.85;
+      --orbeon-pill-color-chroma                               : 0.11;
+      .pill-colors();
+      --orbeon-landing-card-border-color                       : @gray-27;
+      --orbeon-landing-card-image-border                       : @gray-27;
+      --orbeon-landing-card-header-color                       : @text-light;
+      --orbeon-landing-card-header-background-color            : @gray-20;
+      --orbeon-landing-card-hover-background-color             : @gray-20;
+      --orbeon-landing-card-link-color                         : hsl(@base-blue, 93%, 62%);
+      --orbeon-landing-card-link-hover-color                   : var(--orbeon-landing-card-link-color);
+      --orbeon-dialog-background-color                         : @gray-20;
+      --orbeon-dialog-title-color                              : @text-light;
+      --orbeon-dialog-title-background-color                   : @gray-16;
+      --orbeon-version-color                                   : @gray-53;
+      --orbeon-on-premise-captcha-label-color                  : @gray-16;
+      --orbeon-stripe-color-1                                  : @gray-20;
+      --orbeon-stripe-color-2                                  : @base-bg;
+    }
   }
-}
+
+  @media print {
+    .orbeon {
+      // For CSS debugging with "Preview" and the relevant .fr-pdf-color-mode-* classes
+      &:has(.fr-pdf-color-mode-black-and-white), &:has(.fr-pdf-color-mode-keep-field-colors) {
+        // Use !important instead of more complex selectors to win over .orbeon:not(:has(.fb-main)), etc.
+        --orbeon-page-background-color: white !important;
+      }
+
+      --orbeon-base-font-size                                  : 13px;
+      --orbeon-page-background-color                           : white;
+      --orbeon-form-background-color                           : white;
+      --orbeon-base-border-color                               : #e3e3e3;
+      --orbeon-base-font-family                                : @frPrintBaseFontFamily;
+      --orbeon-base-color                                      : black;
+      --orbeon-control-read-only-background-color              : white;
+      --orbeon-control-border-color                            : #ccc;
+      --orbeon-handwritten-signature-read-only-background-color: white;
+      --orbeon-section-title-color                             : black;
+      --orbeon-section-title-background-color                  : white;
+      --orbeon-repeat-menu-background-color                    : white;
+      --orbeon-toc-color                                       : black;
+      --orbeon-toc-subsection-color                            : black;
+      --orbeon-navbar-background-color                         : white;
+      --orbeon-navbar-heading-font-size                        : 1.85em;
+      --orbeon-navbar-heading-color                            : black;
+      --orbeon-navbar-title-color                              : black;
+      --orbeon-alert-color                                     : black;
+      --orbeon-alert-background-color                          : white;
+      --orbeon-alert-border-color                              : #e3e3e3;
+      --orbeon-alert-error-color                               : black;
+      --orbeon-alert-error-background-color                    : white;
+      --orbeon-alert-error-border-color                        : #f5c2c7;
+      --orbeon-alert-success-color                             : black;
+      --orbeon-alert-success-background-color                  : white;
+      --orbeon-alert-success-border-color                      : #badbcc;
+      --orbeon-alert-warning-color                             : black;
+      --orbeon-alert-warning-background-color                  : white;
+      --orbeon-alert-warning-border-color                      : #ffecb5;
+    }
+  }
 }

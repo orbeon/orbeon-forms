@@ -20,7 +20,12 @@
         <!-- This page needs access to Form Builder permission -->
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
         <!-- FR Home page XForms model -->
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
+        <xf:model
+            id="fr-form-model"
+            xxf:xpath-analysis="true"
+            xxf:expose-xpath-types="true"
+            xxf:readonly-appearance.static.select="minimal"
+            xxf:readonly-appearance.static.select1="minimal">
 
             <xf:var
                 name="tz"
@@ -328,103 +333,7 @@
                     data-tab-id="fr-landing-tab-workspace"
                 >
                     <xh:div class="fr-landing-grid">
-                        <xf:repeat id="workspace-cards-repeat" ref="$workspace-cards">
-                            <xf:var
-                                name="is-published-forms"
-                                value="card-type = 'published-forms'"/>
-                            <xf:var
-                                name="is-form-data"
-                                value="card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))"/>
-
-                            <fr:card-quick-links
-                                id="quick-links-card"
-                                ref=".[card-type = 'quick-links']"
-                                links="{string-join(if (links/@type = 'array') then links/_ else links, ' ')}"
-                                layout="{layout}"
-                                filter="{instance('fr-landing-ui-instance')/@filter}"
-                            >
-                                <xf:label
-                                    ref="
-                                        if (title/@type = 'object') then
-                                            title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(title)) then
-                                            xxf:r(title, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                                <xf:help
-                                    ref="
-                                        if (description/@type = 'object') then
-                                            description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(description)) then
-                                            xxf:r(description, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                            </fr:card-quick-links>
-
-                            <fr:card-published-forms
-                                id="published-form-card"
-                                ref=".[$is-published-forms]"
-                                active="{$is-published-forms}"
-                                app="{app}"
-                                exclude-apps="{string-join(if (exclude-apps/@type = 'array') then exclude-apps/_ else exclude-apps, ' ')}"
-                                thumbnail="{thumbnail}"
-                                sort-by="{sort-by}"
-                                sort-direction="{sort-direction}"
-                                link-to="{link-to}"
-                                empty-action-href="{'/fr/orbeon/builder/new'[$is-allow-form-builder and xxf:is-blank(app)]}"
-                                empty-action-label="{$new-form-label[$is-allow-form-builder and xxf:is-blank(app)]}"
-                                filter="{instance('fr-landing-ui-instance')/@filter}"
-                                refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
-                            >
-                                <xf:label
-                                    ref="
-                                        if (title/@type = 'object') then
-                                            title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(title)) then
-                                            xxf:r(title, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                                <xf:help
-                                    ref="
-                                        if (description/@type = 'object') then
-                                            description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(description)) then
-                                            xxf:r(description, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                            </fr:card-published-forms>
-
-                            <fr:card-form-data
-                                id="form-data-card"
-                                ref=".[$is-form-data]"
-                                active="{$is-form-data}"
-                                app="{app}"
-                                form="{form}"
-                                version="{version}"
-                                title-field="{string-join(if (title-field/@type = 'array') then title-field/_ else title-field, ' ')}"
-                                pill-field="{pill-field}"
-                                thumbnail="{thumbnail}"
-                                filter="{instance('fr-landing-ui-instance')/@filter}"
-                                refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
-                            >
-                                <xf:label
-                                    ref="
-                                        if (title/@type = 'object') then
-                                            title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(title)) then
-                                            xxf:r(title, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                                <xf:help
-                                    ref="
-                                        if (description/@type = 'object') then
-                                            description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(description)) then
-                                            xxf:r(description, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                            </fr:card-form-data>
-                        </xf:repeat>
+                        <fr:landing-cards group="workspace"/>
                     </xh:div>
                 </xh:div>
 
@@ -435,78 +344,7 @@
                     hidden="until-found"
                 >
                     <xh:div class="fr-landing-grid">
-                        <xf:repeat id="demo-cards-repeat" ref="$demo-cards">
-                            <xf:var
-                                name="is-published-forms"
-                                value="card-type = 'published-forms'"/>
-                            <xf:var
-                                name="is-form-data"
-                                value="card-type = 'form-data'"/>
-
-                            <fr:card-published-forms
-                                id="demo-published-form-card"
-                                ref=".[$is-published-forms]"
-                                active="{$is-published-forms}"
-                                app="{app}"
-                                hide-when-empty="true"
-                                strip-title-prefix="^(Orbeon(\s+Forms)?\s+Demo|Démo\s+Orbeon(\s+Forms)?)\s*:\s*"
-                                thumbnail="{thumbnail}"
-                                sort-by="{sort-by}"
-                                sort-direction="{sort-direction}"
-                                link-to="{link-to}"
-                                filter="{instance('fr-landing-ui-instance')/@filter}"
-                                refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
-                            >
-                                <xf:label
-                                    ref="
-                                        if (title/@type = 'object') then
-                                            title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(title)) then
-                                            xxf:r(title, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                                <xf:help
-                                    ref="
-                                        if (description/@type = 'object') then
-                                            description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(description)) then
-                                            xxf:r(description, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                            </fr:card-published-forms>
-
-                            <fr:card-form-data
-                                id="demo-form-data-card"
-                                ref=".[$is-form-data]"
-                                active="{$is-form-data}"
-                                app="{app}"
-                                form="{form}"
-                                version="{version}"
-                                title-field="{string-join(if (title-field/@type = 'array') then title-field/_ else title-field, ' ')}"
-                                pill-field="{pill-field}"
-                                hide-when-empty="true"
-                                thumbnail="{thumbnail}"
-                                filter="{instance('fr-landing-ui-instance')/@filter}"
-                                refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
-                            >
-                                <xf:label
-                                    ref="
-                                        if (title/@type = 'object') then
-                                            title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(title)) then
-                                            xxf:r(title, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                                <xf:help
-                                    ref="
-                                        if (description/@type = 'object') then
-                                            description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
-                                        else if (xxf:non-blank(description)) then
-                                            xxf:r(description, '|fr-fr-resources|')
-                                        else
-                                            ()"/>
-                            </fr:card-form-data>
-                        </xf:repeat>
+                        <fr:landing-cards group="demos"/>
                     </xh:div>
                 </xh:div>
             </xh:div>

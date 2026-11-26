@@ -1829,4 +1829,140 @@
         </xf:group>
     </xsl:template>
 
+    <!-- Unroll configured Landing cards statically so each `<fr:card-form-data>` gets a distinct `prefixedId` for `<xxf:dynamic>` -->
+    <xsl:template match="fr:landing-cards">
+        <xsl:variable name="is-demos"   select="@group = 'demos'" as="xs:boolean"/>
+        <xsl:variable name="id-prefix"  select="if ($is-demos) then 'demo' else 'workspace'" as="xs:string"/>
+        <xsl:variable name="cards-var"  select="if ($is-demos) then '$demo-cards' else '$workspace-cards'" as="xs:string"/>
+        <xsl:variable name="all-cards"  select="frf:landingCardsXml()/*/_" as="element()*"/>
+        <xsl:variable
+            name="group-cards"
+            select="
+                if ($is-demos) then
+                    $all-cards[
+                        (card-type = 'published-forms' and app = ('orbeon', 'orbeon-features')) or
+                        (card-type = 'form-data'       and app = ('orbeon', 'orbeon-features') and not(app = 'orbeon' and form = 'builder'))
+                    ]
+                else
+                    $all-cards[
+                        not(
+                            (card-type = 'published-forms' and app = ('orbeon', 'orbeon-features')) or
+                            (card-type = 'form-data'       and app = ('orbeon', 'orbeon-features') and not(app = 'orbeon' and form = 'builder'))
+                        )
+                    ]"
+            as="element()*"/>
+
+        <xsl:for-each select="$group-cards">
+            <xsl:variable name="pos" select="position()" as="xs:integer"/>
+            <xsl:choose>
+                <xsl:when test="card-type = 'quick-links'">
+                    <fr:card-quick-links
+                        id="{$id-prefix}-quick-links-card-{$pos}"
+                        context="{$cards-var}[{$pos}]"
+                        ref="."
+                        links="{{string-join(if (links/@type = 'array') then links/_ else links, ' ')}}"
+                        layout="{{layout}}"
+                        filter="{{instance('fr-landing-ui-instance')/@filter}}"
+                    >
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                    </fr:card-quick-links>
+                </xsl:when>
+                <xsl:when test="card-type = 'published-forms'">
+                    <fr:card-published-forms
+                        id="{$id-prefix}-published-form-card-{$pos}"
+                        context="{$cards-var}[{$pos}]"
+                        ref="."
+                        active="true"
+                        app="{{app}}"
+                        thumbnail="{{thumbnail}}"
+                        sort-by="{{sort-by}}"
+                        sort-direction="{{sort-direction}}"
+                        link-to="{{link-to}}"
+                        filter="{{instance('fr-landing-ui-instance')/@filter}}"
+                        refresh-token="{{instance('fr-landing-ui-instance')/@refresh-token}}"
+                    >
+                        <xsl:choose>
+                            <xsl:when test="$is-demos">
+                                <xsl:attribute name="hide-when-empty" select="'true'"/>
+                                <xsl:attribute name="strip-title-prefix" select="'^(Orbeon(\s+Forms)?\s+Demo|Démo\s+Orbeon(\s+Forms)?)\s*:\s*'"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="exclude-apps" select="'{string-join(if (exclude-apps/@type = ''array'') then exclude-apps/_ else exclude-apps, '' '')}'"/>
+                                <xsl:attribute name="empty-action-href" select="'{''/fr/orbeon/builder/new''[$is-allow-form-builder and xxf:is-blank(app)]}'"/>
+                                <xsl:attribute name="empty-action-label" select="'{$new-form-label[$is-allow-form-builder and xxf:is-blank(app)]}'"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                    </fr:card-published-forms>
+                </xsl:when>
+                <xsl:when test="card-type = 'form-data'">
+                    <fr:card-form-data
+                        id="{$id-prefix}-form-data-card-{$pos}"
+                        context="{$cards-var}[{$pos}]"
+                        ref="{if ($is-demos) then '.' else '.[$is-allow-form-builder or not(app = ''orbeon'' and form = ''builder'')]'}"
+                        active="{if ($is-demos) then 'true' else '{$is-allow-form-builder or not(app = ''orbeon'' and form = ''builder'')}'}"
+                        app="{{app}}"
+                        form="{{form}}"
+                        version="{{version}}"
+                        title-field="{{string-join(if (title-field/@type = 'array') then title-field/_ else title-field, ' ')}}"
+                        pill-field="{{pill-field}}"
+                        thumbnail="{{thumbnail}}"
+                        filter="{{instance('fr-landing-ui-instance')/@filter}}"
+                        refresh-token="{{instance('fr-landing-ui-instance')/@refresh-token}}"
+                    >
+                        <xsl:if test="$is-demos">
+                            <xsl:attribute name="hide-when-empty" select="'true'"/>
+                        </xsl:if>
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                    </fr:card-form-data>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:for-each>
+    </xsl:template>
+
 </xsl:stylesheet>

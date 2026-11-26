@@ -508,11 +508,12 @@
                             <xf:var name="encoded-search-context" value="xxf:instance('fr-last-search-context-instance')/encoded/string()"/>
                             <xf:var name="search-page-offset"     value="xs:integer(xxf:instance('fr-last-search-context-instance')/page-offset)"/>
 
-                            <xh:div
-                                class="fr-search-results fr-table-frame"
-                                tabindex="0"
-                                role="region"
-                                aria-label="{$fr-resources/summary/titles/summary-title}">
+                            <xh:div class="fr-search-results-wrap">
+                                <xh:div
+                                    class="fr-search-results fr-table-frame"
+                                    tabindex="0"
+                                    role="region"
+                                    aria-label="{$fr-resources/summary/titles/summary-title}">
                                 <xh:table class="table table-condensed">
                                     <xh:thead>
                                         <xh:tr id="fr-summary-header-row">
@@ -678,6 +679,7 @@
                                         </xf:repeat>
                                     </xh:tbody>
                                 </xh:table>
+                                </xh:div>
                             </xh:div>
                         </xf:group>
                     </xh:body>

@@ -925,5 +925,119 @@ class SearchResultsTableSupportTest extends AnyFunSpecLike with CleanDocumentBod
       SearchResultsTableSupport.syncTable(table)
       assert(pillRectReads == 2)
     }
+
+    it("must prefer `.fr-col-primary` as flex column on cards and apply anti-flush-cut peeking plus sticky/scroll cues when overflowing") {
+      // 1. Pure anti-flush-cut peek algorithm: when 3 columns `[220, 200, 180]` land flush at `600px`, compress slightly so column 4 peeks in
+      val peekAdjusted =
+        SearchResultsTableSupport.adjustWidthsForOverflowPeek(
+          widths       = Vector(220.0, 200.0, 180.0, 90.0),
+          floors       = Vector(150.0, 130.0, 130.0, 75.0),
+          manualMask   = Vector(false, false, false, false),
+          wrapperWidth = 600
+        )
+      val cum3 = peekAdjusted.take(3).sum
+      // Column 4 now visibly peeks into the 600px viewport by ~42px instead of hiding at 0px
+      assert(600.0 - cum3 >= 38.0)
+      assert(peekAdjusted(3) == 90.0)
+
+      // 2. Card table where 4 columns (`Title | Author | Status | Rating`) fit inside `660px`: `Title` (`.fr-col-primary`) gets `auto`, not `Rating`!
+      SearchResultsTableSupport.resetAllStates()
+      dom.window.sessionStorage.clear()
+      dom.document.body.innerHTML =
+        """<form class="xforms-form">
+          |  <div class="card">
+          |    <div class="fr-card-table-slot fr-dynamic">
+          |      <div class="fr-search-results-wrap">
+          |        <div class="fr-search-results" role="region" aria-label="Bookshelf">
+          |          <table class="table table-condensed">
+          |            <thead>
+          |              <tr>
+          |                <th id="th-title" class="fr-col-primary" scope="col">
+          |                  <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Title</span></button></span>
+          |                </th>
+          |                <th id="th-author" scope="col">
+          |                  <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Author</span></button></span>
+          |                </th>
+          |                <th id="th-status" scope="col">
+          |                  <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Reading Status</span></button></span>
+          |                </th>
+          |                <th id="th-rating" scope="col">
+          |                  <span class="fr-sortable-th"><button class="btn-link" type="button"><span class="xforms-output">Rating</span></button></span>
+          |                </th>
+          |              </tr>
+          |            </thead>
+          |            <tbody>
+          |              <tr>
+          |                <td id="td-title" class="fr-td fr-col-primary" style="padding-left: 14px; padding-right: 10px;">
+          |                  <a href="#1" class="fr-summary-cell-link"></a>
+          |                  <div class="fr-summary-cell-value"><span>One Hundred Years of Solitude</span></div>
+          |                </td>
+          |                <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |                  <a href="#1" class="fr-summary-cell-link"></a>
+          |                  <div class="fr-summary-cell-value"><span>Gabriel García Márquez</span></div>
+          |                </td>
+          |                <td class="fr-td" style="padding-left: 10px; padding-right: 10px;">
+          |                  <a href="#1" class="fr-summary-cell-link"></a>
+          |                  <div class="fr-summary-cell-value"><span>Finished</span></div>
+          |                </td>
+          |                <td class="fr-td" style="padding-left: 10px; padding-right: 14px;">
+          |                  <a href="#1" class="fr-summary-cell-link"></a>
+          |                  <div class="fr-summary-cell-value"><span>★★★★★</span></div>
+          |                </td>
+          |              </tr>
+          |            </tbody>
+          |          </table>
+          |        </div>
+          |      </div>
+          |    </div>
+          |  </div>
+          |</form>""".stripMargin
+      dom.document.body.className = "orbeon"
+
+      val cardWrapper = dom.document.querySelectorT(".fr-search-results")
+      val cardTable   = dom.document.querySelectorT(".fr-search-results table")
+      val titleTh     = cardTable.querySelectorT("#th-title")
+      val titleTd     = cardTable.querySelectorT("#td-title")
+
+      defineNumericProp(cardWrapper, "clientWidth", 660)
+      defineNumericProp(cardWrapper, "scrollWidth", 660)
+      defineNumericProp(cardWrapper, "scrollLeft",  0)
+      mockRect(titleTh,                               195.0)
+      mockRect(cardTable.querySelectorT("#th-author"), 155.0)
+      mockRect(cardTable.querySelectorT("#th-status"), 115.0)
+      mockRect(cardTable.querySelectorT("#th-rating"), 85.0)
+
+      SearchResultsTableSupport.syncTable(cardTable)
+
+      val fitCols = colWidthsByKey(cardTable)
+      assert(fitCols("dyn:0") == "auto")
+      assert(fitCols("dyn:3") == "105px")
+      // Card headers do not attach manual drag resizers, and non-overflowing card wrapper adds no extra tab stop
+      assert(cardTable.querySelectorOpt(s".${SearchResultsTableSupport.ColResizerClass}").isEmpty)
+      assert(! cardWrapper.hasAttribute("tabindex"))
+      assert(! titleTh.hasClass(SearchResultsTableSupport.StickyColClass))
+
+      // 3. Narrower card (`460px` < total widths) activates sticky primary column, `tabindex="0"`, `.can-scroll-end`, and `.fr-sticky-edge` on scroll
+      defineNumericProp(cardWrapper, "clientWidth", 460)
+      defineNumericProp(cardWrapper, "scrollWidth", 590)
+      SearchResultsTableSupport.syncTable(cardTable)
+
+      assert(titleTh.hasClass(SearchResultsTableSupport.StickyColClass))
+      assert(titleTd.hasClass(SearchResultsTableSupport.StickyColClass))
+      assert(titleTh.style.getPropertyValue("inset-inline-start") == "0px")
+      assert(! titleTh.hasClass(SearchResultsTableSupport.StickyEdgeClass))
+      assert(cardWrapper.hasClass(SearchResultsTableSupport.CanScrollEndClass))
+      assert(! cardWrapper.hasClass(SearchResultsTableSupport.ScrolledStartClass))
+      assert(cardWrapper.getAttribute("tabindex") == "0")
+
+      // Simulate scrolling horizontally (`scrollLeft = 48`)
+      defineNumericProp(cardWrapper, "scrollLeft", 48)
+      cardWrapper.dispatchEvent(new dom.Event("scroll"))
+
+      assert(cardWrapper.hasClass(SearchResultsTableSupport.ScrolledStartClass))
+      assert(cardWrapper.hasClass(SearchResultsTableSupport.CanScrollEndClass))
+      assert(titleTh.hasClass(SearchResultsTableSupport.StickyEdgeClass))
+      assert(titleTd.hasClass(SearchResultsTableSupport.StickyEdgeClass))
+    }
   }
 }

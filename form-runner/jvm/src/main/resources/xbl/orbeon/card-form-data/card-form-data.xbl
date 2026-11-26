@@ -5,9 +5,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:OpenSelectSupport="java:org.orbeon.xbl.OpenSelectSupportJava"
-         xmlns:PartialDateSupport="java:org.orbeon.xbl.PartialDateSupportJava">
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding
         id="fr-card-form-data"
@@ -15,31 +13,6 @@
         xxbl:mode="lhha custom-lhha binding"
         class="h-100"
     >
-        <xbl:handlers>
-            <xbl:handler event="fr-sync-aria-sort" phase="target">
-                <xf:action type="javascript">
-                    <xf:param name="col" value="event('col')"/>
-                    <xf:param name="dir" value="event('dir')"/>
-                    <xf:body>
-                        const root = this;
-                        if (root &amp;&amp; root.querySelectorAll) {
-                            const sync = () =&gt; {
-                                const ariaVal = dir === 'asc' ? 'ascending' : (dir === 'desc' ? 'descending' : '');
-                                for (const h of root.querySelectorAll('.fr-card-heading')) {
-                                    if (col &amp;&amp; h.getAttribute('data-col-path') === col &amp;&amp; ariaVal)
-                                        h.setAttribute('aria-sort', ariaVal);
-                                    else
-                                        h.removeAttribute('aria-sort');
-                                }
-                            };
-                            sync();
-                            window.requestAnimationFrame(sync);
-                        }
-                    </xf:body>
-                </xf:action>
-            </xbl:handler>
-        </xbl:handlers>
-
         <xbl:implementation>
             <xf:model id="model">
 
@@ -67,7 +40,20 @@
                 <xf:var name="version" value="xs:integer((fr:component-param-value('version')[. castable as xs:integer], 1)[1])"/>
 
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial" has-loaded="false" source-form-loaded="false" form-not-found="false" operations="" latest-modified="" unfiltered-total="" submitted-query="" sort-announcement=""/>
+                    <_
+                        state="initial"
+                        has-loaded="false"
+                        source-form-loaded="false"
+                        form-not-found="false"
+                        app=""
+                        form=""
+                        card-label=""
+                        operations=""
+                        latest-modified=""
+                        unfiltered-total=""
+                        submitted-query=""
+                        sort-announcement=""
+                    />
                 </xf:instance>
 
                 <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
@@ -78,7 +64,7 @@
                     <_/>
                 </xf:instance>
 
-                <!-- Used for obtaining item labels -->
+                <!-- Used for obtaining item labels in single-column list mode -->
                 <xf:var
                     name="form-resources"
                     value="instance('fr-form-resources')/(*[@xml:lang = xxf:instance('fr-fr-language-instance')], *)[1]"/>
@@ -112,6 +98,93 @@
                     </order-by>
                 </xf:instance>
 
+                <xf:instance id="fr-dynamic-instance">
+                    <_/>
+                </xf:instance>
+
+                <xf:instance id="fr-dynamic-instance-template" xxf:readonly="true">
+                    <xh:html
+                        xmlns:xh="http://www.w3.org/1999/xhtml"
+                        xmlns:xf="http://www.w3.org/2002/xforms"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                        lang="{xxf:instance('fr-fr-language-instance')}"
+                        xml:lang="{xxf:instance('fr-fr-language-instance')}">
+                        <xh:head>
+                            <xf:model
+                                id="fr-summary-dynamic-model"
+                                xxf:readonly-appearance.static.select="minimal"
+                                xxf:readonly-appearance.static.select1="minimal">
+                                <xf:instance id="fr-form-instance">
+                                    <documents/>
+                                </xf:instance>
+                                <xf:instance id="fr-form-resources">
+                                    <resources/>
+                                </xf:instance>
+                                <xf:bind ref="instance('fr-form-instance')">
+                                    <xf:bind ref="document" id="fr-document-bind">
+                                        <xf:bind ref="details" id="fr-details-bind" readonly="true()"/>
+                                    </xf:bind>
+                                </xf:bind>
+                            </xf:model>
+                        </xh:head>
+                        <xh:body>
+                            <xf:var name="fr-resources"      value="xxf:instance('fr-fr-resources')/resource[@xml:lang = xxf:instance('fr-fr-language-instance')][1]"/>
+                            <xf:var name="form-resources"    value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-fr-language-instance')], resource[1])[1]"/>
+                            <xf:var name="app"               value="string(xxf:instance('fr-state-instance')/@app)"/>
+                            <xf:var name="form"              value="string(xxf:instance('fr-state-instance')/@form)"/>
+                            <xf:var name="global-operations" value="xxf:split(xxf:instance('fr-state-instance')/@operations)"/>
+                            <xf:var name="sort-supported"    value="frf:isSortSupported($app, $form)"/>
+                            <xf:var name="page-size"         value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
+
+                            <xf:group ref="instance('fr-form-instance')[exists(document)]">
+                                <xh:div class="fr-search-results-wrap">
+                                    <xh:div
+                                        class="fr-search-results"
+                                        role="region"
+                                        aria-label="{string(xxf:instance('fr-state-instance')/@card-label)}">
+                                        <xh:table class="table table-condensed">
+                                            <xh:thead>
+                                                <xh:tr id="fr-summary-header-row"/>
+                                            </xh:thead>
+                                            <xh:tbody>
+                                                <xf:repeat bind="fr-document-bind" id="documents-repeat">
+                                                    <xf:var name="document"                    value="."/>
+                                                    <xf:var name="is-extra-row"                value="position() gt $page-size"/>
+                                                    <xf:var name="current-document-name"       value="string(@name)"/>
+                                                    <xf:var name="current-document-operations" value="if (exists(@operations)) then xxf:split(@operations) else $global-operations"/>
+                                                    <xf:var
+                                                        name="edit-view-opt"
+                                                        value="
+                                                            if ($current-document-operations = ('*', 'update')) then
+                                                                'edit'
+                                                            else if ($current-document-operations = 'read') then
+                                                                'view'
+                                                            else
+                                                                ()"/>
+                                                    <xf:var
+                                                        name="current-document-href-opt"
+                                                        value="
+                                                            if (exists($edit-view-opt)) then
+                                                                string-join(('/fr', $app, $form, $edit-view-opt, $current-document-name), '/')
+                                                            else
+                                                                ()"/>
+                                                    <xh:tr
+                                                        id="fr-summary-body-row"
+                                                        class="{'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"/>
+                                                </xf:repeat>
+                                            </xh:tbody>
+                                        </xh:table>
+                                    </xh:div>
+                                </xh:div>
+                            </xf:group>
+                        </xh:body>
+                    </xh:html>
+                </xf:instance>
+
+                <!-- Load `form.xhtml` synchronously during initialization so `<xxf:dynamic>` XBL CSS/JS assets are included in `<head>` -->
                 <xf:submission
                     id="fr-get-source-form-submission"
                     method="get"
@@ -125,8 +198,6 @@
                     xxf:cache="false"
                     xxf:xinclude="true"
 
-                    mode="asynchronous"
-                    xxf:response-must-await="200ms"
                     xxf:show-progress="false"
                 >
 
@@ -136,6 +207,8 @@
                     </xf:header>
 
                     <xf:action event="xforms-submit">
+                        <xf:setvalue ref="instance('fr-state-instance')/@app"            value="$app"/>
+                        <xf:setvalue ref="instance('fr-state-instance')/@form"           value="$form"/>
                         <xf:setvalue ref="instance('fr-state-instance')/@form-not-found" value="'false'"/>
                         <xf:setvalue ref="instance('fr-state-instance')/@state"          value="'loading'"/>
                     </xf:action>
@@ -154,6 +227,12 @@
                         <xf:setvalue
                             ref="instance('fr-state-instance')/@operations"
                             value="string-join($operations-from-role, ' ')"/>
+                        <xf:setvalue
+                            ref="instance('fr-state-instance')/@card-label"
+                            value="string((
+                                instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:instance('fr-fr-language-instance')], title)[xxf:non-blank()],
+                                $form
+                            )[1])"/>
                     </xf:action>
 
                     <xf:action event="xforms-submit-error" if="event('error-type') != 'submission-in-progress'">
@@ -206,6 +285,15 @@
 
                         <xf:var name="returned-docs" value="instance('fr-search-results-instance')/document"/>
                         <xf:var name="search-total"  value="xs:integer((instance('fr-search-results-instance')/@search-total[. castable as xs:integer], 0)[1])"/>
+
+                        <xf:action if="exists(instance('fr-dynamic-instance')/*)">
+                            <xf:var name="dyn-docs" value="instance('fr-dynamic-instance')//xf:instance[@id = 'fr-form-instance']/*"/>
+                            <xf:delete ref="$dyn-docs/*"/>
+                            <xf:insert
+                                context="$dyn-docs"
+                                origin="$returned-docs[position() le $max-rows]"/>
+                        </xf:action>
+
                         <xf:action if="xxf:is-blank(instance('fr-state-instance')/@submitted-query)">
                             <xf:setvalue
                                 ref="instance('fr-state-instance')/@unfiltered-total"
@@ -301,6 +389,26 @@
                     <xf:delete
                         ref="instance('fr-search-instance')/query/*"/>
 
+                    <!-- Build dynamic Summary table for multi-column data cards -->
+                    <xf:var
+                        name="is-list-mode-init"
+                        value="exists(xxf:split(fr:component-param-value('title-field')))"/>
+
+                    <xf:action if="not($is-list-mode-init)">
+                        <xf:delete ref="instance('fr-dynamic-instance')/*"/>
+                        <xf:insert
+                            ref="instance('fr-dynamic-instance')"
+                            origin="
+                                frf:buildCardSummaryDynamicForm(
+                                    instance('fr-source-form-instance')/root(),
+                                    instance('fr-dynamic-instance-template'),
+                                    $app,
+                                    $form,
+                                    $version,
+                                    instance('fr-form-resources')
+                                )"/>
+                    </xf:action>
+
                     <xf:setvalue
                         ref="instance('fr-state-instance')/@source-form-loaded"
                         value="'true'"/>
@@ -312,10 +420,6 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-
-            <xf:var
-                name="non-card-controls"
-                value="('attachment', 'image-attachment', 'video-attachment', 'audio-attachment', 'handwritten-signature', 'wpaint')"/>
 
             <xf:var
                 name="title-fields"
@@ -334,28 +438,16 @@
                 value="instance('fr-search-instance')/query[exists(@name)]"/>
 
             <xf:var
-                name="card-query-paths"
-                value="$all-named-queries[@summary-show = 'true' and not(@control = $non-card-controls)]/@path"/>
-
-            <xf:var
-                name="summary-queries"
-                value="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true' and @path = $card-query-paths]"/>
-
-            <xf:var
-                name="detail-positions"
-                value="$all-named-queries[@summary-show = 'true' and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)"/>
-
-            <xf:var
-                name="active-query-positions"
+                name="list-query-positions"
                 value="
                     if ($is-list-mode) then
-                        $all-named-queries[@name = ($title-fields, $pill-field) and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)
+                        $all-named-queries[@name = ($title-fields, $pill-field)]/(count(preceding-sibling::query[@name]) + 1)
                     else
-                        $detail-positions"/>
+                        ()"/>
 
             <xf:var
-                name="active-query-names"
-                value="for $p in $active-query-positions return string($all-named-queries[$p]/@name)"/>
+                name="list-query-names"
+                value="for $p in $list-query-positions return string($all-named-queries[$p]/@name)"/>
 
             <xf:var
                 name="primary-sort-query"
@@ -548,8 +640,9 @@
                 total-count="{$search-total}"
                 filtered-out="{$is-filtered-out}"
                 auto-hidden="{$is-auto-hidden}"
-                columns="{if ($is-list-mode) then 1 else max((count($detail-positions), 1))}"
-                show-headings="{not($is-list-mode)}"
+                columns="1"
+                show-headings="false"
+                show-table="{not($is-list-mode)}"
                 is-empty="{empty($documents)}"
                 empty-message="{xxf:r('landing.messages.no-data', '|fr-fr-resources|')}"
             >
@@ -623,97 +716,6 @@
                     </xh:a>
                 </fr:card-actions>
 
-                <fr:headings>
-                    <xf:repeat ref="$summary-queries[not($is-list-mode)]">
-                        <xf:var name="path"      value="string(@path)"/>
-                        <xf:var name="label"     value="string((resources[@lang = xxf:lang()]/label, resources/label, @name)[1])"/>
-                        <xf:var name="is-sorted" value="instance('fr-order-by')/column = $path"/>
-                        <xf:var name="caret-value" value="
-                            if (not($is-sorted) or instance('fr-order-by')/direction = 'asc') then
-                                '&#x25B2;'
-                            else
-                                '&#x25BC;'
-                        "/>
-                        <xh:span class="fr-card-col fr-card-heading" role="columnheader" data-col-path="{$path}">
-                            <xf:trigger appearance="minimal" class="fr-card-sort-trigger">
-                                <xf:label>
-                                    <xh:span class="fr-card-col-text text-truncate">
-                                        <xf:output value="$label"/>
-                                    </xh:span>
-                                    <xh:span
-                                        class="{
-                                            'fr-card-sort-caret',
-                                            'active-caret'[$is-sorted],
-                                            'hover-caret'[not($is-sorted)]
-                                        }"
-                                        aria-hidden="true">
-                                        <xf:output value="$caret-value"/>
-                                    </xh:span>
-                                </xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:var name="target-col"  value="$path"/>
-                                    <xf:var name="current-col" value="string(instance('fr-order-by')/column)"/>
-                                    <xf:var name="current-dir" value="string(instance('fr-order-by')/direction)"/>
-                                    <xf:var name="next-col" value="
-                                        if ($current-col = $target-col and $current-dir = 'desc') then
-                                            'last-modified'
-                                        else
-                                            $target-col
-                                    "/>
-                                    <xf:var name="next-dir" value="
-                                        if ($current-col = $target-col) then
-                                            'desc'
-                                        else
-                                            'asc'
-                                    "/>
-                                    <xf:var name="announce-col-label" value="
-                                        if ($next-col = 'last-modified') then
-                                            xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
-                                        else
-                                            $label
-                                    "/>
-
-                                    <xf:setvalue ref="instance('fr-order-by')/column"    value="$next-col"/>
-                                    <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
-                                    <xf:setvalue
-                                        ref="instance('fr-state-instance')/@sort-announcement"
-                                        value="
-                                            if ($next-dir = 'asc') then
-                                                xxf:format-message(
-                                                    xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
-                                                    $announce-col-label
-                                                )
-                                            else
-                                                xxf:format-message(
-                                                    xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
-                                                    $announce-col-label
-                                                )"/>
-
-                                    <xf:dispatch name="fr-sync-aria-sort" targetid="fr-card-form-data">
-                                        <xf:property name="col" value="if ($next-col = 'last-modified') then '' else $next-col"/>
-                                        <xf:property name="dir" value="$next-dir"/>
-                                    </xf:dispatch>
-
-                                    <!-- Delete sort attribute from all queries -->
-                                    <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
-
-                                    <!-- Insert sort attribute on the appropriate query -->
-                                    <xf:insert
-                                        context="
-                                            if ($next-col = 'last-modified') then
-                                                instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
-                                            else
-                                                instance('fr-search-instance')/query[@path = $next-col]"
-                                        origin="xf:attribute('sort', $next-dir)"/>
-
-                                    <!-- Query documents with updated sort order -->
-                                    <xf:send submission="fr-search-submission"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </xh:span>
-                    </xf:repeat>
-                </fr:headings>
-
                 <fr:card-body>
                     <xh:p class="card-text">
                         <xf:output
@@ -738,139 +740,92 @@
                     </xf:group>
                 </fr:card-thumbnail>
 
+                <fr:card-table>
+                    <xxf:dynamic id="fr-card-summary-dynamic" ref="instance('fr-dynamic-instance')[not($is-list-mode)]">
+                        <xf:action event="fr-order-by">
+                            <xf:var name="target-col"  value="string(event('column'))"/>
+                            <xf:var name="col-label"   value="string(event('label'))"/>
+                            <xf:var name="current-col" value="string(instance('fr-order-by')/column)"/>
+                            <xf:var name="current-dir" value="string(instance('fr-order-by')/direction)"/>
+                            <xf:var name="next-col" value="
+                                if ($current-col = $target-col and $current-dir = 'desc') then
+                                    'last-modified'
+                                else
+                                    $target-col
+                            "/>
+                            <xf:var name="next-dir" value="
+                                if ($current-col = $target-col) then
+                                    'desc'
+                                else
+                                    'asc'
+                            "/>
+                            <xf:var name="announce-col-label" value="
+                                if ($next-col = 'last-modified') then
+                                    xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
+                                else
+                                    $col-label
+                            "/>
+
+                            <xf:setvalue ref="instance('fr-order-by')/column"    value="$next-col"/>
+                            <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
+                            <xf:setvalue
+                                ref="instance('fr-state-instance')/@sort-announcement"
+                                value="
+                                    if ($next-dir = 'asc') then
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
+                                            $announce-col-label
+                                        )
+                                    else
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
+                                            $announce-col-label
+                                        )"/>
+
+                            <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
+
+                            <xf:insert
+                                context="
+                                    if ($next-col = 'last-modified') then
+                                        instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
+                                    else
+                                        instance('fr-search-instance')/query[@path = $next-col]"
+                                origin="xf:attribute('sort', $next-dir)"/>
+
+                            <xf:send submission="fr-search-submission"/>
+                        </xf:action>
+                    </xxf:dynamic>
+                </fr:card-table>
+
                 <fr:rows>
                     <xf:var
-                        name="column-labels"
+                        name="list-column-labels"
                         value="
-                            for $p in $active-query-positions,
+                            for $p in $list-query-positions,
                                 $q in $all-named-queries[$p],
                                 $lq in (instance('fr-search-labels-instance')/query[@path = $q/@path][1], $q)[1]
                             return string(($lq/resources[@lang = xxf:lang()]/label, $lq/resources/label, $q/@name)[1])"/>
 
-                    <xf:repeat ref="$documents[position() le $document-count-to-render]">
+                    <xf:repeat ref="$documents[$is-list-mode and position() le $document-count-to-render]">
                         <xf:var name="is-extra-row" value="position() gt $page-size"/>
-                        <xf:var name="document" value="."/>
+                        <xf:var name="document"     value="."/>
                         <xf:var
-                            name="cell-values"
+                            name="list-values"
                             value="
-                                if (empty($active-query-positions)) then
+                                if (empty($list-query-positions)) then
                                     string($document/@name)
                                 else
-                                    for $detail-position in $active-query-positions
+                                    for $detail-position in $list-query-positions
                                     return
                                         let $raw     := $document/details/detail[$detail-position],
                                             $query   := $all-named-queries[$detail-position],
                                             $control := $query/@control,
                                             $value   :=
-                                                if (frf:isMultipleSelectionControl($control)) then
-                                                    string-join(
-                                                        for $code in xxf:split($raw) return
-                                                            (
-                                                                $form-resources/*[local-name() = $query/@name]/item[value = $code]/label,
-                                                                if ($control = 'open-select') then OpenSelectSupport:decodeToken($code) else $code
-                                                            )[1],
-                                                        ', '
-                                                    )
-                                                else if ($control = 'tags-input') then
-                                                    string-join(
-                                                        for $code in xxf:split($raw) return
-                                                            OpenSelectSupport:decodeToken($code),
-                                                        ', '
-                                                    )
-                                                else if ($control = 'date-range') then
-                                                    let $parts := tokenize($raw, '/') return
-                                                    if (count($parts) = 2 and $parts[1] castable as xs:date and $parts[2] castable as xs:date) then
-                                                        concat(
-                                                            format-date(xs:date($parts[1]), xxf:r('summary.formats.date', '|fr-fr-resources|'), $datelang, (), ()),
-                                                            ' – ',
-                                                            format-date(xs:date($parts[2]), xxf:r('summary.formats.date', '|fr-fr-resources|'), $datelang, (), ())
-                                                        )
-                                                    else
-                                                        $raw
-                                                else if ($control = 'partial-date') then
-                                                    PartialDateSupport:formatReadonlyModePartialDate(
-                                                        $raw,
-                                                        (
-                                                            xxf:property(string-join(('oxf.xforms.xbl.fr.date.output-format', $app, $form), '.'))[xxf:non-blank()],
-                                                            xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
-                                                            property('xxf:format.input.date')
-                                                        )[1],
-                                                        'c.',
-                                                        '{decade}s'
-                                                    )
-                                                else if (frf:isSingleSelectionControl($control)) then
+                                                if (frf:isSingleSelectionControl($control)) then
                                                     for $code in $raw return
                                                         ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
-                                                else if ($control = 'secret') then
-                                                    if (normalize-space($raw) = '') then
-                                                        ''
-                                                    else
-                                                        '••••••••'
                                                 else
-                                                    for $type in substring-after($query/@type, ':') return
-                                                        if ($type = 'date') then
-                                                            if ($raw castable as xs:date) then
-                                                                format-date(
-                                                                    xs:date($raw),
-                                                                    xxf:r('summary.formats.date', '|fr-fr-resources|'),
-                                                                    $datelang,
-                                                                    (),
-                                                                    ()
-                                                                )
-                                                            else
-                                                                $raw
-                                                        else if ($type = 'time') then
-                                                            if ($raw castable as xs:time) then
-                                                                format-time(
-                                                                    xs:time($raw),
-                                                                    xxf:r('summary.formats.time', '|fr-fr-resources|'),
-                                                                    $datelang,
-                                                                    (),
-                                                                    ()
-                                                                )
-                                                            else
-                                                                $raw
-                                                        else if ($type = 'dateTime') then
-                                                            if ($raw castable as xs:dateTime) then
-                                                                format-dateTime(
-                                                                    xs:dateTime($raw),
-                                                                    xxf:r('summary.formats.dateTime', '|fr-fr-resources|'),
-                                                                    $datelang,
-                                                                    (),
-                                                                    ()
-                                                                )
-                                                            else
-                                                                $raw
-                                                        else if ($type = 'dayTimeDuration') then
-                                                            if ($raw castable as xs:dayTimeDuration) then
-                                                                let $dur   := xs:dayTimeDuration($raw),
-                                                                    $parts := (
-                                                                        if (days-from-duration($dur) = 0) then
-                                                                            ()
-                                                                        else
-                                                                            concat(days-from-duration($dur), ' d'),
-                                                                        if (hours-from-duration($dur) = 0) then
-                                                                            ()
-                                                                        else
-                                                                            concat(hours-from-duration($dur), ' h'),
-                                                                        if (minutes-from-duration($dur) = 0) then
-                                                                            ()
-                                                                        else
-                                                                            concat(minutes-from-duration($dur), ' min'),
-                                                                        if (seconds-from-duration($dur) = 0) then
-                                                                            ()
-                                                                        else
-                                                                            concat(seconds-from-duration($dur), ' sec')
-                                                                    )
-                                                                return
-                                                                    if (empty($parts)) then
-                                                                        '0 min'
-                                                                    else
-                                                                        string-join($parts, ' ')
-                                                            else
-                                                                $raw
-                                                        else
-                                                            $raw
+                                                    $raw
                                         return
                                             if (xxf:is-blank($value)) then
                                                 '–'
@@ -901,8 +856,8 @@
                             value="
                                 (
                                     for $tf in $title-fields,
-                                        $idx in index-of($active-query-names, $tf)[1]
-                                    return $cell-values[$idx][. != '–'],
+                                        $idx in index-of($list-query-names, $tf)[1]
+                                    return $list-values[$idx][. != '–'],
                                     string($document/@name)
                                 )[1]"/>
 
@@ -910,34 +865,32 @@
                             name="list-pill"
                             value="
                                 for $pf in $pill-field,
-                                    $idx in index-of($active-query-names, $pf)[1]
-                                return $cell-values[$idx][. != '–']"/>
+                                    $idx in index-of($list-query-names, $pf)[1]
+                                return $list-values[$idx][. != '–']"/>
 
                         <xf:var
                             name="row-tooltip"
                             value="
-                                if (empty($column-labels)) then
-                                    string-join($cell-values, ' · ')
+                                if (empty($list-column-labels)) then
+                                    string-join($list-values, ' · ')
                                 else
                                     string-join(
-                                        for $idx in 1 to count($cell-values)
+                                        for $idx in 1 to count($list-values)
                                         return
-                                            if ($is-list-mode and $cell-values[$idx] = '–') then
+                                            if ($list-values[$idx] = '–') then
                                                 ()
                                             else
-                                                concat($column-labels[$idx], ': ', $cell-values[$idx]),
+                                                concat($list-column-labels[$idx], ': ', $list-values[$idx]),
                                         ' · '
                                     )"/>
 
-                        <xf:var name="is-single-cell" value="count($cell-values) le 1"/>
-
                         <xh:li
-                            class="list-group-item {if ($is-list-mode) then 'fr-card-published-row' else ('fr-card-data-row', 'fr-card-data-row-clickable'[xxf:non-blank($row-href)])} {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"
-                            role="{if ($is-list-mode) then 'listitem' else 'row'}"
+                            class="list-group-item fr-card-published-row {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"
+                            role="listitem"
                             title="{$row-tooltip}">
                             <xh:a
                                 href="{if (xxf:non-blank($row-href)) then $row-href else '#'}"
-                                class="fr-card-row-primary {'xforms-hidden'[not($is-list-mode) or xxf:is-blank($row-href)]}">
+                                class="fr-card-row-primary {'xforms-hidden'[xxf:is-blank($row-href)]}">
                                 <xh:span class="fr-card-col fr-card-col-single">
                                     <xh:span class="fr-card-col-text text-truncate">
                                         <xf:output value="$list-title"/>
@@ -948,7 +901,7 @@
                                 </xh:span>
                             </xh:a>
                             <xh:div
-                                class="fr-card-row-primary {'xforms-hidden'[not($is-list-mode) or xxf:non-blank($row-href)]}">
+                                class="fr-card-row-primary {'xforms-hidden'[xxf:non-blank($row-href)]}">
                                 <xh:span class="fr-card-col fr-card-col-single">
                                     <xh:span class="fr-card-col-text text-truncate">
                                         <xf:output value="$list-title"/>
@@ -958,25 +911,6 @@
                                     </xh:span>
                                 </xh:span>
                             </xh:div>
-                            <xf:repeat ref="(1 to count($cell-values))[not($is-list-mode)]">
-                                <xf:var name="col-idx"   value="."/>
-                                <xf:var name="cell-text" value="$cell-values[$col-idx]"/>
-                                <xf:var name="is-link"   value="$col-idx = 1 and xxf:non-blank($row-href)"/>
-                                <xh:span
-                                    class="fr-card-col {if ($is-single-cell) then 'fr-card-col-single' else ''} {if ($col-idx = 1) then 'fr-card-col-primary' else 'fr-card-col-secondary'}"
-                                    role="cell">
-                                    <xh:a
-                                        href="{if ($is-link) then $row-href else '#'}"
-                                        class="fr-card-stretched-link {'xforms-hidden'[not($is-link)]}">
-                                        <xh:span class="fr-card-col-text text-truncate">
-                                            <xf:output value="$cell-text"/>
-                                        </xh:span>
-                                    </xh:a>
-                                    <xh:span class="fr-card-col-text text-truncate {'xforms-hidden'[$is-link]}">
-                                        <xf:output value="$cell-text"/>
-                                    </xh:span>
-                                </xh:span>
-                            </xf:repeat>
                         </xh:li>
                     </xf:repeat>
                 </fr:rows>

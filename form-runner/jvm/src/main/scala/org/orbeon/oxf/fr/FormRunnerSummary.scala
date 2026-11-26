@@ -193,7 +193,32 @@ trait FormRunnerSummary {
       appForm                   = appForm,
       databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
       resourcesRootElemOpt      = Option(resourcesRootElem),
-      functionLibrary           = xfcd.partAnalysis.functionLibrary
+      functionLibrary           = xfcd.partAnalysis.functionLibrary,
+      cardMode                  = false
+    )
+  }
+
+  //@XPathFunction
+  def buildCardSummaryDynamicForm(
+    formDoc          : DocumentInfo,
+    templateNode     : NodeInfo,
+    app              : String,
+    form             : String,
+    version          : Int,
+    resourcesRootElem: NodeInfo
+  ): NodeInfo = {
+    val xfcd = inScopeContainingDocument
+    implicit val indentedLogger: IndentedLogger = xfcd.getIndentedLogger("form-runner")
+    implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
+    val appForm = AppForm(app, form)
+    buildSummaryDynamicFormImpl(
+      formDoc                   = formDoc,
+      templateNode              = templateNode,
+      appForm                   = appForm,
+      databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
+      resourcesRootElemOpt      = Option(resourcesRootElem),
+      functionLibrary           = xfcd.partAnalysis.functionLibrary,
+      cardMode                  = true
     )
   }
 
@@ -203,7 +228,8 @@ trait FormRunnerSummary {
     appForm                  : AppForm,
     databaseDataFormatVersion: DataFormatVersion,
     resourcesRootElemOpt     : Option[NodeInfo],
-    functionLibrary          : FunctionLibrary
+    functionLibrary          : FunctionLibrary,
+    cardMode                 : Boolean = false
   )(implicit
     indentedLogger           : IndentedLogger
   ): NodeInfo = {
@@ -276,7 +302,7 @@ trait FormRunnerSummary {
     val indexedVisibleByNode: Map[NodeInfo, (org.orbeon.oxf.fr.persistence.relational.IndexedControl, Int)] =
       (for {
         (ic, idx0)  <- allControls.zipWithIndex
-        if ic.summarySettings.show
+        if ic.summarySettings.show && (! cardMode || ! NonSortableControlLocalNames(ic.control))
         controlNode <- ic.controlElem
       } yield controlNode -> (ic, idx0)).toMap
 
@@ -321,7 +347,7 @@ trait FormRunnerSummary {
 
       val escapedPath = escapeXPathSingleQuotes(ic.xpath)
       val labelExpr =
-        s"(xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[@lang = xxf:instance('fr-language-instance')]/label, " +
+        s"(xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[@lang = (xxf:instance('fr-language-instance')[xxf:non-blank()], xxf:instance('fr-fr-language-instance'))[1]]/label, " +
         s"xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[1]/label, " +
         s"xf:element('label'))[1]"
 
@@ -407,7 +433,7 @@ trait FormRunnerSummary {
           case Some((ic, idx0)) =>
             matchedIndexedIndices += idx0
             Some(prepareIndexedColumn(ic, idx0, elem))
-          case None if ! indexedAllControlNodes.contains(elem) && isComputedSummaryShowControl(elem) =>
+          case None if ! indexedAllControlNodes.contains(elem) && isComputedSummaryShowControl(elem) && (! cardMode || ! NonSortableControlLocalNames(elem.localname)) =>
             Some(prepareComputedColumn(elem))
           case _ =>
             None
@@ -417,7 +443,7 @@ trait FormRunnerSummary {
     // Append any visible indexed controls outside the top-level body (e.g. inside section templates in `<xbl:xbl>`)
     val remainingIndexedColumns: List[PreparedSummaryColumn] =
       allControls.zipWithIndex.flatMap { case (ic, idx0) =>
-        if (ic.summarySettings.show && ! matchedIndexedIndices.contains(idx0))
+        if (ic.summarySettings.show && (! cardMode || ! NonSortableControlLocalNames(ic.control)) && ! matchedIndexedIndices.contains(idx0))
           ic.controlElem.map(prepareIndexedColumn(ic, idx0, _))
         else
           None
@@ -437,14 +463,20 @@ trait FormRunnerSummary {
       val emptyTh = headerRowElem.addElement(XhThQName)
       emptyTh.addAttribute("scope", "col")
     } else {
-      preparedColumns.foreach { col =>
+      preparedColumns.zipWithIndex.foreach { case (col, colIdx0) =>
         val sortableTh = headerRowElem.addElement(FrSortableThQName)
-        if (col.alignRight)
-          sortableTh.addAttribute("class", "fr-align-right")
+        val thClasses  = List(
+          Option.when(colIdx0 == 0)("fr-col-primary"),
+          Option.when(col.alignRight)("fr-align-right")
+        ).flatten
+        if (thClasses.nonEmpty)
+          sortableTh.addAttribute("class", thClasses.mkString(" "))
         sortableTh.addAttribute("label",          col.labelExpr)
         sortableTh.addAttribute("sort-supported", if (col.isSortable) "{$sort-supported}" else "false")
         sortableTh.addAttribute("instance",       "xxf:instance('fr-order-by')")
         sortableTh.addAttribute("column",         col.columnKey)
+        if (cardMode)
+          sortableTh.addAttribute("target-id", "fr-sortable-th")
       }
     }
 
@@ -483,8 +515,13 @@ trait FormRunnerSummary {
         val pos          = colIdx0 + 1
         val valueGroupId = s"fr-summary-col-$pos-value"
 
-        val tdElem = bodyRowElem.addElement(XhTdQName)
-        tdElem.addAttribute("class", if (col.alignRight) "fr-td fr-align-right" else "fr-td")
+        val tdElem    = bodyRowElem.addElement(XhTdQName)
+        val tdClasses = List(
+          Some("fr-td"),
+          Option.when(colIdx0 == 0)("fr-col-primary"),
+          Option.when(col.alignRight)("fr-align-right")
+        ).flatten
+        tdElem.addAttribute("class", tdClasses.mkString(" "))
 
         val linkElem = tdElem.addElement(XhAQName)
         linkElem.addAttribute("href",            "{$current-document-href-opt}")
@@ -654,7 +691,9 @@ object FormRunnerSummary extends FormRunnerSummary {
     "req-parameters-opt",
     "current-document-href-opt",
     "fr-search-value",
-    "fr-search-page"
+    "fr-search-page",
+    "page-size",
+    "is-extra-row"
   )
 
   private val VarRefFallbackRegex = """\$([A-Za-z_][\w.\-]*)""".r

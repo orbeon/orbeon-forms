@@ -962,6 +962,11 @@ object FormRunnerApp extends App {
                 .querySelectorOpt(":scope > ul.list-group:not(.xforms-hidden)")
                 .filter(_.getBoundingClientRect().height > 0)
 
+            val tableSlotOpt =
+              card
+                .querySelectorOpt(":scope > .fr-card-table-slot:not(.xforms-hidden)")
+                .filter(_.getBoundingClientRect().height > 0)
+
             val (baseListH, baseRows, extraRows) =
               listOpt match {
                 case Some(list) =>
@@ -973,7 +978,23 @@ object FormRunnerApp extends App {
                   val rawBaseListH  = math.max(0.0, list.getBoundingClientRect().height - shownExtraSum - 1.0)
                   (rawBaseListH, base, extra)
                 case None =>
-                  (0.0, Nil, Nil)
+                  tableSlotOpt match {
+                    case Some(slot) =>
+                      val dataRows =
+                        slot
+                          .querySelectorAllT("tbody > tr")
+                          .iterator
+                          .filterNot(_.hasAnyClass("xforms-repeat-begin-end", "xforms-repeat-delimiter", "xforms-group-begin-end", "xforms-disabled", "xforms-hidden"))
+                          .toList
+                      val base          = dataRows.filterNot(_.hasClass(ExtraRowClass))
+                      val extra         = dataRows.filter(_.hasClass(ExtraRowClass))
+                      val shownExtraSum = extra.iterator.filterNot(_.hasClass(ExtraRowHiddenClass)).map(_.getBoundingClientRect().height).sum
+                      // Subtract 1px for `margin-block-end: -1px` on `.fr-card-table-slot`
+                      val rawBaseListH  = math.max(0.0, slot.getBoundingClientRect().height - shownExtraSum - 1.0)
+                      (rawBaseListH, base, extra)
+                    case None =>
+                      (0.0, Nil, Nil)
+                  }
               }
 
             val naturalH      = borderV + headerH + introH + quickLinkH + baseListH + footerH
@@ -1008,6 +1029,7 @@ object FormRunnerApp extends App {
               var usedH          = 0.0
               var shownExtra     = 0
 
+              var anyRowToggled = false
               cm.extraRows.foreach { row =>
                 val rowH =
                   if (!row.hasClass(ExtraRowHiddenClass))
@@ -1020,9 +1042,16 @@ object FormRunnerApp extends App {
                   shownExtra += 1
                 }
                 val shouldHide = !canFit
-                if (row.hasClass(ExtraRowHiddenClass) != shouldHide)
+                if (row.hasClass(ExtraRowHiddenClass) != shouldHide) {
                   row.toggleClass(ExtraRowHiddenClass, shouldHide)
+                  anyRowToggled = true
+                }
               }
+
+              if (anyRowToggled)
+                cm.card.querySelectorOpt(":scope > .fr-card-table-slot table:not(.fr-table-no-form-data)").foreach { table =>
+                  SearchResultsTableSupport.syncTable(table)
+                }
 
               val visibleCount = cm.baseRows.size + shownExtra
               val allShown     = cm.totalCountOpt.exists(total => total > 0 && visibleCount >= total)

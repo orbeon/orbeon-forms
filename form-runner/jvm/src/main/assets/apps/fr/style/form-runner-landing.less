@@ -11,6 +11,7 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 //
 @import (reference) "form-runner-common";
+@import "form-runner-search";
 
 .orbeon {
 
@@ -1117,6 +1118,140 @@
         }
     }
 
+    // Dynamic Summary table slot inside Form Data cards (`<fr:card-table>`)
+    .card .fr-card-table-slot {
+        flex: 0 0 auto;
+        margin-block-end: -1px; // Merge last visible row's bottom border with `.card-footer` top border when flush
+
+        &.xforms-hidden {
+            display: none !important;
+        }
+
+        &.fr-card-is-refreshing {
+            opacity: 0.6;
+            transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+        }
+
+        .fr-search-results {
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+
+            &:focus-visible {
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: -2px;
+            }
+
+            table {
+                background-color: var(--orbeon-form-background-color);
+                border: 0;
+                margin: 0;
+            }
+
+            thead tr th {
+                background-color: var(--orbeon-landing-card-header-background-color);
+                color: var(--orbeon-landing-card-header-color);
+                border-top: 0;
+                border-inline: 0;
+                border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+                font-size: 0.92em;
+
+                button.btn-link {
+                    padding: 0.56em 0.75em;
+                    font-weight: 600;
+                }
+
+                &:first-child button.btn-link {
+                    padding-inline-start: 1.09em;
+                }
+
+                &:last-child button.btn-link {
+                    padding-inline-end: 1.09em;
+                }
+
+                span.fr-sortable-th button.btn-link:hover,
+                span.fr-sortable-th button.btn-link:focus {
+                    color: var(--orbeon-landing-card-link-hover-color);
+                    background-color: transparent;
+                }
+
+                &.fr-sticky-edge {
+                    box-shadow: inset -1px 0 0 var(--orbeon-landing-card-border-color);
+
+                    &:dir(rtl) {
+                        box-shadow: inset 1px 0 0 var(--orbeon-landing-card-border-color);
+                    }
+
+                    &[aria-sort],
+                    &:has(.caret-container.active-caret) {
+                        box-shadow:
+                            inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color),
+                            inset -1px 0 0 var(--orbeon-landing-card-border-color);
+
+                        &:dir(rtl) {
+                            box-shadow:
+                                inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color),
+                                inset 1px 0 0 var(--orbeon-landing-card-border-color);
+                        }
+                    }
+                }
+            }
+
+            tbody {
+                tr.fr-card-extra-row-hidden {
+                    display: none !important;
+                }
+
+                tr > td,
+                tr:nth-child(4n+3) > td {
+                    background-color: var(--orbeon-form-background-color);
+                }
+
+                tr:hover > td,
+                tr:focus-within > td {
+                    background-color: var(--orbeon-landing-card-hover-background-color);
+                }
+
+                tr > td {
+                    padding: 0.52em 0.7em;
+                    border-top: 0;
+                    border-inline: 0;
+                    border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+
+                    &:first-child {
+                        padding-inline-start: 1em;
+                    }
+
+                    &:last-child {
+                        padding-inline-end: 1em;
+                    }
+
+                    &.fr-sticky-edge {
+                        box-shadow: inset -1px 0 0 var(--orbeon-landing-card-border-color);
+
+                        &:dir(rtl) {
+                            box-shadow: inset 1px 0 0 var(--orbeon-landing-card-border-color);
+                        }
+                    }
+
+                    &.fr-col-primary:has(> a.fr-summary-cell-link:not(.xforms-hidden)) .fr-summary-cell-value {
+                        color: var(--orbeon-landing-card-link-color);
+                        font-weight: 500;
+                    }
+                }
+
+                tr:hover > td.fr-col-primary:has(> a.fr-summary-cell-link:not(.xforms-hidden)) .fr-summary-cell-value {
+                    color: var(--orbeon-landing-card-link-hover-color);
+                }
+            }
+        }
+    }
+
     // List & multi-column table grid inside cards
     .card .list-group {
         flex: 0 0 auto;
@@ -1336,48 +1471,6 @@
             }
         }
 
-        // Form Data row: full-row stretched link in primary column + neutral secondary columns
-        &.fr-card-data-row {
-            .fr-card-col-primary {
-                font-weight: 500;
-            }
-
-            .fr-card-col-secondary {
-                color: var(--orbeon-base-color);
-            }
-
-            .fr-card-stretched-link {
-                display: flex;
-                align-items: center;
-                inline-size: 100%;
-                min-inline-size: 0;
-                color: var(--orbeon-landing-card-link-color);
-
-                &.xforms-hidden {
-                    display: none;
-                }
-
-                &::after {
-                    content: "";
-                    position: absolute;
-                    inset: 0;
-                    z-index: 1;
-                }
-
-                &:hover {
-                    color: var(--orbeon-landing-card-link-hover-color);
-                }
-            }
-
-            .fr-card-col-text.xforms-hidden {
-                display: none;
-            }
-
-            &:has(.fr-card-stretched-link:focus-visible) {
-                box-shadow: 0 0 0 2px inset var(--orbeon-focus-border-color);
-            }
-        }
-
         // Legacy itemset row fallback
         & > a.fr-card-row-primary {
             color: var(--orbeon-landing-card-link-color);
@@ -1402,8 +1495,7 @@
     }
 
     a figure,
-    .card .list-group-item.fr-card-published-row,
-    .card .list-group-item.fr-card-data-row-clickable {
+    .card .list-group-item.fr-card-published-row {
         &:focus-within {
             background-color: var(--orbeon-landing-card-hover-background-color);
         }
@@ -1437,90 +1529,6 @@
             .xforms-output-output {
                 display: inline;
                 min-inline-size: 0;
-            }
-        }
-    }
-
-    .fr-card-heading {
-        &[aria-sort] .fr-card-sort-trigger,
-        .fr-card-sort-trigger:has(.fr-card-sort-caret.active-caret) {
-            color: var(--orbeon-table-header-sorted-color);
-            box-shadow: inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color);
-        }
-
-        .fr-card-sort-trigger {
-            min-inline-size: 0;
-            flex: 1 1 auto;
-            display: flex;
-            align-items: center;
-
-            button.btn-link {
-                border: 0;
-                border-radius: 0;
-                min-block-size: 28px;
-                padding: 0.48em 0;
-                margin: 0;
-                inline-size: 100%;
-                min-inline-size: 0;
-                display: flex;
-                align-items: center;
-                background: transparent;
-                color: inherit;
-                font: inherit;
-                font-weight: 600;
-                text-decoration: none;
-                cursor: pointer;
-                box-shadow: none;
-
-                &:hover {
-                    color: var(--orbeon-landing-card-link-hover-color);
-                    text-decoration: none;
-                }
-
-                &:focus-visible {
-                    outline: 2px solid var(--orbeon-focus-border-color);
-                    outline-offset: -2px;
-                }
-
-                @media (hover: hover) {
-                    &:hover .fr-card-sort-caret.hover-caret {
-                        opacity: 0.45;
-                    }
-                }
-
-                &:focus-visible .fr-card-sort-caret.hover-caret {
-                    opacity: 0.45;
-                }
-
-                .fr-card-col-text {
-                    flex: 0 1 auto;
-                }
-
-                .fr-card-sort-caret {
-                    margin-inline-start: 0.35em;
-                    font-size: 0.7em;
-                    flex: 0 0 auto;
-                    line-height: 1;
-
-                    &.hover-caret {
-                        opacity: 0;
-                        transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
-
-                        @media (prefers-reduced-motion: reduce) {
-                            transition: none;
-                        }
-                    }
-
-                    &.no-caret {
-                        display: none !important;
-                    }
-
-                    .xforms-output,
-                    .xforms-output-output {
-                        display: inline;
-                        line-height: inherit;
-                    }
-                }
             }
         }
     }

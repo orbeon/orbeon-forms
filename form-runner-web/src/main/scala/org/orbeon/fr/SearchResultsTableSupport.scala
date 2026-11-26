@@ -48,6 +48,77 @@ object SearchResultsTableSupport {
   val PillsGridClass            = "fr-pills-grid"
   val PillsGridColsCssVar       = "--fr-pills-grid-cols"
   val PopoverOpenClass          = "fr-popover-open"
+  val StickyColClass            = "fr-sticky-col"
+  val StickyEdgeClass           = "fr-sticky-edge"
+  val ScrolledStartClass        = "is-scrolled-start"
+  val CanScrollEndClass         = "can-scroll-end"
+
+  private[fr] def adjustWidthsForOverflowPeek(
+    widths       : Vector[Double],
+    floors       : Vector[Double],
+    manualMask   : Vector[Boolean],
+    wrapperWidth : Int
+  ): Vector[Double] = {
+    val n     = widths.length
+    val total = widths.sum
+    if (n < 2 || wrapperWidth <= 0 || total <= wrapperWidth + 1.0) {
+      widths
+    } else {
+      val MinNextColPeekPx     = 32.0
+      val TargetNextColPeekPx  = 42.0
+      val FlushOvershootZonePx = 20.0
+      val MaxTotalPeekShrinkPx = 72.0
+      val TargetOvershootPx    = 36.0
+
+      var cum       = 0.0
+      var boundaryK = -1
+      var i         = 0
+      while (i < n - 1 && boundaryK < 0) {
+        cum += widths(i)
+        val inUndershootDanger = cum <= wrapperWidth && (wrapperWidth - cum) < MinNextColPeekPx
+        val inOvershootDanger  = cum > wrapperWidth  && (cum - wrapperWidth) < FlushOvershootZonePx
+        if (inUndershootDanger || inOvershootDanger)
+          boundaryK = i
+        i += 1
+      }
+
+      if (boundaryK < 0) {
+        widths
+      } else {
+        val cumAtK       = widths.take(boundaryK + 1).sum
+        val targetCum    = wrapperWidth.toDouble - TargetNextColPeekPx
+        val neededShrink = cumAtK - targetCum
+        val slacks       = (0 to boundaryK).map { j =>
+          if (manualMask(j)) 0.0 else math.max(0.0, widths(j) - floors(j))
+        }
+        val totalSlack   = slacks.sum
+
+        if (neededShrink > 0.0 && totalSlack >= neededShrink && neededShrink <= MaxTotalPeekShrinkPx) {
+          widths.zipWithIndex.map { case (w, j) =>
+            if (j <= boundaryK && slacks(j) > 0.0)
+              math.round(w - neededShrink * (slacks(j) / totalSlack)).toDouble
+            else
+              w
+          }
+        } else {
+          // Cannot shrink preceding columns enough; nudge non-manual columns slightly wider so column `boundaryK` visibly clips mid-cell
+          val nonManualIndices = (0 to boundaryK).filterNot(manualMask)
+          val neededGrow       = (wrapperWidth.toDouble + TargetOvershootPx) - cumAtK
+          if (neededGrow > 0.0 && neededGrow <= 56.0 && nonManualIndices.nonEmpty) {
+            val perCol = neededGrow / nonManualIndices.size
+            widths.zipWithIndex.map { case (w, j) =>
+              if (j <= boundaryK && ! manualMask(j))
+                math.round(w + perCol).toDouble
+              else
+                w
+            }
+          } else {
+            widths
+          }
+        }
+      }
+    }
+  }
 
   def init(): Unit =
     if (! initialized) {
@@ -76,7 +147,7 @@ object SearchResultsTableSupport {
     }
     statesByScope.clear()
     if (clearManual)
-      Try(dom.window.sessionStorage.removeItem(storageKeyForCurrentPath))
+      clearStoredWidthsForCurrentPath(keepManual = false)
     else
       clearStoredLockedWidthsForCurrentPath()
   }
@@ -141,7 +212,8 @@ object SearchResultsTableSupport {
                   persistToSession(sig, state)
               }
 
-              attachResizers(tableElem, cols)
+              if (tableElem.closestOpt(".card").isEmpty)
+                attachResizers(tableElem, cols)
               applyWidthsToColgroup(wrapperElem, tableElem, cols, state)
               observeAndRefreshTruncations(tableElem, state)
             }
@@ -180,6 +252,10 @@ object SearchResultsTableSupport {
     val DynamicWideMaxCh         = 34.0
     val DynamicFlexMinCh         = 24.0
     val DynamicFlexCapCh         = 32.0
+    val DynamicCompactFlexMinCh  = 15.0
+    val DynamicCompactFlexCapCh  = 22.0
+    val DynamicCompactMaxCh      = 18.0
+    val CompactShortColMaxCh     = 16.0
     val DynamicTextHeadroomCh    = 2.5
     val DynamicNumHeadroomCh     = 1.5
     val DynamicCompactHeadroomCh = 1.0
@@ -251,8 +327,16 @@ object SearchResultsTableSupport {
       manualWidths : Map[String, Double]
     )
 
+    case class StickySpec(
+      colIndex    : Int,
+      naturalLeft : Double,
+      stickyStart : Double
+    )
+
     class TableState(
+      var scopeKey                : String                                  = "",
       val lockedWidths            : mutable.LinkedHashMap[String, Double]   = mutable.LinkedHashMap.empty,
+      val headerMinWidths         : mutable.HashMap[String, Double]         = mutable.HashMap.empty,
       val manualWidths            : mutable.LinkedHashMap[String, Double]   = mutable.LinkedHashMap.empty,
       val versionPillWidthByShape : mutable.HashMap[(Int, Boolean), Double] = mutable.HashMap.empty,
       val triggerWidthByDigits    : mutable.HashMap[Int, Double]            = mutable.HashMap.empty,
@@ -261,8 +345,11 @@ object SearchResultsTableSupport {
       var isLocked                : Boolean                                 = false,
       var lastSignature           : Option[Vector[String]]                  = None,
       var lastWrapperWidth        : Int                                     = 0,
+      var stickySpecs             : Vector[StickySpec]                      = Vector.empty,
+      var lastActiveStickyEdgeIdx : Option[Int]                             = None,
       var currentTableElem        : Option[html.Element]                    = None,
       var observedWrapper         : Option[html.Element]                    = None,
+      var scrollBoundWrapper      : Option[html.Element]                    = None,
       var wrapperObserver         : Option[ResizeObserver]                  = None,
       var cellObserver            : Option[ResizeObserver]                  = None,
       val observedCells           : WeakMap[html.Element, Boolean]          = new WeakMap[html.Element, Boolean]()
@@ -286,6 +373,9 @@ object SearchResultsTableSupport {
     def storageKeyForCurrentPath: String =
       s"$StorageKeyPrefix${dom.window.location.pathname}"
 
+    def storageKeyForScope(scopeKey: String): String =
+      if (scopeKey.nonEmpty) s"$StorageKeyPrefix$scopeKey" else storageKeyForCurrentPath
+
     def logicalTableKey(wrapperElem: html.Element): String = {
       val allWrappers = dom.document.querySelectorAllT(".orbeon .fr-search-results")
       val idx         = math.max(0, allWrappers.indexOf(wrapperElem))
@@ -300,7 +390,7 @@ object SearchResultsTableSupport {
     }
 
     def ensureWrapperAccessibility(wrapperElem: html.Element): Unit = {
-      if (! wrapperElem.hasAttribute("tabindex"))
+      if (wrapperElem.closestOpt(".card").isEmpty && ! wrapperElem.hasAttribute("tabindex"))
         wrapperElem.tabIndex = 0
       if (! wrapperElem.hasAttribute("role"))
         wrapperElem.setAttribute("role", "region")
@@ -314,6 +404,13 @@ object SearchResultsTableSupport {
       tableElem.style.tableLayout = ""
       tableElem.style.width       = ""
       tableElem.querySelectorOpt(s":scope > colgroup.$ColgroupClass").foreach(_.remove())
+      clearStickyFromTable(tableElem)
+      tableElem.closestOpt(".fr-search-results").foreach { wrapperElem =>
+        wrapperElem.classList.remove(ScrolledStartClass)
+        wrapperElem.classList.remove(CanScrollEndClass)
+        if (wrapperElem.hasAttribute("tabindex"))
+          wrapperElem.removeAttribute("tabindex")
+      }
     }
 
     def isTableLaidOut(wrapperElem: html.Element, tableElem: html.Element): Boolean =
@@ -429,7 +526,7 @@ object SearchResultsTableSupport {
           .toOption
           .orElse(statesByScope.get(scopeKey))
           .getOrElse {
-            val created = new TableState()
+            val created = new TableState(scopeKey = scopeKey)
             loadManualWidthsFromSession(created)
             if (hasResizeObserver) {
               val cellObs = new ResizeObserver((entries, _) => {
@@ -446,9 +543,21 @@ object SearchResultsTableSupport {
             created
           }
 
+      state.scopeKey         = scopeKey
       state.currentTableElem = Some(tableElem)
       statesByScope.put(scopeKey, state)
       tableStates.set(tableElem, state)
+
+      if (! state.scrollBoundWrapper.contains(wrapperElem)) {
+        wrapperElem.addEventListener(
+          "scroll",
+          (_: dom.Event) =>
+            state.currentTableElem.foreach { activeTable =>
+              syncScrollAffordances(wrapperElem, activeTable, state, forceEdgeSync = false)
+            }
+        )
+        state.scrollBoundWrapper = Some(wrapperElem)
+      }
 
       if (hasResizeObserver && ! state.observedWrapper.contains(wrapperElem)) {
         state.wrapperObserver.foreach(_.disconnect())
@@ -478,7 +587,7 @@ object SearchResultsTableSupport {
     }
 
     def loadManualWidthsFromSession(state: TableState): Unit =
-      readSessionPayloadOpt.foreach { payload =>
+      readSessionPayloadOpt(state.scopeKey).foreach { payload =>
         payload.manualWidths.foreach { case (k, v) =>
           if (v >= MinManualWidthPx)
             state.manualWidths.put(k, v)
@@ -486,7 +595,7 @@ object SearchResultsTableSupport {
       }
 
     def tryRestoreLockedWidthsFromSession(sig: Vector[String], state: TableState): Boolean =
-      readSessionPayloadOpt.exists { payload =>
+      readSessionPayloadOpt(state.scopeKey).exists { payload =>
         val matches = payload.signature == sig && payload.lockedWidths.nonEmpty
         if (matches) {
           state.lockedWidths.clear()
@@ -503,22 +612,38 @@ object SearchResultsTableSupport {
           lockedWidths = state.lockedWidths.toMap,
           manualWidths = state.manualWidths.toMap
         )
-        dom.window.sessionStorage.setItem(storageKeyForCurrentPath, payload.asJson.noSpaces)
+        dom.window.sessionStorage.setItem(storageKeyForScope(state.scopeKey), payload.asJson.noSpaces)
       }
 
     def clearStoredLockedWidthsForCurrentPath(): Unit =
+      clearStoredWidthsForCurrentPath(keepManual = true)
+
+    def clearStoredWidthsForCurrentPath(keepManual: Boolean): Unit =
       Try {
-        readSessionPayloadOpt match {
-          case Some(payload) if payload.manualWidths.nonEmpty =>
-            val updated = payload.copy(lockedWidths = Map.empty)
-            dom.window.sessionStorage.setItem(storageKeyForCurrentPath, updated.asJson.noSpaces)
-          case _ =>
-            dom.window.sessionStorage.removeItem(storageKeyForCurrentPath)
+        val prefix = storageKeyForCurrentPath
+        val keys   = (0 until dom.window.sessionStorage.length).flatMap(i => Option(dom.window.sessionStorage.key(i)))
+          .filter(k => k == prefix || k.startsWith(s"$prefix#"))
+        keys.foreach { key =>
+          if (keepManual) {
+            Option(dom.window.sessionStorage.getItem(key))
+              .flatMap(raw => decode[StoredWidthPayload](raw).toOption) match {
+                case Some(payload) if payload.manualWidths.nonEmpty =>
+                  dom.window.sessionStorage.setItem(key, payload.copy(lockedWidths = Map.empty).asJson.noSpaces)
+                case _ =>
+                  dom.window.sessionStorage.removeItem(key)
+              }
+          } else {
+            dom.window.sessionStorage.removeItem(key)
+          }
         }
       }
 
-    def readSessionPayloadOpt: Option[StoredWidthPayload] =
-      Try(Option(dom.window.sessionStorage.getItem(storageKeyForCurrentPath)))
+    def readSessionPayloadOpt(scopeKey: String): Option[StoredWidthPayload] =
+      Try {
+        val scopedKey = storageKeyForScope(scopeKey)
+        Option(dom.window.sessionStorage.getItem(scopedKey))
+          .orElse(if (scopeKey.endsWith("#0")) Option(dom.window.sessionStorage.getItem(storageKeyForCurrentPath)) else None)
+      }
         .toOption
         .flatten
         .flatMap(raw => decode[StoredWidthPayload](raw).toOption)
@@ -629,7 +754,7 @@ object SearchResultsTableSupport {
     def findFlexColumnKeyOpt(cols: Vector[ColumnDescriptor]): Option[String] = {
       val dataCols = cols.filter(_.isDataColumn)
       dataCols
-        .find(_.thElem.hasClass("fr-title"))
+        .find(c => c.thElem.hasAnyClass("fr-title", "fr-col-primary") && ! c.alignRight)
         .orElse(dataCols.findLast(c => c.kind == ColumnKind.Dynamic && ! c.alignRight))
         .orElse(dataCols.findLast(_.kind == ColumnKind.Dynamic))
         .orElse(dataCols.lastOption)
@@ -707,19 +832,23 @@ object SearchResultsTableSupport {
       try {
         val bodyRows     = findVisibleBodyRows(tableElem)
         val headerWidths = measureHeaderWidthsBatch(cols, state.manualWidths)
+        val wrapperW     = tableElem.closestOpt(".fr-search-results").map(_.clientWidth).getOrElse(0)
+        val isCompactBox = wrapperW > 0 && wrapperW < 760
         state.lockedWidths.clear()
+        state.headerMinWidths.clear()
 
         cols.foreach { col =>
+          val (pageW, headerMin) =
+            headerWidths.getOrElse(
+              col.key,
+              math.ceil(col.thElem.getBoundingClientRect().width) -> measureHeaderMinWidth(col.thElem)
+            )
+          state.headerMinWidths.put(col.key, headerMin)
+
           state.manualWidths.get(col.key) match {
             case Some(manualPx) =>
               state.lockedWidths.put(col.key, manualPx)
             case None =>
-              val (pageW, headerMin) =
-                headerWidths.getOrElse(
-                  col.key,
-                  math.ceil(col.thElem.getBoundingClientRect().width) -> measureHeaderMinWidth(col.thElem)
-                )
-
               val resolvedPx = col.kind match {
                 case ColumnKind.Selection =>
                   math.max(SelectionMinPx, pageW)
@@ -755,8 +884,12 @@ object SearchResultsTableSupport {
                   clamp(minPx, pageW + math.ceil(MetadataHeadroomCh * ch), maxPx)
 
                 case ColumnKind.Dynamic if flexKeyOpt.contains(col.key) && dataColCount >= 1 =>
-                  val minPx = math.max(headerMin, math.ceil(DynamicFlexMinCh * ch + padPx))
-                  val capPx = math.max(minPx, math.ceil(DynamicFlexCapCh * ch + padPx))
+                  val flexMinCh = if (isCompactBox) DynamicCompactFlexMinCh else DynamicFlexMinCh
+                  val minPx     = math.max(headerMin, math.ceil(flexMinCh * ch + padPx))
+                  val rawCapPx  =
+                    if (isCompactBox) math.min(math.ceil(DynamicCompactFlexCapCh * ch + padPx), math.floor(wrapperW * 0.38))
+                    else math.ceil(DynamicFlexCapCh * ch + padPx)
+                  val capPx     = math.max(minPx, rawCapPx)
                   clamp(minPx, pageW, capPx)
 
                 case ColumnKind.Dynamic =>
@@ -794,7 +927,8 @@ object SearchResultsTableSupport {
                         else if (col.alignRight) DynamicNumHeadroomCh
                         else DynamicTextHeadroomCh
                       val capCh =
-                        if (pageW > DynamicWideThresholdCh * ch + padPx) DynamicWideMaxCh
+                        if (isCompactBox) DynamicCompactMaxCh
+                        else if (pageW > DynamicWideThresholdCh * ch + padPx) DynamicWideMaxCh
                         else DynamicMaxCh
                       val maxPx = math.max(headerMin, math.ceil(capCh * ch + padPx))
                       clamp(headerMin, pageW + math.ceil(headroomCh * ch), maxPx)
@@ -887,13 +1021,31 @@ object SearchResultsTableSupport {
 
       val flexKeyOpt = findFlexColumnKeyOpt(cols)
       val manualFlex = flexKeyOpt.exists(state.manualWidths.contains)
-      val totalMin   = cols.map(c => state.lockedWidths.getOrElse(c.key, 100.0)).sum
+      val rawWidths  = cols.map(c => math.round(state.lockedWidths.getOrElse(c.key, 100.0)).toDouble)
+      val totalMin   = rawWidths.sum
 
       val fitsContainer = wrapperWidth > 0 && ! manualFlex && totalMin <= wrapperWidth
 
-      cols.zip(colElems).foreach { case (col, colElem) =>
+      val appliedWidths: Vector[Double] =
+        if (fitsContainer) {
+          val nonFlexSum = cols.zip(rawWidths).collect { case (c, w) if ! flexKeyOpt.contains(c.key) => w }.sum
+          cols.zip(rawWidths).map { case (c, w) =>
+            if (flexKeyOpt.contains(c.key)) math.max(w, wrapperWidth.toDouble - nonFlexSum)
+            else w
+          }
+        } else {
+          val floors = cols.zip(rawWidths).map { case (c, w) =>
+            val hMin = state.headerMinWidths.getOrElse(c.key, MinManualWidthPx)
+            if (! c.isDataColumn) w
+            else math.max(MinManualWidthPx, math.max(hMin, math.floor(w * 0.78)))
+          }
+          val manualMask = cols.map(c => state.manualWidths.contains(c.key) || ! c.isDataColumn)
+          adjustWidthsForOverflowPeek(rawWidths, floors, manualMask, wrapperWidth)
+        }
+
+      cols.zip(colElems).zip(appliedWidths).foreach { case ((col, colElem), appliedPx) =>
         colElem.setAttribute("data-fr-col", col.key)
-        val px = math.round(state.lockedWidths.getOrElse(col.key, 100.0))
+        val px = math.round(appliedPx)
         if (fitsContainer && flexKeyOpt.contains(col.key))
           colElem.style.width = "auto"
         else
@@ -904,12 +1056,155 @@ object SearchResultsTableSupport {
           .foreach(_.setAttribute("aria-valuenow", px.toString))
       }
 
+      val totalApplied = appliedWidths.sum
       tableElem.style.width =
         if (fitsContainer || wrapperWidth <= 0 && ! manualFlex) "100%"
-        else s"${math.round(totalMin)}px"
+        else s"${math.round(totalApplied)}px"
 
       tableElem.style.tableLayout = "fixed"
       tableElem.classList.add(FixedTableClass)
+
+      applyStickyColumns(wrapperElem, tableElem, cols, appliedWidths, fitsContainer, state)
+      syncScrollAffordances(wrapperElem, tableElem, state, forceEdgeSync = true)
+    }
+
+    def allBodyRowElements(tableElem: html.Element): Vector[html.Element] =
+      tableElem
+        .querySelectorOpt(":scope > tbody")
+        .toVector
+        .flatMap(_.childrenT)
+        .filter(el => el.localName == "tr" && ! el.hasAnyClass(HiddenOrDelimiterClasses*))
+
+    def visibleOrExtraCellsInRow(rowElem: html.Element): Vector[html.Element] =
+      rowElem
+        .childrenT
+        .iterator
+        .filter(el => el.localName == "td" && ! el.hasAnyClass(HiddenOrDelimiterClasses*))
+        .toVector
+
+    def clearStickyFromTable(tableElem: html.Element): Unit =
+      tableElem
+        .querySelectorAllT(s"th.$StickyColClass, td.$StickyColClass, th.$StickyEdgeClass, td.$StickyEdgeClass")
+        .foreach { el =>
+          el.classList.remove(StickyColClass)
+          el.classList.remove(StickyEdgeClass)
+          el.style.removeProperty("inset-inline-start")
+        }
+
+    def applyStickyColumns(
+      wrapperElem   : html.Element,
+      tableElem     : html.Element,
+      cols          : Vector[ColumnDescriptor],
+      appliedWidths : Vector[Double],
+      fitsContainer : Boolean,
+      state         : TableState
+    ): Unit = {
+      val wrapperWidth = wrapperElem.clientWidth
+      val totalApplied = appliedWidths.sum
+      val overflows    = ! fitsContainer && wrapperWidth >= 360 && totalApplied > wrapperWidth + 1.5
+
+      val candidateStickyCols: Vector[ColumnDescriptor] =
+        if (! overflows) {
+          Vector.empty
+        } else {
+          val leadingChrome = cols.takeWhile(c => c.kind == ColumnKind.Selection || c.kind == ColumnKind.Labels)
+          val primaryOpt    = cols.find(c => c.thElem.hasAnyClass("fr-col-primary", "fr-title"))
+          val combined      = (leadingChrome ++ primaryOpt).distinctBy(_.index).sortBy(_.index)
+          val stickySum     = combined.map(c => appliedWidths(c.index)).sum
+          if (stickySum <= wrapperWidth * 0.55) combined
+          else if (leadingChrome.nonEmpty && leadingChrome.map(c => appliedWidths(c.index)).sum <= wrapperWidth * 0.3) leadingChrome
+          else Vector.empty
+        }
+
+      var stickyAccum = 0.0
+      val specs = candidateStickyCols.map { col =>
+        val naturalLeft = appliedWidths.take(col.index).sum
+        val spec        = StickySpec(col.index, naturalLeft, stickyAccum)
+        stickyAccum += appliedWidths(col.index)
+        spec
+      }
+      val specByIndex = specs.map(s => s.colIndex -> s).toMap
+      state.stickySpecs = specs
+
+      val rows = allBodyRowElements(tableElem)
+      cols.foreach { col =>
+        val cellsForCol = col.thElem +: rows.flatMap(r => visibleOrExtraCellsInRow(r).lift(col.index))
+        specByIndex.get(col.index) match {
+          case Some(spec) =>
+            val offsetStr = s"${math.round(spec.stickyStart)}px"
+            cellsForCol.foreach { cell =>
+              if (! cell.hasClass(StickyColClass))
+                cell.classList.add(StickyColClass)
+              if (cell.style.getPropertyValue("inset-inline-start") != offsetStr)
+                cell.style.setProperty("inset-inline-start", offsetStr)
+            }
+          case None =>
+            cellsForCol.foreach { cell =>
+              if (cell.hasClass(StickyColClass))
+                cell.classList.remove(StickyColClass)
+              if (cell.hasClass(StickyEdgeClass))
+                cell.classList.remove(StickyEdgeClass)
+              if (cell.style.getPropertyValue("inset-inline-start").nonEmpty)
+                cell.style.removeProperty("inset-inline-start")
+            }
+        }
+      }
+    }
+
+    def syncScrollAffordances(
+      wrapperElem   : html.Element,
+      tableElem     : html.Element,
+      state         : TableState,
+      forceEdgeSync : Boolean
+    ): Unit = {
+      val cw            = wrapperElem.clientWidth
+      val sw            = wrapperElem.scrollWidth
+      val sl            = math.abs(wrapperElem.scrollLeft)
+      val canScrollH    = cw > 0 && sw > cw + 1
+      val scrolledStart = canScrollH && sl > 1.0
+      val canScrollEnd  = canScrollH && (sl + cw) < (sw - 1.5)
+
+      val activeEdgeIdxOpt =
+        if (scrolledStart && state.stickySpecs.nonEmpty)
+          state.stickySpecs.filter(s => sl >= (s.naturalLeft - s.stickyStart - 1.5)).lastOption.map(_.colIndex)
+        else
+          None
+
+      if (wrapperElem.hasClass(ScrolledStartClass) != scrolledStart)
+        wrapperElem.toggleClass(ScrolledStartClass, scrolledStart)
+      if (wrapperElem.hasClass(CanScrollEndClass) != canScrollEnd)
+        wrapperElem.toggleClass(CanScrollEndClass, canScrollEnd)
+
+      if (wrapperElem.closestOpt(".card").isDefined) {
+        if (canScrollH) {
+          if (! wrapperElem.hasAttribute("tabindex") || wrapperElem.tabIndex != 0)
+            wrapperElem.tabIndex = 0
+        } else if (wrapperElem.hasAttribute("tabindex")) {
+          wrapperElem.removeAttribute("tabindex")
+        }
+      }
+
+      if (forceEdgeSync || state.lastActiveStickyEdgeIdx != activeEdgeIdxOpt) {
+        val prevIdxOpt = state.lastActiveStickyEdgeIdx
+        state.lastActiveStickyEdgeIdx = activeEdgeIdxOpt
+        val visibleThs = findVisibleHeaders(tableElem)
+        val rows       = allBodyRowElements(tableElem)
+
+        def setEdgeForCol(colIdx: Int, active: Boolean): Unit = {
+          val cells = visibleThs.lift(colIdx).toVector ++ rows.flatMap(r => visibleOrExtraCellsInRow(r).lift(colIdx))
+          cells.foreach { cell =>
+            if (cell.hasClass(StickyEdgeClass) != active)
+              cell.toggleClass(StickyEdgeClass, active)
+          }
+        }
+
+        if (forceEdgeSync) {
+          state.stickySpecs.foreach(s => setEdgeForCol(s.colIndex, activeEdgeIdxOpt.contains(s.colIndex)))
+        } else {
+          prevIdxOpt.filterNot(activeEdgeIdxOpt.contains).foreach(setEdgeForCol(_, active = false))
+          activeEdgeIdxOpt.foreach(setEdgeForCol(_, active = true))
+        }
+      }
     }
 
     def attachResizers(

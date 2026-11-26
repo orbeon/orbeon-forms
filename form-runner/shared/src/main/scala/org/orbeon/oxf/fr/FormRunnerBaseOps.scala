@@ -580,7 +580,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   //@XPathFunction
   def landingCardsXml(): Option[DocumentNodeInfoType] = {
-    implicit val p: FormRunnerParams = FormRunnerParams()
+    implicit val p: FormRunnerParams = FormRunnerParamsOpt().getOrElse(FormRunnerParams(AppForm("*", "*"), "landing"))
     landingCards.map(_._2)
   }
 

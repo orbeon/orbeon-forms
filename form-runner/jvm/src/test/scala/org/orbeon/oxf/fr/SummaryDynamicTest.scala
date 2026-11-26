@@ -1422,5 +1422,148 @@ class SummaryDynamicTest
       assert(varsByName("second-col") == "details/(detail[@path = 'main/second-col'], detail[1])[1]")
       assert(varsByName("first-col")  == "details/(detail[@path = 'main/first-col'], detail[2])[1]")
     }
+
+    it("must build card-mode dynamic tables with `.fr-col-primary`, `target-id='fr-sortable-th'`, and binary attachment/signature controls excluded") {
+      val cardForm =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <main>
+                    <title/>
+                    <cover-image filename="" mediatype="" size=""/>
+                    <amount/>
+                    <rating/>
+                  </main>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-bind" ref="main">
+                  <xf:bind id="title-bind"       ref="title"       name="title"/>
+                  <xf:bind id="cover-image-bind" ref="cover-image" name="cover-image" type="xf:anyURI"/>
+                  <xf:bind id="amount-bind"      ref="amount"      name="amount"      type="xf:decimal"/>
+                  <xf:bind id="rating-bind"      ref="rating"      name="rating"      type="xf:integer"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>orbeon</application-name>
+                  <form-name>bookshelf</form-name>
+                  <title xml:lang="en">Bookshelf</title>
+                </metadata>
+              </xf:instance>
+              <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                  <resource xml:lang="en">
+                    <title><label>Title</label></title>
+                    <cover-image><label>Cover</label></cover-image>
+                    <amount><label>Price</label></amount>
+                    <rating><label>Rating</label></rating>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="main-section" bind="main-bind">
+                  <fr:grid id="main-grid">
+                    <fr:c x="1" y="1" w="3">
+                      <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search">
+                        <xf:label ref="$form-resources/title/label"/>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="4" y="1" w="3">
+                      <fr:image-attachment id="cover-image-control" bind="cover-image-bind" class="fr-summary">
+                        <xf:label ref="$form-resources/cover-image/label"/>
+                      </fr:image-attachment>
+                    </fr:c>
+                    <fr:c x="7" y="1" w="3">
+                      <fr:currency id="amount-control" bind="amount-bind" class="fr-summary fr-search">
+                        <xf:label ref="$form-resources/amount/label"/>
+                      </fr:currency>
+                    </fr:c>
+                    <fr:c x="10" y="1" w="3">
+                      <fr:rating id="rating-control" bind="rating-bind" class="fr-summary fr-search">
+                        <xf:label ref="$form-resources/rating/label"/>
+                      </fr:rating>
+                    </fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+
+      val cardTemplate =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+          <xh:head>
+            <xf:model id="fr-summary-dynamic-model">
+              <xf:instance id="fr-form-instance"><documents/></xf:instance>
+              <xf:instance id="fr-form-resources"><resources/></xf:instance>
+              <xf:bind ref="instance('fr-form-instance')">
+                <xf:bind ref="document" id="fr-document-bind">
+                  <xf:bind ref="details" id="fr-details-bind" readonly="true()"/>
+                </xf:bind>
+              </xf:bind>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xh:div class="fr-search-results-wrap">
+              <xh:div class="fr-search-results">
+                <xh:table class="table table-condensed">
+                  <xh:thead><xh:tr id="fr-summary-header-row"/></xh:thead>
+                  <xh:tbody>
+                    <xf:repeat bind="fr-document-bind" id="documents-repeat">
+                      <xh:tr id="fr-summary-body-row" class="{'fr-card-extra-row'[$is-extra-row]}"/>
+                    </xf:repeat>
+                  </xh:tbody>
+                </xh:table>
+              </xh:div>
+            </xh:div>
+          </xh:body>
+        </xh:html>
+
+      val builtCardNode =
+        FormRunnerSummary.buildSummaryDynamicFormImpl(
+          formDoc                   = elemToDocumentInfo(cardForm),
+          templateNode              = elemToNodeInfo(cardTemplate),
+          appForm                   = AppForm("orbeon", "bookshelf"),
+          databaseDataFormatVersion = DataFormatVersion.V20191,
+          resourcesRootElemOpt      = None,
+          functionLibrary           = FormRunnerFunctionLibrary,
+          cardMode                  = true
+        )
+
+      val domRoot = StaticXPath.tinyTreeToOrbeonDom(builtCardNode).getRootElement
+      val sortableThs =
+        domRoot.descendantElementIterator(includeSelf = true)
+          .filter(_.getName == "sortable-th")
+          .toList
+
+      // `cover-image` (`fr:image-attachment`) is excluded in `cardMode`, leaving `title`, `amount`, and `rating`
+      assert(sortableThs.map(_.attributeValue("column")) == List("main/title", "main/amount", "main/rating"))
+      assert(sortableThs.forall(_.attributeValue("target-id") == "fr-sortable-th"))
+      assert(sortableThs.head.attributeValueOpt("class").contains("fr-col-primary"))
+      assert(sortableThs(1).attributeValueOpt("class").contains("fr-align-right"))
+      assert(sortableThs(2).attributeValueOpt("class").isEmpty)
+
+      val bodyTds =
+        domRoot.descendantElementIterator(includeSelf = true)
+          .filter(_.getName == "td")
+          .toList
+      assert(bodyTds.map(_.attributeValue("class")) == List("fr-td fr-col-primary", "fr-td fr-align-right", "fr-td"))
+    }
   }
 }

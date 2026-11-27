@@ -1,7 +1,7 @@
 addSbtPlugin     ("org.portable-scala"  % "sbt-scalajs-crossproject" % "1.4.0")
 addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"              % "1.22.0")
 addSbtPlugin     ("org.scala-js"        % "sbt-jsdependencies"       % "1.0.2")
-addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"            % "0.13.2")
+addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"            % "0.14.0")
 addSbtPlugin     ("com.github.sbt"      % "sbt-less"                 % "2.0.1")
 //addSbtPlugin     ("net.virtual-void"    % "sbt-dependency-graph"     % "0.9.2")
 //addSbtPlugin     ("com.dwijnand"        % "sbt-project-graph"        % "0.4.0")

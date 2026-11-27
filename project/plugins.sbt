@@ -1,5 +1,5 @@
 addSbtPlugin     ("org.portable-scala"  % "sbt-scalajs-crossproject" % "1.4.0")
-addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"              % "1.22.0")
+addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"              % "1.23.0")
 addSbtPlugin     ("org.scala-js"        % "sbt-jsdependencies"       % "1.0.2")
 addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"            % "0.13.2")
 addSbtPlugin     ("com.github.sbt"      % "sbt-less"                 % "2.0.1")

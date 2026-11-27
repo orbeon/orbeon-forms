@@ -97,7 +97,7 @@ val LibPhoneNumberVersion            = "9.0.42"
 val PlaywrightVersion                = "1.65.0"
 
 // Only on PE for now
-val ApachePOIVersion                 = "5.5.1"
+val ApachePOIVersion                 = "6.0.0"
 val SendGridVersion                  = "4.10.3"
 val JolVersion                       = "0.17"
 

@@ -54,6 +54,7 @@
         <percentage>Введите процент в диапазоне от 0% до 100%</percentage>
         <json>Недопустимый синтаксис JSON</json>
         <permissions-json>Заполните все обязательные имена ролей или исправьте ошибки в JSON настройки прав</permissions-json>
+        <remote-servers-json>Заполните все обязательные URL серверов или исправьте ошибки в JSON удалённых серверов</remote-servers-json>
         <landing-cards>Заполните все обязательные поля карточек</landing-cards>
         <byte-size>Введите размер в байтах или процент от макс. кучи (1–100%), например 15%, 256m, 1g или 0</byte-size>
         <attachment-size>Введите неотрицательный размер, соответствующий целому числу байт</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Конфигурация удалённых серверов (JSON)</label>
+        <label>Конфигурация удалённых серверов</label>
         <hint>Массив JSON удалённых серверов для публикации и администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

@@ -54,6 +54,7 @@
         <percentage>Inserisci una percentuale compresa tra 0% e 100%</percentage>
         <json>Sintassi JSON non valida</json>
         <permissions-json>Completa tutti i nomi di ruolo obbligatori o correggi il JSON delle autorizzazioni</permissions-json>
+        <remote-servers-json>Completa tutti gli URL del server obbligatori o correggi il JSON dei server remoti</remote-servers-json>
         <landing-cards>Completa tutti i campi obbligatori delle schede</landing-cards>
         <byte-size>Inserisci una dimensione in byte o una percentuale dell'heap massimo (1–100%), ad es. 15%, 256m, 1g o 0</byte-size>
         <attachment-size>Inserisci una dimensione non negativa corrispondente a un numero intero di byte</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Configurazione server remoti (JSON)</label>
+        <label>Configurazione server remoti</label>
         <hint>Array JSON di server remoti per pubblicazione/amministrazione dei moduli &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

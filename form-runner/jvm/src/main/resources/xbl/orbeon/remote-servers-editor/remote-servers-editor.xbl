@@ -1,0 +1,927 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:rse="java:org.orbeon.oxf.fr.RemoteServersEditorUI">
+
+    <xbl:binding
+        id="fr-remote-servers-editor"
+        element="fr|remote-servers-editor"
+        xxbl:mode="lhha binding value">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/remote-servers-editor/remote-servers-editor.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="remote-servers-editor-model">
+
+                <xf:instance id="editor" xxf:exclude-result-prefixes="#all">
+                    <editor>
+                        <servers/>
+                    </editor>
+                </xf:instance>
+
+                <xf:instance id="server-template" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <server name="" label="" url="" ui-access="true" api-access="false"/>
+                </xf:instance>
+
+                <xf:instance id="state" xxf:exclude-result-prefixes="#all">
+                    <state
+                        initialized="false"
+                        readonly="true"
+                        syncing="false"
+                        mode="visual"
+                        last-json=""
+                        announcement="">
+                        <raw-json/>
+                    </state>
+                </xf:instance>
+
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <readonly-hint>Enable Override to add, remove, reorder, or edit remote servers.</readonly-hint>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Format</format-json>
+                            <copy-json>Copy</copy-json>
+                            <add-server>Add remote server</add-server>
+                            <empty-servers>No remote servers configured. Click "Add remote server" to add one.</empty-servers>
+                            <drag-to-reorder>Drag to reorder</drag-to-reorder>
+                            <move-up>Move server up</move-up>
+                            <move-down>Move server down</move-down>
+                            <remove-server>Remove server</remove-server>
+                            <moved-announcement>Moved server to position {0} of {1}</moved-announcement>
+                            <removed-announcement>Removed server</removed-announcement>
+                            <label-label>Label</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Name</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI access (Forms Admin)</ui-access-label>
+                            <api-access-label>API access (push/pull)</api-access-label>
+                            <alert-url-required>Server URL is required</alert-url-required>
+                            <alert-duplicate-name>Duplicate server name</alert-duplicate-name>
+                            <invalid-json>Invalid remote servers JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <readonly-hint>Activez Surcharger pour ajouter, supprimer, réordonner ou modifier les serveurs distants.</readonly-hint>
+                            <visual-mode>Visuel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formater</format-json>
+                            <copy-json>Copier</copy-json>
+                            <add-server>Ajouter un serveur distant</add-server>
+                            <empty-servers>Aucun serveur distant configuré. Cliquez sur « Ajouter un serveur distant » pour en ajouter un.</empty-servers>
+                            <drag-to-reorder>Glisser pour réordonner</drag-to-reorder>
+                            <move-up>Monter le serveur</move-up>
+                            <move-down>Descendre le serveur</move-down>
+                            <remove-server>Supprimer le serveur</remove-server>
+                            <moved-announcement>Serveur déplacé à la position {0} sur {1}</moved-announcement>
+                            <removed-announcement>Serveur supprimé</removed-announcement>
+                            <label-label>Libellé</label-label>
+                            <label-placeholder>Préproduction</label-placeholder>
+                            <name-label>Nom</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL du serveur</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Accès interface (Administration des formulaires)</ui-access-label>
+                            <api-access-label>Accès API (push/pull)</api-access-label>
+                            <alert-url-required>L'URL du serveur est requise</alert-url-required>
+                            <alert-duplicate-name>Nom de serveur en double</alert-duplicate-name>
+                            <invalid-json>JSON des serveurs distants invalide</invalid-json>
+                        </resource>
+                        <resource xml:lang="de">
+                            <readonly-hint>Aktivieren Sie Überschreiben, um Remote-Server hinzuzufügen, zu entfernen, neu anzuordnen oder zu bearbeiten.</readonly-hint>
+                            <visual-mode>Visuell</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatieren</format-json>
+                            <copy-json>Kopieren</copy-json>
+                            <add-server>Remote-Server hinzufügen</add-server>
+                            <empty-servers>Keine Remote-Server konfiguriert. Klicken Sie auf „Remote-Server hinzufügen“, um einen hinzuzufügen.</empty-servers>
+                            <drag-to-reorder>Zum Neuordnen ziehen</drag-to-reorder>
+                            <move-up>Server nach oben verschieben</move-up>
+                            <move-down>Server nach unten verschieben</move-down>
+                            <remove-server>Server entfernen</remove-server>
+                            <moved-announcement>Server an Position {0} von {1} verschoben</moved-announcement>
+                            <removed-announcement>Server entfernt</removed-announcement>
+                            <label-label>Beschriftung</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Name</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server-URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-Zugriff (Formularverwaltung)</ui-access-label>
+                            <api-access-label>API-Zugriff (Push/Pull)</api-access-label>
+                            <alert-url-required>Server-URL ist erforderlich</alert-url-required>
+                            <alert-duplicate-name>Doppelter Servername</alert-duplicate-name>
+                            <invalid-json>Ungültiges Remote-Server-JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="es">
+                            <readonly-hint>Active Sobrescribir para añadir, eliminar, reordenar o editar servidores remotos.</readonly-hint>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatear</format-json>
+                            <copy-json>Copiar</copy-json>
+                            <add-server>Añadir servidor remoto</add-server>
+                            <empty-servers>No hay servidores remotos configurados. Haga clic en «Añadir servidor remoto» para añadir uno.</empty-servers>
+                            <drag-to-reorder>Arrastrar para reordenar</drag-to-reorder>
+                            <move-up>Subir servidor</move-up>
+                            <move-down>Bajar servidor</move-down>
+                            <remove-server>Eliminar servidor</remove-server>
+                            <moved-announcement>Servidor movido a la posición {0} de {1}</moved-announcement>
+                            <removed-announcement>Servidor eliminado</removed-announcement>
+                            <label-label>Etiqueta</label-label>
+                            <label-placeholder>Preproducción</label-placeholder>
+                            <name-label>Nombre</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL del servidor</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Acceso UI (Administración de formularios)</ui-access-label>
+                            <api-access-label>Acceso API (push/pull)</api-access-label>
+                            <alert-url-required>La URL del servidor es obligatoria</alert-url-required>
+                            <alert-duplicate-name>Nombre de servidor duplicado</alert-duplicate-name>
+                            <invalid-json>JSON de servidores remotos no válido</invalid-json>
+                        </resource>
+                        <resource xml:lang="it">
+                            <readonly-hint>Attiva Sovrascrivi per aggiungere, rimuovere, riordinare o modificare i server remoti.</readonly-hint>
+                            <visual-mode>Visuale</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatta</format-json>
+                            <copy-json>Copia</copy-json>
+                            <add-server>Aggiungi server remoto</add-server>
+                            <empty-servers>Nessun server remoto configurato. Fai clic su «Aggiungi server remoto» per aggiungerne uno.</empty-servers>
+                            <drag-to-reorder>Trascina per riordinare</drag-to-reorder>
+                            <move-up>Sposta server in alto</move-up>
+                            <move-down>Sposta server in basso</move-down>
+                            <remove-server>Rimuovi server</remove-server>
+                            <moved-announcement>Server spostato alla posizione {0} di {1}</moved-announcement>
+                            <removed-announcement>Server rimosso</removed-announcement>
+                            <label-label>Etichetta</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Nome</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL del server</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Accesso UI (Amministrazione moduli)</ui-access-label>
+                            <api-access-label>Accesso API (push/pull)</api-access-label>
+                            <alert-url-required>L'URL del server è obbligatorio</alert-url-required>
+                            <alert-duplicate-name>Nome server duplicato</alert-duplicate-name>
+                            <invalid-json>JSON dei server remoti non valido</invalid-json>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <readonly-hint>Ative Substituir para adicionar, remover, reordenar ou editar servidores remotos.</readonly-hint>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatar</format-json>
+                            <copy-json>Copiar</copy-json>
+                            <add-server>Adicionar servidor remoto</add-server>
+                            <empty-servers>Nenhum servidor remoto configurado. Clique em «Adicionar servidor remoto» para adicionar um.</empty-servers>
+                            <drag-to-reorder>Arrastar para reordenar</drag-to-reorder>
+                            <move-up>Mover servidor para cima</move-up>
+                            <move-down>Mover servidor para baixo</move-down>
+                            <remove-server>Remover servidor</remove-server>
+                            <moved-announcement>Servidor movido para a posição {0} de {1}</moved-announcement>
+                            <removed-announcement>Servidor removido</removed-announcement>
+                            <label-label>Etiqueta</label-label>
+                            <label-placeholder>Homologação</label-placeholder>
+                            <name-label>Nome</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL do servidor</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Acesso UI (Administração de formulários)</ui-access-label>
+                            <api-access-label>Acesso API (push/pull)</api-access-label>
+                            <alert-url-required>O URL do servidor é obrigatório</alert-url-required>
+                            <alert-duplicate-name>Nome de servidor duplicado</alert-duplicate-name>
+                            <invalid-json>JSON de servidores remotos inválido</invalid-json>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <readonly-hint>Aktivera Åsidosätt för att lägga till, ta bort, ordna om eller redigera fjärrservrar.</readonly-hint>
+                            <visual-mode>Visuellt</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatera</format-json>
+                            <copy-json>Kopiera</copy-json>
+                            <add-server>Lägg till fjärrserver</add-server>
+                            <empty-servers>Inga fjärrservrar konfigurerade. Klicka på "Lägg till fjärrserver" för att lägga till en.</empty-servers>
+                            <drag-to-reorder>Dra för att ordna om</drag-to-reorder>
+                            <move-up>Flytta server uppåt</move-up>
+                            <move-down>Flytta server nedåt</move-down>
+                            <remove-server>Ta bort server</remove-server>
+                            <moved-announcement>Flyttade server till position {0} av {1}</moved-announcement>
+                            <removed-announcement>Tog bort server</removed-announcement>
+                            <label-label>Etikett</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Namn</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server-URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-åtkomst (Formuläradmin)</ui-access-label>
+                            <api-access-label>API-åtkomst (push/pull)</api-access-label>
+                            <alert-url-required>Server-URL krävs</alert-url-required>
+                            <alert-duplicate-name>Dubblett av servernamn</alert-duplicate-name>
+                            <invalid-json>Ogiltig JSON för fjärrservrar</invalid-json>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <readonly-hint>Ota Korvaa käyttöön lisätäksesi, poistaaksesi, järjestääksesi tai muokataksesi etäpalvelimia.</readonly-hint>
+                            <visual-mode>Visuaalinen</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Muotoile</format-json>
+                            <copy-json>Kopioi</copy-json>
+                            <add-server>Lisää etäpalvelin</add-server>
+                            <empty-servers>Etäpalvelimia ei ole määritetty. Lisää palvelin napsauttamalla "Lisää etäpalvelin".</empty-servers>
+                            <drag-to-reorder>Järjestä vetämällä</drag-to-reorder>
+                            <move-up>Siirrä palvelinta ylös</move-up>
+                            <move-down>Siirrä palvelinta alas</move-down>
+                            <remove-server>Poista palvelin</remove-server>
+                            <moved-announcement>Palvelin siirretty sijaintiin {0}/{1}</moved-announcement>
+                            <removed-announcement>Palvelin poistettu</removed-announcement>
+                            <label-label>Nimike</label-label>
+                            <label-placeholder>Testaus</label-placeholder>
+                            <name-label>Nimi</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Palvelimen URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Käyttöliittymäpääsy (Lomakkeiden hallinta)</ui-access-label>
+                            <api-access-label>API-pääsy (push/pull)</api-access-label>
+                            <alert-url-required>Palvelimen URL on pakollinen</alert-url-required>
+                            <alert-duplicate-name>Palvelimen nimi on jo käytössä</alert-duplicate-name>
+                            <invalid-json>Virheellinen etäpalvelimien JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <readonly-hint>Schakel Overschrijven in om externe servers toe te voegen, te verwijderen, te herschikken of te bewerken.</readonly-hint>
+                            <visual-mode>Visueel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Opmaak</format-json>
+                            <copy-json>Kopiëren</copy-json>
+                            <add-server>Externe server toevoegen</add-server>
+                            <empty-servers>Geen externe servers geconfigureerd. Klik op "Externe server toevoegen" om er een toe te voegen.</empty-servers>
+                            <drag-to-reorder>Slepen om te herschikken</drag-to-reorder>
+                            <move-up>Server omhoog verplaatsen</move-up>
+                            <move-down>Server omlaag verplaatsen</move-down>
+                            <remove-server>Server verwijderen</remove-server>
+                            <moved-announcement>Server verplaatst naar positie {0} van {1}</moved-announcement>
+                            <removed-announcement>Server verwijderd</removed-announcement>
+                            <label-label>Label</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Naam</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server-URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-toegang (Formulierenbeheer)</ui-access-label>
+                            <api-access-label>API-toegang (push/pull)</api-access-label>
+                            <alert-url-required>Server-URL is verplicht</alert-url-required>
+                            <alert-duplicate-name>Dubbele servernaam</alert-duplicate-name>
+                            <invalid-json>Ongeldige JSON voor externe servers</invalid-json>
+                        </resource>
+                        <resource xml:lang="no">
+                            <readonly-hint>Aktiver Overstyr for å legge til, fjerne, endre rekkefølge på eller redigere eksterne servere.</readonly-hint>
+                            <visual-mode>Visuell</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formater</format-json>
+                            <copy-json>Kopier</copy-json>
+                            <add-server>Legg til ekstern server</add-server>
+                            <empty-servers>Ingen eksterne servere konfigurert. Klikk på «Legg til ekstern server» for å legge til en.</empty-servers>
+                            <drag-to-reorder>Dra for å endre rekkefølge</drag-to-reorder>
+                            <move-up>Flytt server opp</move-up>
+                            <move-down>Flytt server ned</move-down>
+                            <remove-server>Fjern server</remove-server>
+                            <moved-announcement>Flyttet server til posisjon {0} av {1}</moved-announcement>
+                            <removed-announcement>Fjernet server</removed-announcement>
+                            <label-label>Etikett</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Navn</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server-URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-tilgang (Skjemaadmin)</ui-access-label>
+                            <api-access-label>API-tilgang (push/pull)</api-access-label>
+                            <alert-url-required>Server-URL er påkrevd</alert-url-required>
+                            <alert-duplicate-name>Duplisert servernavn</alert-duplicate-name>
+                            <invalid-json>Ugyldig JSON for eksterne servere</invalid-json>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <readonly-hint>Włącz Nadpisz, aby dodawać, usuwać, zmieniać kolejność lub edytować serwery zdalne.</readonly-hint>
+                            <visual-mode>Wizualny</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatuj</format-json>
+                            <copy-json>Kopiuj</copy-json>
+                            <add-server>Dodaj serwer zdalny</add-server>
+                            <empty-servers>Brak skonfigurowanych serwerów zdalnych. Kliknij „Dodaj serwer zdalny”, aby dodać pierwszy.</empty-servers>
+                            <drag-to-reorder>Przeciągnij, aby zmienić kolejność</drag-to-reorder>
+                            <move-up>Przesuń serwer w górę</move-up>
+                            <move-down>Przesuń serwer w dół</move-down>
+                            <remove-server>Usuń serwer</remove-server>
+                            <moved-announcement>Przeniesiono serwer na pozycję {0} z {1}</moved-announcement>
+                            <removed-announcement>Usunięto serwer</removed-announcement>
+                            <label-label>Etykieta</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Nazwa</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Adres URL serwera</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Dostęp przez UI (Administracja formularzy)</ui-access-label>
+                            <api-access-label>Dostęp przez API (push/pull)</api-access-label>
+                            <alert-url-required>Adres URL serwera jest wymagany</alert-url-required>
+                            <alert-duplicate-name>Zduplikowana nazwa serwera</alert-duplicate-name>
+                            <invalid-json>Nieprawidłowy kod JSON serwerów zdalnych</invalid-json>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <readonly-hint>Включите Переопределить, чтобы добавлять, удалять, менять порядок или редактировать удалённые серверы.</readonly-hint>
+                            <visual-mode>Визуально</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Форматировать</format-json>
+                            <copy-json>Копировать</copy-json>
+                            <add-server>Добавить удалённый сервер</add-server>
+                            <empty-servers>Удалённые серверы не настроены. Нажмите «Добавить удалённый сервер», чтобы добавить сервер.</empty-servers>
+                            <drag-to-reorder>Перетащите для изменения порядка</drag-to-reorder>
+                            <move-up>Переместить сервер вверх</move-up>
+                            <move-down>Переместить сервер вниз</move-down>
+                            <remove-server>Удалить сервер</remove-server>
+                            <moved-announcement>Сервер перемещён на позицию {0} из {1}</moved-announcement>
+                            <removed-announcement>Сервер удалён</removed-announcement>
+                            <label-label>Метка</label-label>
+                            <label-placeholder>Тестовый</label-placeholder>
+                            <name-label>Имя</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL сервера</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Доступ через интерфейс (Администрирование форм)</ui-access-label>
+                            <api-access-label>Доступ через API (push/pull)</api-access-label>
+                            <alert-url-required>Необходимо указать URL сервера</alert-url-required>
+                            <alert-duplicate-name>Дублирующееся имя сервера</alert-duplicate-name>
+                            <invalid-json>Некорректный JSON удалённых серверов</invalid-json>
+                        </resource>
+                        <resource xml:lang="da">
+                            <readonly-hint>Aktivér Tilsidesæt for at tilføje, fjerne, omarrangere eller redigere fjernservere.</readonly-hint>
+                            <visual-mode>Visuel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formatér</format-json>
+                            <copy-json>Kopiér</copy-json>
+                            <add-server>Tilføj fjernserver</add-server>
+                            <empty-servers>Ingen fjernservere konfigureret. Klik på "Tilføj fjernserver" for at tilføje en.</empty-servers>
+                            <drag-to-reorder>Træk for at ændre rækkefølge</drag-to-reorder>
+                            <move-up>Flyt server op</move-up>
+                            <move-down>Flyt server ned</move-down>
+                            <remove-server>Fjern server</remove-server>
+                            <moved-announcement>Flyttede server til position {0} af {1}</moved-announcement>
+                            <removed-announcement>Fjernede server</removed-announcement>
+                            <label-label>Etiket</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Navn</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Server-URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-adgang (Formularadministration)</ui-access-label>
+                            <api-access-label>API-adgang (push/pull)</api-access-label>
+                            <alert-url-required>Server-URL er påkrævet</alert-url-required>
+                            <alert-duplicate-name>Duplikeret servernavn</alert-duplicate-name>
+                            <invalid-json>Ugyldig JSON for fjernservere</invalid-json>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <readonly-hint>Activeu Sobreescriure per afegir, eliminar, reordenar o editar servidors remots.</readonly-hint>
+                            <visual-mode>Visual</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formata</format-json>
+                            <copy-json>Copia</copy-json>
+                            <add-server>Afegeix servidor remot</add-server>
+                            <empty-servers>No hi ha cap servidor remot configurat. Feu clic a «Afegeix servidor remot» per afegir-ne un.</empty-servers>
+                            <drag-to-reorder>Arrossegueu per reordenar</drag-to-reorder>
+                            <move-up>Mou el servidor amunt</move-up>
+                            <move-down>Mou el servidor avall</move-down>
+                            <remove-server>Elimina el servidor</remove-server>
+                            <moved-announcement>S'ha mogut el servidor a la posició {0} de {1}</moved-announcement>
+                            <removed-announcement>S'ha eliminat el servidor</removed-announcement>
+                            <label-label>Etiqueta</label-label>
+                            <label-placeholder>Preproducció</label-placeholder>
+                            <name-label>Nom</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>URL del servidor</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Accés UI (Administració de formularis)</ui-access-label>
+                            <api-access-label>Accés API (push/pull)</api-access-label>
+                            <alert-url-required>L'URL del servidor és obligatori</alert-url-required>
+                            <alert-duplicate-name>Nom de servidor duplicat</alert-duplicate-name>
+                            <invalid-json>JSON de servidors remots no vàlid</invalid-json>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <readonly-hint>Engedélyezze a Felülbírálás beállítást a távoli kiszolgálók hozzáadásához, eltávolításához, átrendezéséhez vagy szerkesztéséhez.</readonly-hint>
+                            <visual-mode>Vizuális</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Formázás</format-json>
+                            <copy-json>Másolás</copy-json>
+                            <add-server>Távoli kiszolgáló hozzáadása</add-server>
+                            <empty-servers>Nincs beállított távoli kiszolgáló. Kattintson a „Távoli kiszolgáló hozzáadása” gombra.</empty-servers>
+                            <drag-to-reorder>Húzza az átrendezéshez</drag-to-reorder>
+                            <move-up>Kiszolgáló mozgatása felfelé</move-up>
+                            <move-down>Kiszolgáló mozgatása lefelé</move-down>
+                            <remove-server>Kiszolgáló eltávolítása</remove-server>
+                            <moved-announcement>Kiszolgáló áthelyezve a(z) {0}/{1}. helyre</moved-announcement>
+                            <removed-announcement>Kiszolgáló eltávolítva</removed-announcement>
+                            <label-label>Címke</label-label>
+                            <label-placeholder>Staging</label-placeholder>
+                            <name-label>Név</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Kiszolgáló URL-je</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UI-hozzáférés (Űrlapkezelő)</ui-access-label>
+                            <api-access-label>API-hozzáférés (push/pull)</api-access-label>
+                            <alert-url-required>A kiszolgáló URL-je kötelező</alert-url-required>
+                            <alert-duplicate-name>Ismétlődő kiszolgálónév</alert-duplicate-name>
+                            <invalid-json>Érvénytelen távoli kiszolgáló JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <readonly-hint>Uzak sunucu eklemek, kaldırmak, yeniden sıralamak veya düzenlemek için Geçersiz Kıl seçeneğini etkinleştirin.</readonly-hint>
+                            <visual-mode>Görsel</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>Biçimlendir</format-json>
+                            <copy-json>Kopyala</copy-json>
+                            <add-server>Uzak sunucu ekle</add-server>
+                            <empty-servers>Yapılandırılmış uzak sunucu yok. Eklemek için "Uzak sunucu ekle" düğmesine tıklayın.</empty-servers>
+                            <drag-to-reorder>Yeniden sıralamak için sürükleyin</drag-to-reorder>
+                            <move-up>Sunucuyu yukarı taşı</move-up>
+                            <move-down>Sunucuyu aşağı taşı</move-down>
+                            <remove-server>Sunucuyu kaldır</remove-server>
+                            <moved-announcement>Sunucu {0} / {1} konumuna taşındı</moved-announcement>
+                            <removed-announcement>Sunucu kaldırıldı</removed-announcement>
+                            <label-label>Etiket</label-label>
+                            <label-placeholder>Hazırlık</label-placeholder>
+                            <name-label>Ad</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>Sunucu URL'si</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>Arayüz erişimi (Form Yönetimi)</ui-access-label>
+                            <api-access-label>API erişimi (push/pull)</api-access-label>
+                            <alert-url-required>Sunucu URL'si gereklidir</alert-url-required>
+                            <alert-duplicate-name>Yinelenen sunucu adı</alert-duplicate-name>
+                            <invalid-json>Geçersiz uzak sunucular JSON verisi</invalid-json>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <readonly-hint>فعّل التجاوز لإضافة أو إزالة أو إعادة ترتيب أو تعديل الخوادم البعيدة.</readonly-hint>
+                            <visual-mode>مرئي</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>تنسيق</format-json>
+                            <copy-json>نسخ</copy-json>
+                            <add-server>إضافة خادم بعيد</add-server>
+                            <empty-servers>لا توجد خوادم بعيدة مهيأة. انقر على «إضافة خادم بعيد» لإضافة خادم.</empty-servers>
+                            <drag-to-reorder>اسحب لإعادة الترتيب</drag-to-reorder>
+                            <move-up>نقل الخادم لأعلى</move-up>
+                            <move-down>نقل الخادم لأسفل</move-down>
+                            <remove-server>إزالة الخادم</remove-server>
+                            <moved-announcement>تم نقل الخادم إلى الموضع {0} من {1}</moved-announcement>
+                            <removed-announcement>تمت إزالة الخادم</removed-announcement>
+                            <label-label>التسمية</label-label>
+                            <label-placeholder>التجريبي</label-placeholder>
+                            <name-label>الاسم</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>عنوان URL للخادم</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>وصول الواجهة (إدارة النماذج)</ui-access-label>
+                            <api-access-label>وصول API (الدفع/السحب)</api-access-label>
+                            <alert-url-required>عنوان URL للخادم مطلوب</alert-url-required>
+                            <alert-duplicate-name>اسم الخادم مكرر</alert-duplicate-name>
+                            <invalid-json>صيغة JSON للخوادم البعيدة غير صالحة</invalid-json>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <readonly-hint>リモートサーバーを追加・削除・並べ替え・編集するには「上書き」を有効にしてください。</readonly-hint>
+                            <visual-mode>ビジュアル</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>整形</format-json>
+                            <copy-json>コピー</copy-json>
+                            <add-server>リモートサーバーを追加</add-server>
+                            <empty-servers>リモートサーバーが設定されていません。「リモートサーバーを追加」をクリックして追加してください。</empty-servers>
+                            <drag-to-reorder>ドラッグして並べ替え</drag-to-reorder>
+                            <move-up>サーバーを上へ移動</move-up>
+                            <move-down>サーバーを下へ移動</move-down>
+                            <remove-server>サーバーを削除</remove-server>
+                            <moved-announcement>サーバーを {1} 件中 {0} 番目に移動しました</moved-announcement>
+                            <removed-announcement>サーバーを削除しました</removed-announcement>
+                            <label-label>ラベル</label-label>
+                            <label-placeholder>ステージング</label-placeholder>
+                            <name-label>名前</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>サーバーURL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>UIアクセス（フォーム管理）</ui-access-label>
+                            <api-access-label>APIアクセス（push/pull）</api-access-label>
+                            <alert-url-required>サーバーURLは必須です</alert-url-required>
+                            <alert-duplicate-name>サーバー名が重複しています</alert-duplicate-name>
+                            <invalid-json>無効なリモートサーバーJSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <readonly-hint>启用覆盖以添加、删除、重新排序或编辑远程服务器。</readonly-hint>
+                            <visual-mode>可视化</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>格式化</format-json>
+                            <copy-json>复制</copy-json>
+                            <add-server>添加远程服务器</add-server>
+                            <empty-servers>尚未配置远程服务器。点击“添加远程服务器”以添加一个。</empty-servers>
+                            <drag-to-reorder>拖动以重新排序</drag-to-reorder>
+                            <move-up>上移服务器</move-up>
+                            <move-down>下移服务器</move-down>
+                            <remove-server>删除服务器</remove-server>
+                            <moved-announcement>已将服务器移至第 {0} / {1} 位</moved-announcement>
+                            <removed-announcement>已删除服务器</removed-announcement>
+                            <label-label>标签</label-label>
+                            <label-placeholder>预发布</label-placeholder>
+                            <name-label>名称</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>服务器 URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>界面访问（表单管理）</ui-access-label>
+                            <api-access-label>API 访问（推送/拉取）</api-access-label>
+                            <alert-url-required>服务器 URL 为必填项</alert-url-required>
+                            <alert-duplicate-name>服务器名称重复</alert-duplicate-name>
+                            <invalid-json>无效的远程服务器 JSON</invalid-json>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <readonly-hint>啟用覆寫以新增、刪除、重新排序或編輯遠端伺服器。</readonly-hint>
+                            <visual-mode>視覺化</visual-mode>
+                            <json-mode>JSON</json-mode>
+                            <format-json>格式化</format-json>
+                            <copy-json>複製</copy-json>
+                            <add-server>新增遠端伺服器</add-server>
+                            <empty-servers>尚未設定遠端伺服器。按一下「新增遠端伺服器」以新增一個。</empty-servers>
+                            <drag-to-reorder>拖曳以重新排序</drag-to-reorder>
+                            <move-up>上移伺服器</move-up>
+                            <move-down>下移伺服器</move-down>
+                            <remove-server>刪除伺服器</remove-server>
+                            <moved-announcement>已將伺服器移至第 {0} / {1} 位</moved-announcement>
+                            <removed-announcement>已刪除伺服器</removed-announcement>
+                            <label-label>標籤</label-label>
+                            <label-placeholder>預發布</label-placeholder>
+                            <name-label>名稱</name-label>
+                            <name-placeholder>staging</name-placeholder>
+                            <url-label>伺服器 URL</url-label>
+                            <url-placeholder>https://staging.example.org/orbeon</url-placeholder>
+                            <ui-access-label>介面存取（表單管理）</ui-access-label>
+                            <api-access-label>API 存取（推送/拉取）</api-access-label>
+                            <alert-url-required>伺服器 URL 為必填項目</alert-url-required>
+                            <alert-duplicate-name>伺服器名稱重複</alert-duplicate-name>
+                            <invalid-json>無效的遠端伺服器 JSON</invalid-json>
+                        </resource>
+                    </_>
+                </xf:instance>
+
+                <xf:bind ref="instance('editor')/servers/server">
+                    <xf:bind
+                        ref="@*"
+                        readonly="instance('state')/@readonly = 'true'"/>
+                    <xf:bind
+                        ref="@url"
+                        required="instance('state')/@readonly != 'true'"
+                        xxf:whitespace="trim"/>
+                    <xf:bind
+                        ref="@name"
+                        xxf:whitespace="trim"
+                        constraint="instance('state')/@readonly = 'true' or xxf:is-blank(.) or not((../../server/@name except .) = .)"/>
+                    <xf:bind
+                        ref="@label"
+                        xxf:whitespace="trim"/>
+                </xf:bind>
+
+                <xf:bind
+                    ref="instance('state')/raw-json"
+                    readonly="instance('state')/@readonly = 'true'"
+                    constraint="instance('state')/@readonly = 'true' or rse:isValidRemoteServersJson(.)"/>
+
+                <!-- Outbound sync: visual UI XML -> bound JSON value -->
+                <xf:action
+                    observer="editor remote-servers-editor-model"
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed fr-rse-push-json"
+                    if="instance('state')/@initialized = 'true' and instance('state')/@syncing != 'true' and instance('state')/@readonly != 'true' and instance('state')/@mode = 'visual'">
+                    <xf:var name="new-json" value="rse:uiXmlToJson(instance('editor')/servers)"/>
+                    <xf:action if="$new-json != string(instance('state')/@last-json)">
+                        <xf:setvalue ref="instance('state')/@last-json" value="$new-json"/>
+                        <xf:setvalue ref="instance('state')/raw-json"   value="$new-json"/>
+                        <xf:setvalue ref="xxf:binding('fr-remote-servers-editor')" value="$new-json"/>
+                    </xf:action>
+                </xf:action>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group id="fr-remote-servers-editor-root" appearance="xxf:internal">
+
+                <xf:var name="binding"       value="xxf:binding('fr-remote-servers-editor')"/>
+                <xf:var name="editor"        value="instance('editor')"/>
+                <xf:var name="state"         value="instance('state')"/>
+                <xf:var name="is-overridden" value="string($binding/../@override)"/>
+
+                <xf:var
+                    name="effective-source-json"
+                    value="
+                        if ($is-overridden = 'true') then
+                            string($binding)
+                        else
+                            (
+                                xxf:property('oxf.fr.home.remote-servers')[xxf:non-blank()],
+                                string($binding)[xxf:non-blank()],
+                                '[]'
+                            )[1]">
+                    <xf:action
+                        event="xforms-enabled xforms-value-changed"
+                        if="$state/@initialized != 'true' or $effective-source-json != string($state/@last-json)">
+                        <xf:setvalue ref="$state/@syncing" value="'true'"/>
+                        <xf:var name="is-valid-source" value="rse:isValidRemoteServersJson($effective-source-json)"/>
+                        <xf:insert
+                            ref="$editor"
+                            origin="rse:jsonToUiXml($effective-source-json)"/>
+                        <xf:setvalue ref="$state/raw-json"   value="rse:formatRemoteServersJson($effective-source-json)"/>
+                        <xf:setvalue ref="$state/@last-json" value="$effective-source-json"/>
+                        <xf:setvalue
+                            if="not($is-valid-source)"
+                            ref="$state/@mode"
+                            value="'json'"/>
+                        <xf:setvalue ref="$state/@initialized" value="'true'"/>
+                        <xf:setvalue ref="$state/@syncing"     value="'false'"/>
+                    </xf:action>
+                </xf:var>
+
+                <xf:var
+                    name="is-readonly"
+                    value="fr:is-readonly-mode() or xxf:readonly($binding)">
+                    <xf:action event="xforms-enabled">
+                        <xf:setvalue ref="$state/@readonly" value="string($is-readonly)"/>
+                    </xf:action>
+                    <xf:action event="xforms-value-changed">
+                        <xf:setvalue ref="$state/@readonly" value="string($is-readonly)"/>
+                        <xf:action if="not($is-readonly) and $state/@mode = 'visual'">
+                            <xf:dispatch name="fr-rse-push-json" targetid="remote-servers-editor-model"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:var>
+
+                <xf:var name="server-count" value="count($editor/servers/server)"/>
+
+                <!-- Live region for screen reader reorder/remove announcements -->
+                <xh:div class="fr-rse-sr-status" role="status" aria-live="polite" aria-atomic="true">
+                    <xf:output value="$state/@announcement"/>
+                </xh:div>
+
+                <xh:div class="fr-remote-servers-editor {'fr-rse-is-readonly'[$is-readonly]}">
+
+                    <!-- Mode switcher tabs: Visual (left) | JSON (right) -->
+                    <xh:div class="fr-rse-mode-tabs" role="tablist">
+                        <xf:trigger
+                            appearance="minimal"
+                            id="fr-rse-visual-tab"
+                            class="fr-rse-mode-tab {'fr-rse-mode-active'[$state/@mode != 'json']}">
+                            <xf:label value="fr:r('visual-mode')"/>
+                            <xf:action event="DOMActivate" if="$state/@mode = 'json'">
+                                <xf:action if="rse:isValidRemoteServersJson($state/raw-json)">
+                                    <xf:setvalue ref="$state/@syncing" value="'true'"/>
+                                    <xf:insert
+                                        ref="$editor"
+                                        origin="rse:jsonToUiXml($state/raw-json)"/>
+                                    <xf:setvalue ref="$state/@mode"    value="'visual'"/>
+                                    <xf:setvalue ref="$state/@syncing" value="'false'"/>
+                                </xf:action>
+                                <xf:action if="not(rse:isValidRemoteServersJson($state/raw-json))">
+                                    <xxf:setvisited control="fr-rse-json-editor" visited="true"/>
+                                </xf:action>
+                            </xf:action>
+                        </xf:trigger>
+
+                        <xf:trigger
+                            appearance="minimal"
+                            id="fr-rse-json-tab"
+                            class="fr-rse-mode-tab {'fr-rse-mode-active'[$state/@mode = 'json']}">
+                            <xf:label value="fr:r('json-mode')"/>
+                            <xf:action event="DOMActivate" if="$state/@mode != 'json'">
+                                <xf:setvalue
+                                    ref="$state/raw-json"
+                                    value="rse:uiXmlToJson($editor/servers)"/>
+                                <xf:setvalue ref="$state/@mode" value="'json'"/>
+                                <xf:action type="javascript">
+                                    <xf:body>
+                                        const root = (this instanceof Element &amp;&amp; this.closest('.fr-remote-servers-editor')) || document.querySelector('.fr-remote-servers-editor');
+                                        if (root) {
+                                            requestAnimationFrame(() =&gt; {
+                                                const cmEl = root.querySelector('.CodeMirror');
+                                                if (cmEl &amp;&amp; cmEl.CodeMirror) cmEl.CodeMirror.refresh();
+                                            });
+                                        }
+                                    </xf:body>
+                                </xf:action>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:div>
+
+                    <xh:div class="fr-rse-panel">
+
+                        <!-- Read-only note when Override is off -->
+                        <xf:group ref=".[$is-readonly and exists($binding/../@override)]" class="fr-rse-readonly-note">
+                            <xh:i class="fa fa-fw fa-lock" aria-hidden="true"/>
+                            <xh:span><xf:output value="fr:r('readonly-hint')"/></xh:span>
+                        </xf:group>
+
+                        <xf:switch caseref="$state/@mode" class="fr-rse-mode-switch">
+
+                            <!-- Visual Mode (left tab) -->
+                            <xf:case value="'visual'">
+                                <xh:div class="fr-rse-visual-body">
+
+                                    <xf:group ref=".[not($is-readonly)]" class="fr-rse-toolbar">
+                                        <xf:trigger id="fr-rse-add-server-btn" class="fr-rse-add-btn">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                                <xh:span><xf:output value="fr:r('add-server')"/></xh:span>
+                                            </xf:label>
+                                            <xf:insert
+                                                event="DOMActivate"
+                                                context="$editor/servers"
+                                                ref="server"
+                                                origin="instance('server-template')"/>
+                                        </xf:trigger>
+                                    </xf:group>
+
+                                    <xh:div class="fr-rse-empty {'xforms-hidden'[$server-count gt 0]}">
+                                        <xf:output value="fr:r('empty-servers')"/>
+                                    </xh:div>
+
+                                    <fr:dnd-repeat
+                                        id="fr-rse-servers-repeat"
+                                        ref="$editor/servers/server"
+                                        class="fr-dnd-drop-indicator">
+                                        <xf:var name="srv" value="."/>
+                                        <xf:var name="pos" value="position()"/>
+                                        <xf:var name="has-invalid" value="exists(@*[not(xxf:valid(.))])"/>
+
+                                        <xh:div class="fr-rse-server-card xforms-dnd-item {'xforms-dnd-moves'[not($is-readonly) and $server-count gt 1]} {'fr-rse-server-invalid'[$has-invalid]}">
+                                            <xh:span
+                                                class="fr-rse-drag-handle xforms-dnd-handle {'xforms-hidden'[$is-readonly or $server-count le 1]}"
+                                                title="{fr:r('drag-to-reorder')}"
+                                                aria-hidden="true">
+                                                <xh:i class="fa fa-grip-vertical"/>
+                                            </xh:span>
+
+                                            <xh:div class="fr-rse-server-fields">
+                                                <xh:div class="fr-rse-fields-row">
+                                                    <xf:input id="fr-rse-label-input" ref="@label" incremental="true" class="fr-rse-field">
+                                                        <xf:label value="fr:r('label-label')"/>
+                                                        <xf:hint appearance="minimal" value="fr:r('label-placeholder')"/>
+                                                    </xf:input>
+
+                                                    <xf:input id="fr-rse-name-input" ref="@name" incremental="true" class="fr-rse-field fr-rse-field-name">
+                                                        <xf:label value="fr:r('name-label')"/>
+                                                        <xf:hint appearance="minimal" value="fr:r('name-placeholder')"/>
+                                                        <xf:alert value="fr:r('alert-duplicate-name')"/>
+                                                    </xf:input>
+
+                                                    <xf:input id="fr-rse-url-input" ref="@url" incremental="true" class="fr-rse-field fr-rse-field-url">
+                                                        <xf:label value="fr:r('url-label')"/>
+                                                        <xf:hint appearance="minimal" value="fr:r('url-placeholder')"/>
+                                                        <xf:alert value="fr:r('alert-url-required')"/>
+                                                    </xf:input>
+                                                </xh:div>
+
+                                                <xh:div class="fr-rse-toggles-row">
+                                                    <fr:checkbox-input id="fr-rse-ui-access-checkbox" ref="@ui-access" class="fr-rse-toggle">
+                                                        <xf:label value="fr:r('ui-access-label')"/>
+                                                    </fr:checkbox-input>
+                                                    <fr:checkbox-input id="fr-rse-api-access-checkbox" ref="@api-access" class="fr-rse-toggle">
+                                                        <xf:label value="fr:r('api-access-label')"/>
+                                                    </fr:checkbox-input>
+                                                </xh:div>
+                                            </xh:div>
+
+                                            <xf:group ref=".[not($is-readonly)]" class="fr-rse-row-actions">
+                                                <xf:group ref=".[$server-count gt 1]" class="fr-rse-move-btns">
+                                                    <xf:trigger
+                                                        id="fr-rse-move-up-btn"
+                                                        appearance="minimal"
+                                                        ref=".[exists($srv/preceding-sibling::server)]"
+                                                        class="fr-rse-icon-btn fr-rse-move-up">
+                                                        <xf:label><xh:i class="fa fa-arrow-up" aria-hidden="true"/></xf:label>
+                                                        <xf:hint value="fr:r('move-up')"/>
+                                                        <xf:action event="DOMActivate">
+                                                            <xf:var name="prev" value="$srv/preceding-sibling::server[1]"/>
+                                                            <xf:insert ref="$prev" position="before" origin="$srv"/>
+                                                            <xf:delete ref="$srv"/>
+                                                            <xf:setvalue
+                                                                ref="$state/@announcement"
+                                                                value="xxf:format-message(fr:r('moved-announcement'), ($pos - 1, $server-count))"/>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                    <xf:trigger
+                                                        id="fr-rse-move-down-btn"
+                                                        appearance="minimal"
+                                                        ref=".[exists($srv/following-sibling::server)]"
+                                                        class="fr-rse-icon-btn fr-rse-move-down">
+                                                        <xf:label><xh:i class="fa fa-arrow-down" aria-hidden="true"/></xf:label>
+                                                        <xf:hint value="fr:r('move-down')"/>
+                                                        <xf:action event="DOMActivate">
+                                                            <xf:var name="next" value="$srv/following-sibling::server[1]"/>
+                                                            <xf:insert ref="$next" position="after" origin="$srv"/>
+                                                            <xf:delete ref="$srv"/>
+                                                            <xf:setvalue
+                                                                ref="$state/@announcement"
+                                                                value="xxf:format-message(fr:r('moved-announcement'), ($pos + 1, $server-count))"/>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                </xf:group>
+
+                                                <xf:trigger
+                                                    id="fr-rse-remove-btn"
+                                                    appearance="minimal"
+                                                    class="fr-rse-icon-btn fr-rse-remove-btn">
+                                                    <xf:label><xh:i class="fa fa-xmark" aria-hidden="true"/></xf:label>
+                                                    <xf:hint value="fr:r('remove-server')"/>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:delete ref="$srv"/>
+                                                        <xf:setvalue ref="$state/@announcement" value="fr:r('removed-announcement')"/>
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xf:group>
+                                        </xh:div>
+                                    </fr:dnd-repeat>
+
+                                </xh:div>
+                            </xf:case>
+
+                            <!-- JSON Mode (right tab) -->
+                            <xf:case value="'json'">
+                                <xh:div class="fr-rse-json-wrap">
+                                    <xh:div class="fr-rse-json-overlay">
+                                        <fr:code-mirror
+                                            id="fr-rse-json-editor"
+                                            ref="$state/raw-json"
+                                            mediatype="application/json"
+                                            class="fr-rse-json-codemirror">
+                                            <xf:alert value="fr:r('invalid-json')"/>
+                                            <xf:action event="xforms-value-changed" if="not($is-readonly)">
+                                                <xf:var name="raw" value="string($state/raw-json)"/>
+                                                <xf:action if="$raw != string($state/@last-json)">
+                                                    <xf:setvalue ref="$state/@last-json" value="$raw"/>
+                                                    <xf:setvalue ref="$binding"          value="$raw"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </fr:code-mirror>
+
+                                        <xh:div class="fr-rse-json-buttons">
+                                            <xf:group ref=".[not($is-readonly)]">
+                                                <xf:trigger appearance="minimal" id="fr-rse-format-json" class="fr-rse-json-btn">
+                                                    <xf:label><xh:i class="fa fa-fw fa-align-left" aria-hidden="true"/></xf:label>
+                                                    <xf:hint value="fr:r('format-json')"/>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:var name="formatted" value="rse:formatRemoteServersJson($state/raw-json)"/>
+                                                        <xf:setvalue ref="$state/raw-json"   value="$formatted"/>
+                                                        <xf:setvalue ref="$state/@last-json" value="$formatted"/>
+                                                        <xf:setvalue ref="$binding"          value="$formatted"/>
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xf:group>
+                                            <xf:trigger appearance="minimal" id="fr-rse-copy-json" class="fr-rse-json-btn">
+                                                <xf:label><xh:i class="fa fa-fw fa-copy" aria-hidden="true"/></xf:label>
+                                                <xf:hint value="fr:r('copy-json')"/>
+                                                <xf:action event="DOMActivate" type="javascript">
+                                                    <xf:param name="text" value="string($state/raw-json)"/>
+                                                    <xf:body>
+                                                        const btn = (this instanceof Element &amp;&amp; this.querySelector('button')) || this;
+                                                        if (navigator.clipboard &amp;&amp; navigator.clipboard.writeText) {
+                                                            navigator.clipboard.writeText(text).then(() =&gt; {
+                                                                if (btn &amp;&amp; btn.classList) {
+                                                                    btn.classList.add('fr-rse-copy-success');
+                                                                    const icon = btn.querySelector('i');
+                                                                    if (icon) icon.className = 'fa fa-fw fa-check';
+                                                                    setTimeout(() =&gt; {
+                                                                        btn.classList.remove('fr-rse-copy-success');
+                                                                        if (icon) icon.className = 'fa fa-fw fa-copy';
+                                                                    }, 1200);
+                                                                }
+                                                            });
+                                                        }
+                                                    </xf:body>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:div>
+                                    </xh:div>
+                                </xh:div>
+                            </xf:case>
+                        </xf:switch>
+                    </xh:div>
+                </xh:div>
+
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

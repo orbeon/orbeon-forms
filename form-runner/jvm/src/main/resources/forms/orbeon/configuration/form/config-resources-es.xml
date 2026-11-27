@@ -54,6 +54,7 @@
         <percentage>Introduzca un porcentaje entre 0 % y 100 %</percentage>
         <json>Sintaxis JSON no válida</json>
         <permissions-json>Complete todos los nombres de rol obligatorios o corrija el JSON de permisos no válido</permissions-json>
+        <remote-servers-json>Complete todas las URL de servidor obligatorias o corrija el JSON de servidores remotos no válido</remote-servers-json>
         <landing-cards>Complete todos los campos obligatorios de las tarjetas</landing-cards>
         <byte-size>Introduzca un tamaño en bytes o porcentaje de memoria máxima (1–100 %), p. ej. 15%, 256m, 1g o 0</byte-size>
         <attachment-size>Introduzca un tamaño no negativo equivalente a un número entero de bytes</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Configuración de servidores remotos (JSON)</label>
+        <label>Configuración de servidores remotos</label>
         <hint>Matriz JSON de servidores remotos para publicación y administración de formularios &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

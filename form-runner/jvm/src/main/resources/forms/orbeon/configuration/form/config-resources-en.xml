@@ -54,6 +54,7 @@
         <percentage>Enter a percentage between 0% and 100%</percentage>
         <json>Invalid JSON syntax</json>
         <permissions-json>Complete all required role names or fix invalid permissions JSON</permissions-json>
+        <remote-servers-json>Complete all required server URLs or fix invalid remote servers JSON</remote-servers-json>
         <landing-cards>Complete all required card fields</landing-cards>
         <byte-size>Enter a byte size or max-heap percentage (1–100%), e.g. 15%, 256m, 1g, or 0</byte-size>
         <attachment-size>Enter a non-negative size yielding a whole number of bytes</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Remote Servers Configuration (JSON)</label>
+        <label>Remote Servers Configuration</label>
         <hint>JSON array of remote servers for form publishing/admin &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

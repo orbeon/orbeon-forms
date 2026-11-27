@@ -54,6 +54,7 @@
         <percentage>请输入 0% 到 100% 之间的百分比</percentage>
         <json>无效的 JSON 语法</json>
         <permissions-json>请填写所有必填角色名称或修正无效的权限 JSON</permissions-json>
+        <remote-servers-json>请填写所有必填服务器 URL 或修正无效的远程服务器 JSON</remote-servers-json>
         <landing-cards>请填写所有必填卡片字段</landing-cards>
         <byte-size>请输入字节大小或最大堆百分比（1–100%），例如 15%、256m、1g 或 0</byte-size>
         <attachment-size>请输入可转换为整数字节的非负大小</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>远程服务器配置 (JSON)</label>
+        <label>远程服务器配置</label>
         <hint>用于表单发布/管理的远程服务器 JSON 数组 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

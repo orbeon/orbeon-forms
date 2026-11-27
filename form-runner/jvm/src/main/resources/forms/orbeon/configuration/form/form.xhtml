@@ -1232,6 +1232,7 @@
                     <xf:bind ref="@value[../@validation = 'duration']"                                                         xxf:whitespace="trim" constraint="frf:isValidCacheDuration(.)"/>
                     <xf:bind ref="@value[../@validation = 'json']"                                                             xxf:whitespace="trim" constraint="frf:isValidJson(.)"/>
                     <xf:bind ref="@value[../@validation = 'permissions-json']"                                                 xxf:whitespace="trim" constraint="frf:isValidPermissionsJson(.)"/>
+                    <xf:bind ref="@value[../@validation = 'remote-servers-json']"                                              xxf:whitespace="trim" constraint="frf:isValidRemoteServersJson(.)"/>
                     <xf:bind ref="@value[../@validation = 'landing-cards']"                                                    xxf:whitespace="trim" constraint="frf:isValidLandingCards(.)"/>
                 </xf:bind>
 
@@ -4109,11 +4110,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <fr:code-mirror id="home-remote-servers-value-control" ref="home-remote-servers/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
+                                        <fr:remote-servers-editor id="home-remote-servers-value-control" ref="home-remote-servers/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/home-remote-servers/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/home-remote-servers/hint else replace($form-resources/home-remote-servers/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/json"/>
-                                        </fr:code-mirror>
+                                            <xf:alert ref="$form-resources/alerts/remote-servers-json"/>
+                                        </fr:remote-servers-editor>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>

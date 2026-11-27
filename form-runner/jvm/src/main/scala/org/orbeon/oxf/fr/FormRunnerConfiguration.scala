@@ -137,6 +137,10 @@ trait FormRunnerConfiguration {
     org.orbeon.oxf.fr.permission.PermissionsEditorUI.isValidPermissionsJson(value)
 
   //@XPathFunction
+  def isValidRemoteServersJson(value: String): Boolean =
+    RemoteServersEditorUI.isValidRemoteServersJson(value)
+
+  //@XPathFunction
   def landingCardsToEditorXml(rawValue: String, fallbackValue: String): DocumentNodeInfoType = {
     val editorDoc = LandingCardsConfigXml.toEditorDom(rawValue, fallbackValue)
     new DocumentWrapper(editorDoc, null, StaticXPath.GlobalConfiguration)
@@ -1288,7 +1292,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       xsType        = "xs:string",
       hasAppForm    = false,
       defaultValue  = "[]",
-      validationOpt = Some("json")
+      validationOpt = Some("remote-servers-json")
     ),
 
     // 9. Import & Export Pages

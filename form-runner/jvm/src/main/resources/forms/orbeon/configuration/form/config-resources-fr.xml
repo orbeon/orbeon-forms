@@ -54,6 +54,7 @@
         <percentage>Saisissez un pourcentage compris entre 0 % et 100 %</percentage>
         <json>Syntaxe JSON invalide</json>
         <permissions-json>Complétez tous les noms de rôles requis ou corrigez le JSON des permissions</permissions-json>
+        <remote-servers-json>Complétez toutes les URL de serveur requises ou corrigez le JSON des serveurs distants</remote-servers-json>
         <landing-cards>Complétez tous les champs requis des cartes</landing-cards>
         <byte-size>Saisissez une taille en octets ou un pourcentage du tas max (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
         <attachment-size>Saisissez une taille positive ou nulle correspondant à un nombre entier d'octets</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Configuration des serveurs distants (JSON)</label>
+        <label>Configuration des serveurs distants</label>
         <hint>Tableau JSON des serveurs distants &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

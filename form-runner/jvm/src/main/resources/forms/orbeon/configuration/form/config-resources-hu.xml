@@ -54,6 +54,7 @@
         <percentage>Adjon meg egy százalékértéket 0% és 100% között</percentage>
         <json>Érvénytelen JSON-szintaxis</json>
         <permissions-json>Töltse ki az összes kötelező szerepkörnevet, vagy javítsa a jogosultságok JSON-kódját</permissions-json>
+        <remote-servers-json>Töltse ki az összes kötelező kiszolgáló-URL-t, vagy javítsa a távoli kiszolgálók JSON-kódját</remote-servers-json>
         <landing-cards>Töltse ki a kártyák összes kötelező mezőjét</landing-cards>
         <byte-size>Adjon meg bájtméretet vagy maximális kupacszázalékot (1–100%), pl. 15%, 256m, 1g vagy 0</byte-size>
         <attachment-size>Adjon meg egész bájtszámot eredményező nemnegatív méretet</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Távoli kiszolgálók konfigurációja (JSON)</label>
+        <label>Távoli kiszolgálók konfigurációja</label>
         <hint>Távoli kiszolgálók JSON-tömbje űrlapok közzétételéhez és adminisztrációjához &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

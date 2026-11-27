@@ -54,6 +54,7 @@
         <percentage>Syötä prosenttiosuus väliltä 0 % – 100 %</percentage>
         <json>Virheellinen JSON-syntaksi</json>
         <permissions-json>Täytä kaikki pakolliset roolinimet tai korjaa virheellinen käyttöoikeuksien JSON</permissions-json>
+        <remote-servers-json>Täytä kaikki pakolliset palvelimen URL-osoitteet tai korjaa virheellinen etäpalvelimien JSON</remote-servers-json>
         <landing-cards>Täytä kaikki korttien pakolliset kentät</landing-cards>
         <byte-size>Syötä tavukoko tai enimmäiskeon prosenttiosuus (1–100 %), esim. 15%, 256m, 1g tai 0</byte-size>
         <attachment-size>Syötä ei-negatiivinen koko, joka vastaa kokonaista tavumäärää</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Etäpalvelimien määritys (JSON)</label>
+        <label>Etäpalvelimien määritys</label>
         <hint>Etäpalvelimien JSON-taulukko lomakkeiden julkaisua ja hallintaa varten &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

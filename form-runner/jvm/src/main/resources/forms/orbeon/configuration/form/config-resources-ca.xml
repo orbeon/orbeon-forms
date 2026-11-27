@@ -54,6 +54,7 @@
         <percentage>Introduïu un percentatge entre 0 % i 100 %</percentage>
         <json>Sintaxi JSON no vàlida</json>
         <permissions-json>Completeu tots els noms de rol obligatoris o corregiu el JSON de permisos no vàlid</permissions-json>
+        <remote-servers-json>Completeu tots els URL de servidor obligatoris o corregiu el JSON de servidors remots no vàlid</remote-servers-json>
         <landing-cards>Completeu tots els camps obligatoris de les targetes</landing-cards>
         <byte-size>Introduïu una mida en bytes o un percentatge de memòria màxima (1–100 %), p. ex. 15%, 256m, 1g o 0</byte-size>
         <attachment-size>Introduïu una mida no negativa equivalent a un nombre enter de bytes</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Configuració de servidors remots (JSON)</label>
+        <label>Configuració de servidors remots</label>
         <hint>Matriu JSON de servidors remots per a la publicació i l'administració de formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

@@ -54,6 +54,7 @@
         <percentage>Ange en procentsats mellan 0 % och 100 %</percentage>
         <json>Ogiltig JSON-syntax</json>
         <permissions-json>Fyll i alla obligatoriska rollnamn eller åtgärda ogiltig JSON för rättigheter</permissions-json>
+        <remote-servers-json>Fyll i alla obligatoriska server-URL:er eller åtgärda ogiltig JSON för fjärrservrar</remote-servers-json>
         <landing-cards>Fyll i alla obligatoriska kortfält</landing-cards>
         <byte-size>Ange en storlek i byte eller procentandel av max-heap (1–100 %), t.ex. 15%, 256m, 1g eller 0</byte-size>
         <attachment-size>Ange en icke-negativ storlek som ger ett helt antal byte</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Konfiguration av fjärrservrar (JSON)</label>
+        <label>Konfiguration av fjärrservrar</label>
         <hint>JSON-fält med fjärrservrar för publicering och administration av formulär &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

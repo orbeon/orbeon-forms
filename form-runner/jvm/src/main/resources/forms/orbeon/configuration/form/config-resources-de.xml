@@ -54,6 +54,7 @@
         <percentage>Geben Sie einen Prozentsatz zwischen 0 % und 100 % ein</percentage>
         <json>Ungültige JSON-Syntax</json>
         <permissions-json>Vervollständigen Sie alle erforderlichen Rollennamen oder korrigieren Sie das ungültige Berechtigungs-JSON</permissions-json>
+        <remote-servers-json>Vervollständigen Sie alle erforderlichen Server-URLs oder korrigieren Sie das ungültige Remote-Server-JSON</remote-servers-json>
         <landing-cards>Vervollständigen Sie alle erforderlichen Kartenfelder</landing-cards>
         <byte-size>Geben Sie eine Größe in Byte oder einen Prozentsatz des maximalen Heaps ein (1–100 %), z. B. 15%, 256m, 1g oder 0</byte-size>
         <attachment-size>Geben Sie eine nichtnegative Größe ein, die eine ganze Anzahl von Bytes ergibt</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Konfiguration entfernter Server (JSON)</label>
+        <label>Konfiguration entfernter Server</label>
         <hint>JSON-Array entfernter Server für Formularveröffentlichung/-verwaltung &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

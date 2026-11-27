@@ -54,6 +54,7 @@
         <percentage>Wprowadź wartość procentową z zakresu od 0% do 100%</percentage>
         <json>Nieprawidłowa składnia JSON</json>
         <permissions-json>Uzupełnij wszystkie wymagane nazwy ról lub popraw nieprawidłowy kod JSON uprawnień</permissions-json>
+        <remote-servers-json>Uzupełnij wszystkie wymagane adresy URL serwerów lub popraw nieprawidłowy kod JSON serwerów zdalnych</remote-servers-json>
         <landing-cards>Uzupełnij wszystkie wymagane pola kart</landing-cards>
         <byte-size>Wprowadź rozmiar w bajtach lub procent maksymalnej sterty (1–100%), np. 15%, 256m, 1g lub 0</byte-size>
         <attachment-size>Wprowadź nieujemny rozmiar dający całkowitą liczbę bajtów</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Konfiguracja zdalnych serwerów (JSON)</label>
+        <label>Konfiguracja zdalnych serwerów</label>
         <hint>Tablica JSON zdalnych serwerów do publikowania formularzy i administracji &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

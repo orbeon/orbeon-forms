@@ -54,6 +54,7 @@
         <percentage>0% から 100% の間のパーセンテージを入力してください</percentage>
         <json>JSON構文が無効です</json>
         <permissions-json>必須のロール名をすべて入力するか、無効な権限JSONを修正してください</permissions-json>
+        <remote-servers-json>必須のサーバーURLをすべて入力するか、無効なリモートサーバーJSONを修正してください</remote-servers-json>
         <landing-cards>カードの必須フィールドをすべて入力してください</landing-cards>
         <byte-size>バイトサイズまたは最大ヒープに対する割合（1–100%）を入力してください（例: 15%、256m、1g、または 0）</byte-size>
         <attachment-size>整数のバイト数となる0以上のサイズを入力してください</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>リモートサーバー設定 (JSON)</label>
+        <label>リモートサーバー設定</label>
         <hint>フォームの公開/管理用リモートサーバーのJSON配列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

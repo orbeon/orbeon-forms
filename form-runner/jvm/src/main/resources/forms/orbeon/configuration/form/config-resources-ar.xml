@@ -54,6 +54,7 @@
         <percentage>أدخل نسبة مئوية بين 0% و100%</percentage>
         <json>صيغة JSON غير صالحة</json>
         <permissions-json>أكمل جميع أسماء الأدوار المطلوبة أو أصلح صيغة JSON غير الصالحة للأذونات</permissions-json>
+        <remote-servers-json>أكمل جميع عناوين URL المطلوبة للخوادم أو أصلح صيغة JSON غير الصالحة للخوادم البعيدة</remote-servers-json>
         <landing-cards>أكمل جميع حقول البطاقات المطلوبة</landing-cards>
         <byte-size>أدخل حجمًا بالبايت أو نسبة من الحد الأقصى للكومة (1–100%)، مثل 15% أو 256m أو 1g أو 0</byte-size>
         <attachment-size>أدخل حجمًا غير سالب ينتج عنه عدد صحيح من البايتات</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>تكوين الخوادم البعيدة (JSON)</label>
+        <label>تكوين الخوادم البعيدة</label>
         <hint>مصفوفة JSON للخوادم البعيدة لنشر النماذج وإدارتها &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

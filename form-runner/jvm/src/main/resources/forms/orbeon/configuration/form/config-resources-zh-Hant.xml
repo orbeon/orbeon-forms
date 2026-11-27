@@ -54,6 +54,7 @@
         <percentage>請輸入 0% 到 100% 之間的百分比</percentage>
         <json>無效的 JSON 語法</json>
         <permissions-json>請填寫所有必填角色名稱或修正無效的權限 JSON</permissions-json>
+        <remote-servers-json>請填寫所有必填伺服器 URL 或修正無效的遠端伺服器 JSON</remote-servers-json>
         <landing-cards>請填寫所有必填卡片欄位</landing-cards>
         <byte-size>請輸入位元組大小或最大堆積百分比（1–100%），例如 15%、256m、1g 或 0</byte-size>
         <attachment-size>請輸入可轉換為整數位元組的非負大小</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>遠端伺服器設定 (JSON)</label>
+        <label>遠端伺服器設定</label>
         <hint>用於表單發布/管理的遠端伺服器 JSON 陣列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

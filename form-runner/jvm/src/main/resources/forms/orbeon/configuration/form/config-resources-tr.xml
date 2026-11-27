@@ -54,6 +54,7 @@
         <percentage>%0 ile %100 arasında bir yüzde girin</percentage>
         <json>Geçersiz JSON sözdizimi</json>
         <permissions-json>Gerekli tüm rol adlarını tamamlayın veya geçersiz izin JSON verisini düzeltin</permissions-json>
+        <remote-servers-json>Gerekli tüm sunucu URL'lerini tamamlayın veya geçersiz uzak sunucular JSON verisini düzeltin</remote-servers-json>
         <landing-cards>Gerekli tüm kart alanlarını tamamlayın</landing-cards>
         <byte-size>Bayt cinsinden bir boyut veya maks. yığın yüzdesi (1–100%) girin, örn. 15%, 256m, 1g veya 0</byte-size>
         <attachment-size>Tam sayı bayt karşılığı veren negatif olmayan bir boyut girin</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Uzak Sunucu Yapılandırması (JSON)</label>
+        <label>Uzak Sunucu Yapılandırması</label>
         <hint>Form yayınlama ve yönetimi için uzak sunucuların JSON dizisi &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

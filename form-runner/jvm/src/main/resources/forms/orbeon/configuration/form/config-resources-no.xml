@@ -54,6 +54,7 @@
         <percentage>Skriv inn en prosentandel mellom 0 % og 100 %</percentage>
         <json>Ugyldig JSON-syntaks</json>
         <permissions-json>Fyll ut alle påkrevde rollenavn eller rett ugyldig JSON for tillatelser</permissions-json>
+        <remote-servers-json>Fyll ut alle påkrevde server-URL-er eller rett ugyldig JSON for eksterne servere</remote-servers-json>
         <landing-cards>Fyll ut alle påkrevde kortfelter</landing-cards>
         <byte-size>Skriv inn en størrelse i byte eller prosentandel av maks. heap (1–100 %), f.eks. 15%, 256m, 1g eller 0</byte-size>
         <attachment-size>Skriv inn en ikke-negativ størrelse som gir et helt antall byte</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Konfigurasjon av eksterne servere (JSON)</label>
+        <label>Konfigurasjon av eksterne servere</label>
         <hint>JSON-matrise med eksterne servere for publisering og administrasjon av skjema &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

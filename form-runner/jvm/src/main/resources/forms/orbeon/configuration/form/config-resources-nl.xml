@@ -54,6 +54,7 @@
         <percentage>Voer een percentage tussen 0% en 100% in</percentage>
         <json>Ongeldige JSON-syntaxis</json>
         <permissions-json>Vul alle verplichte rolnamen in of herstel de ongeldige bevoegdheden-JSON</permissions-json>
+        <remote-servers-json>Vul alle verplichte server-URL's in of herstel de ongeldige JSON voor externe servers</remote-servers-json>
         <landing-cards>Vul alle verplichte kaartvelden in</landing-cards>
         <byte-size>Voer een grootte in bytes of een percentage van de maximale heap in (1–100%), bijv. 15%, 256m, 1g of 0</byte-size>
         <attachment-size>Voer een niet-negatieve grootte in die een geheel aantal bytes oplevert</attachment-size>
@@ -1482,7 +1483,7 @@
         </item>
     </home-search-options-opened-on-load>
     <home-remote-servers>
-        <label>Configuratie van externe servers (JSON)</label>
+        <label>Configuratie van externe servers</label>
         <hint>JSON-array van externe servers voor formulierpublicatie en -beheer &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
     <export-page-enable>

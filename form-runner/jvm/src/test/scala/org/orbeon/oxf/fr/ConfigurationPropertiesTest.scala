@@ -878,7 +878,7 @@ class ConfigurationPropertiesTest
             val newSummaryItem  = homeLinksSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("new summary")).get._1
             setControlValueWithEventSearchNested(homeLinksSelect.effectiveId, newSummaryItem.externalValue(homeLinksSelect.mustEncodeValues))
 
-            // Test <fr:code-mirror> + Circe JSON validation on home-remote-servers-value-control
+            // Test <fr:remote-servers-editor> + Circe JSON validation on home-remote-servers-value-control
             val remoteServersOverride       = resolveObject[XFormsSingleNodeControl]("home-remote-servers-override-control").get
             val remoteServersOverrideSelect = ControlsIterator(remoteServersOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
             val remoteServersValue          = resolveObject[XFormsValueControl]("home-remote-servers-value-control").get
@@ -886,7 +886,7 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(remoteServersOverrideSelect.effectiveId, encodedTrue)
             setControlValueWithEventSearchNested(remoteServersValue.effectiveId, "[{broken json")
             assert(! remoteServersValue.isValid)
-            setControlValueWithEventSearchNested(remoteServersValue.effectiveId, """[{"label": "Staging", "url": "https://staging.example.org/fr"}]""")
+            setControlValueWithEventSearchNested(remoteServersValue.effectiveId, """[{"name": "staging", "label": "Staging", "url": "https://staging.example.org/fr"}]""")
             assert(remoteServersValue.isValid)
 
             // Test <fr:boolean-or-formula> on warn-when-data-unsafe-value-control

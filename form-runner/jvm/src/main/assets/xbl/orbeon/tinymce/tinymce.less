@@ -61,7 +61,7 @@ body {
     }
     .tox.tox-hugerte-inline {
         .tox-editor-header {
-            z-index: 1500; // so it shows in front of modals
+            z-index: 1200; // Above the page, including the navbar, and below the dialogs of the editor (1300)
         }
     }
 
@@ -98,6 +98,90 @@ body {
             color: var(--orbeon-dropdown-menu-disabled-color);
         }
         .tox-icon svg {
+            fill: currentColor;
+        }
+    }
+
+    // Dialogs of the editor, such as the link dialog: without this, they keep the light colors of the skin, on which
+    // our own rules for labels and fields apply
+    .tox-dialog-wrap__backdrop {
+        background-color: var(--orbeon-dialog-backdrop-color);
+    }
+    .tox-dialog,
+    .tox-dialog__header,
+    .tox-dialog__footer {
+        background-color: var(--orbeon-dialog-background-color);
+    }
+    .tox-dialog__header {
+        color: var(--orbeon-dialog-title-color);
+    }
+    .tox-dialog__body {
+        color: var(--orbeon-base-color);
+    }
+    .tox-label {
+        color: var(--orbeon-label-color);
+    }
+    .tox-textfield,
+    .tox-listboxfield .tox-listbox--select {
+        background-color: var(--orbeon-control-background-color);
+        border-color: var(--orbeon-control-border-color);
+        color: var(--orbeon-control-color);
+        &:focus {
+            background-color: var(--orbeon-control-background-color);
+            border-color: var(--orbeon-focus-border-color);
+            box-shadow: var(--orbeon-control-focus-ring);
+        }
+    }
+    .tox-listbox__select-chevron svg {
+        fill: currentColor;
+    }
+    .tox-button {
+        &, &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            border-color: transparent;
+            color: var(--orbeon-button-primary-color);
+        }
+        background-color: var(--orbeon-button-primary-background-color);
+        &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            background-color: var(--orbeon-button-primary-highlight-background-color);
+        }
+        &::before {
+            box-shadow: var(--orbeon-button-focus-ring);
+        }
+    }
+    .tox-button--secondary {
+        &, &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            color: var(--orbeon-button-color);
+        }
+        background-color: var(--orbeon-button-background-color);
+        &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            background-color: var(--orbeon-button-highlight-background-color);
+        }
+    }
+    .tox-button--naked {
+        &, &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            color: var(--orbeon-dialog-title-color);
+        }
+        background-color: transparent;
+        &:hover:not(:disabled), &:focus:not(:disabled), &:active:not(:disabled) {
+            background-color: var(--orbeon-button-background-color);
+        }
+    }
+
+    // Menu of a dropdown in a dialog, such as the target of a link
+    .tox-menu {
+        background-color: var(--orbeon-dropdown-menu-background-color);
+        border-color: var(--orbeon-dropdown-menu-border-color);
+    }
+    .tox-collection--list {
+        .tox-collection__item, .tox-collection__item--enabled {
+            background-color: transparent;
+            color: var(--orbeon-dropdown-menu-color);
+        }
+        .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+            background-color: var(--orbeon-dropdown-menu-hover-background-color);
+            color: var(--orbeon-dropdown-menu-hover-color);
+        }
+        .tox-collection__item-checkmark svg {
             fill: currentColor;
         }
     }

@@ -90,6 +90,9 @@
     <detail-section>
         <label>详情页面</label>
     </detail-section>
+    <buttons-section>
+        <label>按钮</label>
+    </buttons-section>
     <wizard-section>
         <label>向导</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>覆盖流程</dialog-title-override>
         <dialog-title-add>添加自定义流程</dialog-title-add>
         <dialog-title-edit>编辑流程</dialog-title-edit>
+        <button-bar-edit>按钮：编辑 / 新建</button-bar-edit>
+        <button-bar-view>按钮：查看 / 审核</button-bar-view>
+        <button-bar-inner>按钮：内部</button-bar-inner>
+        <configure-button-hint>在“按钮”选项卡中配置此按钮</configure-button-hint>
+        <add-as-button>添加为按钮…</add-as-button>
+        <add-as-button-hint>将此自定义流程作为按钮放置在“编辑 / 新建”栏中</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>控件设置</label>

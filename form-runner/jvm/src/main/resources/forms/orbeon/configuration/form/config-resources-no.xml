@@ -90,6 +90,9 @@
     <detail-section>
         <label>Detaljside</label>
     </detail-section>
+    <buttons-section>
+        <label>Knapper</label>
+    </buttons-section>
     <wizard-section>
         <label>Veiviser</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Overstyr prosess</dialog-title-override>
         <dialog-title-add>Legg til tilpasset prosess</dialog-title-add>
         <dialog-title-edit>Rediger prosess</dialog-title-edit>
+        <button-bar-edit>Knapp: Redigering / Ny</button-bar-edit>
+        <button-bar-view>Knapp: Visning / Gjennomgang</button-bar-view>
+        <button-bar-inner>Knapp: Indre</button-bar-inner>
+        <configure-button-hint>Konfigurer denne knappen i fanen Knapper</configure-button-hint>
+        <add-as-button>Legg til som knapp…</add-as-button>
+        <add-as-button-hint>Plasser denne tilpassede prosessen som en knapp på raden Redigering / Ny</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Kontrollinnstillinger</label>

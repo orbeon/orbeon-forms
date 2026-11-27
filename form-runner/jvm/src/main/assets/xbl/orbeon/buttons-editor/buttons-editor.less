@@ -1,0 +1,951 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    .xbl-fr-buttons-editor {
+        display: block;
+
+        .fr-be-sr-status {
+            position: absolute;
+            clip-path: inset(50%);
+            overflow: hidden;
+            inline-size: 1px;
+            block-size: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            white-space: nowrap;
+        }
+    }
+
+    // Shared button chip & pill badges (used in both main editor and modal dialog)
+    .xbl-fr-buttons-editor,
+    .fr-button-config-dialog {
+
+        .fr-be-button-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            padding: 4px 12px;
+            border-radius: var(--orbeon-button-border-radius);
+            background-color: var(--orbeon-button-background-color);
+            color: var(--orbeon-button-color);
+            font-size: 0.93em;
+            font-weight: 500;
+            line-height: 1.35;
+            white-space: nowrap;
+
+            .xforms-output,
+            .xforms-output-output {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35em;
+            }
+
+            &.fr-be-button-chip-primary {
+                background-color: var(--orbeon-button-primary-background-color);
+                color: var(--orbeon-button-primary-color);
+            }
+
+            .fr-be-split-caret {
+                display: inline-flex;
+                align-items: center;
+                padding-inline-start: 0.35em;
+                margin-inline-start: 0.15em;
+                border-inline-start: 1px solid currentColor;
+                opacity: 0.8;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        .fr-be-token-code {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            font-family: var(--orbeon-code-font-family);
+            font-size: 0.86em;
+            color: var(--orbeon-code-color);
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .fr-be-bar-prop {
+            font-family: var(--orbeon-code-font-family);
+            font-size: 0.84em;
+            color: var(--orbeon-hint-color);
+            background: transparent;
+            padding: 0;
+            border: none;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-be-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            font-size: 0.82em;
+            font-weight: 500;
+            line-height: 1.35;
+            white-space: nowrap;
+
+            &.xforms-hidden {
+                display: none;
+            }
+
+            &.fr-be-pill-primary {
+                color: var(--orbeon-info-alert-color);
+                background-color: var(--orbeon-info-alert-background-color);
+                border: 1px solid var(--orbeon-info-alert-border-color);
+            }
+
+            &.fr-be-pill-override {
+                color: var(--orbeon-link-color);
+                background-color: var(--orbeon-table-action-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+            }
+
+            &.fr-be-pill-muted {
+                color: var(--orbeon-pill-muted-color);
+                background-color: var(--orbeon-pill-muted-background-color);
+                border: 1px solid var(--orbeon-pill-muted-border-color);
+            }
+
+            &.fr-be-pill-warning {
+                color: var(--orbeon-warning-alert-color);
+                background-color: var(--orbeon-warning-alert-background-color);
+                border: 1px solid var(--orbeon-warning-alert-border-color);
+            }
+        }
+    }
+
+    .fr-buttons-editor {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65em;
+
+        // 1. Segmented Bar Switcher
+        .fr-be-bar-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45em;
+        }
+
+        .fr-be-bar-tabs {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            align-self: flex-start;
+            background-color: var(--orbeon-tab-bar-background-color);
+            border: 1px solid var(--orbeon-tab-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            .xforms-repeat-begin-end,
+            .xforms-repeat-delimiter,
+            .xforms-repeat-template {
+                display: none !important;
+            }
+        }
+
+        .fr-be-bar-tab {
+            display: inline-flex;
+
+            .xforms-trigger {
+                margin: 0;
+            }
+
+            button.btn-link,
+            a {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4em;
+                padding: 5px 12px;
+                border-radius: 6px;
+                border: 1px solid transparent;
+                font-size: 0.95em;
+                font-weight: 500;
+                color: var(--orbeon-tab-inactive-color);
+                text-decoration: none;
+                background: transparent;
+
+                @media (hover: hover) {
+                    &:hover {
+                        color: var(--orbeon-tab-inactive-hover-color);
+                    }
+                }
+            }
+
+            &.fr-be-bar-tab-active {
+                button.btn-link,
+                a {
+                    background-color: var(--orbeon-tab-background-color);
+                    border-color: var(--orbeon-tab-border-color);
+                    color: var(--orbeon-base-color);
+                    font-weight: 600;
+                }
+            }
+
+            .fr-be-bar-tab-dot {
+                inline-size: 6px;
+                block-size: 6px;
+                border-radius: 50%;
+                background-color: var(--orbeon-accent-color);
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        .fr-be-bar-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.4em 1em;
+            font-size: 0.92em;
+            color: var(--orbeon-hint-color);
+        }
+
+        // 2. Action Toolbar
+        .fr-be-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6em;
+            padding: 0.55em 0.75em;
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            .fr-be-toolbar-start,
+            .fr-be-toolbar-end,
+            .fr-be-add-controls:not(.xforms-disabled),
+            .fr-be-override-controls:not(.xforms-disabled) {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.5em;
+            }
+
+            .fr-be-add-standard-select:not(.xforms-disabled) {
+                margin: 0;
+
+                select {
+                    inline-size: auto;
+                    max-inline-size: 20em;
+                    min-block-size: var(--orbeon-control-height);
+                    margin: 0;
+                }
+            }
+
+            .fr-be-add-btn {
+                margin: 0;
+
+                button.btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35em;
+                    min-block-size: var(--orbeon-control-height);
+                    padding: 0 0.75em;
+                    margin: 0;
+                    font-weight: 500;
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-control-background-color);
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: var(--orbeon-landing-tile-border-radius);
+                    box-shadow: none;
+
+                    @media (hover: hover) {
+                        &:hover {
+                            background-color: var(--orbeon-pill-muted-background-color);
+                            border-color: var(--orbeon-base-border-color);
+                        }
+                    }
+                }
+            }
+
+            .fr-be-override-checkbox {
+                margin: 0;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .fr-be-utility-btn {
+                margin: 0;
+
+                button.btn-link,
+                a {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.3em;
+                    padding: 2px 6px;
+                    color: var(--orbeon-link-color);
+                    text-decoration: none;
+                    font-size: 0.92em;
+                }
+            }
+        }
+
+        .fr-be-inherited-banner {
+            display: flex;
+            align-items: baseline;
+            gap: 0.45em;
+            padding: 0.45em 0.7em;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: var(--orbeon-hint-color);
+            background-color: var(--orbeon-page-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-be-empty {
+            padding: 1.4em 1em;
+            text-align: center;
+            color: var(--orbeon-hint-color);
+            border: 1px dashed var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        // 3. Reorderable Button Stack
+        .xbl-fr-dnd-repeat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4em;
+
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > .xforms-repeat-template {
+                display: none !important;
+            }
+        }
+
+        .fr-be-row {
+            display: flex;
+            align-items: center;
+            gap: 0.55em;
+            padding: 0.45em 0.65em;
+            background-color: var(--orbeon-form-background-color);
+            border: 1px solid var(--orbeon-landing-card-border-color);
+            border-radius: var(--orbeon-landing-card-border-radius);
+
+            &.fr-be-row-invalid {
+                border-color: var(--orbeon-error-color);
+            }
+        }
+
+        .fr-be-drag-handle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-inline-size: 22px;
+            min-block-size: 26px;
+            color: var(--orbeon-hint-color);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-be-row-main {
+            flex: 1 1 auto;
+            min-inline-size: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4em 0.5em;
+        }
+
+        .fr-be-kbd {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 5px;
+            font-family: var(--orbeon-code-font-family);
+            font-size: 0.78em;
+            color: var(--orbeon-pill-muted-color);
+            background-color: var(--orbeon-pill-muted-background-color);
+            border: 1px solid var(--orbeon-pill-muted-border-color);
+            border-radius: 4px;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-be-missing-process-btn {
+            margin: 0;
+
+            button.btn-link,
+            a {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3em;
+                padding: 2px 8px;
+                border-radius: 9999px;
+                font-size: 0.82em;
+                font-weight: 600;
+                color: var(--orbeon-warning-alert-color);
+                background-color: var(--orbeon-warning-alert-background-color);
+                border: 1px solid var(--orbeon-warning-alert-border-color);
+                text-decoration: none;
+            }
+        }
+
+        .fr-be-row-actions {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            .fr-be-move-btns:not(.xforms-disabled) {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+            }
+
+            .fr-be-configure-btn {
+                margin: 0;
+
+                button.btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.3em;
+                }
+            }
+
+            .fr-be-icon-btn {
+                margin: 0;
+
+                button.btn-link,
+                a {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-inline-size: 26px;
+                    min-block-size: 26px;
+                    padding: 0;
+                    border-radius: 5px;
+                    color: var(--orbeon-hint-color);
+                    text-decoration: none;
+
+                    @media (hover: hover) {
+                        &:hover {
+                            color: var(--orbeon-base-color);
+                            background-color: var(--orbeon-pill-muted-background-color);
+                        }
+                    }
+                }
+
+                &.fr-be-remove-btn {
+                    button.btn-link,
+                    a {
+                        @media (hover: hover) {
+                            &:hover {
+                                color: var(--orbeon-error-color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Extra Rules Block
+        .fr-be-extra-rules:not(.xforms-disabled) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45em;
+            margin-block-start: 0.5em;
+            padding-block-start: 0.65em;
+            border-block-start: 1px solid var(--orbeon-base-border-color);
+
+            .fr-be-extra-rules-header {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: baseline;
+                gap: 0.35em 0.75em;
+            }
+
+            .fr-be-extra-rules-title {
+                font-weight: 600;
+                font-size: 0.95em;
+                color: var(--orbeon-base-color);
+            }
+
+            .fr-be-extra-rules-hint {
+                font-size: 0.88em;
+                color: var(--orbeon-hint-color);
+            }
+
+            .fr-be-extra-rules-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.35em;
+            }
+        }
+    }
+
+    // 5. Configure Button Modal Dialog
+    dialog.fr-button-config-dialog,
+    .fr-button-config-dialog {
+        width: 720px;
+        max-width: calc(100vw - 24px);
+        max-height: calc(100vh - 32px);
+
+        &[open] {
+            display: flex;
+            flex-direction: column;
+        }
+
+        > .xxforms-dialog-head {
+            flex-shrink: 0;
+        }
+
+        > .xxforms-dialog-body {
+            flex: 1 1 auto;
+            min-block-size: 0;
+            overflow-y: auto;
+        }
+
+        .fr-be-dialog-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65em;
+        }
+
+        .fr-be-split-bar:not(.xforms-disabled) {
+            padding: 0.4em 0.65em;
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+
+            .fr-be-split-bar-row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5em;
+            }
+
+            .fr-be-split-pills,
+            .fr-be-split-add {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.4em;
+            }
+
+            .fr-be-split-label {
+                font-size: 0.86em;
+                font-weight: 600;
+                color: var(--orbeon-hint-color);
+                margin-inline-end: 0.2em;
+            }
+
+            .fr-be-split-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+                padding: 2px 8px;
+                border-radius: 6px;
+                background-color: var(--orbeon-tab-background-color);
+                border: 1px solid var(--orbeon-tab-border-color);
+
+                .xforms-trigger {
+                    margin: 0;
+                }
+
+                button.btn-link,
+                a {
+                    padding: 1px 3px;
+                    border-radius: 4px;
+                    font-family: var(--orbeon-code-font-family);
+                    font-size: 0.9em;
+                    color: var(--orbeon-tab-inactive-color);
+                    text-decoration: none;
+
+                    &:focus-visible {
+                        outline: none;
+                    }
+                }
+
+                &.fr-be-split-pill-active {
+                    border-color: var(--orbeon-accent-color);
+
+                    button.btn-link,
+                    a {
+                        color: var(--orbeon-base-color);
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .fr-be-split-select {
+                margin: 0;
+
+                select {
+                    inline-size: auto;
+                    max-inline-size: 15em;
+                    margin: 0;
+                }
+            }
+        }
+
+        .fr-be-part-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65em;
+        }
+
+        .fr-be-dialog-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45em;
+            padding: 0.6em 0.8em;
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-landing-card-border-radius);
+            background-color: var(--orbeon-form-background-color);
+        }
+
+        .fr-be-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5em;
+            padding-block-end: 0.35em;
+            border-block-end: 1px solid var(--orbeon-base-border-color);
+        }
+
+        .fr-be-section-title {
+            font-size: 0.98em;
+            font-weight: 600;
+            color: var(--orbeon-base-color);
+        }
+
+        .fr-be-sub-label {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--orbeon-label-color);
+        }
+
+        .fr-be-readonly-identity:not(.xforms-disabled) {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5em 0.75em;
+
+            .fr-be-field-hint {
+                font-size: 0.88em;
+                color: var(--orbeon-hint-color);
+            }
+        }
+
+        .fr-be-info-note:not(.xforms-disabled) {
+            display: flex;
+            align-items: baseline;
+            gap: 0.4em;
+            font-size: 0.9em;
+            color: var(--orbeon-hint-color);
+        }
+
+        .fr-be-icon-picker-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35em;
+            margin-block-end: 0.35em;
+        }
+
+        .fr-be-icon-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+
+            .xforms-repeat-begin-end,
+            .xforms-repeat-delimiter,
+            .xforms-repeat-template {
+                display: none !important;
+            }
+        }
+
+        .fr-be-icon-choice {
+            display: inline-flex;
+
+            .xforms-trigger {
+                margin: 0;
+            }
+
+            button.btn-link,
+            a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                inline-size: 30px;
+                block-size: 30px;
+                padding: 0;
+                border-radius: 6px;
+                border: 1px solid var(--orbeon-base-border-color);
+                background-color: var(--orbeon-control-background-color);
+                color: var(--orbeon-base-color);
+                text-decoration: none;
+
+                @media (hover: hover) {
+                    &:hover {
+                        border-color: var(--orbeon-accent-color);
+                    }
+                }
+            }
+
+            &.fr-be-icon-choice-selected {
+                button.btn-link,
+                a {
+                    background-color: var(--orbeon-button-primary-background-color);
+                    border-color: var(--orbeon-button-primary-background-color);
+                    color: var(--orbeon-button-primary-color);
+                }
+            }
+        }
+
+        .fr-be-translations-grid:not(.xforms-disabled) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4em;
+            margin-block-start: 0.35em;
+
+            .fr-be-translation-row {
+                display: grid;
+                grid-template-columns: 11em minmax(0, 1fr);
+                align-items: center;
+                gap: 0.6em;
+            }
+
+            .fr-be-lang-badge {
+                font-size: 0.9em;
+                font-weight: 500;
+                color: var(--orbeon-hint-color);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .fr-be-lang-input {
+                margin: 0;
+
+                input {
+                    inline-size: 100%;
+                    box-sizing: border-box;
+                    margin: 0;
+                }
+            }
+        }
+
+        .fr-be-condition-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35em;
+        }
+
+        .fr-be-builtin-formula {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.35em;
+            font-size: 0.86em;
+            color: var(--orbeon-hint-color);
+
+            code {
+                font-family: var(--orbeon-code-font-family);
+                font-size: 0.95em;
+                padding: 1px 5px;
+                border-radius: 4px;
+                background-color: var(--orbeon-control-read-only-background-color);
+                color: var(--orbeon-code-color);
+            }
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-be-code-textarea {
+            textarea {
+                inline-size: 100%;
+                min-block-size: 4.2em;
+                box-sizing: border-box;
+                font-family: var(--orbeon-code-font-family);
+                font-size: 0.92em;
+            }
+        }
+
+        .fr-be-quick-chips:not(.xforms-disabled),
+        .fr-be-xpath-box:not(.xforms-disabled) .fr-be-quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35em;
+            margin-block-start: 0.25em;
+
+            .fr-be-chips-label {
+                font-size: 0.84em;
+                color: var(--orbeon-hint-color);
+            }
+
+            .fr-be-chip-btn {
+                margin: 0;
+
+                button.btn-link,
+                a {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25em;
+                    padding: 2px 8px;
+                    border-radius: 9999px;
+                    font-size: 0.82em;
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-pill-muted-background-color);
+                    border: 1px solid var(--orbeon-pill-muted-border-color);
+                    text-decoration: none;
+
+                    @media (hover: hover) {
+                        &:hover {
+                            border-color: var(--orbeon-accent-color);
+                            color: var(--orbeon-accent-color);
+                        }
+                    }
+                }
+            }
+        }
+
+        .fr-be-process-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45em;
+            padding: 0.6em 0.75em;
+            border-radius: 6px;
+            background-color: var(--orbeon-control-read-only-background-color);
+            border: 1px solid var(--orbeon-base-border-color);
+
+            .fr-be-process-box-head {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.45em;
+            }
+
+            .fr-be-process-box-title,
+            .fr-be-process-box-actions {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.4em;
+            }
+
+            .fr-be-process-preview {
+                display: block;
+                max-block-size: 9.5em;
+                overflow-y: auto;
+                margin: 0;
+                padding: 0.45em 0.65em;
+                border-radius: 5px;
+                background-color: var(--orbeon-form-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                font-family: var(--orbeon-code-font-family);
+                font-size: 0.86em;
+                white-space: pre-wrap;
+                word-break: break-word;
+                color: var(--orbeon-code-color);
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-be-process-empty {
+                font-size: 0.88em;
+                color: var(--orbeon-hint-color);
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        .fr-be-loading-select {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6em;
+            margin: 0;
+
+            .xforms-label {
+                margin: 0;
+                font-size: 0.9em;
+                font-weight: 500;
+                color: var(--orbeon-label-color);
+            }
+
+            select {
+                inline-size: auto;
+                min-inline-size: 13em;
+                margin: 0;
+            }
+        }
+
+        .fr-be-close-uri-block:not(.xforms-disabled) {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3em;
+            padding-block-start: 0.35em;
+            border-block-start: 1px dashed var(--orbeon-base-border-color);
+
+            input {
+                inline-size: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        .fr-be-dialog-footer {
+            position: sticky;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5em;
+            padding-block-start: 0.55em;
+            background-color: var(--orbeon-form-background-color);
+            border-block-start: 1px solid var(--orbeon-base-border-color);
+        }
+    }
+}

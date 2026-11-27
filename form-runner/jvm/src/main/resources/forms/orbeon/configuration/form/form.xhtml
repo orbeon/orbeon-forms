@@ -23,6 +23,7 @@
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:beu="java:org.orbeon.oxf.fr.ButtonsEditorUI"
     xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
         <xh:title>Orbeon Forms Configuration</xh:title>
@@ -861,6 +862,38 @@
                 color: var(--orbeon-accent-color);
                 background-color: color-mix(in oklab, var(--orbeon-accent-color) 10%, transparent);
             }
+            .orbeon .fr-config-process-btn-link {
+                margin: 0;
+            }
+            .orbeon .fr-config-process-btn-link.xforms-disabled {
+                display: none;
+            }
+            .orbeon .fr-config-process-btn-link button.btn-link,
+            .orbeon .fr-config-process-btn-link a {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 1px 8px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 500;
+                color: var(--orbeon-link-color);
+                background-color: var(--orbeon-table-action-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                text-decoration: none;
+            }
+            .orbeon .fr-config-process-btn-link.fr-config-process-btn-add button.btn-link,
+            .orbeon .fr-config-process-btn-link.fr-config-process-btn-add a {
+                background-color: var(--orbeon-control-background-color);
+                border-style: dashed;
+            }
+            @media (hover: hover) {
+                .orbeon .fr-config-process-btn-link button.btn-link:hover,
+                .orbeon .fr-config-process-btn-link a:hover {
+                    border-color: var(--orbeon-accent-color);
+                    color: var(--orbeon-accent-color);
+                }
+            }
             .orbeon .fr-config-process-card-actions {
                 display: inline-flex;
                 align-items: center;
@@ -1080,6 +1113,7 @@
                         <selection/>
                         <editing-qname/>
                     </control-editor>
+                    <buttons-editor valid="true"/>
                 </ui>
             </xf:instance>
 
@@ -1213,6 +1247,24 @@
                         ref="@profiles"
                         xxf:whitespace="trim"
                         constraint="xxf:is-blank() or (every $p in xxf:split(.) satisfies $p castable as xs:NMTOKEN)"/>
+                </xf:bind>
+
+                <xf:bind ref="detail-buttons | app-form-overrides/override/detail-buttons">
+                    <xf:bind ref="@close-uri-override" type="xs:boolean"/>
+                    <xf:bind ref="bar/@override"       type="xs:boolean"/>
+                    <xf:bind ref="button">
+                        <xf:bind ref="@visible-override | @enabled-override | @loading-override" type="xs:boolean"/>
+                        <xf:bind
+                            ref="@visible[string(../@visible-override) = 'true']"
+                            required="true()"
+                            type="xxf:XPath2"
+                            xxf:whitespace="trim"/>
+                        <xf:bind
+                            ref="@enabled[string(../@enabled-override) = 'true']"
+                            required="true()"
+                            type="xxf:XPath2"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
                 </xf:bind>
 
                 <xf:bind ref="resources/message | app-form-overrides/override/resources/message">
@@ -1521,6 +1573,9 @@
                                             name="global-override-count"
                                             value="
                                                 count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
+                                                count(instance('fr-configuration-instance')/detail-buttons/bar[string(@override) = 'true']) +
+                                                count(instance('fr-configuration-instance')/detail-buttons[string(@close-uri-override) = 'true']) +
+                                                count(instance('fr-configuration-instance')/detail-buttons/button[string(@visible-override) = 'true' or string(@enabled-override) = 'true' or string(@loading-override) = 'true']) +
                                                 count(
                                                     instance('fr-configuration-instance')/resources/message[
                                                         xxf:non-blank(@name) or
@@ -1545,6 +1600,7 @@
                                                 not($is-global-scope) and
                                                 exists((
                                                     instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']/@value |
+                                                    instance('fr-configuration-instance')/detail-buttons/button/(@visible | @enabled) |
                                                     instance('fr-configuration-instance')/resources/message/(. | @xml:lang | @name) |
                                                     instance('fr-configuration-instance')/processes/process/(. | @name) |
                                                     instance('fr-configuration-instance')/custom-properties/property/(@name | @type | @profiles)
@@ -1619,6 +1675,9 @@
                                                 name="row-override-count"
                                                 value="
                                                     count(curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]) +
+                                                    count(detail-buttons/bar[string(@override) = 'true']) +
+                                                    count(detail-buttons[string(@close-uri-override) = 'true']) +
+                                                    count(detail-buttons/button[string(@visible-override) = 'true' or string(@enabled-override) = 'true' or string(@loading-override) = 'true']) +
                                                     count(
                                                         resources/message[
                                                             xxf:is-blank($ov/@profiles) and (
@@ -1637,6 +1696,7 @@
                                                     not($is-selected) and
                                                     exists((
                                                         curated/*/*[string(@override) = 'true' and (xxf:is-blank($ov/@profiles) or @has-profiles = 'true')]/@value |
+                                                        detail-buttons/button/(@visible | @enabled) |
                                                         resources/message[xxf:is-blank($ov/@profiles)]/(. | @xml:lang | @name) |
                                                         processes/process/(. | @name)
                                                     )[not(xxf:valid(.))])
@@ -1744,6 +1804,13 @@
                                                                     <xf:setvalue if="exists(quantity)" ref="quantity" value="''"/>
                                                                     <xf:setvalue if="exists(quantity/@unit)" ref="quantity/@unit" value="'MB'"/>
                                                                 </xf:action>
+                                                                <xf:setvalue ref="$ov/detail-buttons/@close-uri-override" value="'false'"/>
+                                                                <xf:setvalue ref="$ov/detail-buttons/@close-uri" value="''"/>
+                                                                <xf:action iterate="$ov/detail-buttons/bar">
+                                                                    <xf:setvalue ref="@override" value="'false'"/>
+                                                                    <xf:setvalue ref="@value" value="@default"/>
+                                                                </xf:action>
+                                                                <xf:delete ref="$ov/detail-buttons/button"/>
                                                                 <xf:delete ref="$ov/resources/message"/>
                                                                 <xf:insert context="$ov/resources" origin="instance('fr-configuration-instance')/templates/message"/>
                                                                 <xf:delete ref="$ov/processes/process"/>
@@ -2598,32 +2665,6 @@
                                 </xh:div>
                                 <fr:grid id="detail-grid" ref="$active-scope/curated/detail">
                                     <fr:c x="1" y="1" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="detail-buttons-override-control" ref="detail-buttons/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:input id="detail-buttons-value-control" ref="detail-buttons/@value" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/detail-buttons/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/detail-buttons/hint else replace($form-resources/detail-buttons/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                        </xf:input>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="detail-buttons-view-override-control" ref="detail-buttons-view/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:input id="detail-buttons-view-value-control" ref="detail-buttons-view/@value" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/detail-buttons-view/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/detail-buttons-view/hint else replace($form-resources/detail-buttons-view/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                        </xf:input>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="3" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="autosave-delay-override-control" ref="autosave-delay/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2637,7 +2678,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="4" w="12">
+                                    <fr:c x="1" y="2" w="12">
                                         <xf:select1 id="data-migration-value-control" appearance="minimal" ref="data-migration/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/data-migration/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/data-migration/hint else replace($form-resources/data-migration/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2652,7 +2693,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="5" w="12">
+                                    <fr:c x="1" y="3" w="12">
                                         <xf:select1 id="grid-tab-order-value-control" appearance="minimal" ref="grid-tab-order/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/grid-tab-order/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/grid-tab-order/hint else replace($form-resources/grid-tab-order/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2667,7 +2708,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="6" w="12">
+                                    <fr:c x="1" y="4" w="12">
                                         <xf:select1 id="initial-focus-value-control" appearance="minimal" ref="initial-focus/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/initial-focus/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/initial-focus/hint else replace($form-resources/initial-focus/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2682,7 +2723,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="7" w="12">
+                                    <fr:c x="1" y="5" w="12">
                                         <xf:select1 id="automatic-hints-value-control" appearance="minimal" ref="automatic-hints/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/automatic-hints/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/automatic-hints/hint else replace($form-resources/automatic-hints/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2697,7 +2738,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="8" w="12">
+                                    <fr:c x="1" y="6" w="12">
                                         <xf:select1 id="error-summary-value-control" appearance="minimal" ref="error-summary/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/error-summary/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/error-summary/hint else replace($form-resources/error-summary/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2712,7 +2753,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="9" w="12">
+                                    <fr:c x="1" y="7" w="12">
                                         <xf:select1 id="captcha-component-value-control" appearance="minimal" ref="captcha-component/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/captcha-component/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/captcha-component/hint else replace($form-resources/captcha-component/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2727,7 +2768,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="10" w="12">
+                                    <fr:c x="1" y="8" w="12">
                                         <xf:select1 id="singleton-enabled-value-control" appearance="minimal" ref="singleton-enabled/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/singleton-enabled/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/singleton-enabled/hint else replace($form-resources/singleton-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2742,7 +2783,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="11" w="12">
+                                    <fr:c x="1" y="9" w="12">
                                         <xf:select1 id="singleton-if-one-exists-value-control" appearance="minimal" ref="singleton-if-one-exists/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/singleton-if-one-exists/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/singleton-if-one-exists/hint else replace($form-resources/singleton-if-one-exists/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2757,7 +2798,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="12" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="10" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="toc-min-sections-override-control" ref="toc-min-sections/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2770,7 +2811,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="13" w="12">
+                                    <fr:c x="1" y="11" w="12">
                                         <xf:select1 id="toc-position-value-control" appearance="minimal" ref="toc-position/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/toc-position/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/toc-position/hint else replace($form-resources/toc-position/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2785,7 +2826,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="14" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="12" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="toc-modes-override-control" ref="toc-modes/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2802,7 +2843,7 @@
                                         </fr:open-select>
                                     </fr:c>
 
-                                    <fr:c x="1" y="15" w="12">
+                                    <fr:c x="1" y="13" w="12">
                                         <xf:select1 id="messages-appearance-value-control" appearance="minimal" ref="messages-appearance/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/messages-appearance/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/messages-appearance/hint else replace($form-resources/messages-appearance/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2817,7 +2858,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="16" w="12">
+                                    <fr:c x="1" y="14" w="12">
                                         <xf:select1 id="messages-position-value-control" appearance="minimal" ref="messages-position/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/messages-position/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/messages-position/hint else replace($form-resources/messages-position/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2832,7 +2873,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="17" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="15" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="messages-delay-override-control" ref="messages-delay/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2846,7 +2887,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="18" w="12">
+                                    <fr:c x="1" y="16" w="12">
                                         <xf:select1 id="lease-enabled-value-control" appearance="minimal" ref="lease-enabled/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/lease-enabled/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-enabled/hint else replace($form-resources/lease-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2861,7 +2902,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="19" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="17" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="lease-duration-override-control" ref="lease-duration/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2875,7 +2916,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="20" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="18" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="lease-renew-threshold-override-control" ref="lease-renew-threshold/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2889,7 +2930,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="21" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="19" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="lease-alert-threshold-override-control" ref="lease-alert-threshold/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2903,7 +2944,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="22" w="12">
+                                    <fr:c x="1" y="20" w="12">
                                         <xf:select1 id="session-expiration-dialog-enabled-value-control" appearance="minimal" ref="session-expiration-dialog-enabled/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/session-expiration-dialog-enabled/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/session-expiration-dialog-enabled/hint else replace($form-resources/session-expiration-dialog-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2918,7 +2959,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="23" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="21" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="warn-when-data-unsafe-override-control" ref="warn-when-data-unsafe/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2932,7 +2973,7 @@
                                         </fr:boolean-or-formula>
                                     </fr:c>
 
-                                    <fr:c x="1" y="24" w="12">
+                                    <fr:c x="1" y="22" w="12">
                                         <xf:select1 id="validate-selection-controls-choices-value-control" appearance="minimal" ref="validate-selection-controls-choices/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/validate-selection-controls-choices/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/validate-selection-controls-choices/hint else replace($form-resources/validate-selection-controls-choices/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2947,7 +2988,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="25" w="12">
+                                    <fr:c x="1" y="23" w="12">
                                         <xf:select1 id="section-collapsible-value-control" appearance="minimal" ref="section-collapsible/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-collapsible/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-collapsible/hint else replace($form-resources/section-collapsible/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2962,7 +3003,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="26" w="12">
+                                    <fr:c x="1" y="24" w="12">
                                         <xf:select1 id="section-animate-value-control" appearance="minimal" ref="section-animate/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-animate/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-animate/hint else replace($form-resources/section-animate/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2977,7 +3018,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="27" w="12">
+                                    <fr:c x="1" y="25" w="12">
                                         <xf:select1 id="section-insert-value-control" appearance="minimal" ref="section-insert/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-insert/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-insert/hint else replace($form-resources/section-insert/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2992,7 +3033,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="28" w="12">
+                                    <fr:c x="1" y="26" w="12">
                                         <xf:select1 id="grid-insert-value-control" appearance="minimal" ref="grid-insert/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/grid-insert/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/grid-insert/hint else replace($form-resources/grid-insert/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3007,7 +3048,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="29" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="27" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="attachment-max-size-per-file-override-control" ref="attachment-max-size-per-file/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed">
@@ -3042,7 +3083,7 @@
                                         </xf:group>
                                     </fr:c>
 
-                                    <fr:c x="1" y="30" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="28" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="attachment-max-size-aggregate-per-control-override-control" ref="attachment-max-size-aggregate-per-control/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed">
@@ -3077,7 +3118,7 @@
                                         </xf:group>
                                     </fr:c>
 
-                                    <fr:c x="1" y="31" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="29" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="attachment-max-size-aggregate-per-form-override-control" ref="attachment-max-size-aggregate-per-form/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed">
@@ -3112,7 +3153,7 @@
                                         </xf:group>
                                     </fr:c>
 
-                                    <fr:c x="1" y="32" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="30" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="attachment-max-files-per-control-override-control" ref="attachment-max-files-per-control/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -3126,7 +3167,7 @@
                                         </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="1" y="33" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="31" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="attachment-mediatypes-override-control" ref="attachment-mediatypes/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -3139,7 +3180,7 @@
                                         </fr:tags-input>
                                     </fr:c>
 
-                                    <fr:c x="1" y="34" w="12">
+                                    <fr:c x="1" y="32" w="12">
                                         <xf:select1 id="upload-reject-empty-files-value-control" appearance="minimal" ref="upload-reject-empty-files/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/upload-reject-empty-files/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/upload-reject-empty-files/hint else replace($form-resources/upload-reject-empty-files/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3154,6 +3195,164 @@
                                         </xf:select1>
                                     </fr:c>
                                 </fr:grid>
+                            </fr:tab>
+
+                            <!-- Detail Page Buttons (Unified Editor) -->
+                            <fr:tab id="detail-buttons-tab">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c :=
+                                            count($active-scope/detail-buttons/bar[string(@override) = 'true']) +
+                                            count($active-scope/detail-buttons[string(@close-uri-override) = 'true']) +
+                                            count($active-scope/detail-buttons/button[string(@visible-override) = 'true' or string(@enabled-override) = 'true' or string(@loading-override) = 'true'])
+                                        return concat(
+                                            $form-resources/buttons-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xf:var
+                                    name="btn-active-app"
+                                    value="if ($is-global-scope) then '*' else string($active-override/@app)"/>
+                                <xf:var
+                                    name="btn-active-form"
+                                    value="if ($is-global-scope) then '*' else string($active-override/@form)"/>
+                                <xf:var
+                                    name="parent-scopes"
+                                    value="
+                                        if ($is-global-scope) then
+                                            ()
+                                        else
+                                            (
+                                                if ($btn-active-app != '*' and $btn-active-form != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $btn-active-app and @form = $btn-active-form and xxf:is-blank(@profiles)]
+                                                else (),
+                                                if ($btn-active-app != '*' and $btn-active-form != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $btn-active-app and @form = '*' and @profiles = $active-scope-profiles]
+                                                else (),
+                                                if ($btn-active-app != '*' and ($btn-active-form != '*' or xxf:non-blank($active-scope-profiles))) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $btn-active-app and @form = '*' and xxf:is-blank(@profiles)]
+                                                else (),
+                                                if ($btn-active-app != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = '*' and @form = '*' and @profiles = $active-scope-profiles]
+                                                else (),
+                                                instance('fr-configuration-instance')
+                                            )"/>
+                                <xf:var
+                                    name="inherited-edit-bar"
+                                    value="
+                                        string((
+                                            $parent-scopes/detail-buttons/bar[@name = 'edit' and string(@override) = 'true']/@value,
+                                            $active-scope/detail-buttons/bar[@name = 'edit']/@default
+                                        )[1])"/>
+                                <xf:var
+                                    name="inherited-view-bar"
+                                    value="
+                                        string((
+                                            $parent-scopes/detail-buttons/bar[@name = 'view' and string(@override) = 'true']/@value,
+                                            $active-scope/detail-buttons/bar[@name = 'view']/@default
+                                        )[1])"/>
+                                <xf:var
+                                    name="inherited-inner-bar"
+                                    value="
+                                        string((
+                                            $parent-scopes/detail-buttons/bar[@name = 'inner' and string(@override) = 'true']/@value,
+                                            $active-scope/detail-buttons/bar[@name = 'inner']/@default
+                                        )[1])"/>
+                                <xf:var
+                                    name="inherited-procs"
+                                    value="$parent-scopes/processes/process"/>
+                                <xf:var
+                                    name="inherited-res"
+                                    value="$parent-scopes/resources/message[xxf:non-blank(@name)]"/>
+                                <xf:var
+                                    name="configured-avail-langs-raw"
+                                    value="
+                                        (
+                                            $active-scope/curated/system/available-languages[string(@override) = 'true']/@value/string()[. != '*'][xxf:non-blank()],
+                                            $parent-scopes/curated/system/available-languages[string(@override) = 'true']/@value/string()[. != '*'][xxf:non-blank()],
+                                            instance('fr-configuration-instance')/curated/system/global-available-languages/@value/string()[xxf:non-blank()]
+                                        )[1]"/>
+                                <xf:var
+                                    name="button-editor-langs"
+                                    value="
+                                        distinct-values((
+                                            '*',
+                                            xxf:split($configured-avail-langs-raw)[. != '*'][xxf:non-blank()],
+                                            $active-scope/resources/message/@xml:lang/string()[. != '*'][xxf:non-blank()]
+                                        ))"/>
+                                <xf:var
+                                    name="btn-filter-query"
+                                    value="lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))"/>
+                                <xf:var
+                                    name="buttons-matches-filter"
+                                    value="
+                                        $btn-filter-query != '' and (
+                                            contains(lower-case(string($form-resources/buttons-section/label)), $btn-filter-query) or
+                                            contains('oxf.fr.detail.buttons oxf.fr.detail.button oxf.fr.detail.loading-indicator oxf.fr.detail.close.uri button buttons visible enabled loading-indicator save-final review wizard-prev wizard-next pdf tiff summary edit send submit clear close', $btn-filter-query) or
+                                            exists($active-scope/detail-buttons/(bar/@value | button/@name | button/@visible | button/@enabled)[contains(lower-case(.), $btn-filter-query)])
+                                        )"/>
+
+                                <xh:div class="fr-config-buttons-pane {'fr-config-filter-match'[$buttons-matches-filter]}">
+                                    <xh:div class="fr-config-category-header">
+                                        <xh:h3 class="fr-config-category-title">
+                                            <xf:output ref="$form-resources/buttons-section/label"/>
+                                        </xh:h3>
+                                    </xh:div>
+
+                                    <fr:buttons-editor
+                                        id="fr-config-buttons-editor"
+                                        ref="$active-scope/detail-buttons"
+                                        resources-ref="$active-scope/resources[xxf:is-blank($active-scope-profiles)]"
+                                        processes-ref="$active-scope/processes"
+                                        inherited-edit-ref="$inherited-edit-bar"
+                                        inherited-view-ref="$inherited-view-bar"
+                                        inherited-inner-ref="$inherited-inner-bar"
+                                        inherited-processes-ref="$inherited-procs"
+                                        inherited-resources-ref="$inherited-res"
+                                        languages-ref="$button-editor-langs"
+                                        allow-wildcard-lang="'true'"
+                                        app-ref="$btn-active-app"
+                                        form-ref="$btn-active-form"
+                                        valid-ref="instance('fr-configuration-ui-instance')/buttons-editor/@valid">
+                                        <xf:action event="fr-edit-process">
+                                            <xf:var name="target-proc-name" value="xxf:trim(string(event('name')))"/>
+                                            <xf:var name="is-builtin-proc"  value="string(event('is-builtin')) = 'true'"/>
+                                            <xf:var name="initial-def"      value="string(event('initial-definition'))"/>
+                                            <xf:var
+                                                name="known-custom-procs"
+                                                value="
+                                                    distinct-values((
+                                                        $active-scope/processes/process/@name,
+                                                        $parent-scopes/processes/process/@name
+                                                    )[xxf:non-blank()])"/>
+                                            <xf:var
+                                                name="config-elem"
+                                                value="xf:element('processes', xf:element('process', (xf:attribute('name', $target-proc-name), $initial-def)))"/>
+                                            <xf:var
+                                                name="ctx-elem"
+                                                value="xf:element('form-context', xf:element('processes', for $n in $known-custom-procs return xf:element('item', xf:attribute('value', $n))))"/>
+                                            <xf:setvalue ref="instance('fr-configuration-ui-instance')/process-editor/editing-name" value="$target-proc-name"/>
+                                            <xf:dispatch name="fr-show-dialog" targetid="fr-config-process-editor-dialog">
+                                                <xf:property name="config"         value="$config-elem"/>
+                                                <xf:property name="form-context"   value="$ctx-elem"/>
+                                                <xf:property name="mode"           value="'single'"/>
+                                                <xf:property name="name-readonly"  value="'true'"/>
+                                                <xf:property name="existing-names" value="string-join($active-scope/processes/process/@name[. != $target-proc-name], ' ')"/>
+                                                <xf:property name="title"          value="concat(if ($is-builtin-proc and empty($active-scope/processes/process[@name = $target-proc-name])) then $form-resources/processes-section/dialog-title-override else $form-resources/processes-section/dialog-title-edit, ': ', $target-proc-name)"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </fr:buttons-editor>
+
+                                    <!-- Validation sentinels for active-scope per-button XPath rules when the modal dialog is closed -->
+                                    <xh:div class="xforms-hidden" aria-hidden="true">
+                                        <xf:repeat id="active-scope-button-rules-validator-repeat" ref="$active-scope/detail-buttons/button/(@visible | @enabled)">
+                                            <xf:output id="active-scope-button-rule-validator" ref=".">
+                                                <xf:label value="concat($form-resources/buttons-section/label, ' — ', ../@name)"/>
+                                                <xf:alert ref="$form-resources/alerts/xpath"/>
+                                            </xf:output>
+                                        </xf:repeat>
+                                    </xh:div>
+                                </xh:div>
                             </fr:tab>
 
                             <!-- Wizard -->
@@ -3509,12 +3708,46 @@
                                 </xh:div>
 
                                 <!-- Configured Processes List -->
+                                <xf:var
+                                    name="proc-parent-scopes"
+                                    value="
+                                        if ($is-global-scope) then
+                                            ()
+                                        else
+                                            (
+                                                if ($active-app != '*' and $active-form != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $active-app and @form = $active-form and xxf:is-blank(@profiles)]
+                                                else (),
+                                                if ($active-app != '*' and $active-form != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $active-app and @form = '*' and @profiles = $active-scope-profiles]
+                                                else (),
+                                                if ($active-app != '*' and ($active-form != '*' or xxf:non-blank($active-scope-profiles))) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = $active-app and @form = '*' and xxf:is-blank(@profiles)]
+                                                else (),
+                                                if ($active-app != '*' and xxf:non-blank($active-scope-profiles)) then
+                                                    instance('fr-configuration-instance')/app-form-overrides/override[@app = '*' and @form = '*' and @profiles = $active-scope-profiles]
+                                                else (),
+                                                instance('fr-configuration-instance')
+                                            )"/>
+                                <xf:var
+                                    name="proc-eff-edit-bar"
+                                    value="string(($active-scope/detail-buttons/bar[@name = 'edit' and string(@override) = 'true']/@value, $proc-parent-scopes/detail-buttons/bar[@name = 'edit' and string(@override) = 'true']/@value, $active-scope/detail-buttons/bar[@name = 'edit']/@default)[1])"/>
+                                <xf:var
+                                    name="proc-eff-view-bar"
+                                    value="string(($active-scope/detail-buttons/bar[@name = 'view' and string(@override) = 'true']/@value, $proc-parent-scopes/detail-buttons/bar[@name = 'view' and string(@override) = 'true']/@value, $active-scope/detail-buttons/bar[@name = 'view']/@default)[1])"/>
+                                <xf:var
+                                    name="proc-eff-inner-bar"
+                                    value="string(($active-scope/detail-buttons/bar[@name = 'inner' and string(@override) = 'true']/@value, $proc-parent-scopes/detail-buttons/bar[@name = 'inner' and string(@override) = 'true']/@value, $active-scope/detail-buttons/bar[@name = 'inner']/@default)[1])"/>
+
                                 <xf:group ref=".[exists($active-scope/processes/process)]">
                                     <xh:div class="fr-config-processes-list">
                                         <xf:repeat id="configured-processes-repeat" ref="$active-scope/processes/process">
                                             <xf:var name="proc"       value="."/>
                                             <xf:var name="proc-name"  value="string(@name)"/>
                                             <xf:var name="is-builtin" value="$proc-name = $builtin-process-names"/>
+                                            <xf:var name="in-edit"    value="beu:barContainsButton($proc-eff-edit-bar, $proc-name)"/>
+                                            <xf:var name="in-view"    value="beu:barContainsButton($proc-eff-view-bar, $proc-name)"/>
+                                            <xf:var name="in-inner"   value="beu:barContainsButton($proc-eff-inner-bar, $proc-name)"/>
                                             <xh:div class="fr-config-process-card">
                                                 <xh:div class="fr-config-process-card-header">
                                                     <xh:div class="fr-config-process-card-title">
@@ -3524,6 +3757,92 @@
                                                         <xh:span class="fr-config-process-kind-badge {'fr-config-process-kind-override'[$is-builtin]}">
                                                             <xf:output value="if ($is-builtin) then $form-resources/processes-section/badge-override else $form-resources/processes-section/badge-custom"/>
                                                         </xh:span>
+
+                                                        <!-- Reverse Button Links (by matching <name>) -->
+                                                        <xf:trigger
+                                                            id="jump-proc-button-edit"
+                                                            appearance="minimal"
+                                                            ref=".[$in-edit]"
+                                                            class="fr-config-process-btn-link">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-hand-pointer" aria-hidden="true"/>
+                                                                <xf:output ref="$form-resources/processes-section/button-bar-edit"/>
+                                                            </xf:label>
+                                                            <xf:hint ref="$form-resources/processes-section/configure-button-hint"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:action type="javascript">
+                                                                    document.querySelector('[id$="fr-configuration-categories-tabs"] .nav-tabs a[href$="detail-buttons-tab"]')?.click();
+                                                                </xf:action>
+                                                                <xf:dispatch name="fr-configure-button" targetid="fr-config-buttons-editor">
+                                                                    <xf:property name="bar"  value="'edit'"/>
+                                                                    <xf:property name="name" value="$proc-name"/>
+                                                                </xf:dispatch>
+                                                            </xf:action>
+                                                        </xf:trigger>
+
+                                                        <xf:trigger
+                                                            id="jump-proc-button-view"
+                                                            appearance="minimal"
+                                                            ref=".[$in-view]"
+                                                            class="fr-config-process-btn-link">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-hand-pointer" aria-hidden="true"/>
+                                                                <xf:output ref="$form-resources/processes-section/button-bar-view"/>
+                                                            </xf:label>
+                                                            <xf:hint ref="$form-resources/processes-section/configure-button-hint"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:action type="javascript">
+                                                                    document.querySelector('[id$="fr-configuration-categories-tabs"] .nav-tabs a[href$="detail-buttons-tab"]')?.click();
+                                                                </xf:action>
+                                                                <xf:dispatch name="fr-configure-button" targetid="fr-config-buttons-editor">
+                                                                    <xf:property name="bar"  value="'view'"/>
+                                                                    <xf:property name="name" value="$proc-name"/>
+                                                                </xf:dispatch>
+                                                            </xf:action>
+                                                        </xf:trigger>
+
+                                                        <xf:trigger
+                                                            id="jump-proc-button-inner"
+                                                            appearance="minimal"
+                                                            ref=".[$in-inner]"
+                                                            class="fr-config-process-btn-link">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-hand-pointer" aria-hidden="true"/>
+                                                                <xf:output ref="$form-resources/processes-section/button-bar-inner"/>
+                                                            </xf:label>
+                                                            <xf:hint ref="$form-resources/processes-section/configure-button-hint"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:action type="javascript">
+                                                                    document.querySelector('[id$="fr-configuration-categories-tabs"] .nav-tabs a[href$="detail-buttons-tab"]')?.click();
+                                                                </xf:action>
+                                                                <xf:dispatch name="fr-configure-button" targetid="fr-config-buttons-editor">
+                                                                    <xf:property name="bar"  value="'inner'"/>
+                                                                    <xf:property name="name" value="$proc-name"/>
+                                                                </xf:dispatch>
+                                                            </xf:action>
+                                                        </xf:trigger>
+
+                                                        <xf:trigger
+                                                            id="add-proc-as-button-link"
+                                                            appearance="minimal"
+                                                            ref=".[not($is-builtin) and not($in-edit) and not($in-view) and not($in-inner)]"
+                                                            class="fr-config-process-btn-link fr-config-process-btn-add">
+                                                            <xf:label>
+                                                                <xh:i class="fa fa-fw fa-plus" aria-hidden="true"/>
+                                                                <xf:output ref="$form-resources/processes-section/add-as-button"/>
+                                                            </xf:label>
+                                                            <xf:hint ref="$form-resources/processes-section/add-as-button-hint"/>
+                                                            <xf:action event="DOMActivate">
+                                                                <xf:action type="javascript">
+                                                                    document.querySelector('[id$="fr-configuration-categories-tabs"] .nav-tabs a[href$="detail-buttons-tab"]')?.click();
+                                                                </xf:action>
+                                                                <xf:dispatch name="fr-configure-button" targetid="fr-config-buttons-editor">
+                                                                    <xf:property name="bar"        value="'edit'"/>
+                                                                    <xf:property name="name"       value="$proc-name"/>
+                                                                    <xf:property name="add-to-bar" value="'true'"/>
+                                                                </xf:dispatch>
+                                                            </xf:action>
+                                                        </xf:trigger>
                                                     </xh:div>
                                                     <xh:div class="fr-config-process-card-actions">
                                                         <xf:trigger id="edit-configured-process-button" appearance="xxf:mini">
@@ -5427,12 +5746,14 @@
                                         (
                                             instance('fr-configuration-instance')[not($is-global-scope)]/(
                                                 curated/*/*[string(@override) = 'true']/@value |
+                                                detail-buttons/button/(@visible | @enabled) |
                                                 resources/message/(. | @xml:lang | @name) |
                                                 processes/process/(. | @name) |
                                                 custom-properties/property/(@name | @type | @profiles)
                                             ),
                                             instance('fr-configuration-instance')/app-form-overrides/override[@id != $selected-scope-id]/(
                                                 curated/*/*[string(@override) = 'true' and (xxf:is-blank(ancestor::override/@profiles) or @has-profiles = 'true')]/@value |
+                                                detail-buttons/button/(@visible | @enabled) |
                                                 resources/message[xxf:is-blank(ancestor::override/@profiles)]/(. | @xml:lang | @name) |
                                                 processes/process/(. | @name)
                                             )
@@ -5449,7 +5770,9 @@
                                                         else
                                                             concat($ov/@app, ' / ', $ov/@form),
                                                     $prop-label :=
-                                                        if (exists(self::message | parent::message)) then
+                                                        if (exists(parent::button)) then
+                                                            concat($form-resources/buttons-section/label, ' (', ../@name, ')')
+                                                        else if (exists(self::message | parent::message)) then
                                                             $form-resources/resources-section/label
                                                         else if (exists(self::process | parent::process)) then
                                                             $form-resources/processes-section/label
@@ -5704,6 +6027,9 @@
                                 exists($existing-match) and
                                 $eff-profiles = '' and
                                 empty($existing-match/curated/*/*[string(@override) = 'true']) and
+                                empty($existing-match/detail-buttons/bar[string(@override) = 'true']) and
+                                string($existing-match/detail-buttons/@close-uri-override) != 'true' and
+                                empty($existing-match/detail-buttons/button[string(@visible-override) = 'true' or string(@enabled-override) = 'true' or string(@loading-override) = 'true']) and
                                 empty($existing-match/resources/message[xxf:non-blank(@name) or xxf:non-blank(.) or string(@html) = 'true']) and
                                 empty($existing-match/processes/process) and
                                 empty($existing-match/control-settings/*)
@@ -5836,6 +6162,9 @@
                                             exists($cur-existing-match) and
                                             $cur-profiles = '' and
                                             empty($cur-existing-match/curated/*/*[string(@override) = 'true']) and
+                                            empty($cur-existing-match/detail-buttons/bar[string(@override) = 'true']) and
+                                            string($cur-existing-match/detail-buttons/@close-uri-override) != 'true' and
+                                            empty($cur-existing-match/detail-buttons/button[string(@visible-override) = 'true' or string(@enabled-override) = 'true' or string(@loading-override) = 'true']) and
                                             empty($cur-existing-match/resources/message[xxf:non-blank(@name) or xxf:non-blank(.) or string(@html) = 'true']) and
                                             empty($cur-existing-match/processes/process) and
                                             empty($cur-existing-match/control-settings/*)

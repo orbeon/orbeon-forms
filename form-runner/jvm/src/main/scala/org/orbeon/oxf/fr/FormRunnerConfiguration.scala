@@ -160,6 +160,7 @@ trait FormRunnerConfiguration {
       Properties.instance.getPropertySet
         .getStringOrURIAsStringOpt(s"$DetailProcessPropertyPrefix$trimmedName.$effApp.$effForm")
         .orElse(Properties.instance.getPropertySet.getStringOrURIAsStringOpt(s"$DetailProcessPropertyPrefix$trimmedName.*.*"))
+        .orElse(ButtonsEditorUI.StandardDetailButtonsByName.get(trimmedName).map(_.defaultProcessFallback).filter(_.nonEmpty))
     }.getOrElse("")
 
   //@XPathFunction
@@ -256,10 +257,26 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     name: String
   )
 
-  private val ResourcePropertyPrefix      = "oxf.fr.resource."
-  private val DetailProcessPropertyPrefix = "oxf.fr.detail.process."
-  private val XblPropertyPrefix           = "oxf.xforms.xbl."
-  private val HtmlSuffix                  = "html"
+  private val ResourcePropertyPrefix         = "oxf.fr.resource."
+  private val DetailProcessPropertyPrefix    = "oxf.fr.detail.process."
+  private val DetailButtonsPropertyPrefix    = "oxf.fr.detail.buttons."
+  private val DetailButtonRulePropertyPrefix = "oxf.fr.detail.button."
+  private val DetailLoadingPropertyPrefix    = "oxf.fr.detail.loading-indicator."
+  private val DetailCloseUriPropertyPrefix   = "oxf.fr.detail.close.uri."
+  private val XblPropertyPrefix              = "oxf.xforms.xbl."
+  private val HtmlSuffix                     = "html"
+
+  private class ButtonRuleState(
+    var visibleOpt: Option[String] = None,
+    var enabledOpt: Option[String] = None,
+    var loadingOpt: Option[String] = None
+  )
+
+  private class DetailButtonsScopeState {
+    val bars       : mutable.Map[String, String]                   = mutable.Map.empty
+    var closeUriOpt: Option[String]                                = None
+    val buttonRules: mutable.LinkedHashMap[String, ButtonRuleState] = mutable.LinkedHashMap.empty
+  }
 
   private val BuiltinDetailButtonProcessNames: List[String] = List(
     "save",
@@ -274,6 +291,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     "new-to-edit",
     "wizard-prev",
     "wizard-next",
+    "wizard-toc",
     "search-first",
     "search-prev",
     "search-next",
@@ -717,24 +735,6 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
 
     // 3. Detail Page / Form Options
-    CuratedPropertyDef(
-      key          = "detail-buttons",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.buttons",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "home review pdf delete duplicate clear save-final wizard-prev wizard-next"
-    ),
-    CuratedPropertyDef(
-      key          = "detail-buttons-view",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.buttons.view",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "edit pdf"
-    ),
     CuratedPropertyDef(
       key           = "autosave-delay",
       category      = "detail",
@@ -1932,11 +1932,13 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     val catalog = ControlSettingsSupport.currentCatalog()
 
     val globalCuratedValues    = mutable.Map.empty[String, String]
+    val globalDetailButtons    = new DetailButtonsScopeState
     val globalResourceValues   = mutable.LinkedHashMap.empty[ResourceOverrideKey, String]
     val globalResourceHtml     = mutable.Map.empty[ResourceOverrideKey, Boolean]
     val globalProcesses        = mutable.LinkedHashMap.empty[String, String]
     val globalControlSettings  = mutable.LinkedHashMap.empty[String, mutable.LinkedHashMap[QName, (String, Boolean)]]
     val appFormOverrides       = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
+    val appFormDetailButtons   = mutable.LinkedHashMap.empty[OverrideScope, DetailButtonsScopeState]
     val appFormResources       = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[ResourceOverrideKey, String]]
     val appFormResourceHtml    = mutable.Map.empty[OverrideScope, mutable.Map[ResourceOverrideKey, Boolean]]
     val appFormProcesses       = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[String, String]]
@@ -2107,6 +2109,104 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         false
       }
 
+    def tryMatchDetailButtonsProperty(
+      name         : String,
+      asType       : String,
+      value        : String,
+      profiles     : String,
+      processorName: String
+    ): Boolean = {
+      def isAllowedAppForm(app: String, form: String): Boolean =
+        app.nonEmpty && form.nonEmpty &&
+          AppForm(app, form) != AppForm.FormBuilder &&
+          AppForm(app, form) != AppForm.FormConfiguration
+
+      def scopeStateFor(app: String, form: String): DetailButtonsScopeState =
+        if (app == "*" && form == "*" && profiles.isEmpty) {
+          globalDetailButtons
+        } else {
+          val scope = OverrideScope(app, form, profiles)
+          appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
+          appFormDetailButtons.getOrElseUpdate(scope, new DetailButtonsScopeState)
+        }
+
+      def tryPutBar(barName: String, app: String, form: String): Boolean = {
+        val st = scopeStateFor(app, form)
+        if (! st.bars.contains(barName)) {
+          st.bars.put(barName, value)
+          true
+        } else {
+          false
+        }
+      }
+
+      if (processorName.nonEmpty) {
+        false
+      } else if (asType == "xs:string" && name.startsWith(DetailButtonsPropertyPrefix)) {
+        name.substring(DetailButtonsPropertyPrefix.length).splitTo[List](".") match {
+          case List("view", app, form)  if isAllowedAppForm(app, form) => tryPutBar("view", app, form)
+          case List("inner", app, form) if isAllowedAppForm(app, form) => tryPutBar("inner", app, form)
+          case List(app, form)          if isAllowedAppForm(app, form) => tryPutBar("edit", app, form)
+          case _                                                       => false
+        }
+      } else if ((asType == "xs:anyURI" || asType == "xs:string") && name.startsWith(DetailCloseUriPropertyPrefix)) {
+        name.substring(DetailCloseUriPropertyPrefix.length).splitTo[List](".") match {
+          case List(app, form) if isAllowedAppForm(app, form) =>
+            val st = scopeStateFor(app, form)
+            if (st.closeUriOpt.isEmpty) {
+              st.closeUriOpt = Some(value)
+              true
+            } else {
+              false
+            }
+          case _ =>
+            false
+        }
+      } else if (asType == "xs:string" && name.startsWith(DetailButtonRulePropertyPrefix)) {
+        name.substring(DetailButtonRulePropertyPrefix.length).splitTo[List](".") match {
+          case List(btnName, "visible", app, form)
+            if ButtonsEditorUI.ButtonNameRegex.matches(btnName) && isAllowedAppForm(app, form) =>
+            val st   = scopeStateFor(app, form)
+            val rule = st.buttonRules.getOrElseUpdate(btnName, new ButtonRuleState)
+            if (rule.visibleOpt.isEmpty) {
+              rule.visibleOpt = Some(value)
+              true
+            } else {
+              false
+            }
+          case List(btnName, "enabled", app, form)
+            if ButtonsEditorUI.ButtonNameRegex.matches(btnName) && isAllowedAppForm(app, form) =>
+            val st   = scopeStateFor(app, form)
+            val rule = st.buttonRules.getOrElseUpdate(btnName, new ButtonRuleState)
+            if (rule.enabledOpt.isEmpty) {
+              rule.enabledOpt = Some(value)
+              true
+            } else {
+              false
+            }
+          case _ =>
+            false
+        }
+      } else if (asType == "xs:string" && name.startsWith(DetailLoadingPropertyPrefix)) {
+        name.substring(DetailLoadingPropertyPrefix.length).splitTo[List](".") match {
+          case List(btnName, app, form)
+            if ButtonsEditorUI.ButtonNameRegex.matches(btnName) && isAllowedAppForm(app, form) =>
+            val st   = scopeStateFor(app, form)
+            val rule = st.buttonRules.getOrElseUpdate(btnName, new ButtonRuleState)
+            if (rule.loadingOpt.isEmpty) {
+              rule.loadingOpt = Some(value)
+              true
+            } else {
+              false
+            }
+          case _ =>
+            false
+        }
+      } else {
+        false
+      }
+    }
+
     rootOpt.foreach { root =>
       collectNamespaces(root)
 
@@ -2119,8 +2219,9 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         val profiles      = propElem.attributeValueOpt("profiles").orElse(propElem.attributeValueOpt("profile")).map(_.splitTo[List]().mkString(" ")).getOrElse("")
         val processorName = propElem.attributeValueOpt("processor-name").flatMap(_.trimAllToOpt).getOrElse("")
 
-        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName) &&
-            ! tryMatchProcessProperty(name, asType, value, profiles, processorName)  &&
+        if (! tryMatchDetailButtonsProperty(name, asType, value, profiles, processorName) &&
+            ! tryMatchResourceProperty(name, asType, value, profiles, processorName)      &&
+            ! tryMatchProcessProperty(name, asType, value, profiles, processorName)       &&
             ! tryMatchControlSettingProperty(name, asType, value, profiles, processorName)) {
           val matchedGlobal =
             if (profiles.isEmpty && processorName.isEmpty)
@@ -2198,8 +2299,9 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         qNameStr -> attMap.map { case (k, (v, _)) => k -> v }
       }
 
-    // 1. Global curated properties, resource overrides, processes & control settings
+    // 1. Global curated properties, detail buttons, resource overrides, processes & control settings
     appendCuratedBlock(configRoot, globalCuratedValues, appFormOnly = false)
+    appendDetailButtonsBlock(configRoot, Some(globalDetailButtons))
     appendResourcesBlock(configRoot, globalResourceValues, globalResourceHtml)
     appendProcessesBlock(configRoot, globalProcesses)
     appendControlSettingsBlock(configRoot, globalControlSettingsPlain, catalog)
@@ -2213,6 +2315,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       overrideElem.addAttribute("form", scope.form)
       overrideElem.addAttribute("profiles", scope.profiles)
       appendCuratedBlock(overrideElem, values, appFormOnly = true)
+      appendDetailButtonsBlock(overrideElem, appFormDetailButtons.get(scope))
       appendResourcesBlock(
         overrideElem,
         appFormResources.getOrElse(scope, Map.empty),
@@ -2269,6 +2372,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     templateOverride.addAttribute("form", "*")
     templateOverride.addAttribute("profiles", "")
     appendCuratedBlock(templateOverride, Map.empty, appFormOnly = true)
+    appendDetailButtonsBlock(templateOverride, None)
     appendResourcesBlock(templateOverride, Map.empty, Map.empty)
     appendProcessesBlock(templateOverride, Map.empty)
     appendControlSettingsBlock(templateOverride, Map.empty, catalog)
@@ -2457,6 +2561,56 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     }
   }
 
+  private val DetailButtonBarsWithDefaults: List[(String, String)] = List(
+    "edit"  -> ButtonsEditorUI.DefaultEditButtons,
+    "view"  -> ButtonsEditorUI.DefaultViewButtons,
+    "inner" -> ButtonsEditorUI.DefaultInnerButtons
+  )
+
+  private def appendDetailButtonsBlock(
+    parent  : Element,
+    stateOpt: Option[DetailButtonsScopeState]
+  ): Unit = {
+    val dbElem = parent.addElement("detail-buttons")
+    stateOpt.flatMap(_.closeUriOpt) match {
+      case Some(uri) =>
+        dbElem.addAttribute("close-uri-override", "true")
+        dbElem.addAttribute("close-uri", uri)
+      case None =>
+        dbElem.addAttribute("close-uri-override", "false")
+        dbElem.addAttribute("close-uri", "")
+    }
+
+    for ((barName, defaultVal) <- DetailButtonBarsWithDefaults) {
+      val barElem = dbElem.addElement("bar")
+      barElem.addAttribute("name", barName)
+      barElem.addAttribute("default", defaultVal)
+      stateOpt.flatMap(_.bars.get(barName)) match {
+        case Some(v) =>
+          barElem.addAttribute("override", "true")
+          barElem.addAttribute("value", v)
+        case None =>
+          barElem.addAttribute("override", "false")
+          barElem.addAttribute("value", defaultVal)
+      }
+    }
+
+    for {
+      state          <- stateOpt.toList
+      (btnName, rule) <- state.buttonRules
+      if rule.visibleOpt.isDefined || rule.enabledOpt.isDefined || rule.loadingOpt.isDefined
+    } {
+      val btnElem = dbElem.addElement("button")
+      btnElem.addAttribute("name", btnName)
+      btnElem.addAttribute("visible-override", rule.visibleOpt.isDefined.toString)
+      btnElem.addAttribute("visible", rule.visibleOpt.getOrElse(""))
+      btnElem.addAttribute("enabled-override", rule.enabledOpt.isDefined.toString)
+      btnElem.addAttribute("enabled", rule.enabledOpt.getOrElse(""))
+      btnElem.addAttribute("loading-override", rule.loadingOpt.isDefined.toString)
+      btnElem.addAttribute("loading-indicator", rule.loadingOpt.getOrElse(""))
+    }
+  }
+
   private def appendProcessesBlock(
     parent   : Element,
     processes: scala.collection.Map[String, String]
@@ -2528,6 +2682,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           parentElem.addAttribute("form", "*")
           parentElem.addAttribute("profiles", "")
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
+          appendDetailButtonsBlock(parentElem, None)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
           appendProcessesBlock(parentElem, Map.empty)
           parentElem.addElement("control-settings")
@@ -2554,6 +2709,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           parentElem.addAttribute("form", form)
           parentElem.addAttribute("profiles", "")
           appendCuratedBlock(parentElem, Map.empty, appFormOnly = true)
+          appendDetailButtonsBlock(parentElem, None)
           appendResourcesBlock(parentElem, Map.empty, Map.empty)
           appendProcessesBlock(parentElem, Map.empty)
           parentElem.addElement("control-settings")
@@ -2679,6 +2835,62 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           )
       }
 
+    def appendDetailButtonsProperties(detailButtonsElemOpt: Option[Element], app: String, form: String, profiles: String = ""): Unit =
+      detailButtonsElemOpt.foreach { dbElem =>
+        for {
+          barElem <- dbElem.elements("bar")
+          if barElem.attributeValueOpt("override").contains("true")
+          barName <- barElem.attributeValueOpt("name").flatMap(_.trimAllToOpt)
+          propName <- barName match {
+            case "edit"  => Some(s"${DetailButtonsPropertyPrefix}$app.$form")
+            case "view"  => Some(s"${DetailButtonsPropertyPrefix}view.$app.$form")
+            case "inner" => Some(s"${DetailButtonsPropertyPrefix}inner.$app.$form")
+            case _       => None
+          }
+        } appendProperty(
+          name     = propName,
+          xsType   = "xs:string",
+          value    = barElem.attributeValueOpt("value").getOrElse(barElem.getText),
+          profiles = profiles
+        )
+
+        if (dbElem.attributeValueOpt("close-uri-override").contains("true"))
+          appendProperty(
+            name     = s"$DetailCloseUriPropertyPrefix$app.$form",
+            xsType   = "xs:anyURI",
+            value    = dbElem.attributeValueOpt("close-uri").getOrElse(""),
+            profiles = profiles
+          )
+
+        for {
+          btnElem <- dbElem.elements("button")
+          btnName <- btnElem.attributeValueOpt("name").flatMap(_.trimAllToOpt)
+          if ButtonsEditorUI.ButtonNameRegex.matches(btnName)
+        } {
+          if (btnElem.attributeValueOpt("visible-override").contains("true"))
+            appendProperty(
+              name     = s"$DetailButtonRulePropertyPrefix$btnName.visible.$app.$form",
+              xsType   = "xs:string",
+              value    = btnElem.attributeValueOpt("visible").getOrElse(""),
+              profiles = profiles
+            )
+          if (btnElem.attributeValueOpt("enabled-override").contains("true"))
+            appendProperty(
+              name     = s"$DetailButtonRulePropertyPrefix$btnName.enabled.$app.$form",
+              xsType   = "xs:string",
+              value    = btnElem.attributeValueOpt("enabled").getOrElse(""),
+              profiles = profiles
+            )
+          if (btnElem.attributeValueOpt("loading-override").contains("true"))
+            appendProperty(
+              name     = s"$DetailLoadingPropertyPrefix$btnName.$app.$form",
+              xsType   = "xs:string",
+              value    = btnElem.attributeValueOpt("loading-indicator").getOrElse(""),
+              profiles = profiles
+            )
+        }
+      }
+
     def appendProcessProperties(processesElemOpt: Option[Element], app: String, form: String, profiles: String = ""): Unit =
       for {
         processesElem <- processesElemOpt.toList
@@ -2747,6 +2959,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         value  = propElem.attributeValueOpt("value").getOrElse(propElem.getText)
       )
 
+      appendDetailButtonsProperties(Option(configRoot.element("detail-buttons")), "*", "*")
       appendResourceProperties(Option(configRoot.element("resources")), "*", "*")
       appendProcessProperties(Option(configRoot.element("processes")), "*", "*")
       appendControlSettingsProperties(Option(configRoot.element("control-settings")), "*", "*")
@@ -2773,6 +2986,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           profiles = profiles
         )
 
+        appendDetailButtonsProperties(Option(overrideElem.element("detail-buttons")), app, form, profiles)
         if (profiles.isEmpty)
           appendResourceProperties(Option(overrideElem.element("resources")), app, form)
         appendProcessProperties(Option(overrideElem.element("processes")), app, form, profiles)

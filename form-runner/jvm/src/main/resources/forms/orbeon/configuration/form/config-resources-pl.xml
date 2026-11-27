@@ -90,6 +90,9 @@
     <detail-section>
         <label>Strona szczegółów</label>
     </detail-section>
+    <buttons-section>
+        <label>Przyciski</label>
+    </buttons-section>
     <wizard-section>
         <label>Kreator</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Nadpisz proces</dialog-title-override>
         <dialog-title-add>Dodaj proces niestandardowy</dialog-title-add>
         <dialog-title-edit>Edytuj proces</dialog-title-edit>
+        <button-bar-edit>Przycisk: Edycja / Nowy</button-bar-edit>
+        <button-bar-view>Przycisk: Podgląd / Przegląd</button-bar-view>
+        <button-bar-inner>Przycisk: Wewnętrzny</button-bar-inner>
+        <configure-button-hint>Skonfiguruj ten przycisk na karcie Przyciski</configure-button-hint>
+        <add-as-button>Dodaj jako przycisk…</add-as-button>
+        <add-as-button-hint>Umieść ten proces niestandardowy jako przycisk na pasku Edycja / Nowy</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Ustawienia kontrolek</label>

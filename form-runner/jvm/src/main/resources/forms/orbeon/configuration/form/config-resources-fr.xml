@@ -90,6 +90,9 @@
     <detail-section>
         <label>Page de détail</label>
     </detail-section>
+    <buttons-section>
+        <label>Boutons</label>
+    </buttons-section>
     <wizard-section>
         <label>Wizard</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Surcharger le processus</dialog-title-override>
         <dialog-title-add>Ajouter un processus personnalisé</dialog-title-add>
         <dialog-title-edit>Modifier le processus</dialog-title-edit>
+        <button-bar-edit>Bouton : Édition / Nouveau</button-bar-edit>
+        <button-bar-view>Bouton : Consultation / Révision</button-bar-view>
+        <button-bar-inner>Bouton : Intérieur</button-bar-inner>
+        <configure-button-hint>Configurer ce bouton dans l'onglet Boutons</configure-button-hint>
+        <add-as-button>Ajouter comme bouton…</add-as-button>
+        <add-as-button-hint>Placer ce processus personnalisé dans la barre Édition / Nouveau</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Paramètres des contrôles</label>

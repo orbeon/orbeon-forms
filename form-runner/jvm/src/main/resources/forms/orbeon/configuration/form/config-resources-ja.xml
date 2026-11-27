@@ -90,6 +90,9 @@
     <detail-section>
         <label>詳細ページ</label>
     </detail-section>
+    <buttons-section>
+        <label>ボタン</label>
+    </buttons-section>
     <wizard-section>
         <label>ウィザード</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>プロセスをオーバーライド</dialog-title-override>
         <dialog-title-add>カスタムプロセスを追加</dialog-title-add>
         <dialog-title-edit>プロセスを編集</dialog-title-edit>
+        <button-bar-edit>ボタン: 編集 / 新規</button-bar-edit>
+        <button-bar-view>ボタン: 表示 / 確認</button-bar-view>
+        <button-bar-inner>ボタン: 内部</button-bar-inner>
+        <configure-button-hint>「ボタン」タブでこのボタンを設定します</configure-button-hint>
+        <add-as-button>ボタンとして追加…</add-as-button>
+        <add-as-button-hint>このカスタムプロセスを「編集 / 新規」バーにボタンとして配置します</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>コントロール設定</label>

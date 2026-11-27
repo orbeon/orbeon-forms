@@ -90,6 +90,9 @@
     <detail-section>
         <label>Pàgina de detall</label>
     </detail-section>
+    <buttons-section>
+        <label>Botons</label>
+    </buttons-section>
     <wizard-section>
         <label>Assistent</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Redefinir el procés</dialog-title-override>
         <dialog-title-add>Afegir un procés personalitzat</dialog-title-add>
         <dialog-title-edit>Editar el procés</dialog-title-edit>
+        <button-bar-edit>Botó: Edició / Nou</button-bar-edit>
+        <button-bar-view>Botó: Visualització / Revisió</button-bar-view>
+        <button-bar-inner>Botó: Interior</button-bar-inner>
+        <configure-button-hint>Configurar aquest botó a la pestanya Botons</configure-button-hint>
+        <add-as-button>Afegir com a botó…</add-as-button>
+        <add-as-button-hint>Col·locar aquest procés personalitzat com a botó a la barra Edició / Nou</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Configuració de controls</label>

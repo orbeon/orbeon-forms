@@ -90,6 +90,9 @@
     <detail-section>
         <label>詳情頁面</label>
     </detail-section>
+    <buttons-section>
+        <label>按鈕</label>
+    </buttons-section>
     <wizard-section>
         <label>精靈</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>覆寫流程</dialog-title-override>
         <dialog-title-add>新增自訂流程</dialog-title-add>
         <dialog-title-edit>編輯流程</dialog-title-edit>
+        <button-bar-edit>按鈕：編輯 / 新建</button-bar-edit>
+        <button-bar-view>按鈕：查看 / 審查</button-bar-view>
+        <button-bar-inner>按鈕：內部</button-bar-inner>
+        <configure-button-hint>在「按鈕」分頁中設定此按鈕</configure-button-hint>
+        <add-as-button>新增為按鈕…</add-as-button>
+        <add-as-button-hint>將此自訂流程作為按鈕放置在「編輯 / 新建」列中</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>控制項設定</label>

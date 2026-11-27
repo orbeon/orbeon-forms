@@ -90,6 +90,9 @@
     <detail-section>
         <label>Részletező oldal</label>
     </detail-section>
+    <buttons-section>
+        <label>Gombok</label>
+    </buttons-section>
     <wizard-section>
         <label>Varázsló</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Folyamat felülbírálása</dialog-title-override>
         <dialog-title-add>Egyéni folyamat hozzáadása</dialog-title-add>
         <dialog-title-edit>Folyamat szerkesztése</dialog-title-edit>
+        <button-bar-edit>Gomb: Szerkesztés / Új</button-bar-edit>
+        <button-bar-view>Gomb: Nézet / Áttekintés</button-bar-view>
+        <button-bar-inner>Gomb: Belső</button-bar-inner>
+        <configure-button-hint>Állítsa be ezt a gombot a Gombok lapon</configure-button-hint>
+        <add-as-button>Hozzáadás gombként…</add-as-button>
+        <add-as-button-hint>Helyezze el ezt az egyéni folyamatot gombként a Szerkesztés / Új sávon</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Vezérlőbeállítások</label>

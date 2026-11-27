@@ -90,6 +90,9 @@
     <detail-section>
         <label>Página de detalhe</label>
     </detail-section>
+    <buttons-section>
+        <label>Botões</label>
+    </buttons-section>
     <wizard-section>
         <label>Assistente</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Redefinir processo</dialog-title-override>
         <dialog-title-add>Adicionar processo personalizado</dialog-title-add>
         <dialog-title-edit>Editar processo</dialog-title-edit>
+        <button-bar-edit>Botão: Edição / Novo</button-bar-edit>
+        <button-bar-view>Botão: Visualização / Revisão</button-bar-view>
+        <button-bar-inner>Botão: Interior</button-bar-inner>
+        <configure-button-hint>Configurar este botão no separador Botões</configure-button-hint>
+        <add-as-button>Adicionar como botão…</add-as-button>
+        <add-as-button-hint>Colocar este processo personalizado como botão na barra Edição / Novo</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Configurações de controlo</label>

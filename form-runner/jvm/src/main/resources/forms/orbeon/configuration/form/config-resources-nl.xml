@@ -90,6 +90,9 @@
     <detail-section>
         <label>Detailpagina</label>
     </detail-section>
+    <buttons-section>
+        <label>Knoppen</label>
+    </buttons-section>
     <wizard-section>
         <label>Wizard</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Proces overschrijven</dialog-title-override>
         <dialog-title-add>Aangepast proces toevoegen</dialog-title-add>
         <dialog-title-edit>Proces bewerken</dialog-title-edit>
+        <button-bar-edit>Knop: Bewerken / Nieuw</button-bar-edit>
+        <button-bar-view>Knop: Weergave / Beoordeling</button-bar-view>
+        <button-bar-inner>Knop: Intern</button-bar-inner>
+        <configure-button-hint>Configureer deze knop op het tabblad Knoppen</configure-button-hint>
+        <add-as-button>Toevoegen als knop…</add-as-button>
+        <add-as-button-hint>Plaats dit aangepaste proces als knop in de balk Bewerken / Nieuw</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Veldinstellingen</label>

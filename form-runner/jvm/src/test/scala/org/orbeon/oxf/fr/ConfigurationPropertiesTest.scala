@@ -378,10 +378,9 @@ class ConfigurationPropertiesTest
       assert(firstOverride.attributeValue("app") == "*")
       assert(firstOverride.attributeValue("form") == "*")
       assert(firstOverride.attributeValue("profiles") == "internal")
-      val buttonsElem = firstOverride.element("curated").element("detail").element("detail-buttons")
-      assert(buttonsElem.attributeValue("override") == "true")
-      assert(buttonsElem.attributeValue("value") == "save-final pdf")
-      assert(buttonsElem.attributeValue("has-profiles") == "true")
+      val editBarElem = firstOverride.element("detail-buttons").elements("bar").find(_.attributeValue("name") == "edit").get
+      assert(editBarElem.attributeValue("override") == "true")
+      assert(editBarElem.attributeValue("value") == "save-final pdf")
 
       val parentHrOverride = overrides(1)
       assert(parentHrOverride.attributeValue("app") == "hr")
@@ -1626,6 +1625,207 @@ class ConfigurationPropertiesTest
         assert(staticStateEventOpt(warmFormEvents2).exists(ss => ! ss.read && ss.found))
         assert(resolvedCssPaths(cachedLandingHtml).contains("/apps/fr/themes/2025/theme.css"))
         assert(resolvedCssPaths(cachedFormHtml).contains("/apps/fr/themes/2025/theme.css"))
+      }
+      PersistencePropertyProvider.invalidateCache()
+    }
+
+    it("must round-trip detail-buttons bars, per-button visible/enabled/loading-indicator rules, and close.uri across scopes while preserving wildcards and shortcuts") {
+      val inputPropsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"                            value="summary pdf|tiff save-final review"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.view.*.*"                       value="edit pdf"/>
+          |    <property as="xs:anyURI" name="oxf.fr.detail.close.uri.*.*"                          value="/fr/"/>
+          |    <property as="xs:string" name="oxf.fr.detail.button.review.enabled.*.*"              value="fr:is-wizard-last-page()"/>
+          |    <property as="xs:string" name="oxf.fr.detail.loading-indicator.save-final.*.*"       value="modal"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.acme.w9"                        value=""/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.inner.acme.w9"                  value="wizard-prev wizard-next review"/>
+          |    <property as="xs:string" name="oxf.fr.detail.button.approve.visible.acme.order"      profiles="internal" value="fr:user-roles() = 'manager'"/>
+          |    <property as="xs:string" name="oxf.fr.detail.loading-indicator.approve.acme.order"   profiles="internal" value="inline"/>
+          |    <property as="xs:anyURI" name="oxf.fr.detail.close.uri.acme.order"                   value="/acme/dashboard"/>
+          |    <property as="xs:string" name="oxf.fr.detail.button.*.visible.*.*"                   value="fr:owns-lease-or-none-required()"/>
+          |    <property as="xs:string" name="oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*" value="not(fr:is-embedded())"/>
+          |    <property as="xs:string" name="oxf.fr.detail.button.keyboard-shortcut.save-final"    value="⌘S"/>
+          |    <property as="xs:string" name="oxf.fr.detail.buttons.orbeon.builder"                 value="summary save"/>
+          |</properties>""".stripMargin
+
+      val configDoc  = FormRunnerConfiguration.propertiesDomToConfigurationDom(IOSupport.readOrbeonDom(inputPropsXml))
+      val configRoot = configDoc.getRootElement
+
+      // 1. Global <detail-buttons>
+      val globalDb = configRoot.element("detail-buttons")
+      assert(globalDb.attributeValue("close-uri-override") == "true")
+      assert(globalDb.attributeValue("close-uri") == "/fr/")
+      val globalBars = globalDb.elements("bar").map(b => b.attributeValue("name") -> (b.attributeValue("override"), b.attributeValue("value"))).toMap
+      assert(globalBars("edit")  == ("true",  "summary pdf|tiff save-final review"))
+      assert(globalBars("view")  == ("true",  "edit pdf"))
+      assert(globalBars("inner") == ("false", ""))
+      val globalRules = globalDb.elements("button").map(b => b.attributeValue("name") -> b).toMap
+      assert(globalRules("review").attributeValue("enabled-override") == "true")
+      assert(globalRules("review").attributeValue("enabled") == "fr:is-wizard-last-page()")
+      assert(globalRules("save-final").attributeValue("loading-override") == "true")
+      assert(globalRules("save-final").attributeValue("loading-indicator") == "modal")
+
+      // 2. Wildcards, multi-segment lease rules, keyboard shortcuts, and protected forms stay in <custom-properties>
+      val customNames = configRoot.element("custom-properties").elements("property").map(_.attributeValue("name")).toSet
+      assert(customNames == Set(
+        "oxf.fr.detail.button.*.visible.*.*",
+        "oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*",
+        "oxf.fr.detail.button.keyboard-shortcut.save-final",
+        "oxf.fr.detail.buttons.orbeon.builder"
+      ))
+
+      // 3. Round-trip back to <properties>
+      val roundTripDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val defs         = PropertyStore.parseToPropertyDefinitions(roundTripDoc).asScala
+      assert(defs.size == 14)
+
+      val byNameAndProfile = defs.map(d => (d.getName, d.getProfiles.asScala.toList) -> d).toMap
+      assert(byNameAndProfile(("oxf.fr.detail.buttons.*.*", Nil)).getValue == "summary pdf|tiff save-final review")
+      assert(byNameAndProfile(("oxf.fr.detail.close.uri.*.*", Nil)).getValue.toString == "/fr/")
+      assert(byNameAndProfile(("oxf.fr.detail.button.review.enabled.*.*", Nil)).getValue == "fr:is-wizard-last-page()")
+      assert(byNameAndProfile(("oxf.fr.detail.loading-indicator.save-final.*.*", Nil)).getValue == "modal")
+      assert(byNameAndProfile(("oxf.fr.detail.buttons.acme.w9", Nil)).getValue == "")
+      assert(byNameAndProfile(("oxf.fr.detail.buttons.inner.acme.w9", Nil)).getValue == "wizard-prev wizard-next review")
+      assert(byNameAndProfile(("oxf.fr.detail.button.approve.visible.acme.order", List("internal"))).getValue == "fr:user-roles() = 'manager'")
+      assert(byNameAndProfile(("oxf.fr.detail.loading-indicator.approve.acme.order", List("internal"))).getValue == "inline")
+      assert(byNameAndProfile(("oxf.fr.detail.close.uri.acme.order", Nil)).getValue.toString == "/acme/dashboard")
+    }
+
+    it("must parse and compose button labels with Font Awesome icons losslessly and manipulate split-button bar tokens") {
+      // Standard icon + text
+      val parsedSave = ButtonsEditorUI.parseButtonLabel("""<i class="fa fa-fw fa-hdd-o"></i> Save &amp; Close""", isHtml = true)
+      assert(parsedSave == ButtonsEditorUI.ParsedButtonLabel("structured", "fa-hdd-o", "Save & Close"))
+      assert(ButtonsEditorUI.composeButtonLabel("fa-hdd-o", "Save & Close") == ("""<i class="fa fa-fw fa-hdd-o"></i> Save &amp; Close""", true))
+
+      // Icon-only button (e.g. collapse-all)
+      val parsedIconOnly = ButtonsEditorUI.parseButtonLabel("""<i class="fa fa-fw fa-compress"></i>""", isHtml = true)
+      assert(parsedIconOnly == ButtonsEditorUI.ParsedButtonLabel("structured", "fa-compress", ""))
+      assert(ButtonsEditorUI.composeButtonLabel("fa-compress", "") == ("""<i class="fa fa-fw fa-compress"></i>""", true))
+
+      // Plain non-HTML label
+      val parsedPlain = ButtonsEditorUI.parseButtonLabel("Submit Order", isHtml = false)
+      assert(parsedPlain == ButtonsEditorUI.ParsedButtonLabel("structured", "", "Submit Order"))
+      assert(ButtonsEditorUI.composeButtonLabel("", "Submit Order") == ("Submit Order", false))
+
+      // Complex arbitrary HTML preserved in raw-html mode
+      val rawComplex = """<span class="custom-btn"><b>Approve</b> <em>Now</em></span>"""
+      val parsedRaw  = ButtonsEditorUI.parseButtonLabel(rawComplex, isHtml = true)
+      assert(parsedRaw == ButtonsEditorUI.ParsedButtonLabel("raw-html", "", rawComplex))
+
+      // Bar token parsing, split buttons, containment, and coordinated rename
+      val parsedItems = ButtonsEditorUI.parseBarTokensXml("home pdf|tiff save-final review")
+      assert(ButtonsEditorUI.serializeBarItems(parsedItems) == "home pdf|tiff save-final review")
+      assert(ButtonsEditorUI.barContainsButton("home pdf|tiff save-final", "tiff"))
+      assert(! ButtonsEditorUI.barContainsButton("home pdf|tiff save-final", "approve"))
+      assert(ButtonsEditorUI.renameButtonInBarValue("home pdf|approve save-final", "approve", "approve-final") == "home pdf|approve-final save-final")
+    }
+
+    it("must synchronize unified fr:buttons-editor custom button, label, XPath rule, and process without duplicate properties and validate XPath") {
+      withTempSQLite { connection =>
+        val (processorService, docOpt, _) =
+          runFormRunner(
+            app  = "orbeon",
+            form = "configuration",
+            mode = "new"
+          )
+
+        assert(docOpt.isDefined)
+        val doc = docOpt.get
+
+        withTestExternalContext { implicit ec =>
+          withFormRunnerDocument(processorService, doc) {
+            val editorCtrl = resolveObject[org.orbeon.oxf.xforms.control.XFormsComponentControl]("fr-config-buttons-editor").get
+
+            def findInButtonsEditor[T <: org.orbeon.oxf.xforms.control.XFormsControl : scala.reflect.ClassTag](staticId: String): T =
+              ControlsIterator(editorCtrl, includeSelf = false)
+                .collectFirst { case c: T if c.getId == staticId && c.isRelevant => c }
+                .getOrElse {
+                  val allMatches = ControlsIterator(editorCtrl, includeSelf = false)
+                    .filter(_.getId == staticId)
+                    .map(c => s"${c.effectiveId}(relevant=${c.isRelevant}, class=${c.getClass.getSimpleName})")
+                    .toList
+                  val dlgStr = editorCtrl.nestedContainerOpt
+                    .flatMap(_.findInstance("dialog"))
+                    .map(instanceToString)
+                    .getOrElse("<no-dialog-instance/>")
+                  fail(s"Control `$staticId` not found/relevant in `${editorCtrl.effectiveId}` (editorRelevant=${editorCtrl.isRelevant}, matches=$allMatches, dlg=$dlgStr)")
+                }
+
+            // 1. Open Configure Button dialog in add-custom mode via fr-configure-button
+            doc.withOutermostActionHandler {
+              dispatch(
+                name        = "fr-configure-button",
+                effectiveId = editorCtrl.effectiveId,
+                properties  = Map(
+                  "bar"        -> Some("edit"),
+                  "name"       -> Some("approve"),
+                  "add-to-bar" -> Some("true")
+                )
+              )
+            }
+
+            // 2. Configure icon + single label, enabled XPath formula, and modal loading indicator
+            val labelModeCtrl = findInButtonsEditor[XFormsSelect1Control]("fr-be-label-mode-select")
+            val singleItem    = labelModeCtrl.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("single")).get._1
+            setControlValueWithEventSearchNested(labelModeCtrl.effectiveId, singleItem.externalValue(labelModeCtrl.mustEncodeValues))
+
+            val singleTextCtrl = findInButtonsEditor[XFormsValueControl]("fr-be-single-label-input")
+            setControlValueWithEventSearchNested(singleTextCtrl.effectiveId, "Approve Order")
+
+            val enabledModeCtrl = findInButtonsEditor[XFormsSelect1Control]("fr-be-enabled-mode-select")
+            val xpathModeItem   = enabledModeCtrl.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("xpath")).get._1
+            setControlValueWithEventSearchNested(enabledModeCtrl.effectiveId, xpathModeItem.externalValue(enabledModeCtrl.mustEncodeValues))
+
+            val enabledXpathCtrl = findInButtonsEditor[XFormsValueControl]("fr-be-enabled-xpath-input")
+            // Verify invalid XPath blocks apply
+            setControlValueWithEventSearchNested(enabledXpathCtrl.effectiveId, "fr:mode( =")
+            activateControlWithEvent(findInButtonsEditor[org.orbeon.oxf.xforms.control.XFormsControl]("fr-be-apply-dialog-btn").effectiveId)
+            val configRootBeforeValid = instance("fr-configuration-instance").get.rootElement
+            assert((configRootBeforeValid / "detail-buttons" / "button").isEmpty)
+
+            // Fix XPath formula & select modal loading indicator, then apply
+            setControlValueWithEventSearchNested(enabledXpathCtrl.effectiveId, "fr:mode() = 'edit'")
+            val loadingCtrl = findInButtonsEditor[XFormsSelect1Control]("fr-be-loading-select")
+            val modalItem   = loadingCtrl.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("modal")).get._1
+            setControlValueWithEventSearchNested(loadingCtrl.effectiveId, modalItem.externalValue(loadingCtrl.mustEncodeValues))
+
+            activateControlWithEvent(findInButtonsEditor[org.orbeon.oxf.xforms.control.XFormsControl]("fr-be-apply-dialog-btn").effectiveId)
+
+            // 3. Verify single-source-of-truth sync into <detail-buttons> and <resources>
+            val configRoot = instance("fr-configuration-instance").get.rootElement
+            val editBar    = (configRoot / "detail-buttons" / "bar").find(b => (b /@ "name").stringValue == "edit").get
+            val afterDlg   = editorCtrl.nestedContainerOpt.flatMap(_.findInstance("dialog")).map(instanceToString).getOrElse("")
+            val afterItems = editorCtrl.nestedContainerOpt.flatMap(_.findInstance("bar-items")).map(instanceToString).getOrElse("")
+            assert((editBar /@ "override").stringValue == "true", s"dlg=$afterDlg\nbar-items=$afterItems")
+            assert((editBar /@ "value").stringValue.endsWith(" approve"), s"dlg=$afterDlg\nbar-items=$afterItems")
+
+            val approveRule = (configRoot / "detail-buttons" / "button").find(b => (b /@ "name").stringValue == "approve").get
+            assert((approveRule /@ "enabled-override").stringValue == "true")
+            assert((approveRule /@ "enabled").stringValue == "fr:mode() = 'edit'")
+            assert((approveRule /@ "loading-override").stringValue == "true")
+            assert((approveRule /@ "loading-indicator").stringValue == "modal")
+
+            val approveMsgs = (configRoot / "resources" / "message").filter(m => (m /@ "name").stringValue == "buttons.approve")
+            assert(approveMsgs.size == 1)
+            assert(approveMsgs.head.stringValue == "Approve Order")
+
+            // Save configuration to SQLite and verify zero duplicate <property> entries
+            SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
+          }
+
+          useAndClose(connection.prepareStatement("SELECT xml FROM orbeon_form_data WHERE app = 'orbeon' AND form = 'configuration' AND draft = 'N' AND deleted = 'N'")) { ps =>
+            useAndClose(ps.executeQuery()) { rs =>
+              assert(rs.next())
+              val savedPropsDoc = IOSupport.readOrbeonDom(rs.getString(1))
+              val propNames     = savedPropsDoc.getRootElement.elements("property").map(_.attributeValue("name")).toList
+              assert(propNames.distinct.size == propNames.size)
+              assert(propNames.contains("oxf.fr.detail.buttons.*.*"))
+              assert(propNames.contains("oxf.fr.detail.button.approve.enabled.*.*"))
+              assert(propNames.contains("oxf.fr.detail.loading-indicator.approve.*.*"))
+              assert(propNames.contains("oxf.fr.resource.*.*.*.buttons.approve"))
+            }
+          }
+        }
       }
       PersistencePropertyProvider.invalidateCache()
     }

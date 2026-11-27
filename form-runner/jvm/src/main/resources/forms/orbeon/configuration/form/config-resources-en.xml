@@ -90,6 +90,9 @@
     <detail-section>
         <label>Detail Page</label>
     </detail-section>
+    <buttons-section>
+        <label>Buttons</label>
+    </buttons-section>
     <wizard-section>
         <label>Wizard</label>
     </wizard-section>
@@ -140,6 +143,12 @@
         <dialog-title-override>Override Process</dialog-title-override>
         <dialog-title-add>Add Custom Process</dialog-title-add>
         <dialog-title-edit>Edit Process</dialog-title-edit>
+        <button-bar-edit>Button: Edit / New</button-bar-edit>
+        <button-bar-view>Button: View / Review</button-bar-view>
+        <button-bar-inner>Button: Inner</button-bar-inner>
+        <configure-button-hint>Configure this button in the Buttons tab</configure-button-hint>
+        <add-as-button>Add as button…</add-as-button>
+        <add-as-button-hint>Place this custom process as a button in the Edit / New bar</add-as-button-hint>
     </processes-section>
     <control-settings-section>
         <label>Control Settings</label>

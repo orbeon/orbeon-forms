@@ -3371,7 +3371,7 @@
                                         id="fr-be-move-up-btn"
                                         appearance="minimal"
                                         ref=".[exists($item/preceding-sibling::item)]"
-                                        class="fr-be-icon-btn">
+                                        class="fr-be-icon-btn fr-be-move-up">
                                         <xf:label><xh:i class="fa fa-arrow-up" aria-hidden="true"/></xf:label>
                                         <xf:hint value="fr:r('move-up')"/>
                                         <xf:action event="DOMActivate">
@@ -3387,7 +3387,7 @@
                                         id="fr-be-move-down-btn"
                                         appearance="minimal"
                                         ref=".[exists($item/following-sibling::item)]"
-                                        class="fr-be-icon-btn">
+                                        class="fr-be-icon-btn fr-be-move-down">
                                         <xf:label><xh:i class="fa fa-arrow-down" aria-hidden="true"/></xf:label>
                                         <xf:hint value="fr:r('move-down')"/>
                                         <xf:action event="DOMActivate">

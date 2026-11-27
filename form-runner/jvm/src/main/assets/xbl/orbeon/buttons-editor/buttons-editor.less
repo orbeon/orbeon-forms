@@ -431,9 +431,18 @@
             gap: 4px;
 
             .fr-be-move-btns:not(.xforms-disabled) {
-                display: inline-flex;
+                display: inline-grid;
+                grid-template-columns: 26px 26px;
                 align-items: center;
                 gap: 2px;
+
+                .fr-be-move-up {
+                    grid-column: 1;
+                }
+
+                .fr-be-move-down {
+                    grid-column: 2;
+                }
             }
 
             .fr-be-configure-btn {

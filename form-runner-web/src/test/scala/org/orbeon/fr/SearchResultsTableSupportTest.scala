@@ -14,6 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.CleanDocumentBody
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalatest.funspec.AnyFunSpecLike
@@ -21,7 +22,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 import scala.scalajs.js
 
 
-class SearchResultsTableSupportTest extends AnyFunSpecLike {
+class SearchResultsTableSupportTest extends AnyFunSpecLike with CleanDocumentBody {
 
   private def mockRect(elem: dom.Element, width: Double, height: Double = 32.0): Unit =
     elem.asInstanceOf[js.Dynamic].getBoundingClientRect = () =>

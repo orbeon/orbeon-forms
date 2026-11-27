@@ -14,12 +14,13 @@
 package org.orbeon.fr
 
 import org.orbeon.fr.DropIndicatorDnD.*
+import org.orbeon.xforms.CleanDocumentBody
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalatest.funspec.AnyFunSpecLike
 
 
-class DropIndicatorDnDTest extends AnyFunSpecLike {
+class DropIndicatorDnDTest extends AnyFunSpecLike with CleanDocumentBody {
 
   describe("DropIndicatorDnD.computeLinearDropTargetsFromRects") {
 
@@ -155,12 +156,8 @@ class DropIndicatorDnDTest extends AnyFunSpecLike {
       root.appendChild(dialog)
       dom.document.body.appendChild(root)
 
-      try {
-        assert(overlayHostEl(inner) eq dialog)
-        assert(overlayHostEl(root) eq root)
-      } finally {
-        dom.document.body.removeChild(root)
-      }
+      assert(overlayHostEl(inner) eq dialog)
+      assert(overlayHostEl(root) eq root)
     }
   }
 }

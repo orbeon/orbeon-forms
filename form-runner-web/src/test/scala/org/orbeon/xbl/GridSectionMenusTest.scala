@@ -14,12 +14,13 @@
 package org.orbeon.xbl
 
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.CleanDocumentBody
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalatest.funspec.AnyFunSpecLike
 
 
-class GridSectionMenusTest extends AnyFunSpecLike {
+class GridSectionMenusTest extends AnyFunSpecLike with CleanDocumentBody {
 
   private def buildGlobalMenu(componentName: String): html.Element = {
     val menu = dom.document.createElement("div").asInstanceOf[html.Element]
@@ -62,7 +63,6 @@ class GridSectionMenusTest extends AnyFunSpecLike {
   describe("GridSectionMenus menu container placement") {
 
     it("must place the menu outside `.fr-grid.fr-repeat` and inside `form.xforms-form`, `.fb-main`, or `dialog`") {
-      dom.document.body.innerHTML = ""
       dom.document.body.className = "orbeon"
 
       val form = dom.document.createElement("form").asInstanceOf[html.Form]

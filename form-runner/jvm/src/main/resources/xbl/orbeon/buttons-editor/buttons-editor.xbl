@@ -190,10 +190,10 @@
                             <label-mode-raw-html>Custom HTML</label-mode-raw-html>
                             <icon-label>Icon</icon-label>
                             <icon-none>No icon</icon-none>
-                            <label-text-label>Button Text</label-text-label>
+                            <label-text-label>Button Label</label-text-label>
                             <label-text-placeholder>Enter button label…</label-text-placeholder>
                             <raw-html-label>HTML Markup</raw-html-label>
-                            <section-conditions>Visibility &amp; Readonliness</section-conditions>
+                            <section-conditions>Visibility &amp; Enabled</section-conditions>
                             <visible-label>Visibility</visible-label>
                             <visible-default>Default</visible-default>
                             <visible-always>Always visible</visible-always>
@@ -304,7 +304,7 @@
                             <label-mode-raw-html>HTML personnalisé</label-mode-raw-html>
                             <icon-label>Icône</icon-label>
                             <icon-none>Sans icône</icon-none>
-                            <label-text-label>Texte du bouton</label-text-label>
+                            <label-text-label>Libellé du bouton</label-text-label>
                             <label-text-placeholder>Saisir le libellé du bouton…</label-text-placeholder>
                             <raw-html-label>Code HTML</raw-html-label>
                             <section-conditions>Visibilité et activation</section-conditions>
@@ -418,7 +418,7 @@
                             <label-mode-raw-html>HTML مخصص</label-mode-raw-html>
                             <icon-label>الأيقونة</icon-label>
                             <icon-none>بدون أيقونة</icon-none>
-                            <label-text-label>نص الزر</label-text-label>
+                            <label-text-label>تسمية الزر</label-text-label>
                             <label-text-placeholder>أدخل تسمية الزر…</label-text-placeholder>
                             <raw-html-label>ترميز HTML</raw-html-label>
                             <section-conditions>الظهور والتفعيل</section-conditions>
@@ -532,7 +532,7 @@
                             <label-mode-raw-html>HTML personalitzat</label-mode-raw-html>
                             <icon-label>Icona</icon-label>
                             <icon-none>Sense icona</icon-none>
-                            <label-text-label>Text del botó</label-text-label>
+                            <label-text-label>Etiqueta del botó</label-text-label>
                             <label-text-placeholder>Introduïu l'etiqueta del botó…</label-text-placeholder>
                             <raw-html-label>Marcatge HTML</raw-html-label>
                             <section-conditions>Visibilitat i activació</section-conditions>
@@ -646,7 +646,7 @@
                             <label-mode-raw-html>Brugerdefineret HTML</label-mode-raw-html>
                             <icon-label>Ikon</icon-label>
                             <icon-none>Intet ikon</icon-none>
-                            <label-text-label>Knaptekst</label-text-label>
+                            <label-text-label>Knapetiket</label-text-label>
                             <label-text-placeholder>Indtast knapetiket…</label-text-placeholder>
                             <raw-html-label>HTML-opmærkning</raw-html-label>
                             <section-conditions>Synlighed og aktivering</section-conditions>
@@ -760,7 +760,7 @@
                             <label-mode-raw-html>Benutzerdefiniertes HTML</label-mode-raw-html>
                             <icon-label>Symbol</icon-label>
                             <icon-none>Kein Symbol</icon-none>
-                            <label-text-label>Schaltflächentext</label-text-label>
+                            <label-text-label>Schaltflächenbeschriftung</label-text-label>
                             <label-text-placeholder>Schaltflächen-Beschriftung eingeben…</label-text-placeholder>
                             <raw-html-label>HTML-Markup</raw-html-label>
                             <section-conditions>Sichtbarkeit &amp; Aktivierung</section-conditions>
@@ -874,7 +874,7 @@
                             <label-mode-raw-html>HTML personalizado</label-mode-raw-html>
                             <icon-label>Icono</icon-label>
                             <icon-none>Sin icono</icon-none>
-                            <label-text-label>Texto del botón</label-text-label>
+                            <label-text-label>Etiqueta del botón</label-text-label>
                             <label-text-placeholder>Introduzca la etiqueta del botón…</label-text-placeholder>
                             <raw-html-label>Código HTML</raw-html-label>
                             <section-conditions>Visibilidad y habilitación</section-conditions>
@@ -988,7 +988,7 @@
                             <label-mode-raw-html>Mukautettu HTML</label-mode-raw-html>
                             <icon-label>Kuvake</icon-label>
                             <icon-none>Ei kuvaketta</icon-none>
-                            <label-text-label>Painikkeen teksti</label-text-label>
+                            <label-text-label>Painikkeen nimike</label-text-label>
                             <label-text-placeholder>Syötä painikkeen nimike…</label-text-placeholder>
                             <raw-html-label>HTML-merkintä</raw-html-label>
                             <section-conditions>Näkyvyys ja käytettävyys</section-conditions>
@@ -1102,7 +1102,7 @@
                             <label-mode-raw-html>Egyéni HTML</label-mode-raw-html>
                             <icon-label>Ikon</icon-label>
                             <icon-none>Nincs ikon</icon-none>
-                            <label-text-label>Gomb szövege</label-text-label>
+                            <label-text-label>Gomb címkéje</label-text-label>
                             <label-text-placeholder>Adja meg a gomb címkéjét…</label-text-placeholder>
                             <raw-html-label>HTML-jelölés</raw-html-label>
                             <section-conditions>Láthatóság és engedélyezés</section-conditions>
@@ -1216,7 +1216,7 @@
                             <label-mode-raw-html>HTML personalizzato</label-mode-raw-html>
                             <icon-label>Icona</icon-label>
                             <icon-none>Nessuna icona</icon-none>
-                            <label-text-label>Testo del pulsante</label-text-label>
+                            <label-text-label>Etichetta del pulsante</label-text-label>
                             <label-text-placeholder>Inserisci etichetta del pulsante…</label-text-placeholder>
                             <raw-html-label>Markup HTML</raw-html-label>
                             <section-conditions>Visibilità e abilitazione</section-conditions>
@@ -1330,7 +1330,7 @@
                             <label-mode-raw-html>カスタムHTML</label-mode-raw-html>
                             <icon-label>アイコン</icon-label>
                             <icon-none>アイコンなし</icon-none>
-                            <label-text-label>ボタンテキスト</label-text-label>
+                            <label-text-label>ボタンラベル</label-text-label>
                             <label-text-placeholder>ボタンラベルを入力…</label-text-placeholder>
                             <raw-html-label>HTMLマークアップ</raw-html-label>
                             <section-conditions>表示と有効/無効</section-conditions>
@@ -1444,7 +1444,7 @@
                             <label-mode-raw-html>Aangepaste HTML</label-mode-raw-html>
                             <icon-label>Pictogram</icon-label>
                             <icon-none>Geen pictogram</icon-none>
-                            <label-text-label>Knoptekst</label-text-label>
+                            <label-text-label>Knoplabel</label-text-label>
                             <label-text-placeholder>Voer knoplabel in…</label-text-placeholder>
                             <raw-html-label>HTML-opmaak</raw-html-label>
                             <section-conditions>Zichtbaarheid &amp; activering</section-conditions>
@@ -1558,7 +1558,7 @@
                             <label-mode-raw-html>Tilpasset HTML</label-mode-raw-html>
                             <icon-label>Ikon</icon-label>
                             <icon-none>Ingen ikon</icon-none>
-                            <label-text-label>Knappetekst</label-text-label>
+                            <label-text-label>Knappeetikett</label-text-label>
                             <label-text-placeholder>Skriv inn knappeetikett…</label-text-placeholder>
                             <raw-html-label>HTML-oppmerking</raw-html-label>
                             <section-conditions>Synlighet og aktivering</section-conditions>
@@ -1672,7 +1672,7 @@
                             <label-mode-raw-html>Niestandardowy kod HTML</label-mode-raw-html>
                             <icon-label>Ikona</icon-label>
                             <icon-none>Brak ikony</icon-none>
-                            <label-text-label>Tekst przycisku</label-text-label>
+                            <label-text-label>Etykieta przycisku</label-text-label>
                             <label-text-placeholder>Wprowadź etykietę przycisku…</label-text-placeholder>
                             <raw-html-label>Kod HTML</raw-html-label>
                             <section-conditions>Widoczność i aktywność</section-conditions>
@@ -1786,7 +1786,7 @@
                             <label-mode-raw-html>HTML personalizado</label-mode-raw-html>
                             <icon-label>Ícone</icon-label>
                             <icon-none>Sem ícone</icon-none>
-                            <label-text-label>Texto do botão</label-text-label>
+                            <label-text-label>Etiqueta do botão</label-text-label>
                             <label-text-placeholder>Introduza a etiqueta do botão…</label-text-placeholder>
                             <raw-html-label>Código HTML</raw-html-label>
                             <section-conditions>Visibilidade e ativação</section-conditions>
@@ -1900,7 +1900,7 @@
                             <label-mode-raw-html>Пользовательский HTML</label-mode-raw-html>
                             <icon-label>Значок</icon-label>
                             <icon-none>Без значка</icon-none>
-                            <label-text-label>Текст кнопки</label-text-label>
+                            <label-text-label>Метка кнопки</label-text-label>
                             <label-text-placeholder>Введите метку кнопки…</label-text-placeholder>
                             <raw-html-label>HTML-разметка</raw-html-label>
                             <section-conditions>Видимость и доступность</section-conditions>
@@ -2014,7 +2014,7 @@
                             <label-mode-raw-html>Anpassad HTML</label-mode-raw-html>
                             <icon-label>Ikon</icon-label>
                             <icon-none>Ingen ikon</icon-none>
-                            <label-text-label>Knapptext</label-text-label>
+                            <label-text-label>Knappetikett</label-text-label>
                             <label-text-placeholder>Ange knappetikett…</label-text-placeholder>
                             <raw-html-label>HTML-kod</raw-html-label>
                             <section-conditions>Synlighet och aktivering</section-conditions>
@@ -2128,7 +2128,7 @@
                             <label-mode-raw-html>Özel HTML</label-mode-raw-html>
                             <icon-label>Simge</icon-label>
                             <icon-none>Simge yok</icon-none>
-                            <label-text-label>Düğme Metni</label-text-label>
+                            <label-text-label>Düğme Etiketi</label-text-label>
                             <label-text-placeholder>Düğme etiketini girin…</label-text-placeholder>
                             <raw-html-label>HTML İşaretlemesi</raw-html-label>
                             <section-conditions>Görünürlük ve Etkinlik</section-conditions>
@@ -2242,7 +2242,7 @@
                             <label-mode-raw-html>自定义 HTML</label-mode-raw-html>
                             <icon-label>图标</icon-label>
                             <icon-none>无图标</icon-none>
-                            <label-text-label>按钮文本</label-text-label>
+                            <label-text-label>按钮标签</label-text-label>
                             <label-text-placeholder>输入按钮标签…</label-text-placeholder>
                             <raw-html-label>HTML 标记</raw-html-label>
                             <section-conditions>可见性与启用状态</section-conditions>
@@ -2356,7 +2356,7 @@
                             <label-mode-raw-html>自訂 HTML</label-mode-raw-html>
                             <icon-label>圖示</icon-label>
                             <icon-none>無圖示</icon-none>
-                            <label-text-label>按鈕文字</label-text-label>
+                            <label-text-label>按鈕標籤</label-text-label>
                             <label-text-placeholder>輸入按鈕標籤…</label-text-placeholder>
                             <raw-html-label>HTML 標記</raw-html-label>
                             <section-conditions>可見性與啟用狀態</section-conditions>
@@ -2595,6 +2595,34 @@
                 <!-- ======================================================================= -->
                 <!-- Reusable Internal Actions for Populating & Saving the Button Dialog     -->
                 <!-- ======================================================================= -->
+
+                <!-- Insert an XPath snippet at the current caret/selection of the target textarea without replacing existing content -->
+                <xf:action event="fr-be-insert-xpath" target="fr-be-root">
+                    <xf:action type="javascript">
+                        <xf:param name="targetId" value="xxf:client-id(string(event('target-id')))"/>
+                        <xf:param name="snippet"  value="string(event('snippet'))"/>
+                        <xf:body>
+                            const host = document.getElementById(targetId);
+                            const ta   = host ? host.querySelector('textarea') : null;
+                            if (ta) {
+                                const val    = ta.value || '';
+                                const start  = typeof ta.selectionStart === 'number' ? ta.selectionStart : val.length;
+                                const end    = typeof ta.selectionEnd   === 'number' ? ta.selectionEnd   : val.length;
+                                const before = val.slice(0, start);
+                                const after  = val.slice(end);
+                                const padL   = before.length > 0 &amp;&amp; !/[\s(\[,]$/ .test(before) ? ' ' : '';
+                                const padR   = after.length  > 0 &amp;&amp; !/^[\s)\],]/ .test(after)  ? ' ' : '';
+                                const insert = padL + snippet + padR;
+                                const caret  = start + padL.length + snippet.length;
+                                ta.value = before + insert + after;
+                                ta.focus();
+                                ta.setSelectionRange(caret, caret);
+                                ta.dispatchEvent(new Event('input',  { bubbles: true }));
+                                ta.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        </xf:body>
+                    </xf:action>
+                </xf:action>
 
                 <!-- Populate the last <part> in $dlg/parts from model state for event('part-name') -->
                 <xf:action event="fr-be-init-last-part" target="fr-be-root">
@@ -3782,7 +3810,7 @@
                                             </xh:div>
 
                                             <xf:group ref=".[@label-mode = 'single']">
-                                                <xf:input id="fr-be-single-label-input" ref="@single-text" incremental="true">
+                                                <xf:input id="fr-be-single-label-input" ref="@single-text" incremental="true" class="fr-be-single-label-input">
                                                     <xf:label value="fr:r('label-text-label')"/>
                                                     <xf:hint appearance="minimal" value="fr:r('label-text-placeholder')"/>
                                                 </xf:input>
@@ -3852,7 +3880,7 @@
                                         </xh:div>
 
                                         <xf:group ref=".[@visible-mode = 'xpath']" class="fr-be-xpath-box">
-                                            <xf:textarea id="fr-be-visible-xpath-input" ref="@visible-xpath" incremental="true" class="fr-be-code-textarea">
+                                            <xf:textarea id="fr-be-visible-xpath-input" ref="@visible-xpath" appearance="xpath-completion" incremental="true" class="fr-be-xpath-textarea">
                                                 <xf:label class="xforms-hidden" value="fr:r('visible-xpath')"/>
                                                 <xf:alert value="fr:r('alert-xpath')"/>
                                             </xf:textarea>
@@ -3860,19 +3888,31 @@
                                                 <xh:span class="fr-be-chips-label"><xf:output value="fr:r('insert-formula')"/></xh:span>
                                                 <xf:trigger appearance="minimal" id="fr-be-vis-chip-wizard" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-wizard-last')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@visible-xpath" value="'fr:is-wizard-last-page()'"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-visible-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:is-wizard-last-page()'"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:trigger appearance="minimal" id="fr-be-vis-chip-edit" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-edit-mode')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@visible-xpath" value="'fr:mode() = ''edit'''"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-visible-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:mode() = ''edit'''"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:trigger appearance="minimal" id="fr-be-vis-chip-new" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-new-mode')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@visible-xpath" value="'fr:mode() = ''new'''"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-visible-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:mode() = ''new'''"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:trigger appearance="minimal" id="fr-be-vis-chip-role" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-admin-role')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@visible-xpath" value="'fr:user-roles() = ''admin'''"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-visible-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:user-roles() = ''admin'''"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                             </xh:div>
                                         </xf:group>
@@ -3904,7 +3944,7 @@
                                         </xh:div>
 
                                         <xf:group ref=".[@enabled-mode = 'xpath']" class="fr-be-xpath-box">
-                                            <xf:textarea id="fr-be-enabled-xpath-input" ref="@enabled-xpath" incremental="true" class="fr-be-code-textarea">
+                                            <xf:textarea id="fr-be-enabled-xpath-input" ref="@enabled-xpath" appearance="xpath-completion" incremental="true" class="fr-be-xpath-textarea">
                                                 <xf:label class="xforms-hidden" value="fr:r('enabled-xpath')"/>
                                                 <xf:alert value="fr:r('alert-xpath')"/>
                                             </xf:textarea>
@@ -3912,15 +3952,24 @@
                                                 <xh:span class="fr-be-chips-label"><xf:output value="fr:r('insert-formula')"/></xh:span>
                                                 <xf:trigger appearance="minimal" id="fr-be-en-chip-wizard" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-wizard-last')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@enabled-xpath" value="'fr:is-wizard-last-page()'"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-enabled-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:is-wizard-last-page()'"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:trigger appearance="minimal" id="fr-be-en-chip-edit" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-edit-mode')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@enabled-xpath" value="'fr:mode() = ''edit'''"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-enabled-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:mode() = ''edit'''"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                                 <xf:trigger appearance="minimal" id="fr-be-en-chip-role" class="fr-be-chip-btn">
                                                     <xf:label value="fr:r('chip-admin-role')"/>
-                                                    <xf:setvalue event="DOMActivate" ref="$active-part/@enabled-xpath" value="'fr:user-roles() = ''admin'''"/>
+                                                    <xf:dispatch event="DOMActivate" name="fr-be-insert-xpath" targetid="fr-be-root">
+                                                        <xf:property name="target-id" value="'fr-be-enabled-xpath-input'"/>
+                                                        <xf:property name="snippet"   value="'fr:user-roles() = ''admin'''"/>
+                                                    </xf:dispatch>
                                                 </xf:trigger>
                                             </xh:div>
                                         </xf:group>
@@ -4020,9 +4069,7 @@
                                             </xh:div>
                                         </xh:div>
 
-                                        <xh:code class="fr-be-process-preview {'xforms-hidden'[empty($effective-proc-body)]}">
-                                            <xf:output mediatype="text/html" value="frf:formatProcessDefinitionHtml(($effective-proc-body, '')[1])"/>
-                                        </xh:code>
+                                        <xh:code class="fr-be-process-preview {'xforms-hidden'[empty($effective-proc-body)]}"><xf:output mediatype="text/html" value="frf:formatProcessDefinitionHtml(xxf:trim(($effective-proc-body, '')[1]))"/></xh:code>
                                         <xh:div class="fr-be-process-empty {'xforms-hidden'[exists($effective-proc-body)]}">
                                             <xf:output value="fr:r('process-missing-hint')"/>
                                         </xh:div>

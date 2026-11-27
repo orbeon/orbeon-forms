@@ -947,11 +947,11 @@ object PopoverSelectPicker {
                     if (children.exists(_.nonEmpty) && valOpt.isEmpty) {
                       val cid = s"cat-${categoriesBuf.size}"
                       val short =
-                        if (label.length <= 18) label
-                        else label.take(16).trim + "…"
+                        if (label.length <= 22) label
+                        else label.take(20).trim + "…"
                       categoriesBuf += Category(id = cid, shortLabel = short, fullLabel = label)
                       visitNodes(children.get, cid, label)
-                    } else {
+                    } else if (valOpt.isDefined) {
                       val value         = valOpt.getOrElse("")
                       val isPlaceholder = placeholderValOpt.contains(value) && label.isEmpty
                       val rawCodeOpt    = nextRawValueOpt(value, isPlaceholder)
@@ -985,7 +985,7 @@ object PopoverSelectPicker {
                   if (child.tagName.equalsIgnoreCase("OPTGROUP")) {
                     val grpLabel = Option(child.getAttribute("label")).getOrElse("")
                     val cid      = s"cat-${categoriesBuf.size}"
-                    val short    = if (grpLabel.length <= 18) grpLabel else grpLabel.take(16).trim + "…"
+                    val short    = if (grpLabel.length <= 22) grpLabel else grpLabel.take(20).trim + "…"
                     categoriesBuf += Category(id = cid, shortLabel = short, fullLabel = grpLabel)
                     var cIdx = 0
                     while (cIdx < child.children.length) {
@@ -1123,6 +1123,7 @@ object PopoverSelectPicker {
 
           val minWidth =
             if (isPhoneFormat) 280.0
+            else if (categories.size >= 3) 400.0
             else if (categories.size >= 2 || items.exists(i => i.hintOpt.nonEmpty || i.badgeOpt.nonEmpty)) 340.0
             else 240.0
 

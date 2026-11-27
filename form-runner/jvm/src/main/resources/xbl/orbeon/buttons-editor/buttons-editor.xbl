@@ -3044,35 +3044,59 @@
                     <xh:div class="fr-be-toolbar">
                         <xh:div class="fr-be-toolbar-start">
                             <xf:group ref=".[not($is-readonly)]" class="fr-be-add-controls">
-                                <xf:select1
+                                <xf:var
+                                    name="available-standard-buttons"
+                                    value="$selectable-buttons[not(@name = $active-bar-part-names)]"/>
+                                <fr:dropdown-select1-search
                                     id="fr-be-add-standard-select"
                                     ref="instance('state')/@add-standard-choice"
-                                    appearance="minimal"
+                                    show-value="true"
                                     class="fr-be-add-standard-select">
-                                    <xf:label class="xforms-hidden" value="fr:r('add-standard-placeholder')"/>
-                                    <xf:item>
-                                        <xf:label value="fr:r('add-standard-placeholder')"/>
-                                        <xf:value/>
-                                    </xf:item>
-                                    <xf:itemset ref="$selectable-buttons">
-                                        <xf:label
-                                            value="
-                                                let $nm       := string(@name),
-                                                    $cat      := string(@category),
-                                                    $cat-lbl  := if ($cat = 'navigation') then fr:r('cat-navigation') else if ($cat = 'export') then fr:r('cat-export') else fr:r('cat-workflow'),
-                                                    $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
-                                                    $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
-                                                    $disp     := (string($parsed)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1],
-                                                    $in-bar   := $nm = $active-bar-part-names
-                                                return concat(
-                                                    if ($in-bar) then '✓ ' else '',
-                                                    $disp,
-                                                    ' (', $nm, ') — ', $cat-lbl
-                                                )"/>
-                                        <xf:value ref="@name"/>
-                                    </xf:itemset>
-                                    <xf:action event="xforms-value-changed" if="xxf:non-blank(context())">
-                                        <xf:var name="chosen" value="string(context())"/>
+                                    <xf:label appearance="minimal" value="fr:r('add-standard-placeholder')"/>
+                                    <xf:choices>
+                                        <xf:label value="fr:r('cat-workflow')"/>
+                                        <xf:itemset ref="$available-standard-buttons[@category = 'workflow']">
+                                            <xf:label
+                                                value="
+                                                    let $nm       := string(@name),
+                                                        $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                        $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                        $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                        $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                    return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                            <xf:value ref="@name"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                    <xf:choices>
+                                        <xf:label value="fr:r('cat-navigation')"/>
+                                        <xf:itemset ref="$available-standard-buttons[@category = 'navigation']">
+                                            <xf:label
+                                                value="
+                                                    let $nm       := string(@name),
+                                                        $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                        $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                        $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                        $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                    return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                            <xf:value ref="@name"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                    <xf:choices>
+                                        <xf:label value="fr:r('cat-export')"/>
+                                        <xf:itemset ref="$available-standard-buttons[@category = 'export']">
+                                            <xf:label
+                                                value="
+                                                    let $nm       := string(@name),
+                                                        $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                        $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                        $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                        $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                    return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                            <xf:value ref="@name"/>
+                                        </xf:itemset>
+                                    </xf:choices>
+                                    <xf:action event="xforms-value-changed" if="xxf:non-blank(instance('state')/@add-standard-choice)">
+                                        <xf:var name="chosen" value="string(instance('state')/@add-standard-choice)"/>
                                         <xf:setvalue ref="instance('state')/@add-standard-choice" value="''"/>
                                         <xf:insert
                                             if="not($chosen = $active-bar-part-names)"
@@ -3089,7 +3113,7 @@
                                                     )
                                                 )"/>
                                     </xf:action>
-                                </xf:select1>
+                                </fr:dropdown-select1-search>
 
                                 <xf:trigger id="fr-be-add-custom-btn" class="fr-be-add-btn">
                                     <xf:label>
@@ -3559,22 +3583,59 @@
                                     </xh:div>
 
                                     <xh:div class="fr-be-split-add">
-                                        <xf:select1
+                                        <xf:var
+                                            name="available-split-buttons"
+                                            value="$selectable-buttons[not(@name = $dlg/parts/part/@name)]"/>
+                                        <fr:dropdown-select1-search
                                             id="fr-be-add-split-standard-select"
                                             ref="@add-split-choice"
-                                            appearance="minimal"
+                                            show-value="true"
                                             class="fr-be-split-select">
-                                            <xf:label class="xforms-hidden" value="fr:r('split-add-standard')"/>
-                                            <xf:item>
-                                                <xf:label value="fr:r('split-add-standard')"/>
-                                                <xf:value/>
-                                            </xf:item>
-                                            <xf:itemset ref="$selectable-buttons[not(@name = $dlg/parts/part/@name)]">
-                                                <xf:label value="concat(@default-en-label[xxf:non-blank()], if (xxf:non-blank(@default-en-label)) then concat(' (', @name, ')') else @name)"/>
-                                                <xf:value ref="@name"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed" if="xxf:non-blank(context())">
-                                                <xf:var name="chosen" value="string(context())"/>
+                                            <xf:label appearance="minimal" value="fr:r('split-add-standard')"/>
+                                            <xf:choices>
+                                                <xf:label value="fr:r('cat-workflow')"/>
+                                                <xf:itemset ref="$available-split-buttons[@category = 'workflow']">
+                                                    <xf:label
+                                                        value="
+                                                            let $nm       := string(@name),
+                                                                $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                                $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                                $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                                $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                            return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                                    <xf:value ref="@name"/>
+                                                </xf:itemset>
+                                            </xf:choices>
+                                            <xf:choices>
+                                                <xf:label value="fr:r('cat-navigation')"/>
+                                                <xf:itemset ref="$available-split-buttons[@category = 'navigation']">
+                                                    <xf:label
+                                                        value="
+                                                            let $nm       := string(@name),
+                                                                $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                                $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                                $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                                $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                            return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                                    <xf:value ref="@name"/>
+                                                </xf:itemset>
+                                            </xf:choices>
+                                            <xf:choices>
+                                                <xf:label value="fr:r('cat-export')"/>
+                                                <xf:itemset ref="$available-split-buttons[@category = 'export']">
+                                                    <xf:label
+                                                        value="
+                                                            let $nm       := string(@name),
+                                                                $fr-raw   := xxf:r(concat('buttons.', $nm), '|fr-fr-resources|'),
+                                                                $parsed   := beu:parseButtonLabelXml($fr-raw, true()),
+                                                                $full-raw := if (xxf:is-blank(string($parsed))) then xxf:r(concat('buttons.', $nm, '-full'), '|fr-fr-resources|') else '',
+                                                                $parsed-f := if (xxf:non-blank($full-raw)) then beu:parseButtonLabelXml($full-raw, true()) else ()
+                                                            return (string($parsed)[xxf:non-blank()], string($parsed-f)[xxf:non-blank()], string(@default-en-label)[xxf:non-blank()], $nm)[1]"/>
+                                                    <xf:value ref="@name"/>
+                                                </xf:itemset>
+                                            </xf:choices>
+                                            <xf:action event="xforms-value-changed" if="xxf:non-blank($dlg/@add-split-choice)">
+                                                <xf:var name="chosen" value="string($dlg/@add-split-choice)"/>
                                                 <xf:setvalue ref="$dlg/@add-split-choice" value="''"/>
                                                 <xf:insert context="$dlg/parts" ref="*" origin="$dlg/templates/part"/>
                                                 <xf:dispatch name="fr-be-init-last-part" targetid="fr-be-root">
@@ -3582,7 +3643,7 @@
                                                 </xf:dispatch>
                                                 <xf:setvalue ref="$dlg/@active-part-index" value="count($dlg/parts/part)"/>
                                             </xf:action>
-                                        </xf:select1>
+                                        </fr:dropdown-select1-search>
 
                                         <xf:trigger id="fr-be-add-split-custom-btn" appearance="minimal" class="fr-be-utility-btn">
                                             <xf:label value="fr:r('split-add-custom')"/>

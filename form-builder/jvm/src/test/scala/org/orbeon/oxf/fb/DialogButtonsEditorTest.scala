@@ -224,6 +224,22 @@ class DialogButtonsEditorTest
 
           val buttonsEditorCtrl = findByStaticId("fb-buttons-editor").get
 
+          // Verify `#fr-be-add-standard-select` exposes grouped `<xf:choices>` categories and localized `Collapse All` / `Expand All` labels
+          val addStdWrapper = findByStaticId("fr-be-add-standard-select").get
+          val addStdSelect1 = ControlsIterator(addStdWrapper, includeSelf = false).collectFirst { case s: XFormsSelect1Control => s }.get
+          val addStdItemset = addStdSelect1.getItemset(EventCollector.Throw)
+          val choiceLabels  = addStdItemset.children.collect { case c: org.orbeon.oxf.xforms.itemset.Item.ChoiceNode => c.label.label }
+          assert(choiceLabels == List("Save & Workflow", "Navigation & Wizard", "Export & Utilities"))
+          val allItemLabels = addStdItemset.allItemsWithValueIterator(reverse = false).map { case (item, v) => v -> item.label.label }.toMap
+          assert(allItemLabels.get(Left("collapse-all")).contains("Collapse All"))
+          assert(allItemLabels.get(Left("expand-all")).contains("Expand All"))
+          assert(! allItemLabels.contains(Left("save-final"))) // already in inherited Edit bar
+
+          // Selecting `send` from `#fr-be-add-standard-select` appends it to the Edit bar and resets the picker to ''
+          val sendItem = addStdItemset.allItemsWithValueIterator(reverse = false).find(_._2 == Left("send")).get._1
+          setControlValueWithEventSearchNested(addStdSelect1.effectiveId, sendItem.externalValue(addStdSelect1.mustEncodeValues))
+          assert(addStdSelect1.getValue(EventCollector.Throw) == "")
+
           // 2. Configure & add custom button `approve` on the Edit bar
           doc.withOutermostActionHandler {
             dispatch(

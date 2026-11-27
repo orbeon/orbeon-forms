@@ -344,6 +344,12 @@
                         <resource xml:lang="ar"><search-placeholder>بحث…</search-placeholder><no-results>لا توجد خيارات مطابقة</no-results><all>الكل</all></resource>
                         <resource xml:lang="pl"><search-placeholder>Szukaj…</search-placeholder><no-results>Brak pasujących opcji</no-results><all>Wszystkie</all></resource>
                         <resource xml:lang="ja"><search-placeholder>検索…</search-placeholder><no-results>一致する選択肢がありません</no-results><all>すべて</all></resource>
+                        <resource xml:lang="ca"><search-placeholder>Cerca…</search-placeholder><no-results>Cap opció coincident</no-results><all>Totes</all></resource>
+                        <resource xml:lang="da"><search-placeholder>Søg…</search-placeholder><no-results>Ingen matchende valg</no-results><all>Alle</all></resource>
+                        <resource xml:lang="hu"><search-placeholder>Keresés…</search-placeholder><no-results>Nincs egyező lehetőség</no-results><all>Összes</all></resource>
+                        <resource xml:lang="tr"><search-placeholder>Ara…</search-placeholder><no-results>Eşleşen seçenek yok</no-results><all>Tümü</all></resource>
+                        <resource xml:lang="zh-Hans"><search-placeholder>搜索…</search-placeholder><no-results>没有匹配的选项</no-results><all>全部</all></resource>
+                        <resource xml:lang="zh-Hant"><search-placeholder>搜尋…</search-placeholder><no-results>沒有符合的選項</no-results><all>全部</all></resource>
                     </_>
                 </xf:instance>
             </xf:model>

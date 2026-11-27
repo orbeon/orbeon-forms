@@ -226,13 +226,13 @@ object ButtonsEditorUI {
       name                = "collapse-all",
       category            = "export",
       defaultIcon         = "fa-compress",
-      defaultEnglishLabel = ""
+      defaultEnglishLabel = "Collapse All"
     ),
     StandardButtonDef(
       name                = "expand-all",
       category            = "export",
       defaultIcon         = "fa-expand",
-      defaultEnglishLabel = ""
+      defaultEnglishLabel = "Expand All"
     ),
 
     // Legacy / compatibility aliases (recognized when present in existing configs, hidden from primary Add menu)

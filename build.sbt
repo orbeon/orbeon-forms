@@ -94,7 +94,7 @@ val OracleJdbcVersion                = "23.26.4.0.0"
 val JsoupVersion                     = "1.23.2"
 val CommonMarkVersion                = "0.24.0"
 val LibPhoneNumberVersion            = "9.0.42"
-val PlaywrightVersion                = "1.65.0"
+val PlaywrightVersion                = "1.65.1"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"

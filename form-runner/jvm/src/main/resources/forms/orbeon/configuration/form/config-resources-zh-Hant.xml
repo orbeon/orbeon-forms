@@ -100,6 +100,12 @@
     <formulas-section>
         <label>公式</label>
     </formulas-section>
+    <lease-section>
+        <label>租約</label>
+    </lease-section>
+    <attachments-section>
+        <label>附件</label>
+    </attachments-section>
     <landing-section>
         <label>起始頁</label>
     </landing-section>

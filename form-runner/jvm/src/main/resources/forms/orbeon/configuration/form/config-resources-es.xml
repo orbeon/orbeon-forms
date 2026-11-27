@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Fórmulas</label>
     </formulas-section>
+    <lease-section>
+        <label>Bloqueo (Lease)</label>
+    </lease-section>
+    <attachments-section>
+        <label>Adjuntos</label>
+    </attachments-section>
     <landing-section>
         <label>Página de inicio</label>
     </landing-section>

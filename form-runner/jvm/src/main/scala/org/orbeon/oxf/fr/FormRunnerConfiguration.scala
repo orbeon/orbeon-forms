@@ -318,6 +318,8 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       "detail",
       "wizard",
       "formulas",
+      "lease",
+      "attachments",
       "admin",
       "pdf",
       "email",
@@ -878,7 +880,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key          = "lease-enabled",
-      category     = "detail",
+      category     = "lease",
       baseName     = "oxf.fr.detail.lease.enabled",
       xsType       = "xs:boolean",
       hasAppForm   = true,
@@ -887,7 +889,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "lease-duration",
-      category      = "detail",
+      category      = "lease",
       baseName      = "oxf.fr.detail.lease.duration.*",
       xsType        = "xs:integer",
       hasAppForm    = true,
@@ -897,7 +899,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "lease-renew-threshold",
-      category      = "detail",
+      category      = "lease",
       baseName      = "oxf.fr.detail.lease.renew-threshold",
       xsType        = "xs:integer",
       hasAppForm    = true,
@@ -907,7 +909,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "lease-alert-threshold",
-      category      = "detail",
+      category      = "lease",
       baseName      = "oxf.fr.detail.lease.alert-threshold",
       xsType        = "xs:integer",
       hasAppForm    = true,
@@ -981,7 +983,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "attachment-max-size-per-file",
-      category      = "detail",
+      category      = "attachments",
       baseName      = "oxf.fr.detail.attachment.max-size-per-file",
       xsType        = "xs:string",
       hasAppForm    = true,
@@ -991,7 +993,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "attachment-max-size-aggregate-per-control",
-      category      = "detail",
+      category      = "attachments",
       baseName      = "oxf.fr.detail.attachment.max-size-aggregate-per-control",
       xsType        = "xs:string",
       hasAppForm    = true,
@@ -1001,7 +1003,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "attachment-max-size-aggregate-per-form",
-      category      = "detail",
+      category      = "attachments",
       baseName      = "oxf.fr.detail.attachment.max-size-aggregate-per-form",
       xsType        = "xs:string",
       hasAppForm    = true,
@@ -1011,7 +1013,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key           = "attachment-max-files-per-control",
-      category      = "detail",
+      category      = "attachments",
       baseName      = "oxf.fr.detail.attachment.max-files-per-control",
       xsType        = "xs:string",
       hasAppForm    = true,
@@ -1021,7 +1023,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key          = "attachment-mediatypes",
-      category     = "detail",
+      category     = "attachments",
       baseName     = "oxf.fr.detail.attachment.mediatypes",
       xsType       = "xs:string",
       hasAppForm   = true,
@@ -1030,7 +1032,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key          = "upload-reject-empty-files",
-      category     = "detail",
+      category     = "attachments",
       baseName     = "oxf.fr.upload.reject-empty-files",
       xsType       = "xs:boolean",
       hasAppForm   = false,

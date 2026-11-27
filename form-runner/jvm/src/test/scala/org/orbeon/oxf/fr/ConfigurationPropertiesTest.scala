@@ -661,19 +661,19 @@ class ConfigurationPropertiesTest
             |    <property as="xs:string" name="oxf.xforms.cache.live-documents.max-size-bytes"              value="256000000"/>
             |</properties>""".stripMargin
         )
-      val configDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(propsDoc)
-      val detailEl  = configDoc.getRootElement.element("curated").element("detail")
-      val perFileEl = detailEl.element("attachment-max-size-per-file")
+      val configDoc     = FormRunnerConfiguration.propertiesDomToConfigurationDom(propsDoc)
+      val attachmentsEl = configDoc.getRootElement.element("curated").element("attachments")
+      val perFileEl     = attachmentsEl.element("attachment-max-size-per-file")
       assert(perFileEl.element("mode").getText == "size")
       assert(perFileEl.element("quantity").getText == "10")
       assert(perFileEl.element("quantity").attributeValue("unit") == "MB")
 
-      val perCtrlEl = detailEl.element("attachment-max-size-aggregate-per-control")
+      val perCtrlEl = attachmentsEl.element("attachment-max-size-aggregate-per-control")
       assert(perCtrlEl.element("mode").getText == "size")
       assert(perCtrlEl.element("quantity").getText == "1048576")
       assert(perCtrlEl.element("quantity").attributeValue("unit") == "B")
 
-      val perFormEl = detailEl.element("attachment-max-size-aggregate-per-form")
+      val perFormEl = attachmentsEl.element("attachment-max-size-aggregate-per-form")
       assert(perFormEl.element("mode").getText == "unlimited")
       assert(perFormEl.attributeValue("value") == "-1")
 
@@ -1495,12 +1495,12 @@ class ConfigurationPropertiesTest
             assert((reloadedXpathBytes /@ "value").stringValue == "8%")
             assert((reloadedXpathBytes / "percentage").stringValue == "0.08")
 
-            val reloadedPerFileNode = (configRoot / "curated" / "detail" / "attachment-max-size-per-file").head
+            val reloadedPerFileNode = (configRoot / "curated" / "attachments" / "attachment-max-size-per-file").head
             assert((reloadedPerFileNode /@ "value").stringValue == "10000000")
             assert((reloadedPerFileNode / "quantity").stringValue == "10")
             assert((reloadedPerFileNode / "quantity" /@ "unit").stringValue == "MB")
 
-            val reloadedPerCtrlNode = (configRoot / "curated" / "detail" / "attachment-max-size-aggregate-per-control").head
+            val reloadedPerCtrlNode = (configRoot / "curated" / "attachments" / "attachment-max-size-aggregate-per-control").head
             assert((reloadedPerCtrlNode /@ "value").stringValue == "500000")
             assert((reloadedPerCtrlNode / "quantity").stringValue == "500")
             assert((reloadedPerCtrlNode / "quantity" /@ "unit").stringValue == "KB")

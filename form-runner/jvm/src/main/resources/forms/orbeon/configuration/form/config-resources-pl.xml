@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Formuły</label>
     </formulas-section>
+    <lease-section>
+        <label>Dzierżawa (Lease)</label>
+    </lease-section>
+    <attachments-section>
+        <label>Załączniki</label>
+    </attachments-section>
     <landing-section>
         <label>Strona startowa</label>
     </landing-section>

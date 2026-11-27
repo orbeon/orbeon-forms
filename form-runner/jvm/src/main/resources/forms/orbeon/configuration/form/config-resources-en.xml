@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Formulas</label>
     </formulas-section>
+    <lease-section>
+        <label>Lease</label>
+    </lease-section>
+    <attachments-section>
+        <label>Attachments</label>
+    </attachments-section>
     <landing-section>
         <label>Landing Page</label>
     </landing-section>

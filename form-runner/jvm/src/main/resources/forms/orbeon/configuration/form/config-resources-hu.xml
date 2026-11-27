@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Képletek</label>
     </formulas-section>
+    <lease-section>
+        <label>Zárolás (Lease)</label>
+    </lease-section>
+    <attachments-section>
+        <label>Mellékletek</label>
+    </attachments-section>
     <landing-section>
         <label>Nyitóoldal</label>
     </landing-section>

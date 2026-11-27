@@ -542,32 +542,38 @@
                 width: 100%;
                 gap: 8px;
             }
-            /* Group dividers between General/Shell (1-4), Pages (5-12), Documents/Messaging (13-15), Authoring/Security/Ops (16-19), and Custom Properties (20) */
+            /* Group dividers between General/Shell (1-4), Pages (5-15), Documents/Messaging (16-18), Authoring/Security/Ops (19-22), and Custom Properties (23) */
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(5).xforms-hidden + li:nth-child(6).xforms-hidden + li:nth-child(7):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(13):not(.xforms-hidden)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(16):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(16).xforms-hidden + li:nth-child(17):not(.xforms-hidden)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(20):not(.xforms-hidden)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(19):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(19).xforms-hidden + li:nth-child(20):not(.xforms-hidden)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(23):not(.xforms-hidden)::before {
                 content: "";
                 display: block;
                 height: 1px;
                 margin: 5px 10px;
                 background-color: var(--orbeon-base-border-color);
             }
-            /* Sub-categories nested under Detail Page (Wizard = 8, Formulas = 9, Processes = 10, Control Settings = 11), matching Scopes tree guides */
+            /* Sub-categories nested under Detail Page (Buttons = 8, Wizard = 9, Formulas = 10, Processes = 11, Lease = 12, Attachments = 13, Control Settings = 14), matching Scopes tree guides */
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8),
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9),
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10),
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11) {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11),
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(12),
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(13),
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(14) {
                 position: relative;
                 margin-left: 18px;
             }
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9)::before,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::before,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(12)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(13)::before,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(14)::before {
                 content: "";
                 position: absolute;
                 left: -9px;
@@ -576,13 +582,16 @@
                 border-left: 1px solid var(--orbeon-base-border-color);
                 pointer-events: none;
             }
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::before {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(14)::before {
                 bottom: 50%;
             }
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(8)::after,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(9)::after,
             .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(10)::after,
-            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::after {
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(11)::after,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(12)::after,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(13)::after,
+            .orbeon .fr-config-category-tabs &gt; .tabs-left &gt; .nav-tabs &gt; li:nth-child(14)::after {
                 content: "";
                 position: absolute;
                 left: -9px;
@@ -2888,64 +2897,8 @@
                                         </fr:number>
                                     </fr:c>
 
+
                                     <fr:c x="1" y="16" w="12">
-                                        <xf:select1 id="lease-enabled-value-control" appearance="minimal" ref="lease-enabled/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/lease-enabled/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-enabled/hint else replace($form-resources/lease-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/lease-enabled/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="17" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="lease-duration-override-control" ref="lease-duration/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <fr:number id="lease-duration-value-control" ref="lease-duration/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/lease-duration/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-duration/hint else replace($form-resources/lease-duration/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
-                                        </fr:number>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="18" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="lease-renew-threshold-override-control" ref="lease-renew-threshold/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <fr:number id="lease-renew-threshold-value-control" ref="lease-renew-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/lease-renew-threshold/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-renew-threshold/hint else replace($form-resources/lease-renew-threshold/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
-                                        </fr:number>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="19" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="lease-alert-threshold-override-control" ref="lease-alert-threshold/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <fr:number id="lease-alert-threshold-value-control" ref="lease-alert-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/lease-alert-threshold/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-alert-threshold/hint else replace($form-resources/lease-alert-threshold/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
-                                        </fr:number>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="20" w="12">
                                         <xf:select1 id="session-expiration-dialog-enabled-value-control" appearance="minimal" ref="session-expiration-dialog-enabled/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/session-expiration-dialog-enabled/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/session-expiration-dialog-enabled/hint else replace($form-resources/session-expiration-dialog-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2960,7 +2913,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="21" w="12" class="fr-config-has-override">
+                                    <fr:c x="1" y="17" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="warn-when-data-unsafe-override-control" ref="warn-when-data-unsafe/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
@@ -2974,7 +2927,7 @@
                                         </fr:boolean-or-formula>
                                     </fr:c>
 
-                                    <fr:c x="1" y="22" w="12">
+                                    <fr:c x="1" y="18" w="12">
                                         <xf:select1 id="validate-selection-controls-choices-value-control" appearance="minimal" ref="validate-selection-controls-choices/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/validate-selection-controls-choices/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/validate-selection-controls-choices/hint else replace($form-resources/validate-selection-controls-choices/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -2989,7 +2942,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="23" w="12">
+                                    <fr:c x="1" y="19" w="12">
                                         <xf:select1 id="section-collapsible-value-control" appearance="minimal" ref="section-collapsible/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-collapsible/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-collapsible/hint else replace($form-resources/section-collapsible/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3004,7 +2957,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="24" w="12">
+                                    <fr:c x="1" y="20" w="12">
                                         <xf:select1 id="section-animate-value-control" appearance="minimal" ref="section-animate/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-animate/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-animate/hint else replace($form-resources/section-animate/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3019,7 +2972,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="25" w="12">
+                                    <fr:c x="1" y="21" w="12">
                                         <xf:select1 id="section-insert-value-control" appearance="minimal" ref="section-insert/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/section-insert/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/section-insert/hint else replace($form-resources/section-insert/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3034,7 +2987,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="26" w="12">
+                                    <fr:c x="1" y="22" w="12">
                                         <xf:select1 id="grid-insert-value-control" appearance="minimal" ref="grid-insert/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/grid-insert/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/grid-insert/hint else replace($form-resources/grid-insert/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -3049,152 +3002,6 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="27" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="attachment-max-size-per-file-override-control" ref="attachment-max-size-per-file/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
-                                                    <xf:setvalue ref="../mode" value="'size'"/>
-                                                </xf:action>
-                                                <xf:action if="string(context()) = 'false'">
-                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
-                                                    <xf:setvalue ref="../quantity" value="''"/>
-                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
-                                                </xf:action>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:group ref="attachment-max-size-per-file" class="fr-config-value-control fr-config-size-editor">
-                                            <xf:select1 id="attachment-max-size-per-file-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
-                                                <xf:label ref="$form-resources/attachment-max-size-per-file/label"/>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
-                                                    <xf:value>unlimited</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
-                                                    <xf:value>size</xf:value>
-                                                </xf:item>
-                                            </xf:select1>
-                                            <fr:quantity id="attachment-max-size-per-file-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
-                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
-                                            </fr:quantity>
-                                            <xh:div class="xforms-hint">
-                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-per-file/hint else replace($form-resources/attachment-max-size-per-file/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            </xh:div>
-                                        </xf:group>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="28" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="attachment-max-size-aggregate-per-control-override-control" ref="attachment-max-size-aggregate-per-control/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
-                                                    <xf:setvalue ref="../mode" value="'size'"/>
-                                                </xf:action>
-                                                <xf:action if="string(context()) = 'false'">
-                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
-                                                    <xf:setvalue ref="../quantity" value="''"/>
-                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
-                                                </xf:action>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:group ref="attachment-max-size-aggregate-per-control" class="fr-config-value-control fr-config-size-editor">
-                                            <xf:select1 id="attachment-max-size-aggregate-per-control-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
-                                                <xf:label ref="$form-resources/attachment-max-size-aggregate-per-control/label"/>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
-                                                    <xf:value>unlimited</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
-                                                    <xf:value>size</xf:value>
-                                                </xf:item>
-                                            </xf:select1>
-                                            <fr:quantity id="attachment-max-size-aggregate-per-control-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
-                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
-                                            </fr:quantity>
-                                            <xh:div class="xforms-hint">
-                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-aggregate-per-control/hint else replace($form-resources/attachment-max-size-aggregate-per-control/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            </xh:div>
-                                        </xf:group>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="29" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="attachment-max-size-aggregate-per-form-override-control" ref="attachment-max-size-aggregate-per-form/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
-                                                    <xf:setvalue ref="../mode" value="'size'"/>
-                                                </xf:action>
-                                                <xf:action if="string(context()) = 'false'">
-                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
-                                                    <xf:setvalue ref="../quantity" value="''"/>
-                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
-                                                </xf:action>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:group ref="attachment-max-size-aggregate-per-form" class="fr-config-value-control fr-config-size-editor">
-                                            <xf:select1 id="attachment-max-size-aggregate-per-form-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
-                                                <xf:label ref="$form-resources/attachment-max-size-aggregate-per-form/label"/>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
-                                                    <xf:value>unlimited</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
-                                                    <xf:value>size</xf:value>
-                                                </xf:item>
-                                            </xf:select1>
-                                            <fr:quantity id="attachment-max-size-aggregate-per-form-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
-                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
-                                            </fr:quantity>
-                                            <xh:div class="xforms-hint">
-                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-aggregate-per-form/hint else replace($form-resources/attachment-max-size-aggregate-per-form/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            </xh:div>
-                                        </xf:group>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="30" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="attachment-max-files-per-control-override-control" ref="attachment-max-files-per-control/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <fr:number id="attachment-max-files-per-control-value-control" ref="attachment-max-files-per-control/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/attachment-max-files-per-control/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-files-per-control/hint else replace($form-resources/attachment-max-files-per-control/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:alert ref="$form-resources/alerts/optional-integer-or-unlimited"/>
-                                        </fr:number>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="31" w="12" class="fr-config-has-override">
-                                        <fr:checkbox-input id="attachment-mediatypes-override-control" ref="attachment-mediatypes/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <fr:tags-input id="attachment-mediatypes-value-control" ref="attachment-mediatypes/@value" class="fr-config-value-control">
-                                            <xf:label ref="$form-resources/attachment-mediatypes/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-mediatypes/hint else replace($form-resources/attachment-mediatypes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                        </fr:tags-input>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="32" w="12">
-                                        <xf:select1 id="upload-reject-empty-files-value-control" appearance="minimal" ref="upload-reject-empty-files/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/upload-reject-empty-files/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/upload-reject-empty-files/hint else replace($form-resources/upload-reject-empty-files/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/upload-reject-empty-files/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
                                 </fr:grid>
                             </fr:tab>
 
@@ -3890,6 +3697,250 @@
                                         <xf:output ref="$form-resources/processes-section/empty"/>
                                     </xh:div>
                                 </xf:group>
+                            </fr:tab>
+
+                            <!-- Lease -->
+                            <fr:tab
+                                id="lease-tab"
+                                visible="$is-global-scope or exists($active-scope/curated/lease/*[xxf:is-blank($active-scope-profiles) or @has-profiles = 'true'])">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count($active-scope/curated/lease/*[string(@override) = 'true' and ($is-global-scope or xxf:is-blank($active-scope-profiles) or @has-profiles = 'true')])
+                                        return concat(
+                                            $form-resources/lease-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/lease-section/label"/>
+                                    </xh:h3>
+                                </xh:div>
+                                <fr:grid id="lease-grid" ref="$active-scope/curated/lease">
+                                    <fr:c x="1" y="1" w="12">
+                                        <xf:select1 id="lease-enabled-value-control" appearance="minimal" ref="lease-enabled/@selection" class="fr-config-select1">
+                                            <xf:label ref="$form-resources/lease-enabled/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-enabled/hint else replace($form-resources/lease-enabled/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:itemset ref="$form-resources/lease-enabled/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="lease-duration-override-control" ref="lease-duration/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <fr:number id="lease-duration-value-control" ref="lease-duration/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/lease-duration/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-duration/hint else replace($form-resources/lease-duration/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="3" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="lease-renew-threshold-override-control" ref="lease-renew-threshold/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <fr:number id="lease-renew-threshold-value-control" ref="lease-renew-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/lease-renew-threshold/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-renew-threshold/hint else replace($form-resources/lease-renew-threshold/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="4" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="lease-alert-threshold-override-control" ref="lease-alert-threshold/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <fr:number id="lease-alert-threshold-value-control" ref="lease-alert-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/lease-alert-threshold/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/lease-alert-threshold/hint else replace($form-resources/lease-alert-threshold/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
+                                    </fr:c>
+                                </fr:grid>
+                            </fr:tab>
+
+                            <!-- Attachments -->
+                            <fr:tab
+                                id="attachments-tab"
+                                visible="$is-global-scope or exists($active-scope/curated/attachments/*[xxf:is-blank($active-scope-profiles) or @has-profiles = 'true'])">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count($active-scope/curated/attachments/*[string(@override) = 'true' and ($is-global-scope or xxf:is-blank($active-scope-profiles) or @has-profiles = 'true')])
+                                        return concat(
+                                            $form-resources/attachments-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/attachments-section/label"/>
+                                    </xh:h3>
+                                </xh:div>
+                                <fr:grid id="attachments-grid" ref="$active-scope/curated/attachments">
+                                    <fr:c x="1" y="1" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="attachment-max-size-per-file-override-control" ref="attachment-max-size-per-file/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
+                                                    <xf:setvalue ref="../mode" value="'size'"/>
+                                                </xf:action>
+                                                <xf:action if="string(context()) = 'false'">
+                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
+                                                    <xf:setvalue ref="../quantity" value="''"/>
+                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:group ref="attachment-max-size-per-file" class="fr-config-value-control fr-config-size-editor">
+                                            <xf:select1 id="attachment-max-size-per-file-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
+                                                <xf:label ref="$form-resources/attachment-max-size-per-file/label"/>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
+                                                    <xf:value>unlimited</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
+                                                    <xf:value>size</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                            <fr:quantity id="attachment-max-size-per-file-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
+                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
+                                            </fr:quantity>
+                                            <xh:div class="xforms-hint">
+                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-per-file/hint else replace($form-resources/attachment-max-size-per-file/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            </xh:div>
+                                        </xf:group>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="attachment-max-size-aggregate-per-control-override-control" ref="attachment-max-size-aggregate-per-control/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
+                                                    <xf:setvalue ref="../mode" value="'size'"/>
+                                                </xf:action>
+                                                <xf:action if="string(context()) = 'false'">
+                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
+                                                    <xf:setvalue ref="../quantity" value="''"/>
+                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:group ref="attachment-max-size-aggregate-per-control" class="fr-config-value-control fr-config-size-editor">
+                                            <xf:select1 id="attachment-max-size-aggregate-per-control-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
+                                                <xf:label ref="$form-resources/attachment-max-size-aggregate-per-control/label"/>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
+                                                    <xf:value>unlimited</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
+                                                    <xf:value>size</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                            <fr:quantity id="attachment-max-size-aggregate-per-control-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
+                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
+                                            </fr:quantity>
+                                            <xh:div class="xforms-hint">
+                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-aggregate-per-control/hint else replace($form-resources/attachment-max-size-aggregate-per-control/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            </xh:div>
+                                        </xf:group>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="3" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="attachment-max-size-aggregate-per-form-override-control" ref="attachment-max-size-aggregate-per-form/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action if="string(context()) = 'true' and $is-global-scope and ../mode = 'unlimited'">
+                                                    <xf:setvalue ref="../mode" value="'size'"/>
+                                                </xf:action>
+                                                <xf:action if="string(context()) = 'false'">
+                                                    <xf:setvalue ref="../mode" value="'unlimited'"/>
+                                                    <xf:setvalue ref="../quantity" value="''"/>
+                                                    <xf:setvalue ref="../quantity/@unit" value="'MB'"/>
+                                                </xf:action>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:group ref="attachment-max-size-aggregate-per-form" class="fr-config-value-control fr-config-size-editor">
+                                            <xf:select1 id="attachment-max-size-aggregate-per-form-mode-control" ref="mode" appearance="full xxf:horizontal" class="fr-config-mode-radio">
+                                                <xf:label ref="$form-resources/attachment-max-size-aggregate-per-form/label"/>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/unlimited"/>
+                                                    <xf:value>unlimited</xf:value>
+                                                </xf:item>
+                                                <xf:item>
+                                                    <xf:label ref="$form-resources/size-modes/max-size"/>
+                                                    <xf:value>size</xf:value>
+                                                </xf:item>
+                                            </xf:select1>
+                                            <fr:quantity id="attachment-max-size-aggregate-per-form-value-control" ref="quantity" unit-preset="data" default-unit="MB" field-width="full">
+                                                <xf:alert ref="$form-resources/alerts/attachment-size"/>
+                                            </fr:quantity>
+                                            <xh:div class="xforms-hint">
+                                                <xf:output mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-size-aggregate-per-form/hint else replace($form-resources/attachment-max-size-aggregate-per-form/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            </xh:div>
+                                        </xf:group>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="4" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="attachment-max-files-per-control-override-control" ref="attachment-max-files-per-control/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <fr:number id="attachment-max-files-per-control-value-control" ref="attachment-max-files-per-control/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/attachment-max-files-per-control/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-max-files-per-control/hint else replace($form-resources/attachment-max-files-per-control/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:alert ref="$form-resources/alerts/optional-integer-or-unlimited"/>
+                                        </fr:number>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="5" w="12" class="fr-config-has-override">
+                                        <fr:checkbox-input id="attachment-mediatypes-override-control" ref="attachment-mediatypes/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <fr:tags-input id="attachment-mediatypes-value-control" ref="attachment-mediatypes/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/attachment-mediatypes/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/attachment-mediatypes/hint else replace($form-resources/attachment-mediatypes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                        </fr:tags-input>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="6" w="12">
+                                        <xf:select1 id="upload-reject-empty-files-value-control" appearance="minimal" ref="upload-reject-empty-files/@selection" class="fr-config-select1">
+                                            <xf:label ref="$form-resources/upload-reject-empty-files/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/upload-reject-empty-files/hint else replace($form-resources/upload-reject-empty-files/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:itemset ref="$form-resources/upload-reject-empty-files/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </fr:c>
+                                </fr:grid>
                             </fr:tab>
 
                             <!-- Control Settings (XBL custom control editors) -->

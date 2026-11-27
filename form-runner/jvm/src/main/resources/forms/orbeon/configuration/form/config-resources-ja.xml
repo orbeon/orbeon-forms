@@ -100,6 +100,12 @@
     <formulas-section>
         <label>計算式</label>
     </formulas-section>
+    <lease-section>
+        <label>リース</label>
+    </lease-section>
+    <attachments-section>
+        <label>添付ファイル</label>
+    </attachments-section>
     <landing-section>
         <label>ランディングページ</label>
     </landing-section>

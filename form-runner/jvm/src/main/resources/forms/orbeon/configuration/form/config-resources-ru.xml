@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Формулы</label>
     </formulas-section>
+    <lease-section>
+        <label>Блокировка (Lease)</label>
+    </lease-section>
+    <attachments-section>
+        <label>Вложения</label>
+    </attachments-section>
     <landing-section>
         <label>Начальная страница</label>
     </landing-section>

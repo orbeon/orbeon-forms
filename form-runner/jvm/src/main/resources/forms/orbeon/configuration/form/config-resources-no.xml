@@ -100,6 +100,12 @@
     <formulas-section>
         <label>Formler</label>
     </formulas-section>
+    <lease-section>
+        <label>Lås (Lease)</label>
+    </lease-section>
+    <attachments-section>
+        <label>Vedlegg</label>
+    </attachments-section>
     <landing-section>
         <label>Landingsside</label>
     </landing-section>

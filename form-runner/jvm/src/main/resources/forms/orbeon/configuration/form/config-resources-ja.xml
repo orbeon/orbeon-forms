@@ -113,7 +113,7 @@
         <label>一覧ページ</label>
     </summary-section>
     <admin-section>
-        <label>管理ページ</label>
+        <label>フォーム管理ページ</label>
     </admin-section>
     <import-section>
         <label>インポートとエクスポート</label>

@@ -113,7 +113,7 @@
         <label>Pàgina de resum</label>
     </summary-section>
     <admin-section>
-        <label>Pàgina d'administració</label>
+        <label>Administració de formularis</label>
     </admin-section>
     <import-section>
         <label>Importació i exportació</label>

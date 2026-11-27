@@ -113,7 +113,7 @@
         <label>صفحة الملخص</label>
     </summary-section>
     <admin-section>
-        <label>صفحة الإدارة</label>
+        <label>صفحة إدارة النماذج</label>
     </admin-section>
     <import-section>
         <label>الاستيراد والتصدير</label>

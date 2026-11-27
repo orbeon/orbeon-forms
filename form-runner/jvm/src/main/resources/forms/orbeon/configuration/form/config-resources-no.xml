@@ -113,7 +113,7 @@
         <label>Oppsummeringsside</label>
     </summary-section>
     <admin-section>
-        <label>Administrasjonsside</label>
+        <label>Skjemaadministrasjonsside</label>
     </admin-section>
     <import-section>
         <label>Import og eksport</label>

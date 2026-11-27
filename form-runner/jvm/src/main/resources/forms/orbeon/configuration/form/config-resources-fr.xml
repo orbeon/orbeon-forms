@@ -113,7 +113,7 @@
         <label>Page de sommaire</label>
     </summary-section>
     <admin-section>
-        <label>Page d'administration</label>
+        <label>Administration des formulaires</label>
     </admin-section>
     <import-section>
         <label>Import et export</label>

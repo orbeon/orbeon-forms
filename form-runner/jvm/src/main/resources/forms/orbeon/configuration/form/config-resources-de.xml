@@ -113,7 +113,7 @@
         <label>Übersichtsseite</label>
     </summary-section>
     <admin-section>
-        <label>Verwaltungsseite</label>
+        <label>Formularverwaltungsseite</label>
     </admin-section>
     <import-section>
         <label>Import und Export</label>

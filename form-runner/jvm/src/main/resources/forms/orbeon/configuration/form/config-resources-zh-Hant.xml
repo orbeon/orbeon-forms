@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>顯示按鈕選單項目</label>
+        <hint>在 Form Builder 中顯示按鈕設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>預設 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>顯示自訂流程選單項目</label>
         <hint>在 Form Builder 中顯示自訂流程設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

@@ -1975,6 +1975,7 @@
         <insert-grid>Inserisci una nuova griglia</insert-grid>
         <insert-repeated-grid>Inserisci una nuova griglia ripetuta</insert-repeated-grid>
         <reload-toolbox>Ricarica la casella degli strumenti</reload-toolbox>
+        <open-buttons>Apri pulsanti</open-buttons>
         <open-processes>Apri editor dei processi</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -1983,6 +1984,9 @@
         <name-header>Nome</name-header>
         <value-header>Valore</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Pulsanti</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

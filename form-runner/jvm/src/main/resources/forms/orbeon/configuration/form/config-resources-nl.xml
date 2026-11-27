@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Menu-item Knoppen tonen</label>
+        <hint>Instellingen voor knoppen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Menu-item Aangepaste processen tonen</label>
         <hint>Instellingen voor aangepaste processen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

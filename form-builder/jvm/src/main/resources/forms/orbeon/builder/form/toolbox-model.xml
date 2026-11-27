@@ -274,6 +274,7 @@
             <email/>
             <confirmation/>
             <messages/>
+            <buttons/>
             <processes/>
             <services>
                 <http/>
@@ -304,6 +305,7 @@
         <xf:bind ref="email"                 id="fb-toolbox-email-bind"                  relevant="xxf:property('oxf.fb.menu.email')"/>
         <xf:bind ref="confirmation"          id="fb-toolbox-confirmation-bind"           relevant="xxf:property('oxf.fb.menu.confirmation')"/>
         <xf:bind ref="messages"              id="fb-toolbox-messages-bind"               relevant="xxf:property('oxf.fb.menu.messages')"/>
+        <xf:bind ref="buttons"               id="fb-toolbox-buttons-bind"                relevant="xxf:property('oxf.fb.menu.buttons')"/>
         <xf:bind ref="processes"             id="fb-toolbox-processes-bind"              relevant="xxf:property('oxf.fb.menu.processes')"/>
         <xf:bind ref="services/http"         id="fb-toolbox-services-http-bind"          relevant="xxf:property('oxf.fb.menu.services.http')"/>
         <xf:bind ref="services/http-add"     id="fb-toolbox-services-http-add-bind"      readonly="fr:is-readonly-mode()"/>

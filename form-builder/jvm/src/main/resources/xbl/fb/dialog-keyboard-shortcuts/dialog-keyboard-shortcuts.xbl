@@ -143,7 +143,7 @@
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.redo', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
                                         <xh:tr>
-                                            <xh:td rowspan="15"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td rowspan="16"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
                                             <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-control-settings', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
@@ -187,6 +187,10 @@
                                         <xh:tr>
                                             <xh:td><xh:kbd>O M</xh:kbd></xh:td>
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-messages', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O B</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-buttons', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td><xh:kbd>O R</xh:kbd></xh:td>

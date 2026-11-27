@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Mostrar l'element de menú Botons</label>
+        <hint>Mostrar la configuració de botons a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Mostrar l'element de menú Processos personalitzats</label>
         <hint>Mostrar la configuració de processos personalitzats a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

@@ -2014,6 +2014,7 @@
         <insert-grid>新しいグリッドを挿入</insert-grid>
         <insert-repeated-grid>新しい繰り返しグリッドを挿入</insert-repeated-grid>
         <reload-toolbox>ツールボックスを再読み込み</reload-toolbox>
+        <open-buttons>ボタン設定を開く</open-buttons>
         <open-processes>プロセスエディターを開く</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2022,6 +2023,9 @@
         <name-header>名前</name-header>
         <value-header>値</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>ボタン</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

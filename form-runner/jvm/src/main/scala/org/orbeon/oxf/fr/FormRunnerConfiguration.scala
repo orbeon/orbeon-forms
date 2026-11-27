@@ -1689,6 +1689,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "true"
     ),
     CuratedPropertyDef(
+      key          = "fb-menu-buttons",
+      category     = "form-builder",
+      baseName     = "oxf.fb.menu.buttons",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
       key          = "fb-menu-processes",
       category     = "form-builder",
       baseName     = "oxf.fb.menu.processes",

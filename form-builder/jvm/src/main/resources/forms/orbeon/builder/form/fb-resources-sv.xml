@@ -2050,6 +2050,7 @@
         <insert-grid>Infoga ett nytt rutnät</insert-grid>
         <insert-repeated-grid>Infoga ett nytt upprepande rutnät</insert-repeated-grid>
         <reload-toolbox>Ladda om verktygslådan</reload-toolbox>
+        <open-buttons>Öppna knappar</open-buttons>
         <open-processes>Öppna processredigeraren</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2058,6 +2059,9 @@
         <name-header>Namn</name-header>
         <value-header>Värde</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Knappar</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

@@ -2003,6 +2003,7 @@
         <insert-grid>Nieuw raster invoegen</insert-grid>
         <insert-repeated-grid>Nieuw herhalend raster invoegen</insert-repeated-grid>
         <reload-toolbox>Gereedschapskist herladen</reload-toolbox>
+        <open-buttons>Knoppen openen</open-buttons>
         <open-processes>Proceseditor openen</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2011,6 +2012,9 @@
         <name-header>Naam</name-header>
         <value-header>Waarde</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Knoppen</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

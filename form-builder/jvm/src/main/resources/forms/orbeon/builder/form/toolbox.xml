@@ -664,6 +664,19 @@
                             </xf:action>
                         </fr:trigger>
                         <fr:trigger
+                                id="open-buttons-trigger"
+                                bind="fb-toolbox-buttons-bind"
+                                name="toolbox.open-buttons">
+                            <xf:label>
+                                <xh:i class="fa fa-hand-pointer-o fa-fw"/>
+                                <xf:output value="$form-resources/dialog-buttons-editor/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-buttons-editor"/>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
+                            </xf:action>
+                        </fr:trigger>
+                        <fr:trigger
                                 id="open-processes-trigger"
                                 bind="fb-toolbox-processes-bind"
                                 name="toolbox.open-processes">

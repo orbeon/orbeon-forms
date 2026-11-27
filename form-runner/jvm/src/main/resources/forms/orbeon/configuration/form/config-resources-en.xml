@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Show Buttons Menu Item</label>
+        <hint>Show Buttons settings in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>Default (Yes)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Yes</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Show Custom Processes Menu Item</label>
         <hint>Show Custom Processes settings in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

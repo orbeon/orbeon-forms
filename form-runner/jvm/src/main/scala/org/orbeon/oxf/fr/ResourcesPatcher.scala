@@ -21,6 +21,7 @@ import org.orbeon.oxf.fr.process.FormRunnerActionsCommon
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xml.dom.Support
@@ -201,20 +202,42 @@ object ResourcesPatcher {
     }
   }
 
-  def resourcesFromMetadata(formMetadataDocument : dom.Document): Seq[Resource] =
-    for {
-      resources <- new DocumentWrapper(formMetadataDocument, null, XPath.GlobalConfiguration) / "resources"
-      resource  <- resources / "resource"
-      lang      =  resource attValue XMLNames.XMLLangQName
-      messages  <- resource / "messages"
-      message   <- messages / "message"
-    } yield
-      Resource(
-        lang   = lang,
-        path   = "detail" :: "messages" :: message.attValue("name") :: Nil,
-        value  = message.getStringValue,
-        isHtml = FormRunnerActionsCommon.isMessageInHtml(message)
-      )
+  def resourcesFromMetadata(formMetadataDocument : dom.Document): Seq[Resource] = {
+    val resourceElems =
+      new DocumentWrapper(formMetadataDocument, null, XPath.GlobalConfiguration) / "resources" / "resource"
+
+    val messageResources =
+      for {
+        resource <- resourceElems
+        lang     =  resource attValue XMLNames.XMLLangQName
+        messages <- resource / "messages"
+        message  <- messages / "message"
+      } yield
+        Resource(
+          lang   = lang,
+          path   = "detail" :: "messages" :: message.attValue("name") :: Nil,
+          value  = message.getStringValue,
+          isHtml = FormRunnerActionsCommon.isMessageInHtml(message)
+        )
+
+    val buttonResources =
+      for {
+        resource <- resourceElems
+        lang     =  resource attValue XMLNames.XMLLangQName
+        buttons  <- resource / "buttons"
+        button   <- buttons / "button"
+        name     <- button.attValueOpt("name").flatMap(_.trimAllToOpt)
+        isHtml   =  FormRunnerActionsCommon.isMessageInHtml(button)
+      } yield
+        Resource(
+          lang   = lang,
+          path   = "buttons" :: name :: Nil,
+          value  = if (isHtml) button.getStringValue else button.getStringValue.escapeXmlMinimal,
+          isHtml = isHtml
+        )
+
+    messageResources ++ buttonResources
+  }
 
   def resourcesWithConcreteLanguage(allLanguages: Seq[String], resources: Seq[Resource]): Map[ResourceKey, Resource] = {
     // Process resources with concrete and wildcard languages separately, as we give a higher priority to concrete languages

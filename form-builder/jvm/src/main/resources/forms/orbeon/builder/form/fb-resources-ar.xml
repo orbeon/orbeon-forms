@@ -2022,6 +2022,7 @@
         <insert-grid>إدراج شبكة جديدة</insert-grid>
         <insert-repeated-grid>إدراج شبكة متكررة جديدة</insert-repeated-grid>
         <reload-toolbox>إعادة تحميل صندوق الأدوات</reload-toolbox>
+        <open-buttons>فتح إعدادات الأزرار</open-buttons>
         <open-processes>فتح محرر العمليات</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2030,6 +2031,9 @@
         <name-header>الاسم</name-header>
         <value-header>القيمة</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>الأزرار</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

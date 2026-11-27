@@ -2002,6 +2002,7 @@
         <insert-grid>Inserir uma nova grade</insert-grid>
         <insert-repeated-grid>Inserir uma nova grade repetida</insert-repeated-grid>
         <reload-toolbox>Recarregar a caixa de ferramentas</reload-toolbox>
+        <open-buttons>Abrir botões</open-buttons>
         <open-processes>Abrir editor de processos</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2010,6 +2011,9 @@
         <name-header>Nome</name-header>
         <value-header>Valor</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Botões</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

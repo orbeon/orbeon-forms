@@ -2016,6 +2016,7 @@
         <insert-grid>Insertar una nueva cuadrícula</insert-grid>
         <insert-repeated-grid>Insertar una nueva cuadrícula repetida</insert-repeated-grid>
         <reload-toolbox>Recargar la caja de herramientas</reload-toolbox>
+        <open-buttons>Abrir botones</open-buttons>
         <open-processes>Abrir el editor de procesos</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2024,6 +2025,9 @@
         <name-header>Nombre</name-header>
         <value-header>Valor</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Botones</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

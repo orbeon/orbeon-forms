@@ -43,8 +43,18 @@
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="loading-indicator-property"
                     value="string-join(('oxf.fr.detail.loading-indicator', $button-name, fr:app-name(), fr:form-name()), '.')"/>
+            <xf:var name="meta-loading-indicator-opt"
+                    value="
+                        if (not(fr:mode() = ('summary', 'import'))) then
+                            xxf:instance('fr-form-metadata')/detail-buttons/button[@name = $button-name][1]/@loading-indicator/string()
+                        else
+                            ()"/>
             <xf:var name="loading-indicator"
-                    value="string((xxf:property($loading-indicator-property), '')[1])"/>
+                    value="
+                        if (exists($meta-loading-indicator-opt)) then
+                            $meta-loading-indicator-opt
+                        else
+                            string((xxf:property($loading-indicator-property), '')[1])"/>
             <xf:var name="is-inline"
                     value="$loading-indicator = 'inline'"/>
             <xf:var name="is-modal"

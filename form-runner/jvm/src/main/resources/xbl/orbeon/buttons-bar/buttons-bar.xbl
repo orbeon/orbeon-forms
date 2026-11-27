@@ -67,6 +67,22 @@
                                 $visibility-property-opt
                             else
                                 'oxf.fr.detail.button',
+                        $metadata-detail-buttons :=
+                            xxf:instance('fr-form-metadata')/detail-buttons,
+                        $metadata-bar-name :=
+                            if ($buttons-property = 'oxf.fr.detail.buttons') then
+                                'edit'
+                            else if ($buttons-property = 'oxf.fr.detail.buttons.view') then
+                                'view'
+                            else if ($buttons-property = 'oxf.fr.detail.buttons.inner') then
+                                'inner'
+                            else
+                                (),
+                        $metadata-bar-elem :=
+                            if (exists($metadata-bar-name)) then
+                                $metadata-detail-buttons/bar[@name = $metadata-bar-name][1]
+                            else
+                                (),
                         $buttons-names :=
                             if (empty($buttons-property-opt) and $fr-mode = 'pdf') then
                                 ()
@@ -77,6 +93,8 @@
                                     'validate',
                                     'save-final'[fr:is-browser-environment()]
                                 )
+                            else if (exists($metadata-bar-elem)) then
+                                xxf:split(string($metadata-bar-elem))
                             else
                                 xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
                         $is-inner :=
@@ -89,27 +107,46 @@
                                 $parts-and-refs :=
                                     for $part in $parts
                                     return
-                                        let $visible-opt :=
+                                        let $meta-button :=
+                                                if ($visibility-property-prefix = 'oxf.fr.detail.button') then
+                                                    $metadata-detail-buttons/button[@name = $part][1]
+                                                else
+                                                    (),
+                                            $visible-opt :=
                                                 xs:boolean(
-                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
-                                                        xxf:instance('fr-form-instance'),
-                                                        string-join(
-                                                            ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
-                                                            '.'
-                                                        ),
-                                                        'fr-form-instance'
-                                                    )
+                                                    if (exists($meta-button/@visible)) then
+                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-node(
+                                                            xxf:instance('fr-form-instance'),
+                                                            $meta-button/@visible,
+                                                            'fr-form-instance'
+                                                        )
+                                                    else
+                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                            xxf:instance('fr-form-instance'),
+                                                            string-join(
+                                                                ($visibility-property-prefix, $part, 'visible', fr:app-name(), fr:form-name()),
+                                                                '.'
+                                                            ),
+                                                            'fr-form-instance'
+                                                        )
                                                 ),
                                             $enabled-opt :=
                                                 xs:boolean(
-                                                    xxf:instance('fr-form-instance')/fr:evaluate-from-property(
-                                                        xxf:instance('fr-form-instance'),
-                                                        string-join(
-                                                            ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
-                                                            '.'
-                                                        ),
-                                                        'fr-form-instance'
-                                                    )
+                                                    if (exists($meta-button/@enabled)) then
+                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-node(
+                                                            xxf:instance('fr-form-instance'),
+                                                            $meta-button/@enabled,
+                                                            'fr-form-instance'
+                                                        )
+                                                    else
+                                                        xxf:instance('fr-form-instance')/fr:evaluate-from-property(
+                                                            xxf:instance('fr-form-instance'),
+                                                            string-join(
+                                                                ($visibility-property-prefix, $part, 'enabled', fr:app-name(), fr:form-name()),
+                                                                '.'
+                                                            ),
+                                                            'fr-form-instance'
+                                                        )
                                                 )
                                         return
                                             for $ref in

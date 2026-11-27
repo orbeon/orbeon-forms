@@ -2041,6 +2041,7 @@
         <insert-grid>Insérer une nouvelle grille</insert-grid>
         <insert-repeated-grid>Insérer une nouvelle grille répétée</insert-repeated-grid>
         <reload-toolbox>Recharger la boîte à outils</reload-toolbox>
+        <open-buttons>Ouvrir les boutons</open-buttons>
         <open-processes>Ouvrir l'éditeur de processus</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2049,6 +2050,9 @@
         <name-header>Nom</name-header>
         <value-header>Valeur</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Boutons</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Éditeur de processus</label>
         <process-name>

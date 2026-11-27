@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Показывать пункт меню «Кнопки»</label>
+        <hint>Показывать параметры кнопок в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Показывать пункт меню «Пользовательские процессы»</label>
         <hint>Показывать параметры пользовательских процессов в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

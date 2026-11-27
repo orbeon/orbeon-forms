@@ -2016,6 +2016,7 @@
         <insert-grid>Lisää uusi ruudukko</insert-grid>
         <insert-repeated-grid>Lisää uusi toistuva ruudukko</insert-repeated-grid>
         <reload-toolbox>Lataa työkalupakki uudelleen</reload-toolbox>
+        <open-buttons>Avaa painikkeet</open-buttons>
         <open-processes>Avaa prosessieditori</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2024,6 +2025,9 @@
         <name-header>Nimi</name-header>
         <value-header>Arvo</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Painikkeet</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

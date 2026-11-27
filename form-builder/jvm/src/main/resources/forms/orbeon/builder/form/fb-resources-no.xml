@@ -2003,6 +2003,7 @@
         <insert-grid>Sett inn et nytt rutenett</insert-grid>
         <insert-repeated-grid>Sett inn et nytt gjentakende rutenett</insert-repeated-grid>
         <reload-toolbox>Last inn verktøykassen på nytt</reload-toolbox>
+        <open-buttons>Åpne knapper</open-buttons>
         <open-processes>Åpne prosessredigering</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2011,6 +2012,9 @@
         <name-header>Navn</name-header>
         <value-header>Verdi</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Knapper</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

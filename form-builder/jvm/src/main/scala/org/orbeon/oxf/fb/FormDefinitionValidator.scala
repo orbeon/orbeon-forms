@@ -1001,6 +1001,25 @@ object FormDefinitionValidator {
       }
     }
 
+    // 9. Detail buttons in metadata (`fr-form-metadata/detail-buttons/button`)
+    for {
+      btnElem <- ctx.metadataRootElemOpt.toList / "detail-buttons" / "button"
+      btnName =  btnElem.attValueOpt("name").flatMap(_.trimAllToOpt).getOrElse("(unnamed)")
+      attName <- List("visible", "enabled")
+      rawExpr <- btnElem.attValueOpt(attName).flatMap(_.trimAllToOpt)
+    } locally {
+      val buttonXPathNamespaces =
+        NamespaceMapping(ProcessEditorUI.ProcessNamespaceMapping ++ btnElem.namespaceMappings.toMap)
+      issues ++= validateRawExpression(
+        rawValue         = rawExpr,
+        namespaceMapping = buttonXPathNamespaces,
+        contextElem      = btnElem,
+        avt              = false,
+        controlNameOpt   = None,
+        location         = s"button:$btnName/@$attName"
+      )
+    }
+
     issues.toList
   }
 

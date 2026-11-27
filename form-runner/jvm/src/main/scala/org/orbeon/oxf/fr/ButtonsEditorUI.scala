@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.process.ProcessEditorUI
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.saxon.om.NodeInfo
@@ -507,6 +508,202 @@ object ButtonsEditorUI {
           .mkString(" ")
       case _ =>
         Option(rawBarValue).map(_.splitTo[List]().mkString(" ")).getOrElse("")
+    }
+
+  /*@XPathFunction*/
+  def inheritedPropertyContextXml(app: String, form: String): NodeInfo = {
+    val effApp       = Option(app).flatMap(_.trimAllToOpt).getOrElse("*")
+    val effForm      = Option(form).flatMap(_.trimAllToOpt).getOrElse("*")
+    val appForm      = AppForm(effApp, effForm)
+    val properties   = CoreCrossPlatformSupport.properties
+    val builtinNames = FormRunnerConfiguration.builtinDetailProcessNames().toSet
+
+    def barPropValue(baseName: String, fallback: String): String =
+      properties
+        .getPropertyOpt(s"$baseName.$effApp.$effForm")
+        .map(_.stringValue.splitTo[List]().mkString(" "))
+        .getOrElse(fallback)
+
+    val defaultEdit  = barPropValue("oxf.fr.detail.buttons",       DefaultEditButtons)
+    val defaultView  = barPropValue("oxf.fr.detail.buttons.view",  DefaultViewButtons)
+    val defaultInner = barPropValue("oxf.fr.detail.buttons.inner", DefaultInnerButtons)
+
+    val processPrefix = "oxf.fr.detail.process."
+    val candidateProcessNames =
+      properties
+        .propertiesStartsWith("oxf.fr.detail.process")
+        .flatMap { propName =>
+          propName.stripPrefix(processPrefix).splitTo[List](".") match {
+            case List(procName, pApp, pForm)
+              if ButtonNameRegex.matches(procName) &&
+                 (pApp == "*" || pApp == effApp) &&
+                 (pForm == "*" || pForm == effForm) &&
+                 ((pApp != "*" || pForm != "*") ||
+                   (! StandardDetailButtonsByName.contains(procName) && ! builtinNames(procName))) =>
+              Some(procName)
+            case _ =>
+              None
+          }
+        }
+        .distinct
+        .sorted
+
+    val processesXml =
+      candidateProcessNames.flatMap { procName =>
+        properties
+          .getNonBlankString(s"oxf.fr.detail.process.$procName.$effApp.$effForm")
+          .map(body => s"""<process name="${procName.escapeXmlForAttribute}">${body.escapeXmlMinimal}</process>""")
+      }.mkString
+
+    val resourcesXml =
+      ResourcesPatcher
+        .resourcesFromProperties(properties, appForm)
+        .collect {
+          case ResourcesPatcher.Resource(lang, List("buttons", btnName), value, isHtml) if ButtonNameRegex.matches(btnName) =>
+            s"""<message xml:lang="${lang.escapeXmlForAttribute}" name="buttons.${btnName.escapeXmlForAttribute}" html="$isHtml">${value.escapeXmlMinimal}</message>"""
+        }
+        .mkString
+
+    ProcessEditorUI.xmlStringToMutableNodeInfoRootElem(
+      s"""<inherited default-edit="${defaultEdit.escapeXmlForAttribute}" default-view="${defaultView.escapeXmlForAttribute}" default-inner="${defaultInner.escapeXmlForAttribute}">
+         |  <processes>$processesXml</processes>
+         |  <resources>$resourcesXml</resources>
+         |</inherited>""".stripMargin
+    )
+  }
+
+  /*@XPathFunction*/
+  def metadataToEditorDetailButtonsXml(
+    metadataRootOrNull: NodeInfo,
+    defaultEdit       : String,
+    defaultView       : String,
+    defaultInner      : String
+  ): NodeInfo = {
+    val dbElemOpt = Option(metadataRootOrNull).flatMap(m => (m / "detail-buttons").headOption)
+
+    val (closeUriOverride, closeUri) =
+      dbElemOpt match {
+        case Some(dbElem) =>
+          val ov = dbElem.attValueOpt("close-uri-override").map(_ == "true").getOrElse(dbElem.attValueOpt("close-uri").isDefined)
+          val cu = if (ov) dbElem.attValueOpt("close-uri").map(_.trim).getOrElse("") else ""
+          (ov, cu)
+        case None =>
+          (false, "")
+      }
+
+    val barDefs = List(
+      ("edit",  Option(defaultEdit).getOrElse(DefaultEditButtons)),
+      ("view",  Option(defaultView).getOrElse(DefaultViewButtons)),
+      ("inner", Option(defaultInner).getOrElse(DefaultInnerButtons))
+    )
+
+    val barsXml =
+      barDefs.map { case (barName, rawDef) =>
+        val normDef = rawDef.splitTo[List]().mkString(" ")
+        val barElemOpt =
+          dbElemOpt
+            .toList
+            .flatMap(db => (db / "bar").toList)
+            .find(_.attValueOpt("name").contains(barName))
+            .filter(b => b.attValueOpt("override").forall(_ == "true"))
+
+        val (isOv, barVal) =
+          barElemOpt match {
+            case Some(b) =>
+              val rawVal = b.attValueOpt("value").getOrElse(b.stringValue)
+              (true, rawVal.splitTo[List]().mkString(" "))
+            case None =>
+              (false, normDef)
+          }
+
+        s"""<bar name="$barName" override="$isOv" value="${barVal.escapeXmlForAttribute}" default="${normDef.escapeXmlForAttribute}"/>"""
+      }.mkString
+
+    val buttonsXml =
+      dbElemOpt
+        .toList
+        .flatMap(db => (db / "button").toList)
+        .flatMap { btn =>
+          btn.attValueOpt("name").flatMap(_.trimAllToOpt).filter(ButtonNameRegex.matches).flatMap { bName =>
+            val visOv  = btn.attValueOpt("visible-override").map(_ == "true").getOrElse(btn.attValueOpt("visible").isDefined)
+            val visVal = if (visOv) btn.attValueOpt("visible").map(_.trim).getOrElse("") else ""
+            val enOv   = btn.attValueOpt("enabled-override").map(_ == "true").getOrElse(btn.attValueOpt("enabled").isDefined)
+            val enVal  = if (enOv) btn.attValueOpt("enabled").map(_.trim).getOrElse("") else ""
+            val ldOv   = btn.attValueOpt("loading-override").map(_ == "true").getOrElse(btn.attValueOpt("loading-indicator").isDefined)
+            val ldVal  = if (ldOv) btn.attValueOpt("loading-indicator").map(_.trim).getOrElse("") else ""
+
+            Option.when(visOv || enOv || ldOv) {
+              s"""<button name="${bName.escapeXmlForAttribute}" visible-override="$visOv" visible="${visVal.escapeXmlForAttribute}" enabled-override="$enOv" enabled="${enVal.escapeXmlForAttribute}" loading-override="$ldOv" loading-indicator="${ldVal.escapeXmlForAttribute}"/>"""
+            }
+          }
+        }
+        .mkString
+
+    val nsDeclsXml =
+      ProcessEditorUI.ProcessNamespaceMapping
+        .toList
+        .sortBy(_._1)
+        .map { case (prefix, uri) => s"""xmlns:$prefix="${uri.escapeXmlForAttribute}"""" }
+        .mkString(" ")
+
+    ProcessEditorUI.xmlStringToMutableNodeInfoRootElem(
+      s"""<detail-buttons $nsDeclsXml close-uri-override="$closeUriOverride" close-uri="${closeUri.escapeXmlForAttribute}">$barsXml$buttonsXml</detail-buttons>"""
+    )
+  }
+
+  /*@XPathFunction*/
+  def editorDetailButtonsToMetadataXml(editorDetailButtonsOrNull: NodeInfo): NodeInfo =
+    Option(editorDetailButtonsOrNull) match {
+      case None =>
+        null
+      case Some(db) =>
+        val closeUriOpt =
+          Option.when(db.attValueOpt("close-uri-override").contains("true"))(
+            db.attValueOpt("close-uri").map(_.trim).getOrElse("")
+          )
+
+        val barsXml =
+          List("edit", "view", "inner").flatMap { barName =>
+            (db / "bar")
+              .find(b => b.attValueOpt("name").contains(barName) && b.attValueOpt("override").contains("true"))
+              .map { b =>
+                val normVal = b.attValueOpt("value").getOrElse("").splitTo[List]().mkString(" ")
+                if (normVal.isEmpty)
+                  s"""<bar name="$barName"/>"""
+                else
+                  s"""<bar name="$barName">${normVal.escapeXmlMinimal}</bar>"""
+              }
+          }.mkString
+
+        val buttonsXml =
+          (db / "button").toList.flatMap { btn =>
+            btn.attValueOpt("name").flatMap(_.trimAllToOpt).filter(ButtonNameRegex.matches).flatMap { bName =>
+              val attrs = List(
+                Option.when(btn.attValueOpt("visible-override").contains("true"))(
+                  s"""visible="${btn.attValueOpt("visible").map(_.trim).getOrElse("").escapeXmlForAttribute}""""
+                ),
+                Option.when(btn.attValueOpt("enabled-override").contains("true"))(
+                  s"""enabled="${btn.attValueOpt("enabled").map(_.trim).getOrElse("").escapeXmlForAttribute}""""
+                ),
+                Option.when(btn.attValueOpt("loading-override").contains("true"))(
+                  s"""loading-indicator="${btn.attValueOpt("loading-indicator").map(_.trim).getOrElse("").escapeXmlForAttribute}""""
+                )
+              ).flatten
+
+              Option.when(attrs.nonEmpty) {
+                s"""<button name="${bName.escapeXmlForAttribute}" ${attrs.mkString(" ")}/>"""
+              }
+            }
+          }.mkString
+
+        if (closeUriOpt.isEmpty && barsXml.isEmpty && buttonsXml.isEmpty) {
+          null
+        } else {
+          val closeAttr = closeUriOpt.map(cu => s""" close-uri="${cu.escapeXmlForAttribute}"""").getOrElse("")
+          ProcessEditorUI.xmlStringToMutableNodeInfoRootElem(
+            s"<detail-buttons$closeAttr>$barsXml$buttonsXml</detail-buttons>"
+          )
+        }
     }
 
   private object Private {

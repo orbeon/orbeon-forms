@@ -153,6 +153,7 @@
     <property as="xs:boolean" name="oxf.fb.menu.email"                                          value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.confirmation"                                   value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.messages"                                       value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.buttons"                                        value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.processes"                                      value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.http"                                  value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.database"                              value="true"/>
@@ -453,6 +454,14 @@
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-messages"
         value="OM"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-buttons"
+        value="OB"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-processes"
+        value="OR"/>
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-keyboard-shortcuts"

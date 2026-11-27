@@ -468,9 +468,18 @@ trait FormRunnerActionsCommon {
 
       def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
 
+      def fromMetadata(propertyName: String): Option[String] =
+        Option.when(propertyName == "oxf.fr.detail.close.uri")(
+          frc.metadataInstance
+            .toList
+            .flatMap(mi => (mi.rootElement / "detail-buttons").toList)
+            .flatMap(_.attValueOpt("close-uri"))
+            .headOption
+        ).flatten
+
       def fromProperties = {
         val propertyName =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
-        frc.formRunnerProperty(propertyName)(FormRunnerParams())
+        fromMetadata(propertyName) orElse frc.formRunnerProperty(propertyName)(FormRunnerParams())
       }
 
       val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt getOrElse (throw ProcessError.normal("No URL specified"))

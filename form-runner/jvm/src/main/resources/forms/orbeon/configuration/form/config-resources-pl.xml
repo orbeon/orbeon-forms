@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Pokaż pozycję menu Przyciski</label>
+        <hint>Pokaż ustawienia przycisków w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>Domyślnie (Tak)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tak</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nie</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Pokaż pozycję menu Procesy niestandardowe</label>
         <hint>Pokaż ustawienia procesów niestandardowych w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

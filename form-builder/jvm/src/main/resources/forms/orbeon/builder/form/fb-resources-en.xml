@@ -2040,6 +2040,7 @@
         <insert-grid>Insert a new grid</insert-grid>
         <insert-repeated-grid>Insert a new repeated grid</insert-repeated-grid>
         <reload-toolbox>Reload the toolbox</reload-toolbox>
+        <open-buttons>Open Buttons</open-buttons>
         <open-processes>Open Process Editor</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2048,6 +2049,9 @@
         <name-header>Name</name-header>
         <value-header>Value</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Buttons</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

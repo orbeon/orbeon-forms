@@ -28,7 +28,7 @@ import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.fr.{XMLNames, *}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger, JvmUrlEncoderDecoder, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger, JvmUrlEncoderDecoder, PathUtils, StaticXPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
@@ -43,8 +43,9 @@ import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsLangSupport, XXFormsResource}
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
+import org.orbeon.oxf.xforms.{NonFatalCheckTypedValueExceptionNoLogging, XFormsContainingDocument, function}
 import org.orbeon.oxf.xml.*
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
@@ -209,6 +210,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("evaluate-from-node", classOf[FREvaluateFromNode], op = saxon.functions.Evaluate.EVALUATE, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
@@ -747,12 +754,74 @@ private object FormRunnerFunctions {
         functionLibrary = FormRunner.componentsFunctionLibrary
       )
       .map { rewrittenXPathExpr =>
-        EvaluateSupport.evaluateInContextFromXPathExpr(
-          expr               = rewrittenXPathExpr,
-          exprVarEffectiveId = stringArgument(2),
-          exprContextItem    = itemArgument(0),
-          xfcd               = xfc.containingDocument
-        )
+        try
+          EvaluateSupport.evaluateInContextFromXPathExpr(
+            expr               = rewrittenXPathExpr,
+            exprVarEffectiveId = stringArgument(2),
+            exprContextItem    = itemArgument(0),
+            xfcd               = xfc.containingDocument
+          ).toList
+        catch {
+          case NonFatalCheckTypedValueExceptionNoLogging((_, true)) =>
+            List(BooleanValue.FALSE)
+        }
+      }
+    }
+  }
+
+  class FREvaluateFromNode extends DefaultFunctionSupport with RuntimeDependentFunction {
+    override def iterate(xpathContext: XPathContext): SequenceIterator = {
+
+      implicit val xpc   : XPathContext           = xpathContext
+      implicit val xfc   : XFormsFunction.Context = XFormsFunction.context
+      implicit val logger: IndentedLogger         = FormRunner.newIndentedLogger
+
+      val compiledExprOpt =
+        for {
+          nodeInfo <- itemArgumentOpt(1).collect { case ni: NodeInfo => ni }
+          rawExpr  <- nodeInfo.stringValue.trimAllToOpt
+        } yield {
+          val nsElem =
+            if (nodeInfo.isAttribute)
+              Option(nodeInfo.getParent).getOrElse(nodeInfo)
+            else
+              nodeInfo
+          val namespaceMapping =
+            NamespaceMapping(
+              ProcessEditorUI.ProcessNamespaceMapping ++
+              nsElem.namespaceMappings.toMap +
+              ("frf" -> "java:org.orbeon.oxf.fr.FormRunner")
+            )
+          val rewritten =
+            FormRunnerRename.replaceVarReferencesWithFunctionCalls(
+              xpathString      = rawExpr,
+              namespaceMapping = namespaceMapping,
+              library          = FormRunner.componentsFunctionLibrary,
+              avt              = false,
+              libraryNameOpt   = None,
+              norewrite        = Set.empty
+            )
+          StaticXPath.compileExpression(
+            xpathString      = rewritten,
+            namespaceMapping = namespaceMapping,
+            locationData     = null,
+            functionLibrary  = FormRunner.componentsFunctionLibrary,
+            avt              = false
+          )
+        }
+
+      compiledExprOpt.map { rewrittenXPathExpr =>
+        try
+          EvaluateSupport.evaluateInContextFromXPathExpr(
+            expr               = rewrittenXPathExpr,
+            exprVarEffectiveId = stringArgument(2),
+            exprContextItem    = itemArgument(0),
+            xfcd               = xfc.containingDocument
+          ).toList
+        catch {
+          case NonFatalCheckTypedValueExceptionNoLogging((_, true)) =>
+            List(BooleanValue.FALSE)
+        }
       }
     }
   }

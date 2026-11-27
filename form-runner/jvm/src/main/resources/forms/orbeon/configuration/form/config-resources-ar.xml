@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>إظهار عنصر قائمة «الأزرار»</label>
+        <hint>إظهار إعدادات الأزرار في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>الافتراضي (نعم)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>نعم</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>لا</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>إظهار عنصر قائمة «العمليات المخصصة»</label>
         <hint>إظهار إعدادات العمليات المخصصة في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

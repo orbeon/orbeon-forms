@@ -2069,6 +2069,22 @@
             <value>false</value>
         </item>
     </fb-menu-messages>
+    <fb-menu-buttons>
+        <label>Düğmeler Menü Öğesini Göster</label>
+        <hint>Form Builder'da Düğmeler ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-buttons>
     <fb-menu-processes>
         <label>Özel Süreçler Menü Öğesini Göster</label>
         <hint>Form Builder'da Özel Süreçler ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>

@@ -192,7 +192,14 @@
     <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'), $property-profile-opt)"                        as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'), $property-profile-opt)"                   as="xs:boolean?"/>
 
-    <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.'), $property-profile-opt))"             as="xs:string*"/>
+    <xsl:variable
+        name="inner-buttons"
+        as="xs:string*"
+        select="
+            if (exists($fr-form-metadata/detail-buttons/bar[@name = 'inner'])) then
+                p:split(string($fr-form-metadata/detail-buttons/bar[@name = 'inner'][1]))
+            else
+                p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.'), $property-profile-opt))"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>

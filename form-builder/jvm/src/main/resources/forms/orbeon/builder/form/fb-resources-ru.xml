@@ -2002,6 +2002,7 @@
         <insert-grid>Вставить новую сетку</insert-grid>
         <insert-repeated-grid>Вставить новую повторяющуюся сетку</insert-repeated-grid>
         <reload-toolbox>Перезагрузить панель инструментов</reload-toolbox>
+        <open-buttons>Открыть кнопки</open-buttons>
         <open-processes>Открыть редактор процессов</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -2010,6 +2011,9 @@
         <name-header>Название</name-header>
         <value-header>Значение</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Кнопки</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

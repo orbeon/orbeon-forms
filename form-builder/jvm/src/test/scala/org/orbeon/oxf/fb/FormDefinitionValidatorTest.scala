@@ -1580,4 +1580,99 @@ class FormDefinitionValidatorTest
       assert(issueTexts.contains("""Control "rating-ctrl" uses unknown XML Schema type "rating""""))
     }
   }
+
+  describe("Detail buttons XPath validation in metadata (#2238)") {
+
+    it("must accept valid button visible/enabled XPath expressions and report syntax or unresolved variable errors") {
+      val validButtonsForm = toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form><section-1><amount/></section-1></form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="amount-bind" name="amount" ref="amount" type="xs:decimal"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                  <detail-buttons>
+                    <bar name="edit">save-final approve</bar>
+                    <button name="approve" visible="$amount gt 100 and fr:mode() = 'edit'" enabled="not(fr:is-wizard-first-page())"/>
+                  </detail-buttons>
+                </metadata>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="12"><xf:input id="amount-control" bind="amount-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+      assert(validateFormDefinition(validButtonsForm).isEmpty)
+
+      val invalidButtonsForm = toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form><section-1><amount/></section-1></form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="amount-bind" name="amount" ref="amount" type="xs:decimal"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                  <detail-buttons>
+                    <button name="approve" visible="$missing-control = 'yes'" enabled="1 + )"/>
+                  </detail-buttons>
+                </metadata>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="12"><xf:input id="amount-control" bind="amount-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+      val issues = validateFormDefinition(invalidButtonsForm)
+      assert(issues.contains(UnresolvedVariableReference(None, "button:approve/@visible", "missing-control")))
+      assert(issues.exists {
+        case InvalidXPathExpression(None, "button:approve/@enabled", _) => true
+        case _                                                         => false
+      })
+    }
+  }
 }

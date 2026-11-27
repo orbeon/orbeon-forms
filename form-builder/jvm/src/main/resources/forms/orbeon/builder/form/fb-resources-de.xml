@@ -1972,6 +1972,7 @@
         <insert-grid>Neues Raster einfügen</insert-grid>
         <insert-repeated-grid>Neues wiederholendes Raster einfügen</insert-repeated-grid>
         <reload-toolbox>Werkzeugkasten neu laden</reload-toolbox>
+        <open-buttons>Schaltflächen öffnen</open-buttons>
         <open-processes>Prozess-Editor öffnen</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
@@ -1980,6 +1981,9 @@
         <name-header>Name</name-header>
         <value-header>Wert</value-header>
     </dialog-messages>
+    <dialog-buttons-editor>
+        <label>Schaltflächen</label>
+    </dialog-buttons-editor>
     <dialog-process-editor>
         <label>Process Editor</label>
         <process-name>

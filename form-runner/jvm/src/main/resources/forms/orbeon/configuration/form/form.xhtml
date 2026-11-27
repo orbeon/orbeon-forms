@@ -4855,6 +4855,21 @@
                                     </fr:c>
 
                                     <fr:c x="1" y="9" w="12">
+                                        <xf:select1 id="fb-menu-buttons-value-control" appearance="minimal" ref="fb-menu-buttons/@selection" class="fr-config-select1">
+                                            <xf:label ref="$form-resources/fb-menu-buttons/label"/>
+                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-buttons/hint else replace($form-resources/fb-menu-buttons/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
+                                            <xf:itemset ref="$form-resources/fb-menu-buttons/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="10" w="12">
                                         <xf:select1 id="fb-menu-processes-value-control" appearance="minimal" ref="fb-menu-processes/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-menu-processes/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-processes/hint else replace($form-resources/fb-menu-processes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4869,7 +4884,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="10" w="12">
+                                    <fr:c x="1" y="11" w="12">
                                         <xf:select1 id="fb-menu-services-http-value-control" appearance="minimal" ref="fb-menu-services-http/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-menu-services-http/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-services-http/hint else replace($form-resources/fb-menu-services-http/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4884,7 +4899,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="11" w="12">
+                                    <fr:c x="1" y="12" w="12">
                                         <xf:select1 id="fb-menu-services-database-value-control" appearance="minimal" ref="fb-menu-services-database/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-menu-services-database/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-services-database/hint else replace($form-resources/fb-menu-services-database/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4899,7 +4914,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="12" w="12">
+                                    <fr:c x="1" y="13" w="12">
                                         <xf:select1 id="fb-menu-actions-value-control" appearance="minimal" ref="fb-menu-actions/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-menu-actions/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-actions/hint else replace($form-resources/fb-menu-actions/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4914,7 +4929,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="13" w="12">
+                                    <fr:c x="1" y="14" w="12">
                                         <xf:select1 id="fb-form-title-required-value-control" appearance="minimal" ref="fb-form-title-required/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-form-title-required/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-form-title-required/hint else replace($form-resources/fb-form-title-required/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4929,7 +4944,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="14" w="12">
+                                    <fr:c x="1" y="15" w="12">
                                         <xf:select1 id="fb-form-description-required-value-control" appearance="minimal" ref="fb-form-description-required/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-form-description-required/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-form-description-required/hint else replace($form-resources/fb-form-description-required/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4944,7 +4959,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="15" w="12">
+                                    <fr:c x="1" y="16" w="12">
                                         <xf:select1 id="fb-publish-version-value-control" appearance="minimal" ref="fb-publish-version/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-publish-version/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-publish-version/hint else replace($form-resources/fb-publish-version/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4959,7 +4974,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="16" w="12">
+                                    <fr:c x="1" y="17" w="12">
                                         <xf:select1 id="fb-metadata-logo-value-control" appearance="minimal" ref="fb-metadata-logo/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-metadata-logo/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-metadata-logo/hint else replace($form-resources/fb-metadata-logo/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4974,7 +4989,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="17" w="12">
+                                    <fr:c x="1" y="18" w="12">
                                         <xf:select1 id="fb-mcp-enable-value-control" appearance="minimal" ref="fb-mcp-enable/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-mcp-enable/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-mcp-enable/hint else replace($form-resources/fb-mcp-enable/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4989,7 +5004,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="18" w="12">
+                                    <fr:c x="1" y="19" w="12">
                                         <xf:select1 id="fb-mcp-token-enable-value-control" appearance="minimal" ref="fb-mcp-token-enable/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-mcp-token-enable/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-mcp-token-enable/hint else replace($form-resources/fb-mcp-token-enable/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>

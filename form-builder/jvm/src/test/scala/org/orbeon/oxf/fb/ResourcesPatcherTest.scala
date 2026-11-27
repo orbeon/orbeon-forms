@@ -280,6 +280,89 @@ class ResourcesPatcherTest
 
       assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
     }
+
+    it("must patch button labels from metadata (wildcard and concrete languages, plain and HTML) while preserving messages") {
+      val propertySet = {
+        val properties =
+          <properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <property as="xs:string" name="oxf.fr.resource.*.*.*.detail.buttons.approve" value="Property Approve"/>
+          </properties>.toDocument
+        PropertyStore.parse(properties, "").globalPropertySet
+      }
+
+      val formMetadata =
+        <resources>
+          <resource xml:lang="*">
+            <buttons>
+              <button name="approve" html="true">&lt;i class="fa fa-fw fa-thumbs-up"&gt;&lt;/i&gt; Approve</button>
+              <button name="plain-btn" html="false">Save &amp; Exit</button>
+            </buttons>
+          </resource>
+          <resource xml:lang="fr">
+            <messages>
+              <message name="save-success" html="false">Enregistré</message>
+            </messages>
+            <buttons>
+              <button name="approve" html="true">&lt;i class="fa fa-fw fa-thumbs-up"&gt;&lt;/i&gt; Approuver</button>
+            </buttons>
+          </resource>
+        </resources>.toDocument
+
+      val initial =
+        <resources>
+          <resource xml:lang="en">
+            <buttons>
+              <save-final>Save</save-final>
+            </buttons>
+            <detail>
+              <messages>
+                <save-success>Saved</save-success>
+              </messages>
+            </detail>
+          </resource>
+          <resource xml:lang="fr">
+            <buttons>
+              <save-final>Enregistrer</save-final>
+            </buttons>
+            <detail>
+              <messages>
+                <save-success>Sauvegardé</save-success>
+              </messages>
+            </detail>
+          </resource>
+        </resources>.toDocument
+
+      val expected =
+        <resources>
+          <resource xml:lang="en">
+            <buttons>
+              <save-final>Save</save-final>
+              <approve html="true">&lt;i class="fa fa-fw fa-thumbs-up"&gt;&lt;/i&gt; Approve</approve>
+              <plain-btn>Save &amp;amp; Exit</plain-btn>
+            </buttons>
+            <detail>
+              <messages>
+                <save-success>Saved</save-success>
+              </messages>
+            </detail>
+          </resource>
+          <resource xml:lang="fr">
+            <buttons>
+              <save-final>Enregistrer</save-final>
+              <approve html="true">&lt;i class="fa fa-fw fa-thumbs-up"&gt;&lt;/i&gt; Approuver</approve>
+              <plain-btn>Save &amp;amp; Exit</plain-btn>
+            </buttons>
+            <detail>
+              <messages>
+                <save-success>Enregistré</save-success>
+              </messages>
+            </detail>
+          </resource>
+        </resources>.toDocument
+
+      ResourcesPatcher.transform(initial, formMetadata, AppForm("acme", "claim"))(propertySet)
+      assertXMLDocumentsIgnoreNamespacesInScope(expected, initial)
+    }
   }
 
   private val resourcesUrls = Seq(

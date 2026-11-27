@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Elementer i fanen Avanceret</title>
+        <settings>Indstillinger</settings>
+        <attachments>Vedhæftninger</attachments>
+        <actions-services>Handlinger og tjenester</actions-services>
+        <reset-all>Nulstil alle</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Vis menupunktet XML-skema</label>
+        <label>XML-skema</label>
         <hint>Vis knappen til dialogboksen XML-skema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Vis menupunktet PDF-skabeloner</label>
+        <label>PDF-skabeloner</label>
         <hint>Vis knappen til dialogboksen PDF-skabeloner i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Vis menupunktet Rediger kildekode</label>
+        <label>Rediger kildekode</label>
         <hint>Vis knappen til dialogboksen Rediger kildekode i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Vis menupunktet Arbejdstrin</label>
-        <hint>Vis indstillinger for arbejdstrin i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Nej)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Ja</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Nej</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Vis menupunktet Tilladelser</label>
+        <label>Tilladelser</label>
         <hint>Vis knappen til dialogboksen Tilladelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Vis menupunktet E-mailindstillinger</label>
+        <label>E-mailindstillinger</label>
         <hint>Vis knappen til dialogboksen E-mailindstillinger i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Vis menupunktet Bekræftelsesside</label>
+        <label>Indstillinger for bekræftelsesside</label>
         <hint>Vis indstillinger for bekræftelsesside i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Vis menupunktet Brugerdefinerede meddelelser</label>
+        <label>Beskeder</label>
         <hint>Vis indstillinger for brugerdefinerede meddelelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Vis menupunktet Knapper</label>
+        <label>Knapper</label>
         <hint>Vis indstillinger for knapper i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Vis menupunktet Brugerdefinerede processer</label>
+        <label>Proceseditor</label>
         <hint>Vis indstillinger for brugerdefinerede processer i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Vis HTTP-tjenester i sidepanel</label>
+        <label>HTTP-tjenester</label>
         <hint>Aktivér HTTP-tjenester i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Vis databasetjenester i sidepanel</label>
+        <label>Databasetjenester</label>
         <hint>Aktivér databasetjenester i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Vis handlinger i sidepanel</label>
+        <label>Handlinger</label>
         <hint>Aktivér handlingsredigering i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>

@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Элементы вкладки Дополнительно</title>
+        <settings>Настройки</settings>
+        <attachments>Вложения</attachments>
+        <actions-services>Действия и сервисы</actions-services>
+        <reset-all>Сбросить все</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Показывать пункт меню «Схема XML»</label>
+        <label>XML-схема</label>
         <hint>Показывать кнопку диалога «Схема XML» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Показывать пункт меню «Шаблоны PDF»</label>
+        <label>Шаблоны PDF</label>
         <hint>Показывать кнопку диалога «Шаблоны PDF» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Показывать пункт меню «Редактировать исходный код»</label>
+        <label>Редактировать код</label>
         <hint>Показывать кнопку редактирования исходного кода в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Показывать пункт меню «Стадия рабочего процесса»</label>
-        <hint>Показывать параметры рабочего процесса в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>По умолчанию (Нет)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Да</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Нет</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Показывать пункт меню «Настройка прав»</label>
+        <label>Права доступа</label>
         <hint>Показывать кнопку диалога «Настройка прав» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Показывать пункт меню «Параметры электронной почты»</label>
+        <label>Настройки почты</label>
         <hint>Показывать кнопку диалога параметров электронной почты в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Показывать пункт меню «Страница подтверждения»</label>
+        <label>Настройки страницы подтверждения</label>
         <hint>Показывать параметры страницы подтверждения в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Показывать пункт меню «Пользовательские сообщения»</label>
+        <label>Сообщения</label>
         <hint>Показывать параметры пользовательских сообщений в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Показывать пункт меню «Кнопки»</label>
+        <label>Кнопки</label>
         <hint>Показывать параметры кнопок в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Показывать пункт меню «Пользовательские процессы»</label>
+        <label>Редактор процессов</label>
         <hint>Показывать параметры пользовательских процессов в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Показывать HTTP-сервисы на боковой панели</label>
+        <label>HTTP-сервисы</label>
         <hint>Включить HTTP-сервисы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Показывать сервисы СУБД на боковой панели</label>
+        <label>Сервисы БД</label>
         <hint>Включить сервисы баз данных в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Показывать действия на боковой панели</label>
+        <label>Действия</label>
         <hint>Включить редактор действий в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>

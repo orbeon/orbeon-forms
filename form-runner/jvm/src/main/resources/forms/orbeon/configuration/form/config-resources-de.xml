@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Elemente des Tabs Erweitert</title>
+        <settings>Einstellungen</settings>
+        <attachments>Anhänge</attachments>
+        <actions-services>Aktionen &amp; Dienste</actions-services>
+        <reset-all>Alle zurücksetzen</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Menüeintrag „XML-Schema“ anzeigen</label>
+        <label>XML-Schema</label>
         <hint>Schaltfläche für den XML-Schema-Dialog in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Menüeintrag „PDF-Vorlagen“ anzeigen</label>
+        <label>PDF-Vorlagen</label>
         <hint>Schaltfläche für den Dialog „PDF-Vorlagen“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Menüeintrag „Quelltext ändern“ anzeigen</label>
+        <label>Quelltext bearbeiten</label>
         <hint>Schaltfläche für den Dialog „Quelltext ändern“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Menüeintrag „Workflow-Stufe“ anzeigen</label>
-        <hint>Workflow-Einstellungen in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Standard (Nein)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Ja</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Nein</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Menüeintrag „Berechtigungen“ anzeigen</label>
+        <label>Berechtigungen</label>
         <hint>Schaltfläche für den Dialog „Berechtigungen“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Menüeintrag „E-Mail-Einstellungen“ anzeigen</label>
+        <label>E-Mail-Einstellungen</label>
         <hint>Schaltfläche für den Dialog „E-Mail-Einstellungen“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Menüeintrag „Bestätigungsseite“ anzeigen</label>
+        <label>Bestätigungsseite-Einstellungen</label>
         <hint>Einstellungen für die Bestätigungsseite in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Menüeintrag „Benutzerdefinierte Nachrichten“ anzeigen</label>
+        <label>Meldungen</label>
         <hint>Einstellungen für benutzerdefinierte Nachrichten in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Menüeintrag „Schaltflächen“ anzeigen</label>
+        <label>Schaltflächen</label>
         <hint>Einstellungen für Schaltflächen in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Menüeintrag „Benutzerdefinierte Prozesse“ anzeigen</label>
+        <label>Prozess-Editor</label>
         <hint>Einstellungen für benutzerdefinierte Prozesse in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>HTTP-Dienste in der Seitenleiste anzeigen</label>
+        <label>HTTP-Dienste</label>
         <hint>HTTP-Dienste in Form Builder aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Datenbankdienste in der Seitenleiste anzeigen</label>
+        <label>Datenbankdienste</label>
         <hint>Datenbankdienste in Form Builder aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Aktionen in der Seitenleiste anzeigen</label>
+        <label>Aktionen</label>
         <hint>Aktions-Editor in Form Builder aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>

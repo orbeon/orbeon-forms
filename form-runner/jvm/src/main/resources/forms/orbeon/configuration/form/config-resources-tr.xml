@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Gelişmiş Sekmesi Öğeleri</title>
+        <settings>Ayarlar</settings>
+        <attachments>Ekler</attachments>
+        <actions-services>Eylemler ve Servisler</actions-services>
+        <reset-all>Tümünü sıfırla</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>XML Şeması Menü Öğesini Göster</label>
+        <label>XML Şeması</label>
         <hint>Form Builder'da XML Şeması iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>PDF Şablonları Menü Öğesini Göster</label>
+        <label>PDF Şablonları</label>
         <hint>Form Builder'da PDF Şablonları iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Kaynağı Düzenle Menü Öğesini Göster</label>
+        <label>Kaynağı Düzenle</label>
         <hint>Form Builder'da Kaynağı Düzenle iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>İş Akışı Aşaması Menü Öğesini Göster</label>
-        <hint>Form Builder'da İş Akışı ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Varsayılan (Hayır)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Evet</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Hayır</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>İzinler Menü Öğesini Göster</label>
+        <label>İzinler</label>
         <hint>Form Builder'da İzinler iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>E-posta Ayarları Menü Öğesini Göster</label>
+        <label>E-posta Ayarları</label>
         <hint>Form Builder'da E-posta Ayarları iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Onay Sayfası Menü Öğesini Göster</label>
+        <label>Onay Sayfası Ayarları</label>
         <hint>Form Builder'da Onay Sayfası ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Özel Mesajlar Menü Öğesini Göster</label>
+        <label>Mesajlar</label>
         <hint>Form Builder'da Özel Mesajlar ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Düğmeler Menü Öğesini Göster</label>
+        <label>Düğmeler</label>
         <hint>Form Builder'da Düğmeler ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Özel Süreçler Menü Öğesini Göster</label>
+        <label>İşlem Düzenleyici</label>
         <hint>Form Builder'da Özel Süreçler ayarlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Kenar Çubuğunda HTTP Servislerini Göster</label>
+        <label>HTTP Servisleri</label>
         <hint>Form Builder'da HTTP Servislerini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Kenar Çubuğunda Veritabanı Servislerini Göster</label>
+        <label>Veritabanı Servisleri</label>
         <hint>Form Builder'da Veritabanı Servislerini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Kenar Çubuğunda Eylemleri Göster</label>
+        <label>Eylemler</label>
         <hint>Form Builder'da Eylemler düzenleyicisini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>

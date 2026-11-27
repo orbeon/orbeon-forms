@@ -1655,14 +1655,6 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "true"
     ),
     CuratedPropertyDef(
-      key          = "fb-menu-workflow",
-      category     = "form-builder",
-      baseName     = "oxf.fb.menu.workflow",
-      xsType       = "xs:boolean",
-      hasAppForm   = false,
-      defaultValue = "false"
-    ),
-    CuratedPropertyDef(
       key          = "fb-menu-permissions",
       category     = "form-builder",
       baseName     = "oxf.fb.menu.permissions",

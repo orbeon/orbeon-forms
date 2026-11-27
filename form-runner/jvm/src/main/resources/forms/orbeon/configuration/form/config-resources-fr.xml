@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Éléments de l'onglet Avancé</title>
+        <settings>Paramètres</settings>
+        <attachments>Pièces jointes</attachments>
+        <actions-services>Actions et services</actions-services>
+        <reset-all>Tout réinitialiser</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Afficher le menu Schéma XML</label>
+        <label>Schéma XML</label>
         <hint>Afficher le bouton Schéma XML dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Afficher le menu Modèles PDF</label>
+        <label>Modèles PDF</label>
         <hint>Afficher le bouton Modèles PDF dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Afficher le menu Code source</label>
+        <label>Modifier la source</label>
         <hint>Afficher le bouton d'édition du code source dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Afficher le menu Workflow</label>
-        <hint>Afficher les paramètres de workflow dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Par défaut (Non)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Oui</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Non</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Afficher le menu Permissions</label>
+        <label>Permissions</label>
         <hint>Afficher le bouton Permissions dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Afficher le menu Paramètres email</label>
+        <label>Paramètres d'e-mail</label>
         <hint>Afficher le bouton Paramètres email dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Afficher le menu Page de confirmation</label>
+        <label>Paramètres de confirmation</label>
         <hint>Afficher les paramètres de page de confirmation dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Afficher le menu Messages personnalisés</label>
+        <label>Messages</label>
         <hint>Afficher les messages personnalisés dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Afficher le menu Boutons</label>
+        <label>Boutons</label>
         <hint>Afficher la configuration des boutons dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Afficher le menu Processus personnalisés</label>
+        <label>Éditeur de processus</label>
         <hint>Afficher les processus personnalisés dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Afficher les services HTTP</label>
+        <label>Services HTTP</label>
         <hint>Activer les services HTTP dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Afficher les services de base de données</label>
+        <label>Services de base de données</label>
         <hint>Activer les services de base de données dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Afficher les actions</label>
+        <label>Actions</label>
         <hint>Activer l'éditeur d'actions dans Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Par défaut (Oui)</label>

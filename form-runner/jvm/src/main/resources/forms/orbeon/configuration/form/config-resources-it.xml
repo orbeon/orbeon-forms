@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Elementi della scheda Avanzate</title>
+        <settings>Impostazioni</settings>
+        <attachments>Allegati</attachments>
+        <actions-services>Azioni e servizi</actions-services>
+        <reset-all>Ripristina tutto</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Mostra voce di menu Schema XML</label>
+        <label>Schema XML</label>
         <hint>Mostra il pulsante della finestra Schema XML in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Mostra voce di menu Modelli PDF</label>
+        <label>Modelli PDF</label>
         <hint>Mostra il pulsante della finestra Modelli PDF in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Mostra voce di menu Modifica sorgente</label>
+        <label>Modifica sorgente</label>
         <hint>Mostra il pulsante della finestra Modifica sorgente in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Mostra voce di menu Fase del workflow</label>
-        <hint>Mostra le impostazioni del workflow in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Predefinito (No)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Sì</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>No</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Mostra voce di menu Autorizzazioni</label>
+        <label>Autorizzazioni</label>
         <hint>Mostra il pulsante della finestra Autorizzazioni in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Mostra voce di menu Impostazioni email</label>
+        <label>Impostazioni email</label>
         <hint>Mostra il pulsante della finestra Impostazioni email in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Mostra voce di menu Pagina di conferma</label>
+        <label>Impostazioni pagina di conferma</label>
         <hint>Mostra le impostazioni della Pagina di conferma in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Mostra voce di menu Messaggi personalizzati</label>
+        <label>Messaggi</label>
         <hint>Mostra le impostazioni dei Messaggi personalizzati in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Mostra voce di menu Pulsanti</label>
+        <label>Pulsanti</label>
         <hint>Mostra le impostazioni dei pulsanti in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Mostra voce di menu Processi personalizzati</label>
+        <label>Editor processi</label>
         <hint>Mostra le impostazioni dei Processi personalizzati in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Mostra Servizi HTTP nella barra laterale</label>
+        <label>Servizi HTTP</label>
         <hint>Abilita i Servizi HTTP in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Mostra Servizi database nella barra laterale</label>
+        <label>Servizi database</label>
         <hint>Abilita i Servizi database in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Mostra Azioni nella barra laterale</label>
+        <label>Azioni</label>
         <hint>Abilita l'editor delle Azioni in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Predefinito (Sì)</label>

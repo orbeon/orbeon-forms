@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>「進階」分頁項目</title>
+        <settings>設定</settings>
+        <attachments>附件</attachments>
+        <actions-services>動作與服務</actions-services>
+        <reset-all>全部重設</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>顯示 XML 結構描述選單項目</label>
+        <label>XML Schema</label>
         <hint>在 Form Builder 中顯示 XML 結構描述對話方塊按鈕 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>顯示 PDF 範本選單項目</label>
+        <label>PDF 範本</label>
         <hint>在 Form Builder 中顯示 PDF 範本對話方塊按鈕 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>顯示編輯原始碼選單項目</label>
+        <label>編輯原始碼</label>
         <hint>在 Form Builder 中顯示編輯原始碼對話方塊按鈕 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>顯示工作流階段選單項目</label>
-        <hint>在 Form Builder 中顯示工作流設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>預設 (否)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>是</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>否</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>顯示權限選單項目</label>
+        <label>權限</label>
         <hint>在 Form Builder 中顯示權限對話方塊按鈕 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>顯示電子郵件設定選單項目</label>
+        <label>電子郵件設定</label>
         <hint>在 Form Builder 中顯示電子郵件設定對話方塊按鈕 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>顯示確認頁面選單項目</label>
+        <label>確認頁設定</label>
         <hint>在 Form Builder 中顯示確認頁面設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>顯示自訂訊息選單項目</label>
+        <label>訊息</label>
         <hint>在 Form Builder 中顯示自訂訊息設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>顯示按鈕選單項目</label>
+        <label>按鈕</label>
         <hint>在 Form Builder 中顯示按鈕設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>顯示自訂流程選單項目</label>
+        <label>流程編輯器</label>
         <hint>在 Form Builder 中顯示自訂流程設定 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>在側邊欄中顯示 HTTP 服務</label>
+        <label>HTTP 服務</label>
         <hint>在 Form Builder 中啟用 HTTP 服務 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>在側邊欄中顯示資料庫服務</label>
+        <label>資料庫服務</label>
         <hint>在 Form Builder 中啟用資料庫服務 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>在側邊欄中顯示操作</label>
+        <label>動作</label>
         <hint>在 Form Builder 中啟用操作編輯器 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>預設 (是)</label>

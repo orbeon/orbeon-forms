@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Elements de la pestanya Avançat</title>
+        <settings>Configuració</settings>
+        <attachments>Adjunts</attachments>
+        <actions-services>Accions i serveis</actions-services>
+        <reset-all>Restableix tot</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Mostrar l'element de menú Esquema XML</label>
+        <label>Esquema XML</label>
         <hint>Mostrar el botó del diàleg Esquema XML a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Mostrar l'element de menú Plantilles PDF</label>
+        <label>Plantilles PDF</label>
         <hint>Mostrar el botó del diàleg Plantilles PDF a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Mostrar l'element de menú Editar el codi font</label>
+        <label>Edita el codi font</label>
         <hint>Mostrar el botó del diàleg Editar el codi font a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Mostrar l'element de menú Etapa del flux de treball</label>
-        <hint>Mostrar la configuració del flux de treball a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Per defecte (No)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Sí</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>No</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Mostrar l'element de menú Permisos</label>
+        <label>Permisos</label>
         <hint>Mostrar el botó del diàleg Permisos a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Mostrar l'element de menú Configuració de correu</label>
+        <label>Configuració de correu</label>
         <hint>Mostrar el botó del diàleg Configuració de correu a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Mostrar l'element de menú Pàgina de confirmació</label>
+        <label>Configuració de confirmació</label>
         <hint>Mostrar la configuració de la pàgina de confirmació a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Mostrar l'element de menú Missatges personalitzats</label>
+        <label>Missatges</label>
         <hint>Mostrar la configuració de missatges personalitzats a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Mostrar l'element de menú Botons</label>
+        <label>Botons</label>
         <hint>Mostrar la configuració de botons a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Mostrar l'element de menú Processos personalitzats</label>
+        <label>Editor de processos</label>
         <hint>Mostrar la configuració de processos personalitzats a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Mostrar els Serveis HTTP a la barra lateral</label>
+        <label>Serveis HTTP</label>
         <hint>Activar els serveis HTTP a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Mostrar els Serveis de base de dades a la barra lateral</label>
+        <label>Serveis de base de dades</label>
         <hint>Activar els serveis de base de dades a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Mostrar les Accions a la barra lateral</label>
+        <label>Accions</label>
         <hint>Activar l'editor d'accions a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>

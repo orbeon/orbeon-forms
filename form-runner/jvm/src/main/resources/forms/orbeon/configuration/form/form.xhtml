@@ -1018,6 +1018,178 @@
             .orbeon .fr-config-filtering .fr-config-subgroup:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
+            .orbeon .fr-config-filtering .fr-config-toggle-group:not(:has(.xforms-control:not(.xforms-disabled))) {
+                display: none !important;
+            }
+            /* Compact 2-column tri-state toggle card (e.g. Form Builder visibility options) */
+            .orbeon .fr-config-toggle-card {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75em;
+                padding: 0.75em 0.9em;
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: var(--orbeon-landing-card-border-radius);
+            }
+            .orbeon .fr-config-toggle-card-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5em;
+                padding-bottom: 0.45em;
+                border-bottom: 1px solid var(--orbeon-base-border-color);
+            }
+            .orbeon .fr-config-toggle-card-title {
+                font-size: 0.96em;
+                font-weight: 600;
+                color: var(--orbeon-base-color);
+            }
+            .orbeon .fr-config-toggle-reset {
+                margin: 0;
+            }
+            .orbeon .fr-config-toggle-reset button.btn-link,
+            .orbeon .fr-config-toggle-reset a {
+                padding: 0;
+                font-size: 0.86em;
+                font-weight: 500;
+                color: var(--orbeon-link-color);
+                text-decoration: none;
+            }
+            .orbeon .fr-config-toggle-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+            }
+            .orbeon .fr-config-toggle-group-title {
+                font-size: 0.8em;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-toggle-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.35em;
+            }
+            @media (min-width: 1520px) {
+                .orbeon .fr-config-toggle-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 0.45em;
+                }
+            }
+            .orbeon .xforms-select1.fr-config-tristate:not(.xforms-disabled) {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-rows: auto auto;
+                column-gap: 0.75em;
+                row-gap: 0.1em;
+                align-items: center;
+                margin: 0;
+                padding: 0.4em 0.65em;
+                background-color: var(--orbeon-form-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: var(--orbeon-control-border-radius);
+            }
+            .orbeon .xforms-select1.fr-config-tristate:not(.xforms-disabled):has(&gt; .xforms-items &gt; span:not(:first-child).xforms-selected) {
+                border-color: var(--orbeon-accent-color);
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-label {
+                grid-column: 1;
+                grid-row: 1;
+                min-width: 0;
+                margin: 0;
+                font-size: 0.92em;
+                font-weight: 500;
+                color: var(--orbeon-base-color);
+                line-height: 1.25;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-hint {
+                grid-column: 1;
+                grid-row: 2;
+                min-width: 0;
+                margin: 0;
+                font-size: 0.78em;
+                line-height: 1.2;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-hint .fr-config-prop-name {
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                border: none;
+                font-size: 1em;
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                justify-self: end;
+                display: inline-flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                gap: 2px;
+                padding: 2px;
+                margin: 0;
+                float: none;
+                background-color: var(--orbeon-tab-bar-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: 6px;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items &gt; .xforms-selected,
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items &gt; .xforms-deselected {
+                display: inline-flex;
+                float: none;
+                margin: 0;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items label.radio {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 0;
+                margin: 0;
+                padding: 3px 7px;
+                border-radius: 4px;
+                font-size: 0.8em;
+                font-weight: 500;
+                line-height: 1.25;
+                white-space: nowrap;
+                color: var(--orbeon-tab-inactive-color);
+                cursor: pointer;
+                user-select: none;
+                transition: background-color 120ms ease, color 120ms ease;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items label.radio:hover {
+                color: var(--orbeon-base-color);
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items label.radio &gt; input[type="radio"] {
+                position: absolute;
+                opacity: 0;
+                inline-size: 1px;
+                block-size: 1px;
+                margin: 0;
+                pointer-events: none;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items label.radio:has(&gt; input[type="radio"]:focus-visible) {
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: 1px;
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items &gt; span:first-child.xforms-selected label.radio {
+                background-color: var(--orbeon-tab-background-color);
+                color: var(--orbeon-base-color);
+                box-shadow: 0 1px 2px color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+            }
+            .orbeon .xforms-select1.fr-config-tristate &gt; .xforms-items &gt; span:not(:first-child).xforms-selected label.radio {
+                background-color: var(--orbeon-button-primary-background-color);
+                color: var(--orbeon-button-primary-color);
+            }
             .orbeon .fr-config-filtering .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
@@ -4787,201 +4959,196 @@
                                 </xh:div>
                                 <fr:grid id="form-builder-grid" ref="$active-scope/curated/form-builder">
                                     <fr:c x="1" y="1" w="12">
-                                        <xf:select1 id="fb-menu-schema-value-control" appearance="minimal" ref="fb-menu-schema/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-schema/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-schema/hint else replace($form-resources/fb-menu-schema/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-schema/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
+                                        <xh:div class="fr-config-toggle-card">
+                                            <xh:div class="fr-config-toggle-card-head">
+                                                <xh:span class="fr-config-toggle-card-title">
+                                                    <xf:output ref="$form-resources/fb-visibility/title"/>
+                                                </xh:span>
+                                                <xf:trigger
+                                                    id="fb-visibility-reset-all-btn"
+                                                    appearance="minimal"
+                                                    ref=".[exists((fb-menu-permissions | fb-menu-email | fb-menu-confirmation | fb-menu-messages | fb-menu-buttons | fb-menu-processes | fb-menu-edit-source | fb-menu-pdf | fb-menu-schema | fb-menu-actions | fb-menu-services-http | fb-menu-services-database)[string(@override) = 'true'])]"
+                                                    class="fr-config-toggle-reset">
+                                                    <xf:label ref="$form-resources/fb-visibility/reset-all"/>
+                                                    <xf:action event="DOMActivate" iterate="fb-menu-permissions | fb-menu-email | fb-menu-confirmation | fb-menu-messages | fb-menu-buttons | fb-menu-processes | fb-menu-edit-source | fb-menu-pdf | fb-menu-schema | fb-menu-actions | fb-menu-services-http | fb-menu-services-database">
+                                                        <xf:setvalue ref="@selection" value="'__default__'"/>
+                                                        <xf:setvalue ref="@override"  value="'false'"/>
+                                                        <xf:setvalue ref="@value"     value="@default"/>
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xh:div>
+
+                                            <xh:div class="fr-config-toggle-group">
+                                                <xh:span class="fr-config-toggle-group-title">
+                                                    <xf:output ref="$form-resources/fb-visibility/settings"/>
+                                                </xh:span>
+                                                <xh:div class="fr-config-toggle-grid">
+                                                <xf:select1 id="fb-menu-permissions-value-control" appearance="full" ref="fb-menu-permissions/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-permissions/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-permissions/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-email-value-control" appearance="full" ref="fb-menu-email/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-email/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-email/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-confirmation-value-control" appearance="full" ref="fb-menu-confirmation/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-confirmation/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-confirmation/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-messages-value-control" appearance="full" ref="fb-menu-messages/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-messages/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-messages/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-buttons-value-control" appearance="full" ref="fb-menu-buttons/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-buttons/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-buttons/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-processes-value-control" appearance="full" ref="fb-menu-processes/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-processes/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-processes/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-edit-source-value-control" appearance="full" ref="fb-menu-edit-source/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-edit-source/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-edit-source/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                </xh:div>
+                                            </xh:div>
+
+                                            <xh:div class="fr-config-toggle-group">
+                                                <xh:span class="fr-config-toggle-group-title">
+                                                    <xf:output ref="$form-resources/fb-visibility/attachments"/>
+                                                </xh:span>
+                                                <xh:div class="fr-config-toggle-grid">
+                                                <xf:select1 id="fb-menu-pdf-value-control" appearance="full" ref="fb-menu-pdf/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-pdf/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-pdf/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-schema-value-control" appearance="full" ref="fb-menu-schema/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-schema/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-schema/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                </xh:div>
+                                            </xh:div>
+
+                                            <xh:div class="fr-config-toggle-group">
+                                                <xh:span class="fr-config-toggle-group-title">
+                                                    <xf:output ref="$form-resources/fb-visibility/actions-services"/>
+                                                </xh:span>
+                                                <xh:div class="fr-config-toggle-grid">
+                                                <xf:select1 id="fb-menu-actions-value-control" appearance="full" ref="fb-menu-actions/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-actions/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-actions/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-services-http-value-control" appearance="full" ref="fb-menu-services-http/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-services-http/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-services-http/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                <xf:select1 id="fb-menu-services-database-value-control" appearance="full" ref="fb-menu-services-database/@selection" class="fr-config-tristate">
+                                                    <xf:label ref="$form-resources/fb-menu-services-database/label"/>
+                                                    <xf:hint mediatype="text/html" value="concat('&lt;code class=&quot;fr-config-prop-name&quot;&gt;', ../@name, '&lt;/code&gt;')"/>
+                                                    <xf:itemset ref="$form-resources/fb-menu-services-database/item">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                    <xf:action event="xforms-value-changed">
+                                                        <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                        <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                                    </xf:action>
+                                                </xf:select1>
+                                                </xh:div>
+                                            </xh:div>
+                                        </xh:div>
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="12">
-                                        <xf:select1 id="fb-menu-pdf-value-control" appearance="minimal" ref="fb-menu-pdf/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-pdf/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-pdf/hint else replace($form-resources/fb-menu-pdf/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-pdf/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="3" w="12">
-                                        <xf:select1 id="fb-menu-edit-source-value-control" appearance="minimal" ref="fb-menu-edit-source/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-edit-source/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-edit-source/hint else replace($form-resources/fb-menu-edit-source/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-edit-source/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="4" w="12">
-                                        <xf:select1 id="fb-menu-workflow-value-control" appearance="minimal" ref="fb-menu-workflow/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-workflow/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-workflow/hint else replace($form-resources/fb-menu-workflow/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-workflow/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="5" w="12">
-                                        <xf:select1 id="fb-menu-permissions-value-control" appearance="minimal" ref="fb-menu-permissions/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-permissions/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-permissions/hint else replace($form-resources/fb-menu-permissions/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-permissions/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="6" w="12">
-                                        <xf:select1 id="fb-menu-email-value-control" appearance="minimal" ref="fb-menu-email/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-email/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-email/hint else replace($form-resources/fb-menu-email/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-email/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="7" w="12">
-                                        <xf:select1 id="fb-menu-confirmation-value-control" appearance="minimal" ref="fb-menu-confirmation/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-confirmation/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-confirmation/hint else replace($form-resources/fb-menu-confirmation/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-confirmation/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="8" w="12">
-                                        <xf:select1 id="fb-menu-messages-value-control" appearance="minimal" ref="fb-menu-messages/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-messages/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-messages/hint else replace($form-resources/fb-menu-messages/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-messages/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="9" w="12">
-                                        <xf:select1 id="fb-menu-buttons-value-control" appearance="minimal" ref="fb-menu-buttons/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-buttons/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-buttons/hint else replace($form-resources/fb-menu-buttons/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-buttons/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="10" w="12">
-                                        <xf:select1 id="fb-menu-processes-value-control" appearance="minimal" ref="fb-menu-processes/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-processes/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-processes/hint else replace($form-resources/fb-menu-processes/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-processes/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="11" w="12">
-                                        <xf:select1 id="fb-menu-services-http-value-control" appearance="minimal" ref="fb-menu-services-http/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-services-http/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-services-http/hint else replace($form-resources/fb-menu-services-http/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-services-http/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="12" w="12">
-                                        <xf:select1 id="fb-menu-services-database-value-control" appearance="minimal" ref="fb-menu-services-database/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-services-database/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-services-database/hint else replace($form-resources/fb-menu-services-database/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-services-database/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="13" w="12">
-                                        <xf:select1 id="fb-menu-actions-value-control" appearance="minimal" ref="fb-menu-actions/@selection" class="fr-config-select1">
-                                            <xf:label ref="$form-resources/fb-menu-actions/label"/>
-                                            <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-menu-actions/hint else replace($form-resources/fb-menu-actions/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
-                                            <xf:itemset ref="$form-resources/fb-menu-actions/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                            <xf:action event="xforms-value-changed">
-                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
-                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
-                                            </xf:action>
-                                        </xf:select1>
-                                    </fr:c>
-
-                                    <fr:c x="1" y="14" w="12">
                                         <xf:select1 id="fb-form-title-required-value-control" appearance="minimal" ref="fb-form-title-required/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-form-title-required/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-form-title-required/hint else replace($form-resources/fb-form-title-required/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -4996,7 +5163,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="15" w="12">
+                                    <fr:c x="1" y="3" w="12">
                                         <xf:select1 id="fb-form-description-required-value-control" appearance="minimal" ref="fb-form-description-required/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-form-description-required/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-form-description-required/hint else replace($form-resources/fb-form-description-required/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -5011,7 +5178,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="16" w="12">
+                                    <fr:c x="1" y="4" w="12">
                                         <xf:select1 id="fb-publish-version-value-control" appearance="minimal" ref="fb-publish-version/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-publish-version/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-publish-version/hint else replace($form-resources/fb-publish-version/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -5026,7 +5193,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="17" w="12">
+                                    <fr:c x="1" y="5" w="12">
                                         <xf:select1 id="fb-metadata-logo-value-control" appearance="minimal" ref="fb-metadata-logo/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-metadata-logo/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-metadata-logo/hint else replace($form-resources/fb-metadata-logo/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -5041,7 +5208,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="18" w="12">
+                                    <fr:c x="1" y="6" w="12">
                                         <xf:select1 id="fb-mcp-enable-value-control" appearance="minimal" ref="fb-mcp-enable/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-mcp-enable/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-mcp-enable/hint else replace($form-resources/fb-mcp-enable/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>
@@ -5056,7 +5223,7 @@
                                         </xf:select1>
                                     </fr:c>
 
-                                    <fr:c x="1" y="19" w="12">
+                                    <fr:c x="1" y="7" w="12">
                                         <xf:select1 id="fb-mcp-token-enable-value-control" appearance="minimal" ref="fb-mcp-token-enable/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/fb-mcp-token-enable/label"/>
                                             <xf:hint mediatype="text/html" value="if ($is-global-scope) then $form-resources/fb-mcp-token-enable/hint else replace($form-resources/fb-mcp-token-enable/hint, '\.\*\.\*', concat('.', $active-override/@app, '.', $active-override/@form))"/>

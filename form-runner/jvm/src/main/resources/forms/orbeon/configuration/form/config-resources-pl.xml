@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Elementy karty Zaawansowane</title>
+        <settings>Ustawienia</settings>
+        <attachments>Załączniki</attachments>
+        <actions-services>Akcje i usługi</actions-services>
+        <reset-all>Resetuj wszystko</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Pokaż pozycję menu Schemat XML</label>
+        <label>Schemat XML</label>
         <hint>Pokaż przycisk okna dialogowego Schemat XML w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Pokaż pozycję menu Szablony PDF</label>
+        <label>Szablony PDF</label>
         <hint>Pokaż przycisk okna dialogowego Szablony PDF w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Pokaż pozycję menu Edytuj kod źródłowy</label>
+        <label>Edytuj źródło</label>
         <hint>Pokaż przycisk okna dialogowego Edytuj kod źródłowy w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Pokaż pozycję menu Etap przepływu pracy</label>
-        <hint>Pokaż ustawienia przepływu pracy w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Domyślnie (Nie)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Tak</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Nie</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Pokaż pozycję menu Uprawnienia</label>
+        <label>Uprawnienia</label>
         <hint>Pokaż przycisk okna dialogowego Uprawnienia w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Pokaż pozycję menu Ustawienia e-mail</label>
+        <label>Ustawienia e-mail</label>
         <hint>Pokaż przycisk okna dialogowego Ustawienia e-mail w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Pokaż pozycję menu Strona potwierdzenia</label>
+        <label>Ustawienia strony potwierdzenia</label>
         <hint>Pokaż ustawienia strony potwierdzenia w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Pokaż pozycję menu Komunikaty niestandardowe</label>
+        <label>Komunikaty</label>
         <hint>Pokaż ustawienia komunikatów niestandardowych w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Pokaż pozycję menu Przyciski</label>
+        <label>Przyciski</label>
         <hint>Pokaż ustawienia przycisków w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Pokaż pozycję menu Procesy niestandardowe</label>
+        <label>Edytor procesów</label>
         <hint>Pokaż ustawienia procesów niestandardowych w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>Pokaż Usługi HTTP na pasku bocznym</label>
+        <label>Usługi HTTP</label>
         <hint>Włącz usługi HTTP w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Pokaż Usługi bazy danych na pasku bocznym</label>
+        <label>Usługi bazodanowe</label>
         <hint>Włącz usługi bazy danych w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Pokaż Działania na pasku bocznym</label>
+        <label>Akcje</label>
         <hint>Włącz edytor działań w edytorze Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Domyślnie (Tak)</label>

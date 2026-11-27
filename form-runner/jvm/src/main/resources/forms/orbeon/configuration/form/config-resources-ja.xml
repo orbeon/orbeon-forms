@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>「詳細」タブの項目</title>
+        <settings>設定</settings>
+        <attachments>添付ファイル</attachments>
+        <actions-services>アクションとサービス</actions-services>
+        <reset-all>すべてリセット</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>XMLスキーマメニュー項目を表示</label>
+        <label>XML スキーマ</label>
         <hint>Form Builder にXMLスキーマダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>PDFテンプレートメニュー項目を表示</label>
+        <label>PDF テンプレート</label>
         <hint>Form Builder にPDFテンプレートダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>ソースを編集メニュー項目を表示</label>
+        <label>ソース編集</label>
         <hint>Form Builder にソースを編集ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>ワークフローステージメニュー項目を表示</label>
-        <hint>Form Builder にワークフロー設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>デフォルト (いいえ)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>はい</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>いいえ</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>権限メニュー項目を表示</label>
+        <label>権限</label>
         <hint>Form Builder に権限ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>メール設定メニュー項目を表示</label>
+        <label>メール設定</label>
         <hint>Form Builder にメール設定ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>確認ページメニュー項目を表示</label>
+        <label>確認ページ設定</label>
         <hint>Form Builder に確認ページ設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>カスタムメッセージメニュー項目を表示</label>
+        <label>メッセージ</label>
         <hint>Form Builder にカスタムメッセージ設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>ボタンメニュー項目を表示</label>
+        <label>ボタン</label>
         <hint>Form Builder にボタン設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>カスタムプロセスメニュー項目を表示</label>
+        <label>プロセスエディター</label>
         <hint>Form Builder にカスタムプロセス設定を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>サイドバーにHTTPサービスを表示</label>
+        <label>HTTP サービス</label>
         <hint>Form Builder でHTTPサービスを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>サイドバーにデータベースサービスを表示</label>
+        <label>データベースサービス</label>
         <hint>Form Builder でデータベースサービスを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>サイドバーにアクションを表示</label>
+        <label>アクション</label>
         <hint>Form Builder でアクションエディターを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>

@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>عناصر علامة التبويب متقدم</title>
+        <settings>الإعدادات</settings>
+        <attachments>المرفقات</attachments>
+        <actions-services>الإجراءات والخدمات</actions-services>
+        <reset-all>إعادة تعيين الكل</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>إظهار عنصر قائمة «مخطط XML»</label>
+        <label>مخطط XML</label>
         <hint>إظهار زر مربع حوار «مخطط XML» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>إظهار عنصر قائمة «قوالب PDF»</label>
+        <label>قوالب PDF</label>
         <hint>إظهار زر مربع حوار «قوالب PDF» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>إظهار عنصر قائمة «تحرير المصدر»</label>
+        <label>تعديل المصدر</label>
         <hint>إظهار زر مربع حوار «تحرير المصدر» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>إظهار عنصر قائمة «مرحلة سير العمل»</label>
-        <hint>إظهار إعدادات سير العمل في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>الافتراضي (لا)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>نعم</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>لا</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>إظهار عنصر قائمة «الأذونات»</label>
+        <label>الأذونات</label>
         <hint>إظهار زر مربع حوار «الأذونات» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>إظهار عنصر قائمة «إعدادات البريد الإلكتروني»</label>
+        <label>إعدادات البريد</label>
         <hint>إظهار زر مربع حوار «إعدادات البريد الإلكتروني» في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>إظهار عنصر قائمة «صفحة التأكيد»</label>
+        <label>إعدادات صفحة التأكيد</label>
         <hint>إظهار إعدادات صفحة التأكيد في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>إظهار عنصر قائمة «الرسائل المخصصة»</label>
+        <label>الرسائل</label>
         <hint>إظهار إعدادات الرسائل المخصصة في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>إظهار عنصر قائمة «الأزرار»</label>
+        <label>الأزرار</label>
         <hint>إظهار إعدادات الأزرار في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>إظهار عنصر قائمة «العمليات المخصصة»</label>
+        <label>محرر العمليات</label>
         <hint>إظهار إعدادات العمليات المخصصة في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>إظهار خدمات HTTP في الشريط الجانبي</label>
+        <label>خدمات HTTP</label>
         <hint>تفعيل خدمات HTTP في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>إظهار خدمات قواعد البيانات في الشريط الجانبي</label>
+        <label>خدمات قواعد البيانات</label>
         <hint>تفعيل خدمات قواعد البيانات في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>إظهار الإجراءات في الشريط الجانبي</label>
+        <label>الإجراءات</label>
         <hint>تفعيل محرر الإجراءات في Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>الافتراضي (نعم)</label>

@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Speciális lap elemei</title>
+        <settings>Beállítások</settings>
+        <attachments>Mellékletek</attachments>
+        <actions-services>Műveletek és szolgáltatások</actions-services>
+        <reset-all>Összes visszaállítása</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>XML-séma menüpont megjelenítése</label>
+        <label>XML-séma</label>
         <hint>Az XML-séma párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>PDF-sablonok menüpont megjelenítése</label>
+        <label>PDF-sablonok</label>
         <hint>A PDF-sablonok párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Forráskód szerkesztése menüpont megjelenítése</label>
+        <label>Forrás szerkesztése</label>
         <hint>A Forráskód szerkesztése párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Munkafolyamat állapota menüpont megjelenítése</label>
-        <hint>A munkafolyamat-beállítások megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Alapértelmezett (Nem)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Igen</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Nem</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Jogosultságok menüpont megjelenítése</label>
+        <label>Jogosultságok</label>
         <hint>A Jogosultságok párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>E-mail-beállítások menüpont megjelenítése</label>
+        <label>E-mail beállítások</label>
         <hint>Az E-mail-beállítások párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Megerősítő oldal menüpont megjelenítése</label>
+        <label>Megerősítő oldal beállításai</label>
         <hint>A megerősítő oldal beállításainak megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Egyéni üzenetek menüpont megjelenítése</label>
+        <label>Üzenetek</label>
         <hint>Az egyéni üzenetek beállításainak megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Gombok menüpont megjelenítése</label>
+        <label>Gombok</label>
         <hint>A gombok beállításainak megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Egyéni folyamatok menüpont megjelenítése</label>
+        <label>Folyamatszerkesztő</label>
         <hint>Az egyéni folyamatok beállításainak megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>HTTP-szolgáltatások megjelenítése az oldalsávon</label>
+        <label>HTTP-szolgáltatások</label>
         <hint>HTTP-szolgáltatások engedélyezése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Adatbázis-szolgáltatások megjelenítése az oldalsávon</label>
+        <label>Adatbázis-szolgáltatások</label>
         <hint>Adatbázis-szolgáltatások engedélyezése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Műveletek megjelenítése az oldalsávon</label>
+        <label>Műveletek</label>
         <hint>A műveletszerkesztő engedélyezése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>

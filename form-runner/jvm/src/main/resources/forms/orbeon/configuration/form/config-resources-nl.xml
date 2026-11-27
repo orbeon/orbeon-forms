@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>Items op tabblad Geavanceerd</title>
+        <settings>Instellingen</settings>
+        <attachments>Bijlagen</attachments>
+        <actions-services>Acties en services</actions-services>
+        <reset-all>Alles resetten</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>Menu-item XML-schema tonen</label>
+        <label>XML-schema</label>
         <hint>De knop voor het dialoogvenster XML-schema tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>Menu-item PDF-sjablonen tonen</label>
+        <label>PDF-sjablonen</label>
         <hint>De knop voor het dialoogvenster PDF-sjablonen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>Menu-item Broncode bewerken tonen</label>
+        <label>Bron bewerken</label>
         <hint>De knop voor het dialoogvenster Broncode bewerken tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>Menu-item Workflowfase tonen</label>
-        <hint>De workflow-instellingen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>Standaard (Nee)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>Ja</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>Nee</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>Menu-item Bevoegdheden tonen</label>
+        <label>Bevoegdheden</label>
         <hint>De knop voor het dialoogvenster Bevoegdheden tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>Menu-item E-mailinstellingen tonen</label>
+        <label>E-mailinstellingen</label>
         <hint>De knop voor het dialoogvenster E-mailinstellingen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>Menu-item Bevestigingspagina tonen</label>
+        <label>Bevestigingspagina-instellingen</label>
         <hint>Instellingen voor de bevestigingspagina tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>Menu-item Aangepaste berichten tonen</label>
+        <label>Berichten</label>
         <hint>Instellingen voor aangepaste berichten tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>Menu-item Knoppen tonen</label>
+        <label>Knoppen</label>
         <hint>Instellingen voor knoppen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>Menu-item Aangepaste processen tonen</label>
+        <label>Proceseditor</label>
         <hint>Instellingen voor aangepaste processen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>HTTP-services tonen in zijbalk</label>
+        <label>HTTP-services</label>
         <hint>HTTP-services inschakelen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>Databaseservices tonen in zijbalk</label>
+        <label>Databaseservices</label>
         <hint>Databaseservices inschakelen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>Acties tonen in zijbalk</label>
+        <label>Acties</label>
         <hint>De actie-editor inschakelen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>

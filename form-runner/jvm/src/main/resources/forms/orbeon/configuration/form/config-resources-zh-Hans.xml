@@ -1948,8 +1948,15 @@
             <value>none</value>
         </item>
     </email-attach-files>
+    <fb-visibility>
+        <title>“高级”选项卡项目</title>
+        <settings>设置</settings>
+        <attachments>附件</attachments>
+        <actions-services>操作与服务</actions-services>
+        <reset-all>全部重置</reset-all>
+    </fb-visibility>
     <fb-menu-schema>
-        <label>显示 XML 架构菜单项</label>
+        <label>XML Schema</label>
         <hint>在 Form Builder 中显示 XML 架构对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1965,7 +1972,7 @@
         </item>
     </fb-menu-schema>
     <fb-menu-pdf>
-        <label>显示 PDF 模板菜单项</label>
+        <label>PDF 模板</label>
         <hint>在 Form Builder 中显示 PDF 模板对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.pdf&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1981,7 +1988,7 @@
         </item>
     </fb-menu-pdf>
     <fb-menu-edit-source>
-        <label>显示编辑源码菜单项</label>
+        <label>编辑源代码</label>
         <hint>在 Form Builder 中显示编辑源码对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.edit-source&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1996,24 +2003,8 @@
             <value>false</value>
         </item>
     </fb-menu-edit-source>
-    <fb-menu-workflow>
-        <label>显示工作流阶段菜单项</label>
-        <hint>在 Form Builder 中显示工作流设置 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.workflow&lt;/code&gt;</hint>
-        <item>
-            <label>默认 (否)</label>
-            <value>__default__</value>
-        </item>
-        <item>
-            <label>是</label>
-            <value>true</value>
-        </item>
-        <item>
-            <label>否</label>
-            <value>false</value>
-        </item>
-    </fb-menu-workflow>
     <fb-menu-permissions>
-        <label>显示权限菜单项</label>
+        <label>权限</label>
         <hint>在 Form Builder 中显示权限对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2029,7 +2020,7 @@
         </item>
     </fb-menu-permissions>
     <fb-menu-email>
-        <label>显示电子邮件设置菜单项</label>
+        <label>邮件设置</label>
         <hint>在 Form Builder 中显示电子邮件设置对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.email&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2045,7 +2036,7 @@
         </item>
     </fb-menu-email>
     <fb-menu-confirmation>
-        <label>显示确认页面菜单项</label>
+        <label>确认页设置</label>
         <hint>在 Form Builder 中显示确认页面设置 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.confirmation&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2061,7 +2052,7 @@
         </item>
     </fb-menu-confirmation>
     <fb-menu-messages>
-        <label>显示自定义消息菜单项</label>
+        <label>消息</label>
         <hint>在 Form Builder 中显示自定义消息设置 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.messages&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2077,7 +2068,7 @@
         </item>
     </fb-menu-messages>
     <fb-menu-buttons>
-        <label>显示按钮菜单项</label>
+        <label>按钮</label>
         <hint>在 Form Builder 中显示按钮设置 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.buttons&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2093,7 +2084,7 @@
         </item>
     </fb-menu-buttons>
     <fb-menu-processes>
-        <label>显示自定义流程菜单项</label>
+        <label>流程编辑器</label>
         <hint>在 Form Builder 中显示自定义流程设置 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.processes&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2109,7 +2100,7 @@
         </item>
     </fb-menu-processes>
     <fb-menu-services-http>
-        <label>在侧边栏中显示 HTTP 服务</label>
+        <label>HTTP 服务</label>
         <hint>在 Form Builder 中启用 HTTP 服务 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.http&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2125,7 +2116,7 @@
         </item>
     </fb-menu-services-http>
     <fb-menu-services-database>
-        <label>在侧边栏中显示数据库服务</label>
+        <label>数据库服务</label>
         <hint>在 Form Builder 中启用数据库服务 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.services.database&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -2141,7 +2132,7 @@
         </item>
     </fb-menu-services-database>
     <fb-menu-actions>
-        <label>在侧边栏中显示操作</label>
+        <label>操作</label>
         <hint>在 Form Builder 中启用操作编辑器 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.actions&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>

@@ -382,7 +382,8 @@ class StyleVariablesTest
       }
   }
 
-  // The head of the page is kept with the compiled form, so each test uses its own form or mode
+  // The head of the page is kept with the compiled form, which `new` and `edit` can share, so each test uses its own
+  // form, or the `view` mode
   describe("Style variables in Form Runner pages") {
 
     it("must not produce a stylesheet without properties") {
@@ -420,12 +421,12 @@ class StyleVariablesTest
     it("must produce the light values outside of any layer with a custom theme which doesn't put its light values in a layer") {
       assert(
         styleVariablesStylesheets(
-          "7641",
-          "edit",
-          stringProperty("oxf.fr.style.theme.issue.7641",          "custom7641"),
+          "8054",
+          "new",
+          stringProperty("oxf.fr.style.theme.issue.8054",          "custom7641"),
           stringProperty("oxf.fr.style.themes.custom7641.css-uri", "/forms/issue/7641/theme.css"),
-          variableProperty("accent-color",   "issue.7641", "#333333"),
-          variableProperty("base-font-size", "issue.7641", "12px", variant = "print".some)
+          variableProperty("accent-color",   "issue.8054", "#333333"),
+          variableProperty("base-font-size", "issue.8054", "12px", variant = "print".some)
         ) ==
           List(unlayeredLightCss("--orbeon-accent-color: #333333;") + " " + printCss("--orbeon-base-font-size: 12px;"))
       )

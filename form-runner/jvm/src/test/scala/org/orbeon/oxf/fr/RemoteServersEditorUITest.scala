@@ -90,8 +90,8 @@ class RemoteServersEditorUITest
       // Compatible with FormRunnerHome.tryRemoteServersFromString
       val parsedByHome = FormRunnerHome.tryRemoteServersFromString(serialized).get
       assert(parsedByHome.size == 2)
-      assert(parsedByHome(0) == FormRunnerHome.RemoteServer(Some("staging"), Some("Staging"), "https://staging.example.org/orbeon", uiAccess = true))
-      assert(parsedByHome(1) == FormRunnerHome.RemoteServer(Some("ci"), None, "https://ci.example.org/orbeon", uiAccess = false))
+      assert(parsedByHome(0) == FormRunnerHome.RemoteServer(Some("staging"), Some("Staging"), "https://staging.example.org/orbeon"))
+      assert(parsedByHome(1) == FormRunnerHome.RemoteServer(Some("ci"), None, "https://ci.example.org/orbeon"))
     }
 
     it("serializes empty servers element to []") {

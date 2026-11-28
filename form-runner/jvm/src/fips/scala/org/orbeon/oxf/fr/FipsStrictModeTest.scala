@@ -16,13 +16,9 @@ package org.orbeon.oxf.fr
 import org.bouncycastle.crypto.CryptoServicesRegistrar
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
 import org.orbeon.dom.Document
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.ConfigurationException
-import org.orbeon.oxf.externalcontext.{Credentials, SimpleRole, UserAndGroup}
-import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_CONFIG, INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.generator.{DOMGenerator, KeyPairGenerator}
@@ -30,13 +26,12 @@ import org.orbeon.oxf.processor.{DOMSerializer, SignatureProcessor, SignatureVer
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.PipelineUtils.connect
-import org.orbeon.oxf.util.{ByteEncoding, SecureUtils, XPath}
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.util.{ByteEncoding, SecureUtils}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AnyFunSpecLike
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
+import java.io.File
 import java.security.{GeneralSecurityException, Provider, Security}
 import java.time.Duration
 import java.util.Base64 as JBase64
@@ -210,27 +205,14 @@ class FipsStrictModeTest
       }
     }
 
-    it("must execute FieldEncryption (XML + binary attachments, AAD, rotation, and legacy Tink V0 read) under BCFIPS approved_only") {
+    it("must execute AES-GCM encryption (strings + binary attachments, AAD, rotation, and legacy Tink V0 read) under BCFIPS approved_only") {
       val aadBytes     = "name=oxf.fr.field-encryption.password".getBytes(CharsetNames.Utf8)
       val wrongAad     = "name=oxf.fr.access-token.password".getBytes(CharsetNames.Utf8)
       val attachBytes  = Array.tabulate[Byte](2048)(i => (i * 13 + 5).toByte)
 
-      val (v1EncryptedXml, v1EncryptedAttach, v1WithAad) =
+      val (v1EncryptedString, v1EncryptedAttach, v1WithAad) =
         withProperties("oxf:/ops/unit-tests/properties-encryption-fips-low-iter.xml") {
-          val dom = TransformerUtils.readOrbeonDom(
-            new ByteArrayInputStream(
-              """<form><section><clear>plain</clear><secret>Approved BCFIPS AES-256-GCM</secret></section></form>""".getBytes(CharsetNames.Utf8)
-            ),
-            null,
-            false,
-            false
-          )
-          FieldEncryption.encryptMutableFormData(
-            List(List(PathElem("section"), PathElem("secret"))),
-            new DocumentWrapper(dom, null, XPath.GlobalConfiguration)
-          )
-
-          val cipherText = dom.getRootElement.element("section").element("secret").getStringValue
+          val cipherText = SecureUtils.AesGcm.encrypt("Approved BCFIPS AES-256-GCM", SecureUtils.KeyUsage.FieldEncryption)
           val rawBytes   = JBase64.getDecoder.decode(cipherText)
           assert(rawBytes.take(4) sameElements Array[Byte](0x4F, 0x46, 0x00, 0x01))
 
@@ -244,7 +226,7 @@ class FipsStrictModeTest
             aadOpt     = Some(aadBytes)
           )
 
-          (dom.getRootElement.serializeToString(), encAttach, encWithAad)
+          (cipherText, encAttach, encWithAad)
         }
 
       // Verify AAD unwrap and AAD mismatch failure on BCFIPS
@@ -263,17 +245,11 @@ class FipsStrictModeTest
       }
 
       // Switch to rotated password (`read-fallback` = password 1) in FIPS mode:
-      // 1. Version 1 XML & binary attachment decrypt via V1-first fallback without touching Version 0
-      // 2. Pre-change Google Tink 1.20.0 Version 0 XML & binary attachment vectors also decrypt cleanly via BCFIPS SHA-256 + AES-128-GCM!
+      // 1. Version 1 string & binary attachment decrypt via V1-first fallback without touching Version 0
+      // 2. Pre-change Google Tink 1.20.0 Version 0 string & binary attachment vectors also decrypt cleanly via BCFIPS SHA-256 + AES-128-GCM!
       withProperties("oxf:/ops/unit-tests/properties-encryption-fips-2.xml") {
-        val xmlOut = new ByteArrayOutputStream
-        FieldEncryption.decryptDataXmlTransform(new ByteArrayInputStream(v1EncryptedXml.getBytes(CharsetNames.Utf8)), xmlOut)
-        val decDom = TransformerUtils.readOrbeonDom(new ByteArrayInputStream(xmlOut.toByteArray), null, false, false)
-        assert(decDom.getRootElement.element("section").element("secret").getStringValue == "Approved BCFIPS AES-256-GCM")
-
-        val attachOut = new ByteArrayOutputStream
-        FieldEncryption.decryptAttachmentTransform(new ByteArrayInputStream(v1EncryptedAttach), attachOut)
-        assert(attachOut.toByteArray sameElements attachBytes)
+        assert(SecureUtils.AesGcm.decrypt(v1EncryptedString, SecureUtils.KeyUsage.FieldEncryption) == "Approved BCFIPS AES-256-GCM")
+        assert(SecureUtils.AesGcm.decrypt(v1EncryptedAttach, SecureUtils.KeyUsage.FieldEncryption) sameElements attachBytes)
 
         // Pre-change Tink Version 0 XML & binary attachment vectors
         assert(SecureUtils.AesGcm.decrypt("4gcE0cY39H6A28IYyjzcaHwT4nCtlfVOISljZ6qD") == "43")
@@ -281,9 +257,7 @@ class FipsStrictModeTest
 
         val tinkAttachBytes = JBase64.getDecoder.decode("AYcgoEKSimdvRQYTFufZ9zJOSdwxlLDgJtQjh+BPlfoi4e0DwS/x48u6Ab4=")
         val expectedPngHead = Array(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x7F, 0x80).map(_.toByte)
-        val tinkOut         = new ByteArrayOutputStream
-        FieldEncryption.decryptAttachmentTransform(new ByteArrayInputStream(tinkAttachBytes), tinkOut)
-        assert(tinkOut.toByteArray sameElements expectedPngHead)
+        assert(SecureUtils.AesGcm.decrypt(tinkAttachBytes, SecureUtils.KeyUsage.FieldEncryption) sameElements expectedPngHead)
       }
 
       // Short password (< 15 bytes) fails fast with ConfigurationException
@@ -316,10 +290,6 @@ class FipsStrictModeTest
 
         val extTok = FormRunnerExternalModeToken.encryptToken("acme", "fips-form", 1, Some("doc-1"), Duration.ofMinutes(5)).get
         assert(FormRunnerExternalModeToken.decryptTokenPayloadCheckExpiration((), extTok).isSuccess)
-
-        val mcpCreds = Credentials(UserAndGroup("alice", None), List(SimpleRole("admin")), Nil)
-        val mcpTok   = FormRunnerMcpToken.encryptToken(Duration.ofMinutes(5), ops, Some(mcpCreds)).get
-        assert(FormRunnerMcpToken.decryptTokenPayloadCheckExpiration((), mcpTok).map(p => (p._1.toSet, p._2)) == Success((ops, Some(mcpCreds))))
 
         val opsEnc = FormRunnerOperationsEncryption.encryptString("choices-validation")
         assert(FormRunnerOperationsEncryption.decryptString(opsEnc).contains("choices-validation"))

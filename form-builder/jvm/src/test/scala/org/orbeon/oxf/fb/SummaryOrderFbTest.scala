@@ -13,16 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.builder.rpc.*
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fr.FormRunnerSummaryOrder
 import org.orbeon.oxf.fr.FormRunnerSummaryOrder.SummaryControlColumn
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
+import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
-
-import scala.concurrent.Await
-import scala.concurrent.duration.*
 
 
 class SummaryOrderFbTest
@@ -33,7 +31,7 @@ class SummaryOrderFbTest
 
   private val SectionTemplatesDoc = "oxf:/org/orbeon/oxf/fb/template-with-section-templates.xhtml"
 
-  describe("Form Builder Summary control column ordering, position info, rename/undo, and MCP settings") {
+  describe("Form Builder Summary control column ordering, position info, and rename/undo") {
 
     it("must compute default and custom orders, position indicators, and omit metadata when reset to form order") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
@@ -60,23 +58,13 @@ class SummaryOrderFbTest
         assert(pos2.attValue("active-pos")        == "2")
         assert(pos2.attValue("other-count")       == "1")
 
-        // Set custom order `[control-2, control-1]` via Form Builder MCP
-        Await.result(
-          FormBuilderMcpRpcApiImpl.formSetSettings(
-            "",
-            FormSettingsUpdateR(
-              summary = Some(
-                FormSettingsSummaryUpdateR(
-                  controlColumns = Some(List(
-                    SummaryControlColumnR(control = "control-2"),
-                    SummaryControlColumnR(control = "control-1")
-                  ))
-                )
-              )
-            )
-          ),
-          5.seconds
-        )
+        // Set custom order `[control-2, control-1]` in metadata
+        val reorderedElem: org.orbeon.saxon.om.NodeInfo =
+          <summary-control-columns>
+            <column control="control-2"/>
+            <column control="control-1"/>
+          </summary-control-columns>
+        insert(into = ctx.metadataRootElemOpt.toList, origin = List(reorderedElem))
 
         assert(
           FormRunnerSummaryOrder.readSummaryControlColumns(ctx.metadataRootElemOpt) == List(
@@ -85,13 +73,7 @@ class SummaryOrderFbTest
           )
         )
 
-        // MCP `formGetSettings` and `buildSummaryControlColumnsXml` reflect the reversed order while preserving `@default-pos`
-        val settingsAfterReorder = Await.result(FormBuilderMcpRpcApiImpl.formGetSettings(""), 5.seconds)
-        assert(settingsAfterReorder.summary.controlColumns == List(
-          SummaryControlColumnR(control = "control-2", sectionName = None),
-          SummaryControlColumnR(control = "control-1", sectionName = None)
-        ))
-
+        // `buildSummaryControlColumnsXml` reflects the reversed order while preserving `@default-pos`
         val reorderedCols = (SummaryOrderOps.buildSummaryControlColumnsXml / "column").toList
         assert(reorderedCols.map(c => (c.attValue("control"), c.attValue("default-pos"))) == List(
           ("control-2", "2"),
@@ -101,24 +83,8 @@ class SummaryOrderFbTest
         val pos1After = SummaryOrderOps.controlSummaryPositionInfo("control-1")
         assert(pos1After.attValue("active-pos") == "2")
 
-        // Resetting back to `[control-1, control-2]` (or `Nil`) removes `<summary-control-columns>` from metadata
-        Await.result(
-          FormBuilderMcpRpcApiImpl.formSetSettings(
-            "",
-            FormSettingsUpdateR(
-              summary = Some(
-                FormSettingsSummaryUpdateR(
-                  controlColumns = Some(List(
-                    SummaryControlColumnR(control = "control-1"),
-                    SummaryControlColumnR(control = "control-2")
-                  ))
-                )
-              )
-            )
-          ),
-          5.seconds
-        )
-
+        // Removing `<summary-control-columns>` resets back to form order
+        delete(ctx.metadataRootElemOpt.toList / FormRunnerSummaryOrder.SummaryControlColumnsElemName)
         assert((ctx.metadataRootElemOpt.toList / FormRunnerSummaryOrder.SummaryControlColumnsElemName).isEmpty)
       }
     }
@@ -129,39 +95,6 @@ class SummaryOrderFbTest
         FormBuilderXPathApi.setControlSummaryShow("control-1", enabled = true)
         FormBuilderXPathApi.setControlSummaryShow("control-2", enabled = true)
 
-        // Include both a top-level control and a section-template control (`section-1` / `control-11`) in metadata
-        Await.result(
-          FormBuilderMcpRpcApiImpl.formSetSettings(
-            "",
-            FormSettingsUpdateR(
-              summary = Some(
-                FormSettingsSummaryUpdateR(
-                  controlColumns = Some(List(
-                    SummaryControlColumnR(control = "control-2"),
-                    SummaryControlColumnR(control = "control-11", sectionName = Some("section-1")),
-                    SummaryControlColumnR(control = "control-1")
-                  ))
-                )
-              )
-            )
-          ),
-          5.seconds
-        )
-
-        // Note: `control-11` in `section-1` wasn't statically marked `summary-show` in the template, so manually write
-        // a `<column section-name="section-1" control="control-11"/>` entry into metadata to test rename of both kinds
-        Await.result(
-          FormBuilderMcpRpcApiImpl.formSetSettings(
-            "",
-            FormSettingsUpdateR(
-              summary = Some(FormSettingsSummaryUpdateR(controlColumns = Some(Nil)))
-            )
-          ),
-          5.seconds
-        )
-
-        import org.orbeon.oxf.xforms.action.XFormsAPI.insert
-        import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
         val customElem: org.orbeon.saxon.om.NodeInfo =
           <summary-control-columns>
             <column control="control-2"/>

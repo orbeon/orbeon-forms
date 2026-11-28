@@ -61,6 +61,9 @@
         <positive-byte-size>En az 1 bayt karşılığı veren pozitif bir boyut girin</positive-byte-size>
         <heap-percentage>%0'dan büyük ve en fazla %100 olan bir yüzde girin</heap-percentage>
         <duration>Bir süre girin, örn. 30m, 2h, 1d, PT30M veya milisaniye</duration>
+        <pdf-header-footer-json>Geçersiz PDF üstbilgi/altbilgi JSON yapılandırması</pdf-header-footer-json>
+        <preview-devices-json>Geçersiz önizleme cihazları JSON yapılandırması</preview-devices-json>
+        <positive-duration>Pozitif bir süre girin</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Sınırsız</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>Maks. yığın %</heap-percent>
         <fixed-size>Sabit boyut</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Ayarlanmadı</unset>
+        <disabled>Devre dışı</disabled>
+        <min-sections>Minimum bölüm sayısı</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Devre dışı</disabled>
+        <delay>Gecikmeden sonra</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Sınırsız</unlimited>
+        <max-files>Maksimum dosya sayısı</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Zaman aşımı yok</unlimited>
+        <timeout>Boşta kalma süresi</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Biçimlendir</format>
+        <copy>Kopyala</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>dk.</min>
@@ -113,7 +137,7 @@
         <label>Özet Sayfası</label>
     </summary-section>
     <admin-section>
-        <label>Form Yönetimi Sayfası</label>
+        <label>Yönetim Sayfaları</label>
     </admin-section>
     <import-section>
         <label>İçe ve Dışa Aktarma</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Giriş ve Çıkış Formatları</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>İsteğe bağlı</profiles-hint>
         <profiles-help>İsteğe bağlı özellik profilleri. Bir veya daha fazla profil adı belirtildiğinde, bu özellik yalnızca bu profillerin etkin olduğu isteklere uygulanır; koşulsuz uygulamak için boş bırakın.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Gezinme Çubuğu Öğeleri</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Görünür Tablo Sütunları</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Salt Okunur ve PDF Görünümü</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Detay Sayfası Çerçeve Öğeleri</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Oluşturulan Ekler</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Diller</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Oturum ve Bölgesel Ayarlar</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Tema ve Düzen</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Etiketler, İpuçları ve Kısayollar</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Bileşen Görünümleri</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Marka ve Özel Varlıklar</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Tablo ve Sayfalama</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Düğmeler ve Sürümleme</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Kaydetme ve Oturum</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Form Kullanılabilirliği</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Doğrulama ve Veri</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Hata Özeti</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>CAPTCHA</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Odak, İpuçları ve Sekme Sırası</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Bölümler ve Yinelemeler</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Tekil (Singleton) Form</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Gezinme ve Doğrulama</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL Parametreleri</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Form Yönetimi Sayfası</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Form Analitiği</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Sistem Konsolu</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Sayfa Yapısı ve Üstbilgi/Altbilgi</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Standartlar ve İşleme</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Yazı Tipleri ve Şablonlar</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>İletim ve SMTP Sunucusu</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Adresler</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Dışa Aktarma</label>
+    </export-group>
+    <import-group>
+        <label>İçe Aktarma</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Form Üstverileri ve Yayınlama</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>İzinler İletişim Kutusu Seçenekleri</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP Sunucusu</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP Sunucusu</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner İzinleri</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Gezinme Çubuğu Kullanıcı Menüsü</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Belirteçler (Token)</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Giriş Maskeleri</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Çıkış İfadeleri (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Varsayılan Dil</label>
         <hint>Varsayılan dil kodu &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Maks. Boşta Kalma Süresi</label>
         <hint>Önbelleğe alınmış XPath ifadeleri çıkarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Maks. Giriş Sayısı</label>
+        <hint>JVM yığınında tutulan maksimum paylaşılan salt okunur XML örneği sayısı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Bayt Bütçesi</label>
+        <hint>Maks. JVM yığın yüzdesi, sabit veri boyutu (bayt olarak saklanır) veya sınırsız &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Maks. Boşta Kalma Süresi</label>
+        <hint>Önbelleğe alınan paylaşılan örnekler çıkarılmadan önceki isteğe bağlı boşta kalma zaman aşımı (örn. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; veya boş) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Gezinme Çubuğunda Ana Sayfa Bağlantısını Göster</label>
+        <label>Ana Sayfa Bağlantısı</label>
         <hint>Gezinme çubuğunda Ana Sayfa bağlantısını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Yönetim Menüsü</label>
+        <hint>Gezinme çubuğunda Yönetim menüsünü etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Gezinme Çubuğunda Dil Seçiciyi Göster</label>
+        <label>Dil Seçici</label>
         <hint>Gezinme çubuğunda dil seçiciyi etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Gezinme Çubuğunda Renk Düzeni Seçiciyi Göster</label>
+        <label>Renk Şeması Seçici</label>
         <hint>Gezinme çubuğunda açık/koyu mod seçiciyi etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Gezinme Çubuğunda Paylaş Düğmesini Göster</label>
+        <label>Paylaş Düğmesi</label>
         <hint>Gezinme çubuğunda bağlantı paylaşma düğmesini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Gezinme Çubuğunda Revizyon Geçmişini Göster</label>
+        <label>Sürüm Geçmişi</label>
         <hint>Gezinme çubuğunda revizyon geçmişi simgesini etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Gezinme Çubuğunda İş Akışı Aşamasını Göster</label>
+        <label>İş Akışı Aşaması</label>
         <hint>Gezinme çubuğunda geçerli iş akışı aşamasını görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Kayıt Gezinmesi</label>
+        <hint>Gezinme çubuğunda Önceki/Sonraki kayıt gezinme oklarını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Ek Kotası</label>
+        <hint>Gezinme çubuğunda ek depolama kotası kullanımını görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Tema (Form Başına)</label>
         <hint>Formlar için görsel tema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Salt Okunur Modlarda İpuçlarını Göster</label>
+        <label>Denetim İpuçlarını Göster</label>
         <hint>Görüntüleme ve PDF modlarında kontrol ipuçlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Salt Okunur Modlarda Uyarıları Göster</label>
+        <label>Doğrulama Uyarılarını Göster</label>
         <hint>Görüntüleme ve PDF modlarında doğrulama uyarılarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Salt Okunur Modlarda Zorunlu Alan Göstergelerini Göster</label>
+        <label>Zorunlu Alan İşaretlerini Göster</label>
         <hint>Görüntüleme ve PDF modlarında zorunlu alan göstergelerini göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Görüntüleme Modunda Açıklamaları Göster</label>
+        <label>Açıklamaları Göster (Görüntüleme Modu)</label>
         <hint>Görüntüleme modunda fr:explanation kontrollerini göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Bölüm Görünümü</label>
+        <hint>Bölümler için görsel stil &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Izgara Görünümü</label>
+        <hint>Tekrarlanan ızgaralar için görsel stil &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Hesaplanan Değer Görünümü</label>
+        <hint>Hesaplanan Değer denetimleri için görsel stil &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Tam)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Tam</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Küçük Resmi Göster</label>
+        <hint>Ayrıntı sayfalarında formun küçük resmini görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Ayrıntı Sayfası Düğmeleri</label>
         <hint>Ayrıntı sayfasında gösterilen, boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Görüntüleme sayfasında gösterilen, boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Otomatik Kaydetme Gecikmesi (ms)</label>
-        <hint>Otomatik kaydetme öncesinde milisaniye cinsinden gecikme; 0 otomatik kaydetmeyi devre dışı bırakır &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Otomatik Kaydetme Gecikmesi</label>
+        <hint>Taslak veriler otomatik kaydedilmeden önceki gecikme (milisaniye olarak saklanır) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Basit Veri Taşıma</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Hata Özeti Sayfa Boyutu</label>
+        <hint>Hata özetinde başlangıçta gösterilen maksimum doğrulama mesajı sayısı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Değer Değiştiğinde Kontrolleri Ziyaret Edildi Olarak İşaretle</label>
+        <hint>Değerleri değiştiğinde kontrolleri ziyaret edildi olarak işaretle &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Geçersiz Kontrolleri Ziyaret Edildi Olarak İşaretle</label>
+        <hint>Doğrulama çalıştığında geçersiz kontrolleri ziyaret edildi olarak işaretle &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>CAPTCHA Bileşeni</label>
         <hint>Ayrıntı sayfalarındaki CAPTCHA uygulaması &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>CAPTCHA Konumu</label>
+        <hint>Ayrıntı ve sihirbaz sayfalarında CAPTCHA'nın nerede gösterileceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Formun Altı)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Formun Altı</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Sihirbaz İçinde (Tüm Sayfalar)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Sihirbaz İçinde (İlk Sayfa)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Sihirbaz İçinde (Son Sayfa)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>CAPTCHA Görünürlüğü</label>
+        <hint>CAPTCHA'nın ne zaman gösterileceğini denetleyen mantıksal değer veya XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Tekil Form</label>
         <hint>Bu form için yalnızca tek bir form veri belgesine izin ver &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>İçindekiler Tablosu</label>
+    </toc-group>
     <toc-min-sections>
         <label>İçindekiler İçin Minimum Bölüm Sayısı</label>
-        <hint>İçindekiler tablosunu göstermek için gereken minimum bölüm sayısı; devre dışı bırakmak için -1, kullanılmıyorsa -2 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Formda en az bu kadar bölüm olduğunda içindekiler tablosunu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>İçindekiler Konumu</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Mesajlar</label>
+    </messages-group>
     <messages-appearance>
         <label>Mesaj Görünümü</label>
         <hint>İşlem mesajlarının nasıl görüntüleneceği &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Oturum Süresi Dolma Uyarısı Eşiği</label>
+        <hint>Uyarı iletişim kutusunun görüneceği oturum süresi yüzdesi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Oturum Süresi Dolma Payı</label>
+        <hint>Oturum süresi dolmadan önceki saniye cinsinden güvenlik payı &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Kullanılabilirlik Başlangıcı</label>
+        <hint>Yeni form gönderimlerinin kabul edileceği en erken tarih ve saat &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Kullanılabilirlik Bitişi</label>
+        <hint>Yeni form gönderimlerinin kabul edileceği en geç tarih ve saat &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Kaydedilmemiş Değişikliklerle Ayrılırken Uyar</label>
         <hint>Kaydedilmemiş veri uyarısını denetleyen mantıksal değer veya XPath ifadesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Özet sayfasındaki boşlukla ayrılmış düğme listesi &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Oluşturulma Tarihi Sütununu Göster</label>
+        <label>Oluşturulma</label>
         <hint>Özet sayfasında oluşturulma zaman damgası sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Son Değiştirilme Sütununu Göster</label>
+        <label>Son Değişiklik</label>
         <hint>Özet sayfasında son değiştirilme zaman damgası sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>İş Akışı Aşaması Sütununu Göster</label>
+        <label>İş Akışı Aşaması</label>
         <hint>Özet sayfasında iş akışı aşaması sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Oluşturan Sütununu Göster</label>
+        <label>Oluşturan</label>
         <hint>Özet sayfasında Oluşturan sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Son Değiştiren Sütununu Göster</label>
+        <label>Son Değiştiren</label>
         <hint>Özet sayfasında Son Değiştiren sütununu göster &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Küçük Resim</label>
+        <hint>Özet sayfasında formun küçük resmini görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Özet Sayfası Toplu Eylem Süreçleri</label>
+        <hint>Seçili satırlarda toplu eylem olarak kullanılabilen, boşlukla ayrılmış süreç adları &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Form Yönetimi Sayfa Boyutu</label>
         <hint>Form Yönetimi sayfasında sayfa başına gösterilen form sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Uzak Sunucu Yapılandırması</label>
         <hint>Form yayınlama ve yönetimi için uzak sunucuların JSON dizisi &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Form Analitiğini Etkinleştir</label>
+        <hint>Çalışma zamanı oturum izlemesini ve &lt;code&gt;/fr/analytics&lt;/code&gt; sayfasını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Analitik Yetkili Rolleri</label>
+        <hint>Analitiği görüntülemesine izin verilen, virgül veya boşlukla ayrılmış rol adları &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Analitikte Kullanıcı Adlarını Göster</label>
+        <hint>Form Analitiğinde kimliği doğrulanmış kullanıcı adlarını görüntüle &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Maks. İzlenen Etkin Oturum Sayısı</label>
+        <hint>Bellekte tutulan maksimum etkin form oturumu sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Maks. İzlenen Son Oturum Sayısı</label>
+        <hint>Bellekte tutulan maksimum tamamlanmış form oturumu sayısı &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Metrik Geçmişi Örneklemesini Etkinleştir</label>
+        <hint>&lt;code&gt;/fr/console&lt;/code&gt; için arka planda JVM ve önbellek metrik geçmişini topla &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Metrik Örnekleme Aralığı</label>
+        <hint>Sistem Konsolu metrikleri için örnekleme aralığı (en az 1 saniye) &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Dışa Aktarma Sayfasını Etkinleştir</label>
         <hint>Form verilerini dışa aktarma sayfasını etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Varsayılan gizli bilgi (BCC) alıcı e-posta adresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>E-postaya PDF Ekle</label>
+        <label>PDF</label>
         <hint>Oluşturulan PDF'i bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>E-postaya XML Verisi Ekle</label>
+        <label>XML Verisi</label>
         <hint>Form XML verilerini bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Evet)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>E-postaya TIFF Ekle</label>
+        <label>TIFF</label>
         <hint>Oluşturulan TIFF görüntüsünü bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>E-postaya Excel (Adlandırılmış Aralıklar) Ekle</label>
+        <label>Excel (Adlandırılmış Aralıklar)</label>
         <hint>Adlandırılmış aralıklar içeren Excel dosyasını bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>E-postaya XML Form Yapısı ve Verilerini Ekle</label>
+        <label>XML Form Yapısı ve Verisi</label>
         <hint>Form yapısı ve verilerinin XML dışa aktarımını bildirim e-postalarına ekle &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Varsayılan (Hayır)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Eylemler ve Servisler</actions-services>
         <reset-all>Tümünü sıfırla</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Denetimlere Genel Bakış</label>
+        <hint>Form Builder'da Denetimlere Genel Bakış iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Formu Denetle</label>
+        <hint>Form Builder'da Formu Denetle iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML Şeması</label>
         <hint>Form Builder'da XML Şeması iletişim kutusu düğmesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Belirteç Erişimi Seçeneği</label>
+        <hint>Form Builder İzinler iletişim kutusunda belirteçle erişim seçeneğini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Sahip ve Grup İzinleri</label>
+        <hint>Form Builder İzinler iletişim kutusunda Sahip ve Grup Üyeleri satırlarını göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Rol Seçim Listesi</label>
+        <hint>Form Builder İzinler iletişim kutusunda yapılandırılmış rol seçim listesini göster &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Yeni Form İletişim Kutusu Adımları</label>
+        <hint>Form Builder'da yeni bir form oluştururken gösterilen adımlar &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Şablonlar ve Genel Ayarlar)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Şablonlar ve Genel Ayarlar</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Yalnızca Şablonlar</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Yalnızca Genel Ayarlar</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Yok (Doğrudan Düzenleyiciyi Aç)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Bölümleri Otomatik Daraltma Eşiği</label>
+        <hint>Form Builder'da bölümlerin başlangıçta daraltılmış açılacağı denetim sayısı eşiği &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Önizleme Cihazı Ön Ayarları (JSON)</label>
+        <hint>Form Builder Test iletişim kutusunda gösterilen duyarlı cihaz ön ayarlarının JSON dizisi &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Form Builder MCP Sunucusunu Etkinleştir</label>
         <hint>Form Builder için Model Bağlam Protokolü (MCP) sunucusunu etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Form Builder MCP Belirteci Geçerlilik Süresi (Dakika)</label>
+        <hint>Form Builder MCP belirteçleri için dakika cinsinden geçerlilik süresi &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Form Runner MCP Sunucusunu Etkinleştir</label>
+        <hint>Form Runner için Model Bağlam Protokolü (MCP) sunucusunu etkinleştir &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Hayır)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Form Runner MCP Sunucusu İçin Belirteç Zorunlu Kıl</label>
+        <hint>Form Runner MCP sunucusu için belirteç tabanlı kimlik doğrulamayı zorunlu kıl &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Varsayılan (Evet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Evet</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Hayır</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Form Runner MCP Belirteci Geçerlilik Süresi (Dakika)</label>
+        <hint>Form Runner MCP belirteçleri için dakika cinsinden geçerlilik süresi &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Tarih Giriş Formatı</label>
         <hint>Tarih giriş formatı maskesi, örn. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; veya &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

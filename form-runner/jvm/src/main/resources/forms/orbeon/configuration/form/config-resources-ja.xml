@@ -61,6 +61,9 @@
         <positive-byte-size>1バイト以上となる正のサイズを入力してください</positive-byte-size>
         <heap-percentage>0% より大きく 100% 以下のパーセンテージを入力してください</heap-percentage>
         <duration>期間を入力してください（例: 30m、2h、1d、PT30M、またはミリ秒）</duration>
+        <pdf-header-footer-json>PDF ヘッダー／フッターの JSON 設定が無効です</pdf-header-footer-json>
+        <preview-devices-json>プレビューデバイスの JSON 設定が無効です</preview-devices-json>
+        <positive-duration>正の期間を入力してください</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>無制限</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>最大ヒープ %</heap-percent>
         <fixed-size>固定サイズ</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>未設定</unset>
+        <disabled>無効</disabled>
+        <min-sections>最小セクション数</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>無効</disabled>
+        <delay>指定時間後</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>無制限</unlimited>
+        <max-files>最大ファイル数</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>タイムアウトなし</unlimited>
+        <timeout>アイドルタイムアウト</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>整形</format>
+        <copy>コピー</copy>
+    </json-actions>
     <units>
         <ms>ミリ秒</ms>
         <min>分</min>
@@ -113,7 +137,7 @@
         <label>一覧ページ</label>
     </summary-section>
     <admin-section>
-        <label>フォーム管理ページ</label>
+        <label>管理ページ</label>
     </admin-section>
     <import-section>
         <label>インポートとエクスポート</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>入出力フォーマット</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>任意</profiles-hint>
         <profiles-help>任意のプロパティプロファイルです。1 つ以上のプロファイル名を指定すると、それらのプロファイルが有効なリクエストにのみこのプロパティが適用されます。無条件に適用する場合は空欄のままにします。</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>ナビゲーションバーの項目</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>表示するテーブル列</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>読み取り専用および PDF 表示</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>詳細ページの UI 要素</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>自動生成される添付ファイル</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>言語</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>セッションと地域設定</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>テーマとレイアウト</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>ラベル・ヒント・ショートカット</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>コンポーネントの外観</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>ブランディングとカスタムアセット</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>テーブルとページネーション</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>ボタンとバージョン管理</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>保存とセッション</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>フォームの利用可能期間</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>バリデーションとデータ</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>エラー概要</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>CAPTCHA</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>フォーカス・ヒント・タブ移動</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>セクションと繰り返し</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>シングルトンフォーム</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>ナビゲーションとバリデーション</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL パラメータ</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>フォーム管理ページ</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>フォーム分析</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>システムコンソール</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>ページ設定とヘッダー／フッター</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>規格とレンダリング</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>フォントとテンプレート</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>送信方式と SMTP サーバー</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>メールアドレス</label>
+    </email-addresses-group>
+    <export-group>
+        <label>エクスポート</label>
+    </export-group>
+    <import-group>
+        <label>インポート</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>フォームメタデータと公開</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>権限ダイアログのオプション</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP サーバー</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP サーバー</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner の権限</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>ナビゲーションバーのユーザーメニュー</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>トークン</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>入力マスク</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>出力フォーマット式 (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>デフォルト言語</label>
         <hint>デフォルトの言語コード &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>最大アイドル時間</label>
         <hint>キャッシュされたXPath式を破棄するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>最大エントリ数</label>
+        <hint>JVMヒープ内に保持する共有読み取り専用XMLインスタンスの最大数 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>メモリ上限</label>
+        <hint>最大JVMヒープに対する割合、固定データサイズ（バイト単位で保存）、または無制限 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>最大アイドル時間</label>
+        <hint>キャッシュされた共有インスタンスを破棄するまでのアイドルタイムアウト（任意、例: &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt;、または空欄） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>ナビゲーションバーにホームリンクを表示</label>
+        <label>ホームリンク</label>
         <hint>ナビゲーションバーのホームリンクを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>管理メニュー</label>
+        <hint>ナビゲーションバーの管理メニューを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>ナビゲーションバーに言語セレクターを表示</label>
+        <label>言語セレクター</label>
         <hint>ナビゲーションバーの言語セレクターを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>ナビゲーションバーにカラースキームセレクターを表示</label>
+        <label>カラースキーム切替</label>
         <hint>ナビゲーションバーのライト/ダークモード切り替えを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>ナビゲーションバーに共有ボタンを表示</label>
+        <label>共有ボタン</label>
         <hint>ナビゲーションバーの共有リンクボタンを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>ナビゲーションバーに変更履歴を表示</label>
+        <label>改訂履歴</label>
         <hint>ナビゲーションバーの変更履歴アイコンを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>ナビゲーションバーにワークフローステージを表示</label>
+        <label>ワークフローステージ</label>
         <hint>ナビゲーションバーに現在のワークフローステージを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>検索ナビゲーション</label>
+        <hint>ナビゲーションバーの前後レコード移動矢印を有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>添付ファイル使用量</label>
+        <hint>ナビゲーションバーに添付ファイル容量の使用状況を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>テーマ（フォームごと）</label>
         <hint>フォームのビジュアルテーマ &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>読み取り専用モードでヒントを表示</label>
+        <label>コントロールのヒントを表示</label>
         <hint>表示モードおよびPDFモードでコントロールのヒントを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>読み取り専用モードでアラートを表示</label>
+        <label>バリデーション警告を表示</label>
         <hint>表示モードおよびPDFモードで検証アラートを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>読み取り専用モードで必須マークを表示</label>
+        <label>必須マークを表示</label>
         <hint>表示モードおよびPDFモードで必須フィールドのマークを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>表示モードで説明テキストを表示</label>
+        <label>説明コントロールを表示（表示モード）</label>
         <hint>表示モードで fr:explanation コントロールを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>セクションの外観</label>
+        <hint>セクションの表示スタイル &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (通常)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>通常</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>シンプル</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>グリッドの外観</label>
+        <hint>繰り返しグリッドの表示スタイル &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (通常)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>通常</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>シンプル</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>計算値コントロールの外観</label>
+        <hint>計算値コントロールの表示スタイル &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (通常)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>通常</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>シンプル</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>サムネイルを表示</label>
+        <hint>詳細ページにフォームのサムネイルを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>詳細ページのボタン</label>
         <hint>詳細ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>表示ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>自動保存の遅延 (ミリ秒)</label>
-        <hint>自動保存までのミリ秒単位の遅延時間（0で自動保存を無効化） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>自動保存の間隔</label>
+        <hint>下書きを自動保存するまでの待機時間（ミリ秒単位で保存） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>簡易データ移行</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>エラー概要の初期表示件数</label>
+        <hint>エラー概要に最初から表示する検証メッセージの最大件数 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>値変更時にコントロールを訪問済みに設定</label>
+        <hint>値が変更されたときにコントロールを訪問済みにする &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>無効なコントロールを訪問済みに設定</label>
+        <hint>検証実行時に無効なコントロールを訪問済みにする &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>CAPTCHAコンポーネント</label>
         <hint>詳細ページで使用するCAPTCHA実装 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>CAPTCHAの位置</label>
+        <hint>詳細ページおよびウィザードページでCAPTCHAを表示する位置 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (フォームの下部)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>フォームの下部</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>ウィザード内 (すべてのページ)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>ウィザード内 (最初のページ)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>ウィザード内 (最後のページ)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>CAPTCHAの表示条件</label>
+        <hint>CAPTCHAを表示するかどうかを制御するブール値またはXPath式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>シングルトンフォーム</label>
         <hint>このフォームに対して1つのフォームデータドキュメントのみを許可する &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>目次</label>
+    </toc-group>
     <toc-min-sections>
         <label>目次を表示する最小セクション数</label>
-        <hint>目次を表示するために必要な最小セクション数（-1で無効、-2で未使用） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>フォームにこの数以上のセクションがある場合に目次を表示 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>目次の位置</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>メッセージ</label>
+    </messages-group>
     <messages-appearance>
         <label>メッセージの外観</label>
         <hint>アクションメッセージの表示方法 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>セッション期限切れ警告のトリガー</label>
+        <hint>警告ダイアログを表示するセッション有効期間に対する割合（%） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>セッション期限切れのマージン</label>
+        <hint>セッション期限切れ前の安全マージン（秒単位） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>利用開始日時</label>
+        <hint>新規フォームデータの受付を開始する日時 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>利用終了日時</label>
+        <hint>新規フォームデータの受付を終了する日時 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>未保存の変更がある状態で離れる際に警告</label>
         <hint>未保存データの警告を制御するブール値またはXPath式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>一覧ページに表示するスペース区切りのボタンリスト &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>作成日列を表示</label>
+        <label>作成日時</label>
         <hint>一覧ページに作成日時の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>更新日列を表示</label>
+        <label>最終更新日時</label>
         <hint>一覧ページに最終更新日時の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>ワークフローステージ列を表示</label>
+        <label>ワークフローステージ</label>
         <hint>一覧ページにワークフローステージの列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>作成者列を表示</label>
+        <label>作成者</label>
         <hint>一覧ページに作成者の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>更新者列を表示</label>
+        <label>最終更新者</label>
         <hint>一覧ページに更新者の列を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>サムネイル</label>
+        <hint>一覧ページにフォームのサムネイルを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>一覧ページの一括アクションプロセス</label>
+        <hint>選択した行に対して一括アクションとして実行できるスペース区切りのプロセス名 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>フォーム管理ページの表示件数</label>
         <hint>フォーム管理ページで1ページあたりに表示するフォーム数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>リモートサーバー設定</label>
         <hint>フォームの公開/管理用リモートサーバーのJSON配列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>フォーム分析を有効化</label>
+        <hint>実行時のセッショントラッキングと &lt;code&gt;/fr/analytics&lt;/code&gt; ページを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>分析の閲覧を許可するロール</label>
+        <hint>分析の閲覧を許可するカンマまたはスペース区切りのロール名 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>分析にユーザー名を表示</label>
+        <hint>フォーム分析に認証済みユーザー名を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>追跡するアクティブセッションの最大数</label>
+        <hint>メモリ内に保持するアクティブなフォームセッションの最大数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>追跡する最近のセッションの最大数</label>
+        <hint>メモリ内に保持する完了済みフォームセッションの最大数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>メトリクス履歴のサンプリングを有効化</label>
+        <hint>&lt;code&gt;/fr/console&lt;/code&gt; 用にバックグラウンドでJVMおよびキャッシュのメトリクス履歴を収集する &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>メトリクスサンプリング間隔</label>
+        <hint>システムコンソールのメトリクスのサンプリング間隔（1秒以上） &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>エクスポートページを有効化</label>
         <hint>フォームデータのエクスポートページを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>デフォルトのBCCメールアドレス &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>メールにPDFを添付</label>
+        <label>PDF</label>
         <hint>通知メールに生成されたPDFを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>メールにXMLデータを添付</label>
+        <label>XML データ</label>
         <hint>通知メールにフォームのXMLデータを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (はい)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>メールにTIFFを添付</label>
+        <label>TIFF</label>
         <hint>通知メールに生成されたTIFF画像を添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>メールにExcel (名前付き範囲) を添付</label>
+        <label>Excel（名前付き範囲）</label>
         <hint>通知メールに名前付き範囲付きのExcelファイルを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>メールにXMLフォーム構造とデータを添付</label>
+        <label>XML フォーム構造とデータ</label>
         <hint>通知メールにフォーム構造とデータのXMLエクスポートを添付する &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>デフォルト (いいえ)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>アクションとサービス</actions-services>
         <reset-all>すべてリセット</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>コントロール一覧</label>
+        <hint>Form Builder にコントロール一覧ダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>フォームチェック</label>
+        <hint>Form Builder にフォームチェックダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML スキーマ</label>
         <hint>Form Builder にXMLスキーマダイアログボタンを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>トークンアクセスオプション</label>
+        <hint>Form Builder の権限ダイアログにトークンアクセスオプションを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>所有者とグループの権限</label>
+        <hint>Form Builder の権限ダイアログに所有者とグループメンバーの行を表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>ロール選択リスト</label>
+        <hint>Form Builder の権限ダイアログに設定済みのロール選択リストを表示する &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>新規フォームダイアログのステップ</label>
+        <hint>Form Builder で新規フォームを作成するときに表示するステップ &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (テンプレートと全般設定)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>テンプレートと全般設定</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>テンプレートのみ</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>全般設定のみ</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>なし (エディターを直接開く)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>セクション自動折りたたみのしきい値</label>
+        <hint>Form Builder でセクションを初期状態で折りたたむコントロール数のしきい値 &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>プレビューデバイスプリセット (JSON)</label>
+        <hint>Form Builder のテストダイアログに表示するレスポンシブデバイスプリセットのJSON配列 &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Form Builder MCPサーバーを有効化</label>
         <hint>Form Builder の Model Context Protocol (MCP) サーバーを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Form Builder MCPトークンの有効期間 (分)</label>
+        <hint>Form Builder MCPトークンの分単位の有効期間 &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Form Runner MCPサーバーを有効化</label>
+        <hint>Form Runner の Model Context Protocol (MCP) サーバーを有効にする &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (いいえ)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Form Runner MCPサーバーにトークンを要求</label>
+        <hint>Form Runner MCPサーバーにトークン認証を要求する &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>デフォルト (はい)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>はい</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>いいえ</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Form Runner MCPトークンの有効期間 (分)</label>
+        <hint>Form Runner MCPトークンの分単位の有効期間 &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>日付入力フォーマット</label>
         <hint>日付入力フォーマットマスク（例: &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; または &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt;） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

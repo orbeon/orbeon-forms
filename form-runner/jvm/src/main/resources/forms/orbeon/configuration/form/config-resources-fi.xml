@@ -61,6 +61,9 @@
         <positive-byte-size>Syötä positiivinen koko, joka on vähintään 1 tavu</positive-byte-size>
         <heap-percentage>Syötä prosenttiosuus, joka on suurempi kuin 0 % ja enintään 100 %</heap-percentage>
         <duration>Syötä kesto, esim. 30m, 2h, 1d, PT30M tai millisekunnit</duration>
+        <pdf-header-footer-json>Virheellinen PDF-ylä-/alatunnisteen JSON-määritys</pdf-header-footer-json>
+        <preview-devices-json>Virheellinen esikatselulaitteiden JSON-määritys</preview-devices-json>
+        <positive-duration>Anna positiivinen kesto</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Rajoittamaton</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>Enimmäiskeon %</heap-percent>
         <fixed-size>Kiinteä koko</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Ei asetettu</unset>
+        <disabled>Pois käytöstä</disabled>
+        <min-sections>Vähimmäisosiomäärä</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Ei käytössä</disabled>
+        <delay>Viiveen jälkeen</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Rajoittamaton</unlimited>
+        <max-files>Enimmäismäärä</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Ei aikakatkaisua</unlimited>
+        <timeout>Joutokäynnin aikakatkaisu</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Muotoile</format>
+        <copy>Kopioi</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>min</min>
@@ -113,7 +137,7 @@
         <label>Yhteenvetosivu</label>
     </summary-section>
     <admin-section>
-        <label>Lomakehallintasivu</label>
+        <label>Ylläpitosivut</label>
     </admin-section>
     <import-section>
         <label>Tuonti ja vienti</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Syöttö- ja tulostusmuodot</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Valinnainen</profiles-hint>
         <profiles-help>Valinnaiset ominaisuusprofiilit. Kun yksi tai useampi profiilinimi on määritetty, tämä ominaisuus koskee vain pyyntöjä, joissa kyseiset profiilit ovat käytössä; jätä tyhjäksi käyttääksesi ehdoitta.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Navigointipalkin kohteet</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Näkyvät taulukon sarakkeet</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Vain luku- ja PDF-näkymä</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Lomakesivun kehyselementit</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Luodut liitteet</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Kielet</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Istunto ja alueasetukset</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Teema ja asettelu</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Nimikkeet, vihjeet ja pikanäppäimet</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Komponenttien ulkoasut</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Ilme ja mukautetut resurssit</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Taulukko ja sivutus</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Painikkeet ja versiointi</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Tallennus ja istunto</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Lomakkeen saatavuus</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Validointi ja tiedot</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Virheyhteenveto</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Kohdistus, vihjeet ja sarkainjärjestys</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Osiot ja toistot</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Yksittäislomake (singleton)</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navigointi ja validointi</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL-parametrit</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Lomakehallintasivu</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Lomakeanalytiikka</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Järjestelmäkonsoli</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Sivun asetukset ja ylä-/alatunniste</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Standardit ja tulostus</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Fontit ja pohjat</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Välitys ja SMTP-palvelin</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Osoitteet</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Vienti</label>
+    </export-group>
+    <import-group>
+        <label>Tuonti</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Lomakkeen metatiedot ja julkaisu</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Käyttöoikeusikkunan asetukset</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP -palvelin</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP -palvelin</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner -käyttöoikeudet</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Navigointipalkin käyttäjävalikko</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Valtuustunnukset (tokenit)</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Syöttömuodot</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Tulostuslausekkeet (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Oletuskieli</label>
         <hint>Oletuskielikoodi &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Enimmäisjoutoaika</label>
         <hint>Valinnainen joutoajan aikakatkaisu ennen välimuistissa olevien XPath-lausekkeiden poistamista (esim. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; tai tyhjä) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Enimmäismäärä</label>
+        <hint>JVM-kekomuistissa pidettävien jaettujen vain luku -tilaisten XML-instanssien enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Tavukiintiö</label>
+        <hint>JVM-enimmäiskeon prosenttiosuus, kiinteä tietokoko (tallennetaan tavuina) tai rajoittamaton &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Enimmäisjoutoaika</label>
+        <hint>Valinnainen joutoajan aikakatkaisu ennen välimuistissa olevien jaettujen instanssien poistamista (esim. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; tai tyhjä) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Näytä Koti-linkki navigointipalkissa</label>
+        <label>Etusivulinkki</label>
         <hint>Ota Koti-linkki käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Ylläpitovalikko</label>
+        <hint>Ota Ylläpito-valikko käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Näytä kielivalitsin navigointipalkissa</label>
+        <label>Kielivalitsin</label>
         <hint>Ota kielivalitsin käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Näytä väriteeman valitsin navigointipalkissa</label>
+        <label>Väriteeman valitsin</label>
         <hint>Ota vaalean/tumman tilan valitsin käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Näytä Jaa-painike navigointipalkissa</label>
+        <label>Jaa-painike</label>
         <hint>Ota jakolinkkipainike käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Näytä versiohistoria navigointipalkissa</label>
+        <label>Versiohistoria</label>
         <hint>Ota versiohistorian kuvake käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Näytä työvaihe navigointipalkissa</label>
+        <label>Työnkulun vaihe</label>
         <hint>Näytä nykyinen työvaihe navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Hakunavigointi</label>
+        <hint>Ota Edellinen/Seuraava-tietuenavigointinuolet käyttöön navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Liitekiintiö</label>
+        <hint>Näytä liitteiden tallennuskiintiön käyttö navigointipalkissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Ei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Teema (lomakekohtainen)</label>
         <hint>Lomakkeiden visuaalinen teema &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Näytä vihjeet vain luku -tiloissa</label>
+        <label>Näytä kenttien vihjeet</label>
         <hint>Näytä kontrollien vihjeet katselu- ja PDF-tiloissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Näytä virheilmoitukset vain luku -tiloissa</label>
+        <label>Näytä validointi-ilmoitukset</label>
         <hint>Näytä validointi-ilmoitukset katselu- ja PDF-tiloissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Näytä pakollisuuden merkinnät vain luku -tiloissa</label>
+        <label>Näytä pakollisuuden merkinnät</label>
         <hint>Näytä pakollisten kenttien merkinnät katselu- ja PDF-tiloissa &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Näytä selitykset katselutilassa</label>
+        <label>Näytä selitteet (katselutila)</label>
         <hint>Näytä fr:explanation-kontrollit katselutilassa &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Osion ulkoasu</label>
+        <hint>Osioiden visuaalinen tyyli &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Täysi)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Täysi</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaalinen</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Ruudukon ulkoasu</label>
+        <hint>Toistuvien ruudukoiden visuaalinen tyyli &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Täysi)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Täysi</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaalinen</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Lasketun arvon ulkoasu</label>
+        <hint>Laskettu arvo -kontrollien visuaalinen tyyli &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Täysi)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Täysi</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaalinen</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Näytä pikkukuva</label>
+        <hint>Näytä lomakkeen pikkukuva yksityiskohtasivuilla &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Ei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Yksityiskohtasivun painikkeet</label>
         <hint>Välilyönnein erotettu luettelo yksityiskohtasivulla näytettävistä painikkeista &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Välilyönnein erotettu luettelo katselusivulla näytettävistä painikkeista &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Automaattitallennuksen viive (ms)</label>
-        <hint>Viive millisekunteina ennen automaattitallennusta; 0 poistaa käytöstä &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Automaattitallennuksen viive</label>
+        <hint>Viive ennen luonnosten automaattista tallennusta (tallennetaan millisekunteina) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Yksinkertainen tietojen migraatio</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Virheyhteenvedon sivukoko</label>
+        <hint>Virheyhteenvedossa aluksi näytettävien validointiviestien enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Merkitse kontrollit käydyiksi arvon muuttuessa</label>
+        <hint>Merkitse kontrollit käydyiksi, kun niiden arvo muuttuu &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Merkitse virheelliset kontrollit käydyiksi</label>
+        <hint>Merkitse virheelliset kontrollit käydyiksi validoinnin suorituksen yhteydessä &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Captcha-komponentti</label>
         <hint>Captcha-toteutus yksityiskohtasivuilla &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Captcha-sijainti</label>
+        <hint>Missä Captcha esitetään yksityiskohta- ja ohjatun toiminnon sivuilla &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Lomakkeen alaosassa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Lomakkeen alaosassa</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Ohjatun toiminnon sisällä (kaikki sivut)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Ohjatun toiminnon sisällä (ensimmäinen sivu)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Ohjatun toiminnon sisällä (viimeinen sivu)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Captcha-näkyvyys</label>
+        <hint>Totuusarvo tai XPath-lauseke, joka ohjaa Captchan näyttämistä &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Singleton-lomake</label>
         <hint>Salli vain yksi lomaketietoasiakirja tälle lomakkeelle &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Sisällysluettelo</label>
+    </toc-group>
     <toc-min-sections>
         <label>Sisällysluettelon vähimmäisosiomäärä</label>
-        <hint>Sisällysluettelon näyttämiseen vaadittava vähimmäisosiomäärä; -1 poistaa käytöstä, -2 ei käytössä &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Näytä sisällysluettelo, kun lomakkeessa on vähintään tämä määrä osioita &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Sisällysluettelon sijainti</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Viestit</label>
+    </messages-group>
     <messages-appearance>
         <label>Viestien ulkoasu</label>
         <hint>Miten toimintojen viestit näytetään &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Istunnon vanhenemisvaroituksen kynnys</label>
+        <hint>Prosenttiosuus istunnon kestosta, jonka jälkeen varoitusikkuna näytetään &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Istunnon vanhenemisen varmuusmarginaali</label>
+        <hint>Varmuusmarginaali sekunteina ennen istunnon vanhenemista &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Saatavilla alkaen</label>
+        <hint>Aikaisin päivämäärä ja kellonaika, jolloin uusia lomakelähetyksiä vastaanotetaan &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Saatavilla asti</label>
+        <hint>Myöhäisin päivämäärä ja kellonaika, jolloin uusia lomakelähetyksiä vastaanotetaan &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Varoita poistuttaessa tallentamattomien muutosten kanssa</label>
         <hint>Totuusarvo tai XPath-lauseke, joka ohjaa tallentamattomien tietojen varoitusta &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Välilyönnein erotettu luettelo yhteenvetosivun painikkeista &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Näytä Luotu-sarake</label>
+        <label>Luotu</label>
         <hint>Näytä luontiajan sarake yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Näytä Muokattu-sarake</label>
+        <label>Viimeksi muokattu</label>
         <hint>Näytä viimeisimmän muokkausajan sarake yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Näytä Työvaihe-sarake</label>
+        <label>Työnkulun vaihe</label>
         <hint>Näytä työvaiheen sarake yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Näytä Luonut-sarake</label>
+        <label>Luonut</label>
         <hint>Näytä Luonut-sarake yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Näytä Muokannut-sarake</label>
+        <label>Muokannut</label>
         <hint>Näytä Muokannut-sarake yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Pikkukuva</label>
+        <hint>Näytä lomakkeen pikkukuva yhteenvetosivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Ei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Yhteenvetosivun massatoimintoprosessit</label>
+        <hint>Välilyönnein erotetut prosessien nimet, jotka ovat käytettävissä massatoimintoina valituille riveille &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Lomakehallinnan sivukoko</label>
         <hint>Lomakkeiden määrä sivua kohden Lomakehallinta-sivulla &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Etäpalvelimien määritys</label>
         <hint>Etäpalvelimien JSON-taulukko lomakkeiden julkaisua ja hallintaa varten &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Ota lomakeanalytiikka käyttöön</label>
+        <hint>Ota ajonaikainen istuntoseuranta ja &lt;code&gt;/fr/analytics&lt;/code&gt;-sivu käyttöön &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Analytiikan valtuutetut roolit</label>
+        <hint>Pilkuin tai välilyönnein erotetut roolinimet, joilla on oikeus tarkastella analytiikkaa &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Näytä käyttäjätunnukset analytiikassa</label>
+        <hint>Näytä todennetut käyttäjätunnukset lomakeanalytiikassa &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Seurattavien aktiivisten istuntojen enimmäismäärä</label>
+        <hint>Muistissa säilytettävien aktiivisten lomakeistuntojen enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Seurattavien viimeaikaisten istuntojen enimmäismäärä</label>
+        <hint>Muistissa säilytettävien päättyneiden lomakeistuntojen enimmäismäärä &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Ota mittarihistorian näytteenotto käyttöön</label>
+        <hint>Kerää taustalla JVM- ja välimuistimittarien historiaa &lt;code&gt;/fr/console&lt;/code&gt;-sivua varten &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Mittarien näytteenottoväli</label>
+        <hint>Näytteenottoväli (vähintään 1 sekunti) järjestelmäkonsolin mittareille &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Ota vientisivu käyttöön</label>
         <hint>Ota lomaketietojen vientisivu käyttöön &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Piilokopion vastaanottajan oletussähköpostiosoite (BCC) &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>Liitä PDF sähköpostiin</label>
+        <label>PDF</label>
         <hint>Liitä luotu PDF-tiedosto ilmoitussähköposteihin &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>Liitä XML-tiedot sähköpostiin</label>
+        <label>XML-tiedot</label>
         <hint>Liitä lomakkeen XML-tiedot ilmoitussähköposteihin &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Kyllä)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>Liitä TIFF sähköpostiin</label>
+        <label>TIFF</label>
         <hint>Liitä luotu TIFF-kuva ilmoitussähköposteihin &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Liitä Excel (nimetyt alueet) sähköpostiin</label>
+        <label>Excel (nimetyt alueet)</label>
         <hint>Liitä nimetyillä alueilla varustettu Excel-tiedosto ilmoitussähköposteihin &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>Liitä lomakkeen XML-rakenne ja tiedot sähköpostiin</label>
+        <label>XML-lomakerakenne ja -tiedot</label>
         <hint>Liitä lomakkeen rakenteen ja tietojen XML-vienti ilmoitussähköposteihin &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Oletus (Ei)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Toiminnot ja palvelut</actions-services>
         <reset-all>Palauta kaikki</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Kontrollien yleiskatsaus</label>
+        <hint>Näytä Kontrollien yleiskatsaus -valintaikkunan painike Form Builder -työkalussa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Tarkista lomake</label>
+        <hint>Näytä Tarkista lomake -valintaikkunan painike Form Builder -työkalussa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-skeema</label>
         <hint>Näytä XML-skeeman valintaikkunan painike Form Builder -työkalussa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Valtuutustunnuspääsyn valinta</label>
+        <hint>Näytä valtuutustunnuspääsyn valinta Form Builder -työkalun Käyttöoikeudet-ikkunassa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Omistajan ja ryhmän käyttöoikeudet</label>
+        <hint>Näytä Omistaja- ja Ryhmän jäsenet -rivit Form Builder -työkalun Käyttöoikeudet-ikkunassa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Roolien valintaluettelo</label>
+        <hint>Näytä määritetty roolien valintaluettelo Form Builder -työkalun Käyttöoikeudet-ikkunassa &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Uuden lomakkeen valintaikkunan vaiheet</label>
+        <hint>Vaiheet, jotka näytetään luotaessa uutta lomaketta Form Builder -työkalussa &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Mallipohjat ja yleiset asetukset)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Mallipohjat ja yleiset asetukset</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Vain mallipohjat</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Vain yleiset asetukset</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Ei mitään (avaa editori suoraan)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Osioiden automaattisen kutistamisen kynnysarvo</label>
+        <hint>Kontrollien määrän kynnysarvo, jonka täyttyessä tai ylittyessä osiot avataan kutistettuina Form Builder -työkalussa &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Esikatselulaitteiden esiasetukset (JSON)</label>
+        <hint>Responsiivisten laite-esiasetusten JSON-taulukko Form Builder -työkalun esikatseluikkunassa &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Ota Form Builder MCP -palvelin käyttöön</label>
         <hint>Ota Model Context Protocol (MCP) -palvelin käyttöön Form Builder -työkalulle &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Form Builder MCP -valtuutustunnuksen voimassaoloaika (minuuttia)</label>
+        <hint>Form Builder MCP -valtuutustunnusten voimassaoloaika minuutteina &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Ota Form Runner MCP -palvelin käyttöön</label>
+        <hint>Ota Model Context Protocol (MCP) -palvelin käyttöön Form Runner -ympäristölle &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Ei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Vaadi valtuutustunnus Form Runner MCP -palvelimelle</label>
+        <hint>Vaadi valtuutustunnukseen perustuva todennus Form Runner MCP -palvelimelle &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Oletus (Kyllä)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Kyllä</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Ei</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Form Runner MCP -valtuutustunnuksen voimassaoloaika (minuuttia)</label>
+        <hint>Form Runner MCP -valtuutustunnusten voimassaoloaika minuutteina &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Päivämäärän syöttömuoto</label>
         <hint>Päivämäärän syöttömuotomaski, esim. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; tai &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

@@ -141,6 +141,61 @@ trait FormRunnerConfiguration {
     RemoteServersEditorUI.isValidRemoteServersJson(value)
 
   //@XPathFunction
+  def isValidPdfHeaderFooterJson(value: String): Boolean =
+    Option(value).flatMap(_.trimAllToOpt) match {
+      case None           => true
+      case Some(nonEmpty) => Try(org.orbeon.oxf.fr.pdf.PdfConfig20231.decode(nonEmpty)).toOption.exists(_.isSuccess)
+    }
+
+  //@XPathFunction
+  def isValidPreviewDevicesJson(value: String): Boolean =
+    FormRunnerConfiguration.checkPreviewDevicesJson(value)
+
+  //@XPathFunction
+  def isValidSampleIntervalQuantity(rawAmount: String, unitCode: String): Boolean =
+    FormRunnerConfiguration.cacheIdleQuantityToStringOpt(rawAmount, unitCode)
+      .flatMap(ObjectCache.parseDurationMillis)
+      .exists(_ >= ConsoleMetricsHistory.MinSampleIntervalMs)
+
+  //@XPathFunction
+  def formatJson(value: String): String = {
+    val raw = Option(value).getOrElse("")
+    raw.trimAllToOpt match {
+      case None => ""
+      case Some(nonEmpty) =>
+        io.circe.parser.parse(nonEmpty) match {
+          case Right(json) => json.spaces2
+          case Left(_)     => raw
+        }
+    }
+  }
+
+  //@XPathFunction
+  def availableTimezoneIds(): Array[String] =
+    FormRunnerConfiguration.AvailableTimezoneIds
+
+  //@XPathFunction
+  def isValidAutosaveQuantity(rawAmount: String, unitCode: String): Boolean =
+    FormRunnerConfiguration.autosaveQuantityToMillisOpt(rawAmount, unitCode).exists(_ > 0L)
+
+  //@XPathFunction
+  def autosaveQuantityToMillis(rawAmount: String, unitCode: String): String =
+    FormRunnerConfiguration.autosaveQuantityToMillisOpt(rawAmount, unitCode) match {
+      case Some(ms) => ms.toString
+      case None     => Option(rawAmount).map(_.trimAllToEmpty).getOrElse("")
+    }
+
+  //@XPathFunction
+  def isValidCacheIdleQuantity(rawAmount: String, unitCode: String): Boolean =
+    FormRunnerConfiguration.cacheIdleQuantityToStringOpt(rawAmount, unitCode)
+      .exists(s => ObjectCache.parseDurationMillis(s).isDefined)
+
+  //@XPathFunction
+  def cacheIdleQuantityToString(rawAmount: String, unitCode: String): String =
+    FormRunnerConfiguration.cacheIdleQuantityToStringOpt(rawAmount, unitCode)
+      .getOrElse(Option(rawAmount).map(_.trimAllToEmpty).getOrElse(""))
+
+  //@XPathFunction
   def landingCardsToEditorXml(rawValue: String, fallbackValue: String): DocumentNodeInfoType = {
     val editorDoc = LandingCardsConfigXml.toEditorDom(rawValue, fallbackValue)
     new DocumentWrapper(editorDoc, null, StaticXPath.GlobalConfiguration)
@@ -325,10 +380,53 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       "email",
       "import",
       "form-builder",
+      "mcp",
       "security",
       "formats",
       "caches"
     )
+
+  private val ValidPreviewDeviceCategories: Set[String] =
+    Set("mobile", "tablet", "desktop")
+
+  private val MultiTokenSelectionKeys: Set[String] =
+    Set("home-table-link-to", "fb-new-form-wizard-steps")
+
+  val DefaultFbTestDevicesJson: String =
+    """[
+      |  {"id": "iphone-18-pro", "name": "iPhone 18 Pro", "width": 402, "height": 874, "category": "mobile"},
+      |  {"id": "iphone-18-pro-max", "name": "iPhone 18 Pro Max", "width": 440, "height": 956, "category": "mobile"},
+      |  {"id": "iphone-duo-folded", "name": "iPhone Duo (Folded)", "width": 382, "height": 618, "category": "mobile"},
+      |  {"id": "pixel-11", "name": "Pixel 11", "width": 412, "height": 924, "category": "mobile"},
+      |  {"id": "galaxy-s26", "name": "Galaxy S26", "width": 360, "height": 780, "category": "mobile"},
+      |  {"id": "iphone-duo-unfolded", "name": "iPhone Duo (Unfolded)", "width": 669, "height": 902, "category": "tablet"},
+      |  {"id": "ipad-mini", "name": "iPad Mini", "width": 744, "height": 1133, "category": "tablet"},
+      |  {"id": "ipad-air", "name": "iPad Air", "width": 820, "height": 1180, "category": "tablet"},
+      |  {"id": "ipad-pro-13", "name": "iPad Pro 13\"", "width": 1024, "height": 1366, "category": "tablet"},
+      |  {"id": "laptop", "name": "Laptop", "width": 1280, "height": 800, "category": "desktop"},
+      |  {"id": "desktop", "name": "Desktop", "width": 1440, "height": 900, "category": "desktop"}
+      |]""".stripMargin
+
+  def checkPreviewDevicesJson(value: String): Boolean =
+    Option(value).flatMap(_.trimAllToOpt) match {
+      case None => true
+      case Some(nonEmpty) =>
+        io.circe.parser.parse(nonEmpty).toOption.flatMap(_.asArray) match {
+          case Some(arr) if arr.nonEmpty =>
+            arr.forall { item =>
+              val c = item.hcursor
+              (for {
+                _   <- c.downField("id").as[String].toOption.flatMap(_.trimAllToOpt)
+                _   <- c.downField("name").as[String].toOption.flatMap(_.trimAllToOpt)
+                w   <- c.downField("width").as[Int].toOption if w > 0
+                h   <- c.downField("height").as[Int].toOption if h > 0
+                cat <- c.downField("category").as[String].toOption.map(_.trim.toLowerCase)
+                if ValidPreviewDeviceCategories(cat)
+              } yield ()).isDefined
+            }
+          case _ => false
+        }
+    }
 
   val CuratedProperties: List[CuratedPropertyDef] = List(
     // 1. System
@@ -495,12 +593,47 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       validationOpt   = Some("duration"),
       legacyBaseNames = List("oxf.cache.xpath.max-idle")
     ),
+    CuratedPropertyDef(
+      key           = "cache-shared-instances-size",
+      category      = "caches",
+      baseName      = "oxf.xforms.cache.shared-instances.size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "200",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-shared-instances-max-size-bytes",
+      category      = "caches",
+      baseName      = "oxf.xforms.cache.shared-instances.max-size-bytes",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "5%",
+      validationOpt = Some("byte-size-or-percent")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-shared-instances-max-idle",
+      category      = "caches",
+      baseName      = "oxf.xforms.cache.shared-instances.max-idle",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "",
+      validationOpt = Some("duration")
+    ),
 
     // 2. Navigation Bar
     CuratedPropertyDef(
       key          = "navbar-home-link",
       category     = "navbar",
       baseName     = "oxf.fr.navbar.home-link.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "navbar-admin-menu",
+      category     = "navbar",
+      baseName     = "oxf.fr.navbar.admin-menu.enable",
       xsType       = "xs:boolean",
       hasAppForm   = false,
       defaultValue = "true"
@@ -544,6 +677,24 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       key          = "navbar-workflow-stage",
       category     = "navbar",
       baseName     = "oxf.fr.navbar.workflow-stage.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = "false"
+    ),
+    CuratedPropertyDef(
+      key          = "navbar-search-navigation",
+      category     = "navbar",
+      baseName     = "oxf.fr.navbar.search-navigation.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "navbar-attachment-quota",
+      category     = "navbar",
+      baseName     = "oxf.fr.navbar.attachment-quota.enable",
       xsType       = "xs:boolean",
       hasAppForm   = true,
       hasProfiles = true,
@@ -739,6 +890,42 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasProfiles = true,
       defaultValue = "true"
     ),
+    CuratedPropertyDef(
+      key          = "section-appearance",
+      category     = "appearance",
+      baseName     = "oxf.xforms.xbl.fr.section.appearance",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = ""
+    ),
+    CuratedPropertyDef(
+      key          = "grid-appearance",
+      category     = "appearance",
+      baseName     = "oxf.xforms.xbl.fr.grid.appearance",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = ""
+    ),
+    CuratedPropertyDef(
+      key          = "calculated-value-appearance",
+      category     = "appearance",
+      baseName     = "oxf.xforms.xbl.fr.calculated-value.appearance",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = ""
+    ),
+    CuratedPropertyDef(
+      key          = "detail-show-thumbnail",
+      category     = "appearance",
+      baseName     = "oxf.fr.detail.show-thumbnail",
+      xsType       = "xs:boolean",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = "false"
+    ),
 
     // 3. Detail Page / Form Options
     CuratedPropertyDef(
@@ -749,7 +936,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm    = true,
       hasProfiles   = true,
       defaultValue  = "5000",
-      validationOpt = Some("non-negative-integer")
+      validationOpt = Some("autosave-delay")
     ),
     CuratedPropertyDef(
       key          = "data-migration",
@@ -797,6 +984,31 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "bottom"
     ),
     CuratedPropertyDef(
+      key           = "error-summary-page-size",
+      category      = "detail",
+      baseName      = "oxf.xforms.xbl.fr.error-summary.page-size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "20",
+      validationOpt = Some("positive-integer")
+    ),
+    CuratedPropertyDef(
+      key          = "error-summary-visit-value-changed",
+      category     = "detail",
+      baseName     = "oxf.xforms.xbl.fr.error-summary.visit-value-changed",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "error-summary-visit-invalid",
+      category     = "detail",
+      baseName     = "oxf.xforms.xbl.fr.error-summary.visit-invalid",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
       key          = "captcha-component",
       category     = "detail",
       baseName     = "oxf.fr.detail.captcha.component",
@@ -804,6 +1016,25 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm   = true,
       hasProfiles = true,
       defaultValue = ""
+    ),
+    CuratedPropertyDef(
+      key          = "captcha-location",
+      category     = "detail",
+      baseName     = "oxf.fr.detail.captcha.location",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      hasProfiles = true,
+      defaultValue = "form-bottom"
+    ),
+    CuratedPropertyDef(
+      key           = "captcha-visible",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.captcha.visible",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "true",
+      validationOpt = Some("xpath2-or-avt")
     ),
     CuratedPropertyDef(
       key          = "singleton-enabled",
@@ -824,13 +1055,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "open"
     ),
     CuratedPropertyDef(
-      key          = "toc-min-sections",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.toc.min-sections",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "-2"
+      key           = "toc-min-sections",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.toc.min-sections",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "-2",
+      validationOpt = Some("toc-min-sections")
     ),
     CuratedPropertyDef(
       key          = "toc-position",
@@ -927,6 +1159,44 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "false"
     ),
     CuratedPropertyDef(
+      key           = "session-expiration-trigger",
+      category      = "detail",
+      baseName      = "oxf.xforms.session-expiration.trigger",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "80",
+      validationOpt = Some("percentage-1-to-100")
+    ),
+    CuratedPropertyDef(
+      key           = "session-expiration-margin",
+      category      = "detail",
+      baseName      = "oxf.xforms.session-expiration.margin",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "10",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "available-from-datetime",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.available-from.dateTime",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("optional-datetime")
+    ),
+    CuratedPropertyDef(
+      key           = "available-to-datetime",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.available-to.dateTime",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("optional-datetime")
+    ),
+    CuratedPropertyDef(
       key           = "warn-when-data-unsafe",
       category      = "detail",
       baseName      = "oxf.fr.detail.warn-when-data-unsafe",
@@ -1019,7 +1289,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm    = true,
       hasProfiles   = true,
       defaultValue  = "",
-      validationOpt = Some("optional-integer-or-unlimited")
+      validationOpt = Some("attachment-max-files")
     ),
     CuratedPropertyDef(
       key          = "attachment-mediatypes",
@@ -1241,6 +1511,22 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm   = true,
       defaultValue = "false"
     ),
+    CuratedPropertyDef(
+      key          = "summary-show-thumbnail",
+      category     = "summary",
+      baseName     = "oxf.fr.summary.show-thumbnail",
+      xsType       = "xs:boolean",
+      hasAppForm   = true,
+      defaultValue = "false"
+    ),
+    CuratedPropertyDef(
+      key          = "summary-bulk-processes",
+      category     = "summary",
+      baseName     = "oxf.fr.summary.bulk-processes",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      defaultValue = ""
+    ),
     // 7. Landing Page
     CuratedPropertyDef(
       key           = "landing-page-size",
@@ -1295,6 +1581,65 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm    = false,
       defaultValue  = "[]",
       validationOpt = Some("remote-servers-json")
+    ),
+    CuratedPropertyDef(
+      key          = "analytics-enable",
+      category     = "admin",
+      baseName     = "oxf.fr.analytics.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "analytics-roles",
+      category     = "admin",
+      baseName     = "oxf.fr.analytics.roles",
+      xsType       = "xs:string",
+      hasAppForm   = true,
+      defaultValue = ""
+    ),
+    CuratedPropertyDef(
+      key          = "analytics-show-usernames",
+      category     = "admin",
+      baseName     = "oxf.fr.analytics.show-usernames",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key           = "analytics-max-active-sessions",
+      category      = "admin",
+      baseName      = "oxf.fr.analytics.max-active-sessions",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "20000",
+      validationOpt = Some("positive-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "analytics-max-recent-sessions",
+      category      = "admin",
+      baseName      = "oxf.fr.analytics.max-recent-sessions",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "500",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key          = "console-history-enable",
+      category     = "admin",
+      baseName     = "oxf.fr.console.history.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key           = "console-history-sample-interval",
+      category      = "admin",
+      baseName      = "oxf.fr.console.history.sample-interval",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "15s",
+      validationOpt = Some("sample-interval")
     ),
 
     // 9. Import & Export Pages
@@ -1479,7 +1824,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm    = true,
       hasProfiles   = true,
       defaultValue  = "",
-      validationOpt = Some("json")
+      validationOpt = Some("pdf-header-footer-json")
     ),
 
     // 8. Email
@@ -1631,6 +1976,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
     // 9. Form Builder
     CuratedPropertyDef(
+      key          = "fb-menu-controls",
+      category     = "form-builder",
+      baseName     = "oxf.fb.menu.controls",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
       key          = "fb-menu-schema",
       category     = "form-builder",
       baseName     = "oxf.fb.menu.schema",
@@ -1642,6 +1995,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       key          = "fb-menu-pdf",
       category     = "form-builder",
       baseName     = "oxf.fb.menu.pdf",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "fb-menu-check-form",
+      category     = "form-builder",
+      baseName     = "oxf.fb.menu.check-form",
       xsType       = "xs:boolean",
       hasAppForm   = false,
       defaultValue = "true"
@@ -1759,8 +2120,60 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "true"
     ),
     CuratedPropertyDef(
-      key          = "fb-mcp-enable",
+      key          = "fb-menu-permissions-token",
       category     = "form-builder",
+      baseName     = "oxf.fb.menu.permissions.token",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "fb-menu-permissions-owner-group",
+      category     = "form-builder",
+      baseName     = "oxf.fb.menu.permissions.owner-group",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "fb-menu-permissions-list",
+      category     = "form-builder",
+      baseName     = "oxf.fb.menu.permissions.list",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key          = "fb-new-form-wizard-steps",
+      category     = "form-builder",
+      baseName     = "oxf.fb.new-form.wizard-steps",
+      xsType       = "xs:string",
+      hasAppForm   = false,
+      defaultValue = "templates general-settings"
+    ),
+    CuratedPropertyDef(
+      key           = "fb-section-close",
+      category      = "form-builder",
+      baseName      = "oxf.fb.section.close",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "100",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "fb-test-devices",
+      category      = "form-builder",
+      baseName      = "oxf.fb.test.devices",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = DefaultFbTestDevicesJson,
+      validationOpt = Some("preview-devices-json")
+    ),
+
+    // 9b. Model Context Protocol (MCP)
+    CuratedPropertyDef(
+      key          = "fb-mcp-enable",
+      category     = "mcp",
       baseName     = "oxf.fb.mcp.enable",
       xsType       = "xs:boolean",
       hasAppForm   = false,
@@ -1768,11 +2181,45 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key          = "fb-mcp-token-enable",
-      category     = "form-builder",
+      category     = "mcp",
       baseName     = "oxf.fb.mcp.token.enable",
       xsType       = "xs:boolean",
       hasAppForm   = false,
       defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key           = "fb-mcp-token-validity",
+      category      = "mcp",
+      baseName      = "oxf.fb.mcp.token.validity",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "525600",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key          = "fr-mcp-enable",
+      category     = "mcp",
+      baseName     = "oxf.fr.mcp.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "false"
+    ),
+    CuratedPropertyDef(
+      key          = "fr-mcp-token-enable",
+      category     = "mcp",
+      baseName     = "oxf.fr.mcp.token.enable",
+      xsType       = "xs:boolean",
+      hasAppForm   = false,
+      defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key           = "fr-mcp-token-validity",
+      category      = "mcp",
+      baseName      = "oxf.fr.mcp.token.validity",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "525600",
+      validationOpt = Some("non-negative-integer")
     ),
 
     // 10. Global Input / Output Formats
@@ -2448,16 +2895,128 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
           val rawOverrideOpt = values.get(c.key)
           rawOverrideOpt match {
             case Some(v) =>
+              val norm = if (MultiTokenSelectionKeys(c.key)) v.splitTo[List]().mkString(" ") else v
               elem.addAttribute("override", "true")
-              elem.addAttribute("value", v)
-              elem.addAttribute("selection", if (c.key == "home-table-link-to") v.splitTo[List]().mkString(" ") else v)
+              elem.addAttribute("value", norm)
+              elem.addAttribute("selection", norm)
             case None =>
               elem.addAttribute("override", "false")
               elem.addAttribute("value", c.defaultValue)
               elem.addAttribute("selection", "__default__")
           }
 
-          if (c.validationOpt.contains("attachment-max-size")) {
+          if (c.validationOpt.contains("toc-min-sections")) {
+            val modeElem  = elem.addElement("mode")
+            val countElem = elem.addElement("count")
+            rawOverrideOpt match {
+              case None =>
+                modeElem.setText("unset")
+              case Some(v) =>
+                val trimmed = v.trim
+                if (trimmed.isEmpty || trimmed == "-2") {
+                  elem.addAttribute("value", "-2")
+                  modeElem.setText("unset")
+                } else if (trimmed == "-1") {
+                  elem.addAttribute("value", "-1")
+                  modeElem.setText("disabled")
+                } else {
+                  modeElem.setText("min-sections")
+                  countElem.setText(trimmed)
+                }
+            }
+          } else if (c.validationOpt.contains("autosave-delay")) {
+            val modeElem = elem.addElement("mode")
+            val qtyElem  = elem.addElement("quantity")
+            val effectiveRaw = rawOverrideOpt.getOrElse(c.defaultValue).trim
+            if (effectiveRaw.isEmpty || effectiveRaw == "0") {
+              if (rawOverrideOpt.isDefined)
+                elem.addAttribute("value", "0")
+              modeElem.setText("disabled")
+              qtyElem.addAttribute("unit", "s")
+            } else {
+              Try(effectiveRaw.toLong).toOption.filter(_ > 0L) match {
+                case Some(ms) =>
+                  val (numStr, unitCode) = millisToDisplayDuration(ms)
+                  if (rawOverrideOpt.isDefined)
+                    elem.addAttribute("value", ms.toString)
+                  modeElem.setText("delay")
+                  qtyElem.addAttribute("unit", unitCode)
+                  qtyElem.setText(numStr)
+                case None =>
+                  modeElem.setText("delay")
+                  qtyElem.addAttribute("unit", "ms")
+                  qtyElem.setText(effectiveRaw)
+              }
+            }
+          } else if (c.validationOpt.contains("attachment-max-files")) {
+            val modeElem  = elem.addElement("mode")
+            val countElem = elem.addElement("count")
+            rawOverrideOpt match {
+              case None =>
+                modeElem.setText("unlimited")
+              case Some(v) =>
+                val trimmed = v.trim
+                if (trimmed.isEmpty || trimmed == "-1") {
+                  elem.addAttribute("value", "-1")
+                  modeElem.setText("unlimited")
+                } else {
+                  modeElem.setText("max-files")
+                  countElem.setText(trimmed)
+                }
+            }
+          } else if (c.validationOpt.contains("duration")) {
+            val modeElem = elem.addElement("mode")
+            val qtyElem  = elem.addElement("quantity")
+            rawOverrideOpt match {
+              case None =>
+                modeElem.setText("unlimited")
+                qtyElem.addAttribute("unit", "m")
+              case Some(v) =>
+                val trimmed = v.trim
+                if (trimmed.isEmpty || trimmed == "0" || trimmed == "-1") {
+                  elem.addAttribute("value", "")
+                  modeElem.setText("unlimited")
+                  qtyElem.addAttribute("unit", "m")
+                } else {
+                  parseIdleDurationToDisplay(trimmed) match {
+                    case Some((numStr, unitCode, normValue)) =>
+                      elem.addAttribute("value", normValue)
+                      modeElem.setText("timeout")
+                      qtyElem.addAttribute("unit", unitCode)
+                      qtyElem.setText(numStr)
+                    case None =>
+                      modeElem.setText("timeout")
+                      qtyElem.addAttribute("unit", "m")
+                      qtyElem.setText(trimmed)
+                  }
+                }
+            }
+          } else if (c.validationOpt.contains("sample-interval")) {
+            val qtyElem = elem.addElement("quantity")
+            val effectiveRaw = rawOverrideOpt.getOrElse(c.defaultValue).trim
+            parseIdleDurationToDisplay(effectiveRaw) match {
+              case Some((numStr, unitCode, normValue)) if unitCode == "s" || unitCode == "m" || unitCode == "h" || unitCode == "d" =>
+                if (rawOverrideOpt.isDefined)
+                  elem.addAttribute("value", normValue)
+                qtyElem.addAttribute("unit", unitCode)
+                qtyElem.setText(numStr)
+              case Some((_, "ms", _)) =>
+                ObjectCache.parseDurationMillis(effectiveRaw) match {
+                  case Some(ms) if ms >= ConsoleMetricsHistory.MinSampleIntervalMs && ms % 1000L == 0L =>
+                    val secs = ms / 1000L
+                    if (rawOverrideOpt.isDefined)
+                      elem.addAttribute("value", s"${secs}s")
+                    qtyElem.addAttribute("unit", "s")
+                    qtyElem.setText(secs.toString)
+                  case _ =>
+                    qtyElem.addAttribute("unit", "s")
+                    qtyElem.setText(effectiveRaw)
+                }
+              case _ =>
+                qtyElem.addAttribute("unit", "s")
+                qtyElem.setText(effectiveRaw)
+            }
+          } else if (c.validationOpt.contains("attachment-max-size")) {
             val modeElem = elem.addElement("mode")
             val qtyElem  = elem.addElement("quantity")
             rawOverrideOpt match {
@@ -3507,4 +4066,72 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       pills.mkString(" ")
     }
   }
+
+  private val IdleDurationDirectRegex = """^(\d+)\s*(ms|s|m|h|d)?$""".r
+
+  val AvailableTimezoneIds: Array[String] = {
+    import scala.jdk.CollectionConverters.*
+    val standardRegions = Set(
+      "Africa/", "America/", "Antarctica/", "Arctic/", "Asia/",
+      "Atlantic/", "Australia/", "Europe/", "Indian/", "Pacific/"
+    )
+    val regional =
+      java.time.ZoneId.getAvailableZoneIds.asScala
+        .filter(id => standardRegions.exists(id.startsWith))
+        .toVector
+        .sorted
+    ("UTC" +: regional).toArray
+  }
+
+  def autosaveQuantityToMillisOpt(rawAmount: String, unitCode: String): Option[Long] =
+    for {
+      trimmed <- Option(rawAmount).flatMap(_.trimAllToOpt)
+      bd      <- Try(BigDecimal(trimmed)).toOption
+      if bd > BigDecimal(0)
+      mult    <- Option(unitCode).map(_.trim) match {
+                   case Some("ms") | None | Some("") => Some(BigDecimal(1))
+                   case Some("s")                    => Some(BigDecimal(1000))
+                   case Some("min")                  => Some(BigDecimal(60_000))
+                   case _                            => None
+                 }
+      millisBd = bd * mult
+      if millisBd.isWhole && millisBd <= BigDecimal(Long.MaxValue)
+    } yield millisBd.toLongExact
+
+  def millisToDisplayDuration(ms: Long): (String, String) =
+    if (ms >= 60_000L && ms % 60_000L == 0L)
+      ((ms / 60_000L).toString, "min")
+    else if (ms >= 1000L && ms % 1000L == 0L)
+      ((ms / 1000L).toString, "s")
+    else
+      (ms.toString, "ms")
+
+  def cacheIdleQuantityToStringOpt(rawAmount: String, unitCode: String): Option[String] =
+    for {
+      trimmed <- Option(rawAmount).flatMap(_.trimAllToOpt)
+      bd      <- Try(BigDecimal(trimmed)).toOption
+      if bd > BigDecimal(0) && bd.isWhole && bd <= BigDecimal(Long.MaxValue)
+      unit    <- Option(unitCode).map(_.trim) match {
+                   case Some(u @ ("ms" | "s" | "m" | "h" | "d")) => Some(u)
+                   case None | Some("")                          => Some("m")
+                   case _                                        => None
+                 }
+    } yield s"${bd.toLongExact}$unit"
+
+  def parseIdleDurationToDisplay(raw: String): Option[(String, String, String)] =
+    raw.trim match {
+      case IdleDurationDirectRegex(numStr, unitOrNull) =>
+        Try(numStr.toLong).toOption.filter(_ > 0L).map { n =>
+          val u = Option(unitOrNull).filter(_.nonEmpty).getOrElse("ms")
+          (n.toString, u, s"$n$u")
+        }
+      case other =>
+        ObjectCache.parseDurationMillis(other).map { ms =>
+          if (ms % 86_400_000L == 0L)      ((ms / 86_400_000L).toString, "d", s"${ms / 86_400_000L}d")
+          else if (ms % 3_600_000L == 0L)  ((ms / 3_600_000L).toString,  "h", s"${ms / 3_600_000L}h")
+          else if (ms % 60_000L == 0L)     ((ms / 60_000L).toString,     "m", s"${ms / 60_000L}m")
+          else if (ms % 1000L == 0L)       ((ms / 1000L).toString,       "s", s"${ms / 1000L}s")
+          else                             (ms.toString,                 "ms", s"${ms}ms")
+        }
+    }
 }

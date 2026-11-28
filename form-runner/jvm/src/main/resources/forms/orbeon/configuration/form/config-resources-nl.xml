@@ -61,6 +61,9 @@
         <positive-byte-size>Voer een positieve grootte in van ten minste 1 byte</positive-byte-size>
         <heap-percentage>Voer een percentage in groter dan 0% en tot maximaal 100%</heap-percentage>
         <duration>Voer een tijdsduur in, bijv. 30m, 2h, 1d, PT30M of milliseconden</duration>
+        <pdf-header-footer-json>Ongeldige JSON-configuratie voor PDF-koptekst/-voettekst</pdf-header-footer-json>
+        <preview-devices-json>Ongeldige JSON-configuratie voor voorbeeldapparaten</preview-devices-json>
+        <positive-duration>Voer een positieve duur in</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Onbeperkt</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>% max. heap</heap-percent>
         <fixed-size>Vaste grootte</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Niet ingesteld</unset>
+        <disabled>Uitgeschakeld</disabled>
+        <min-sections>Minimaal aantal secties</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Uitgeschakeld</disabled>
+        <delay>Na vertraging</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Onbeperkt</unlimited>
+        <max-files>Maximum aantal bestanden</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Geen time-out</unlimited>
+        <timeout>Inactiviteitstime-out</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Opmaak</format>
+        <copy>Kopiëren</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>min</min>
@@ -113,7 +137,7 @@
         <label>Samenvattingspagina</label>
     </summary-section>
     <admin-section>
-        <label>Formulierenbeheer</label>
+        <label>Beheerpagina's</label>
     </admin-section>
     <import-section>
         <label>Importeren en exporteren</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Invoer- en uitvoerformaten</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Optioneel</profiles-hint>
         <profiles-help>Optionele eigenschapsprofielen. Wanneer een of meer profielnamen zijn opgegeven, geldt deze eigenschap alleen voor verzoeken waarbij die profielen actief zijn; laat leeg om onvoorwaardelijk toe te passen.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Onderdelen van navigatiebalk</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Zichtbare tabelkolommen</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Alleen-lezen en PDF-weergave</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Pagina-elementen op detailpagina</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Gegenereerde bijlagen</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Talen</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Sessie en regionale instellingen</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Thema en lay-out</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Labels, hints en sneltoetsen</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Weergave van componenten</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Huisstijl en aangepaste bestanden</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Tabel en paginering</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Knoppen en versiebeheer</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Opslaan en sessie</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Formulierbeschikbaarheid</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Validatie en gegevens</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Foutenoverzicht</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Focus, hints en tabvolgorde</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Secties en herhalingen</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Singleton-formulier</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navigatie en validatie</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL-parameters</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Pagina Formulierenbeheer</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Formulieranalyse</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Systeemconsole</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Pagina-instelling en kop-/voettekst</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Standaarden en weergave</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Lettertypen en sjablonen</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Transport en SMTP-server</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Adressen</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Exporteren</label>
+    </export-group>
+    <import-group>
+        <label>Importeren</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Formuliermetadata en publiceren</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Opties in dialoogvenster Bevoegdheden</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP-server</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP-server</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner-machtigingen</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Gebruikersmenu in navigatiebalk</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Tokens</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Invoermaskers</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Uitvoerexpressies (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Standaardtaal</label>
         <hint>Standaardtaalcode &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Max. inactiviteit</label>
         <hint>Optionele inactiviteitstime-out vóór verwijdering van gecachete XPath-expressies (bijv. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; of leeg) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Max. items</label>
+        <hint>Maximumaantal gedeelde alleen-lezen XML-instanties in de JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Geheugenbudget</label>
+        <hint>Maximaal JVM-heappercentage, vaste gegevensgrootte (opgeslagen in bytes) of onbeperkt &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Max. inactiviteit</label>
+        <hint>Optionele inactiviteitstime-out vóór verwijdering van gecachete gedeelde instanties (bijv. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; of leeg) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Start-koppeling in navigatiebalk tonen</label>
+        <label>Startpagina-link</label>
         <hint>De Start-koppeling in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Beheermenu</label>
+        <hint>Het menu Beheer in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Taalkiezer in navigatiebalk tonen</label>
+        <label>Taalkeuze</label>
         <hint>De taalkiezer in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Kleurenschemakiezer in navigatiebalk tonen</label>
+        <label>Kleurschemakeuze</label>
         <hint>De kiezer voor lichte/donkere modus in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Deelknop in navigatiebalk tonen</label>
+        <label>Deelknop</label>
         <hint>De knop om een koppeling te delen in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Revisiegeschiedenis in navigatiebalk tonen</label>
+        <label>Revisiegeschiedenis</label>
         <hint>Het pictogram voor revisiegeschiedenis in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Workflowfase in navigatiebalk tonen</label>
+        <label>Workflowfase</label>
         <hint>De huidige workflowfase in de navigatiebalk weergeven &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Zoeknavigatie</label>
+        <hint>Navigatiepijlen Vorige/Volgende record in de navigatiebalk inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Bijlagequotum</label>
+        <hint>Gebruik van opslagquotum voor bijlagen weergeven in de navigatiebalk &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Nee)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Thema (per formulier)</label>
         <hint>Visueel thema voor formulieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Hints tonen in alleen-lezen modi</label>
+        <label>Veldhints tonen</label>
         <hint>Hints van besturingselementen weergeven in weergave- en PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Meldingen tonen in alleen-lezen modi</label>
+        <label>Validatiemeldingen tonen</label>
         <hint>Validatiemeldingen weergeven in weergave- en PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Verplicht-indicatoren tonen in alleen-lezen modi</label>
+        <label>Verplicht-indicatoren tonen</label>
         <hint>Indicatoren voor verplichte velden tonen in weergave- en PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Toelichtingen tonen in weergavemodus</label>
+        <label>Toelichtingen tonen (weergavemodus)</label>
         <hint>fr:explanation-besturingselementen tonen in weergavemodus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Weergave van secties</label>
+        <hint>Visuele stijl voor secties &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Volledig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Volledig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaal</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Weergave van rasters</label>
+        <hint>Visuele stijl voor herhaalde rasters &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Volledig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Volledig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaal</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Weergave van berekende waarden</label>
+        <hint>Visuele stijl voor besturingselementen van het type Berekende waarde &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Volledig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Volledig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimaal</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Miniatuur tonen</label>
+        <hint>De formulierminiatuur weergeven op detailpagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Nee)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Knoppen op detailpagina</label>
         <hint>Door spaties gescheiden lijst van knoppen op de detailpagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Door spaties gescheiden lijst van knoppen op de weergavepagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Vertraging automatisch opslaan (ms)</label>
-        <hint>Vertraging in milliseconden vóór automatisch opslaan; 0 schakelt automatisch opslaan uit &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Vertraging automatisch opslaan</label>
+        <hint>Vertraging vóór het automatisch opslaan van concepten (opgeslagen in milliseconden) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Eenvoudige gegevensmigratie</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Paginagrootte van foutenoverzicht</label>
+        <hint>Maximumaantal validatiemeldingen dat initieel in het foutenoverzicht wordt getoond &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Besturingselementen als bezocht markeren bij waardewijziging</label>
+        <hint>Besturingselementen als bezocht markeren wanneer hun waarde verandert &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Ongeldige besturingselementen als bezocht markeren</label>
+        <hint>Ongeldige besturingselementen als bezocht markeren wanneer validatie wordt uitgevoerd &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Captcha-component</label>
         <hint>Captcha-implementatie op detailpagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Captcha-positie</label>
+        <hint>Waar de captcha wordt weergegeven op detail- en wizardpagina's &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Onderaan formulier)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Onderaan formulier</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>In wizard (alle pagina's)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>In wizard (eerste pagina)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>In wizard (laatste pagina)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Captcha-zichtbaarheid</label>
+        <hint>Booleaanse waarde of XPath-expressie die bepaalt wanneer de captcha wordt getoond &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Singleton-formulier</label>
         <hint>Slechts één gegevensdocument toestaan voor dit formulier &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Inhoudsopgave</label>
+    </toc-group>
     <toc-min-sections>
         <label>Minimumaantal secties voor inhoudsopgave</label>
-        <hint>Minimumaantal secties vereist om de inhoudsopgave te tonen; -1 om uit te schakelen, -2 voor ongebruikt &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Toon de inhoudsopgave wanneer het formulier ten minste dit aantal secties heeft &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Positie van inhoudsopgave</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Berichten</label>
+    </messages-group>
     <messages-appearance>
         <label>Weergave van berichten</label>
         <hint>Hoe actieberichten worden weergegeven &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Activeringsdrempel voor sessieverloopwaarschuwing</label>
+        <hint>Percentage van de sessieduur waarna het waarschuwingsvenster verschijnt &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Marge voor sessieverloop</label>
+        <hint>Veiligheidsmarge in seconden vóór het verlopen van de sessie &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Beschikbaar vanaf</label>
+        <hint>Vroegste datum en tijd vanaf wanneer nieuwe formulierinzendingen worden geaccepteerd &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Beschikbaar tot</label>
+        <hint>Laatste datum en tijd tot wanneer nieuwe formulierinzendingen worden geaccepteerd &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Waarschuwen bij verlaten met niet-opgeslagen wijzigingen</label>
         <hint>Booleaanse waarde of XPath-expressie voor de waarschuwing bij niet-opgeslagen gegevens &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Door spaties gescheiden lijst van knoppen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Kolom Aangemaakt tonen</label>
+        <label>Aangemaakt</label>
         <hint>Kolom met aanmaaktijdstip tonen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Kolom Laatst gewijzigd tonen</label>
+        <label>Laatst gewijzigd</label>
         <hint>Kolom met tijdstip van laatste wijziging tonen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Kolom Workflowfase tonen</label>
+        <label>Workflowfase</label>
         <hint>Kolom met workflowfase tonen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Kolom Gemaakt door tonen</label>
+        <label>Aangemaakt door</label>
         <hint>Kolom Gemaakt door tonen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Kolom Gewijzigd door tonen</label>
+        <label>Laatst gewijzigd door</label>
         <hint>Kolom Gewijzigd door tonen op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Miniatuur</label>
+        <hint>De formulierminiatuur weergeven op de samenvattingspagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Nee)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Processen voor bulkacties op samenvattingspagina</label>
+        <hint>Door spaties gescheiden procesnamen beschikbaar als bulkacties op geselecteerde rijen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Paginagrootte van Formulierenbeheer</label>
         <hint>Aantal formulieren per pagina op de pagina Formulierenbeheer &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Configuratie van externe servers</label>
         <hint>JSON-array van externe servers voor formulierpublicatie en -beheer &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Formulieranalyse inschakelen</label>
+        <hint>Runtime-sessietracking en de pagina &lt;code&gt;/fr/analytics&lt;/code&gt; inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Geautoriseerde rollen voor analyse</label>
+        <hint>Door komma's of spaties gescheiden rolnamen met toegang tot de analysepagina &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Gebruikersnamen tonen in analyse</label>
+        <hint>Geauthenticeerde gebruikersnamen weergeven in Formulieranalyse &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Max. gevolgde actieve sessies</label>
+        <hint>Maximumaantal actieve formuliersessies dat in het geheugen wordt bewaard &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Max. gevolgde recente sessies</label>
+        <hint>Maximumaantal voltooide formuliersessies dat in het geheugen wordt bewaard &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Steekproeven voor metriekgeschiedenis inschakelen</label>
+        <hint>Op de achtergrond geschiedenis van JVM- en cachemetrieken verzamelen voor &lt;code&gt;/fr/console&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Steekproefinterval voor metrieken</label>
+        <hint>Steekproefinterval (minimaal 1 seconde) voor metrieken van de Systeemconsole &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Exportpagina inschakelen</label>
         <hint>De exportpagina voor formuliergegevens inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Standaard BCC-e-mailadres van ontvanger &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>PDF toevoegen aan e-mail</label>
+        <label>PDF</label>
         <hint>Gegenereerde PDF als bijlage toevoegen aan meldingse-mails &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>XML-gegevens toevoegen aan e-mail</label>
+        <label>XML-gegevens</label>
         <hint>XML-formuliergegevens als bijlage toevoegen aan meldingse-mails &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Ja)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>TIFF toevoegen aan e-mail</label>
+        <label>TIFF</label>
         <hint>Gegenereerde TIFF-afbeelding als bijlage toevoegen aan meldingse-mails &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Excel (Benoemde bereiken) toevoegen aan e-mail</label>
+        <label>Excel (benoemde bereiken)</label>
         <hint>Excel-bestand met benoemde bereiken toevoegen aan meldingse-mails &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>XML-formulierstructuur en -gegevens toevoegen aan e-mail</label>
+        <label>XML-formulierstructuur en -gegevens</label>
         <hint>XML-export van formulierstructuur en -gegevens toevoegen aan meldingse-mails &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standaard (Nee)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Acties en services</actions-services>
         <reset-all>Alles resetten</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Overzicht van besturingselementen</label>
+        <hint>De knop voor het dialoogvenster Overzicht van besturingselementen tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Formulier controleren</label>
+        <hint>De knop voor het dialoogvenster Formulier controleren tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-schema</label>
         <hint>De knop voor het dialoogvenster XML-schema tonen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Optie voor tokentoegang</label>
+        <hint>De optie voor tokentoegang tonen in het dialoogvenster Bevoegdheden van Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Eigenaar- en groepsbevoegdheden</label>
+        <hint>De rijen Eigenaar en Groepsleden tonen in het dialoogvenster Bevoegdheden van Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Rolselectielijst</label>
+        <hint>De geconfigureerde rolselectielijst tonen in het dialoogvenster Bevoegdheden van Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Stappen bij Nieuw formulier</label>
+        <hint>Getoonde stappen bij het aanmaken van een nieuw formulier in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Sjablonen en algemene instellingen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sjablonen en algemene instellingen</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Alleen sjablonen</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Alleen algemene instellingen</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Geen (editor direct openen)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Drempel voor automatisch inklappen van secties</label>
+        <hint>Minimumaantal besturingselementen vanaf waar secties ingeklapt openen in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Voorinstellingen voor voorbeeldapparaten (JSON)</label>
+        <hint>JSON-array met responsieve apparaatvoorinstellingen in het voorbeelddialoogvenster van Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Form Builder MCP-server inschakelen</label>
         <hint>De Model Context Protocol (MCP)-server voor Form Builder inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Geldigheid van Form Builder MCP-token (minuten)</label>
+        <hint>Geldigheidsduur in minuten voor Form Builder MCP-tokens &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Form Runner MCP-server inschakelen</label>
+        <hint>De Model Context Protocol (MCP)-server voor Form Runner inschakelen &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Nee)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Token vereisen voor Form Runner MCP-server</label>
+        <hint>Tokenauthenticatie vereisen voor de Form Runner MCP-server &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standaard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nee</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Geldigheid van Form Runner MCP-token (minuten)</label>
+        <hint>Geldigheidsduur in minuten voor Form Runner MCP-tokens &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Invoerformaat voor datum</label>
         <hint>Invoermasker voor datum, bijv. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; of &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

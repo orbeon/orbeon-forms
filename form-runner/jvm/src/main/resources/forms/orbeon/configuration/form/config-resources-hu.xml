@@ -61,6 +61,9 @@
         <positive-byte-size>Adjon meg legalább 1 bájtot eredményező pozitív méretet</positive-byte-size>
         <heap-percentage>Adjon meg 0%-nál nagyobb és legfeljebb 100%-os százalékértéket</heap-percentage>
         <duration>Adjon meg időtartamot, pl. 30m, 2h, 1d, PT30M vagy ezredmásodperc</duration>
+        <pdf-header-footer-json>Érvénytelen PDF fejléc/lábléc JSON-konfiguráció</pdf-header-footer-json>
+        <preview-devices-json>Érvénytelen előnézeti eszközök JSON-konfiguráció</preview-devices-json>
+        <positive-duration>Adjon meg pozitív időtartamot</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Korlátlan</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>Max. kupac %</heap-percent>
         <fixed-size>Rögzített méret</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Nincs beállítva</unset>
+        <disabled>Letiltva</disabled>
+        <min-sections>Minimális szekciószám</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Letiltva</disabled>
+        <delay>Késleltetés után</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Korlátlan</unlimited>
+        <max-files>Fájlok maximális száma</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Nincs időkorlát</unlimited>
+        <timeout>Tétlenségi időkorlát</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Formázás</format>
+        <copy>Másolás</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>perc</min>
@@ -113,7 +137,7 @@
         <label>Összefoglaló oldal</label>
     </summary-section>
     <admin-section>
-        <label>Űrlapok adminisztrációja</label>
+        <label>Adminisztrációs oldalak</label>
     </admin-section>
     <import-section>
         <label>Importálás és exportálás</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Bemeneti és kimeneti formátumok</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Opcionális</profiles-hint>
         <profiles-help>Opcionális tulajdonságprofilok. Ha egy vagy több profilnév meg van adva, ez a tulajdonság csak azokra a kérésekre érvényes, ahol ezek a profilok aktívak; hagyja üresen a feltétel nélküli alkalmazáshoz.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Navigációs sáv elemei</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Látható táblázatoszlopok</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Csak olvasható és PDF-megjelenítés</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Részletező oldal keretelemei</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Generált mellékletek</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Nyelvek</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Munkamenet és területi beállítások</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Téma és elrendezés</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Címkék, tippek és billentyűparancsok</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Komponensek megjelenése</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Arculat és egyéni erőforrások</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Táblázat és lapozás</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Gombok és verziókezelés</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Mentés és munkamenet</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Űrlap elérhetősége</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Ellenőrzés és adatok</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Hibaösszesítő</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Fókusz, tippek és tabulátorsorrend</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Szakaszok és ismétlődések</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Egyetlen példányos (singleton) űrlap</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navigáció és ellenőrzés</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL-paraméterek</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Űrlapok adminisztrációja oldal</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Űrlapanalitika</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Rendszerkonzol</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Oldalbeállítás és fejléc/lábléc</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Szabványok és megjelenítés</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Betűtípusok és sablonok</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Továbbítás és SMTP-kiszolgáló</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Címek</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Exportálás</label>
+    </export-group>
+    <import-group>
+        <label>Importálás</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Űrlap metaadatai és közzététel</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Jogosultságok párbeszédpanel beállításai</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP-kiszolgáló</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP-kiszolgáló</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner jogosultságok</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Navigációs sáv felhasználói menüje</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Tokenek</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Beviteli maszkok</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Kimeneti kifejezések (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Alapértelmezett nyelv</label>
         <hint>Alapértelmezett nyelvkód &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Max. tétlenségi idő</label>
         <hint>Opcionális tétlenségi időkorlát a gyorsítótárazott XPath-kifejezések eltávolítása előtt (pl. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; vagy üres) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Max. elemszám</label>
+        <hint>A JVM-kupacmemóriában tartott megosztott, csak olvasható XML-példányok maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Bájtkeret</label>
+        <hint>Maximális JVM-kupac százalékos aránya, rögzített adatméret (bájtban tárolva) vagy korlátlan &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Max. tétlenségi idő</label>
+        <hint>Opcionális tétlenségi időkorlát a gyorsítótárazott megosztott példányok eltávolítása előtt (pl. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; vagy üres) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Kezdőlap hivatkozás megjelenítése a navigációs sávon</label>
+        <label>Kezdőlap hivatkozás</label>
         <hint>A Kezdőlap hivatkozás engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Adminisztrációs menü</label>
+        <hint>Az Adminisztráció menü engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Nyelvválasztó megjelenítése a navigációs sávon</label>
+        <label>Nyelvválasztó</label>
         <hint>A nyelvválasztó engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Színséma-választó megjelenítése a navigációs sávon</label>
+        <label>Színséma-választó</label>
         <hint>A világos/sötét mód választójának engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Megosztás gomb megjelenítése a navigációs sávon</label>
+        <label>Megosztás gomb</label>
         <hint>A megosztási hivatkozás gomb engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Módosítási előzmények megjelenítése a navigációs sávon</label>
+        <label>Előzmények</label>
         <hint>A módosítási előzmények ikonjának engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Munkafolyamat állapotának megjelenítése a navigációs sávon</label>
+        <label>Munkafolyamat-szakasz</label>
         <hint>Az aktuális munkafolyamat-állapot megjelenítése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Keresési navigáció</label>
+        <hint>Előző/Következő rekordnavigációs nyilak engedélyezése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Mellékletkvóta</label>
+        <hint>A mellékletek tárhelykvóta-kihasználtságának megjelenítése a navigációs sávon &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Nem)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Téma (űrlaponként)</label>
         <hint>Űrlapok vizuális témája &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Útmutatók megjelenítése csak olvasható módokban</label>
+        <label>Vezérlőtippek megjelenítése</label>
         <hint>Vezérlőútmutatók megjelenítése nézet és PDF módban &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Figyelmeztetések megjelenítése csak olvasható módokban</label>
+        <label>Ellenőrzési figyelmeztetések megjelenítése</label>
         <hint>Érvényesítési figyelmeztetések megjelenítése nézet és PDF módban &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Kötelező mező jelölésének megjelenítése csak olvasható módokban</label>
+        <label>Kötelező mező jelölések megjelenítése</label>
         <hint>Kötelező mezők jelölőinek megjelenítése nézet és PDF módban &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Magyarázatok megjelenítése nézet módban</label>
+        <label>Magyarázatok megjelenítése (nézet mód)</label>
         <hint>Az fr:explanation vezérlők megjelenítése nézet módban &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Szekció megjelenése</label>
+        <hint>A szekciók vizuális stílusa &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Teljes)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Teljes</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimális</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Rács megjelenése</label>
+        <hint>Az ismétlődő rácsok vizuális stílusa &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Teljes)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Teljes</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimális</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Számított érték megjelenése</label>
+        <hint>A Számított érték vezérlők vizuális stílusa &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Teljes)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Teljes</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimális</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Bélyegkép megjelenítése</label>
+        <hint>Az űrlap bélyegképének megjelenítése a részletező oldalakon &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Nem)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Részletező oldal gombjai</label>
         <hint>A részletező oldalon megjelenített gombok szóközzel elválasztott listája &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>A nézet oldalon megjelenített gombok szóközzel elválasztott listája &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Automatikus mentés késleltetése (ms)</label>
-        <hint>Késleltetés ezredmásodpercben az automatikus mentés előtt; 0 letiltja az automatikus mentést &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Automatikus mentés késleltetése</label>
+        <hint>Késleltetés a piszkozatok automatikus mentése előtt (ezredmásodpercben tárolva) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Egyszerű adatmigráció</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Hibaösszesítő oldalmérete</label>
+        <hint>A hibaösszesítőben kezdetben megjelenített érvényesítési üzenetek maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Vezérlők megjelölése meglátogatottként értékváltozáskor</label>
+        <hint>Vezérlők megjelölése meglátogatottként az értékük megváltozásakor &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Érvénytelen vezérlők megjelölése meglátogatottként</label>
+        <hint>Érvénytelen vezérlők megjelölése meglátogatottként az érvényesítés futtatásakor &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Captcha-komponens</label>
         <hint>Captcha-megvalósítás a részletező oldalakon &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Captcha helye</label>
+        <hint>A Captcha megjelenítési helye a részletező és a varázslóoldalakon &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Űrlap alján)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Űrlap alján</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Varázslón belül (minden oldal)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Varázslón belül (első oldal)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Varázslón belül (utolsó oldal)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Captcha láthatósága</label>
+        <hint>A Captcha megjelenítését vezérlő logikai érték vagy XPath-kifejezés &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Egyetlen példányos (singleton) űrlap</label>
         <hint>Csak egyetlen űrlapadat-dokumentum engedélyezése ehhez az űrlaphoz &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Tartalomjegyzék</label>
+    </toc-group>
     <toc-min-sections>
         <label>Tartalomjegyzék minimális szekciószáma</label>
-        <hint>A tartalomjegyzék megjelenítéséhez szükséges minimális szekciószám; -1 letiltja, -2 nem használt &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Tartalomjegyzék megjelenítése, ha az űrlap legalább ennyi szekciót tartalmaz &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Tartalomjegyzék pozíciója</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Üzenetek</label>
+    </messages-group>
     <messages-appearance>
         <label>Üzenetek megjelenése</label>
         <hint>A műveleti üzenetek megjelenítési módja &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Munkamenet-lejárati figyelmeztetés küszöbe</label>
+        <hint>A munkamenet élettartamának százalékos aránya, amely után megjelenik a figyelmeztető párbeszédpanel &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Munkamenet-lejárati biztonsági tartalék</label>
+        <hint>Biztonsági tartalék másodpercben a munkamenet lejárta előtt &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Elérhető ettől</label>
+        <hint>A legkorábbi dátum és időpont, amelytől az új űrlapbeküldések elfogadhatók &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Elérhető eddig</label>
+        <hint>A legkésőbbi dátum és időpont, amelyig az új űrlapbeküldések elfogadhatók &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Figyelmeztetés nem mentett módosításokkal történő elhagyáskor</label>
         <hint>A nem mentett adatokra vonatkozó figyelmeztetést vezérlő logikai érték vagy XPath-kifejezés &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Az összefoglaló oldalon megjelenő gombok szóközzel elválasztott listája &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Létrehozva oszlop megjelenítése</label>
+        <label>Létrehozva</label>
         <hint>A létrehozási időbélyeg oszlopának megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Utoljára módosítva oszlop megjelenítése</label>
+        <label>Utoljára módosítva</label>
         <hint>Az utolsó módosítás időbélyeg-oszlopának megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Munkafolyamat állapota oszlop megjelenítése</label>
+        <label>Munkafolyamat-szakasz</label>
         <hint>A munkafolyamat állapota oszlop megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Létrehozta oszlop megjelenítése</label>
+        <label>Létrehozta</label>
         <hint>A Létrehozta oszlop megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Módosította oszlop megjelenítése</label>
+        <label>Módosította</label>
         <hint>A Módosította oszlop megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Bélyegkép</label>
+        <hint>Az űrlap bélyegképének megjelenítése az összefoglaló oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Nem)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Összefoglaló tömeges műveleti folyamatai</label>
+        <hint>A kijelölt sorokon tömeges műveletként elérhető folyamatnevek szóközzel elválasztva &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Űrlapok adminisztrációja oldalméret</label>
         <hint>Oldalankénti űrlapok száma az Űrlapok adminisztrációja oldalon &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Távoli kiszolgálók konfigurációja</label>
         <hint>Távoli kiszolgálók JSON-tömbje űrlapok közzétételéhez és adminisztrációjához &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Űrlapanalitika engedélyezése</label>
+        <hint>Futásidejű munkamenet-követés és a &lt;code&gt;/fr/analytics&lt;/code&gt; oldal engedélyezése &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Analitikára jogosult szerepkörök</label>
+        <hint>Az analitika megtekintésére jogosult szerepkörnevek vesszővel vagy szóközzel elválasztva &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Felhasználónevek megjelenítése az analitikában</label>
+        <hint>Hitelesített felhasználónevek megjelenítése az Űrlapanalitikában &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Követett aktív munkamenetek max. száma</label>
+        <hint>A memóriában megtartott aktív űrlap-munkamenetek maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Követett legutóbbi munkamenetek max. száma</label>
+        <hint>A memóriában megtartott befejezett űrlap-munkamenetek maximális száma &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Metrika-előzmények mintavételezésének engedélyezése</label>
+        <hint>JVM- és gyorsítótár-metrikák előzményeinek háttérbeli gyűjtése a &lt;code&gt;/fr/console&lt;/code&gt; számára &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Metrikák mintavételezési időköze</label>
+        <hint>Mintavételezési időköz (legalább 1 másodperc) a Rendszerkonzol metrikáihoz &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Exportálási oldal engedélyezése</label>
         <hint>Az űrlapadatok exportálási oldalának engedélyezése &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Alapértelmezett titkos másolatot kapó (BCC) e-mail-cím &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>PDF csatolása az e-mailhez</label>
+        <label>PDF</label>
         <hint>Az előállított PDF csatolása az értesítő e-mailekhez &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>XML-adatok csatolása az e-mailhez</label>
+        <label>XML-adatok</label>
         <hint>Az űrlap XML-adatainak csatolása az értesítő e-mailekhez &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Igen)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>TIFF csatolása az e-mailhez</label>
+        <label>TIFF</label>
         <hint>Az előállított TIFF-kép csatolása az értesítő e-mailekhez &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Excel (elnevezett tartományok) csatolása az e-mailhez</label>
+        <label>Excel (elnevezett tartományok)</label>
         <hint>Elnevezett tartományokat tartalmazó Excel-fájl csatolása az értesítő e-mailekhez &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>XML űrlapszerkezet és adatok csatolása az e-mailhez</label>
+        <label>XML űrlapszerkezet és adatok</label>
         <hint>Az űrlapszerkezet és adatok XML-exportjának csatolása az értesítő e-mailekhez &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Alapértelmezett (Nem)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Műveletek és szolgáltatások</actions-services>
         <reset-all>Összes visszaállítása</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Vezérlők áttekintése</label>
+        <hint>A Vezérlők áttekintése párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Űrlap ellenőrzése</label>
+        <hint>Az Űrlap ellenőrzése párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-séma</label>
         <hint>Az XML-séma párbeszédpanel gombjának megjelenítése a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Tokenalapú hozzáférési lehetőség</label>
+        <hint>A tokenalapú hozzáférési lehetőség megjelenítése a Form Builder Jogosultságok párbeszédpaneljén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Tulajdonosi és csoportjogosultságok</label>
+        <hint>A Tulajdonos és Csoporttagok sorok megjelenítése a Form Builder Jogosultságok párbeszédpaneljén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Szerepkör-kiválasztási lista</label>
+        <hint>A beállított szerepkör-kiválasztási lista megjelenítése a Form Builder Jogosultságok párbeszédpaneljén &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Új űrlap párbeszédpanel lépései</label>
+        <hint>Új űrlap létrehozásakor megjelenő lépések a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Sablonok és általános beállítások)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sablonok és általános beállítások</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Csak sablonok</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Csak általános beállítások</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Nincs (szerkesztő közvetlen megnyitása)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Szekciók automatikus összecsukási küszöbe</label>
+        <hint>Vezérlőszám-küszöb, amelytől kezdve a szekciók összecsukva nyílnak meg a Form Builder felületén &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Előnézeti eszköz-előbeállítások (JSON)</label>
+        <hint>A Form Builder tesztelési párbeszédpaneljén megjelenő reszponzív eszköz-előbeállítások JSON-tömbje &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Form Builder MCP-kiszolgáló engedélyezése</label>
         <hint>A Model Context Protocol (MCP) kiszolgáló engedélyezése a Form Builder számára &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Form Builder MCP-token érvényessége (perc)</label>
+        <hint>A Form Builder MCP-tokenek érvényességi időtartama percben &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Form Runner MCP-kiszolgáló engedélyezése</label>
+        <hint>A Model Context Protocol (MCP) kiszolgáló engedélyezése a Form Runner számára &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Nem)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Token megkövetelése a Form Runner MCP-kiszolgálóhoz</label>
+        <hint>Tokenalapú hitelesítés megkövetelése a Form Runner MCP-kiszolgálóhoz &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Alapértelmezett (Igen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Igen</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nem</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Form Runner MCP-token érvényessége (perc)</label>
+        <hint>A Form Runner MCP-tokenek érvényességi időtartama percben &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Dátumbeviteli formátum</label>
         <hint>Dátumbeviteli formátummaszk, pl. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; vagy &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

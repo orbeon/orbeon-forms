@@ -262,7 +262,8 @@ class ConfigurationPropertiesTest
 
       def collectLeaves(el: org.orbeon.dom.Element, prefix: String = ""): List[(String, String)] =
         el.elements.toList.flatMap { ch =>
-          val p = s"$prefix/${ch.getName}"
+          val idSuffix = Option(ch.attributeValue("id")).map(id => s"[@id=$id]").getOrElse("")
+          val p        = s"$prefix/${ch.getName}$idSuffix"
           if (ch.elements.isEmpty) List(p -> ch.getText) else collectLeaves(ch, p)
         }
 
@@ -684,6 +685,40 @@ class ConfigurationPropertiesTest
       assert(docsCacheEl.attributeValue("value") == "256000000")
     }
 
+    it("maps toc-min-sections magic values (-2, -1, >=0) to structured mode and count elements") {
+      val unsetDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(
+        IOSupport.readOrbeonDom("""<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"/>""")
+      )
+      val unsetToc = unsetDoc.getRootElement.element("curated").element("detail").element("toc-min-sections")
+      assert(unsetToc.attributeValue("override") == "false")
+      assert(unsetToc.element("mode").getText == "unset")
+      assert(unsetToc.element("count").getText == "")
+
+      val disabledDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(
+        IOSupport.readOrbeonDom(
+          """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            |    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.*.*" value="-1"/>
+            |</properties>""".stripMargin
+        )
+      )
+      val disabledToc = disabledDoc.getRootElement.element("curated").element("detail").element("toc-min-sections")
+      assert(disabledToc.attributeValue("override") == "true")
+      assert(disabledToc.element("mode").getText == "disabled")
+      assert(disabledToc.attributeValue("value") == "-1")
+
+      val countDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(
+        IOSupport.readOrbeonDom(
+          """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            |    <property as="xs:integer" name="oxf.fr.detail.toc.min-sections.*.*" value="3"/>
+            |</properties>""".stripMargin
+        )
+      )
+      val countToc = countDoc.getRootElement.element("curated").element("detail").element("toc-min-sections")
+      assert(countToc.attributeValue("override") == "true")
+      assert(countToc.element("mode").getText == "min-sections")
+      assert(countToc.element("count").getText == "3")
+    }
+
     it("must discover XBL custom control settings and round-trip global, app/form, and profiled overrides") {
       val catalog = FormRunnerConfiguration.ControlSettingsSupport.currentCatalog()
       val qNames  = catalog.byQName.keySet
@@ -990,9 +1025,11 @@ class ConfigurationPropertiesTest
             val staticIdleValue          = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-idle-value-control").get
 
             setControlValueWithEventSearchNested(staticIdleOverrideSelect.effectiveId, encodedTrue)
-            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, "invalid-duration")
+            assert(staticIdleValue.isRelevant)
+            assert(! staticIdleValue.isValid) // Required when mode = 'timeout'
+            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, numberExternalValue("0"))
             assert(! staticIdleValue.isValid)
-            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, "45m")
+            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, numberExternalValue("45"))
             assert(staticIdleValue.isValid)
 
             val docsSizeOverride       = resolveObject[XFormsSingleNodeControl]("cache-documents-size-override-control").get
@@ -1016,7 +1053,7 @@ class ConfigurationPropertiesTest
             val pipelinesIdleOverrideSelect = ControlsIterator(pipelinesIdleOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
             val pipelinesIdleValue          = resolveObject[XFormsSingleNodeControl]("cache-pipelines-max-idle-value-control").get
             setControlValueWithEventSearchNested(pipelinesIdleOverrideSelect.effectiveId, encodedTrue)
-            setControlValueWithEventSearchNested(pipelinesIdleValue.effectiveId, "30m")
+            setControlValueWithEventSearchNested(pipelinesIdleValue.effectiveId, numberExternalValue("30"))
             assert(pipelinesIdleValue.isValid)
 
             val xpathSizeOverride       = resolveObject[XFormsSingleNodeControl]("cache-xpath-size-override-control").get
@@ -1828,6 +1865,185 @@ class ConfigurationPropertiesTest
         }
       }
       PersistencePropertyProvider.invalidateCache()
+    }
+
+    it("must decompose and validate autosave-delay, attachment-max-files, cache idle durations, PDF header/footer JSON, and timezones") {
+      // 1. Timezone catalog
+      val tzIds = FormRunnerConfiguration.availableTimezoneIds()
+      assert(tzIds.headOption.contains("UTC"))
+      assert(tzIds.contains("America/Los_Angeles"))
+      assert(tzIds.contains("Europe/Zurich"))
+
+      // 2. Autosave quantity helpers
+      assert(FormRunnerConfiguration.isValidAutosaveQuantity("5", "s"))
+      assert(FormRunnerConfiguration.autosaveQuantityToMillis("2.5", "s") == "2500")
+      assert(FormRunnerConfiguration.autosaveQuantityToMillis("2", "min") == "120000")
+      assert(! FormRunnerConfiguration.isValidAutosaveQuantity("0", "s"))
+      assert(! FormRunnerConfiguration.isValidAutosaveQuantity("-3", "s"))
+      assert(! FormRunnerConfiguration.isValidAutosaveQuantity("0.0001", "s"))
+
+      // 3. Cache idle quantity helpers
+      assert(FormRunnerConfiguration.isValidCacheIdleQuantity("45", "m"))
+      assert(FormRunnerConfiguration.cacheIdleQuantityToString("45", "m") == "45m")
+      assert(FormRunnerConfiguration.cacheIdleQuantityToString("2", "h") == "2h")
+      assert(! FormRunnerConfiguration.isValidCacheIdleQuantity("0", "m"))
+      assert(! FormRunnerConfiguration.isValidCacheIdleQuantity("1.5", "m"))
+
+      // 4. PDF header/footer JSON validation & formatting
+      assert(FormRunnerConfiguration.isValidPdfHeaderFooterJson(""))
+      assert(FormRunnerConfiguration.isValidPdfHeaderFooterJson("""{"pages":{"all":{"header":{"left":"none"}}},"parameters":{}}"""))
+      assert(! FormRunnerConfiguration.isValidPdfHeaderFooterJson("{invalid"))
+      assert(! FormRunnerConfiguration.isValidPdfHeaderFooterJson("[1, 2, 3]"))
+      assert(! FormRunnerConfiguration.isValidPdfHeaderFooterJson("""{"pages":{"invalid-page-type":{}},"parameters":{}}"""))
+      assert(FormRunnerConfiguration.formatJson("""{"a":1}""").contains("\n"))
+
+      // 5. XML decomposition for autosave-delay, attachment-max-files-per-control, and cache-*-max-idle
+      val propsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*" value="0"/>
+          |    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.acme.order" value="120000"/>
+          |    <property as="xs:string"  name="oxf.fr.detail.attachment.max-files-per-control.*.*" value="-1"/>
+          |    <property as="xs:string"  name="oxf.fr.detail.attachment.max-files-per-control.acme.order" value="5"/>
+          |    <property as="xs:string"  name="oxf.xforms.cache.live-documents.max-idle" value="PT2H"/>
+          |</properties>""".stripMargin
+
+      val configDoc  = FormRunnerConfiguration.propertiesDomToConfigurationDom(IOSupport.readOrbeonDom(propsXml))
+      val configRoot = configDoc.getRootElement
+
+      val globalAutosave = configRoot.element("curated").element("detail").element("autosave-delay")
+      assert(globalAutosave.attributeValue("override") == "true")
+      assert(globalAutosave.attributeValue("value") == "0")
+      assert(globalAutosave.element("mode").getText == "disabled")
+
+      val globalMaxFiles = configRoot.element("curated").element("attachments").element("attachment-max-files-per-control")
+      assert(globalMaxFiles.attributeValue("override") == "true")
+      assert(globalMaxFiles.attributeValue("value") == "-1")
+      assert(globalMaxFiles.element("mode").getText == "unlimited")
+
+      val docsIdle = configRoot.element("curated").element("caches").element("cache-documents-max-idle")
+      assert(docsIdle.attributeValue("override") == "true")
+      assert(docsIdle.attributeValue("value") == "2h")
+      assert(docsIdle.element("mode").getText == "timeout")
+      assert(docsIdle.element("quantity").getText == "2")
+      assert(docsIdle.element("quantity").attributeValue("unit") == "h")
+
+      val acmeOverride = configRoot.element("app-form-overrides").elements("override").find(e => e.attributeValue("app") == "acme" && e.attributeValue("form") == "order").get
+      val acmeAutosave = acmeOverride.element("curated").element("detail").element("autosave-delay")
+      assert(acmeAutosave.element("mode").getText == "delay")
+      assert(acmeAutosave.element("quantity").getText == "2")
+      assert(acmeAutosave.element("quantity").attributeValue("unit") == "min")
+
+      val acmeMaxFiles = acmeOverride.element("curated").element("attachments").element("attachment-max-files-per-control")
+      assert(acmeMaxFiles.element("mode").getText == "max-files")
+      assert(acmeMaxFiles.element("count").getText == "5")
+    }
+
+    it("must round-trip and validate MCP, Analytics, Console, Shared Instances Cache, Form Builder sub-options, and Detail/Appearance settings") {
+      // 1. Sample interval & preview devices JSON validators
+      assert(FormRunnerConfiguration.isValidSampleIntervalQuantity("5", "s"))
+      assert(FormRunnerConfiguration.isValidSampleIntervalQuantity("1000", "ms"))
+      assert(! FormRunnerConfiguration.isValidSampleIntervalQuantity("500", "ms"))
+      assert(! FormRunnerConfiguration.isValidSampleIntervalQuantity("0", "s"))
+
+      assert(FormRunnerConfiguration.isValidPreviewDevicesJson(""))
+      assert(FormRunnerConfiguration.isValidPreviewDevicesJson(FormRunnerConfiguration.DefaultFbTestDevicesJson))
+      assert(! FormRunnerConfiguration.isValidPreviewDevicesJson("[]"))
+      assert(! FormRunnerConfiguration.isValidPreviewDevicesJson("""[{"id": "p1", "name": "Phone", "width": 400, "height": 800, "category": "watch"}]"""))
+      assert(! FormRunnerConfiguration.isValidPreviewDevicesJson("""[{"id": "p1", "name": "Phone", "width": 0, "height": 800, "category": "mobile"}]"""))
+
+      // 2. Round-trip curated properties across mcp, admin, caches, form-builder, navbar, appearance, summary, and detail
+      val inputPropsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:boolean" name="oxf.fb.mcp.enable"                                          value="true"/>
+          |    <property as="xs:boolean" name="oxf.fb.mcp.token.enable"                                    value="false"/>
+          |    <property as="xs:integer" name="oxf.fb.mcp.token.validity"                                  value="120"/>
+          |    <property as="xs:boolean" name="oxf.fr.mcp.enable"                                          value="true"/>
+          |    <property as="xs:boolean" name="oxf.fr.mcp.token.enable"                                    value="true"/>
+          |    <property as="xs:integer" name="oxf.fr.mcp.token.validity"                                  value="90"/>
+          |    <property as="xs:boolean" name="oxf.fr.analytics.enable"                                    value="true"/>
+          |    <property as="xs:string"  name="oxf.fr.analytics.roles.*.*"                                 value="orbeon-admin"/>
+          |    <property as="xs:string"  name="oxf.fr.analytics.roles.acme.order"                          value="order-manager"/>
+          |    <property as="xs:boolean" name="oxf.fr.analytics.show-usernames"                            value="false"/>
+          |    <property as="xs:integer" name="oxf.fr.analytics.max-active-sessions"                       value="2000"/>
+          |    <property as="xs:integer" name="oxf.fr.analytics.max-recent-sessions"                       value="10000"/>
+          |    <property as="xs:boolean" name="oxf.fr.console.history.enable"                              value="true"/>
+          |    <property as="xs:string"  name="oxf.fr.console.history.sample-interval"                     value="10s"/>
+          |    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"                     value="400"/>
+          |    <property as="xs:string"  name="oxf.xforms.cache.shared-instances.max-size-bytes"           value="64000000"/>
+          |    <property as="xs:string"  name="oxf.xforms.cache.shared-instances.max-idle"                 value="1h"/>
+          |    <property as="xs:boolean" name="oxf.fb.menu.controls"                                       value="false"/>
+          |    <property as="xs:boolean" name="oxf.fb.menu.check-form"                                     value="false"/>
+          |    <property as="xs:boolean" name="oxf.fb.menu.permissions.token"                              value="false"/>
+          |    <property as="xs:boolean" name="oxf.fb.menu.permissions.owner-group"                        value="true"/>
+          |    <property as="xs:boolean" name="oxf.fb.menu.permissions.list"                               value="false"/>
+          |    <property as="xs:string"  name="oxf.fb.new-form.wizard-steps"                               value="  templates   general-settings "/>
+          |    <property as="xs:integer" name="oxf.fb.section.close"                                       value="50"/>
+          |    <property as="xs:string"  name="oxf.fb.test.devices"                                        value="[{&quot;id&quot;:&quot;m1&quot;,&quot;name&quot;:&quot;Mobile&quot;,&quot;width&quot;:390,&quot;height&quot;:844,&quot;category&quot;:&quot;mobile&quot;}]"/>
+          |    <property as="xs:boolean" name="oxf.fr.navbar.admin-menu.enable"                            value="false"/>
+          |    <property as="xs:boolean" name="oxf.fr.navbar.search-navigation.enable.*.*"                 value="false"/>
+          |    <property as="xs:boolean" name="oxf.fr.navbar.attachment-quota.enable.*.*"                  value="true"/>
+          |    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.*.*"                   value="minimal"/>
+          |    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value="minimal"/>
+          |    <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"          value="minimal"/>
+          |    <property as="xs:boolean" name="oxf.fr.detail.show-thumbnail.*.*"                           value="true"/>
+          |    <property as="xs:boolean" name="oxf.fr.summary.show-thumbnail.*.*"                          value="true"/>
+          |    <property as="xs:string"  name="oxf.fr.summary.bulk-processes.*.*"                          value="delete send"/>
+          |    <property as="xs:integer" name="oxf.xforms.session-expiration.trigger"                      value="85"/>
+          |    <property as="xs:integer" name="oxf.xforms.session-expiration.margin"                       value="15"/>
+          |    <property as="xs:string"  name="oxf.fr.detail.available-from.dateTime.*.*"                  value="2026-01-01T00:00:00Z"/>
+          |    <property as="xs:integer" name="oxf.xforms.xbl.fr.error-summary.page-size"                  value="10"/>
+          |    <property as="xs:boolean" name="oxf.xforms.xbl.fr.error-summary.visit-value-changed"        value="false"/>
+          |    <property as="xs:boolean" name="oxf.xforms.xbl.fr.error-summary.visit-invalid"              value="false"/>
+          |    <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                         value="inside-wizard-last-page"/>
+          |    <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                          value="fr:mode() = 'new'"/>
+          |</properties>""".stripMargin
+
+      val configDoc  = FormRunnerConfiguration.propertiesDomToConfigurationDom(IOSupport.readOrbeonDom(inputPropsXml))
+      val configRoot = configDoc.getRootElement
+      val curated    = configRoot.element("curated")
+
+      // Must not leak any curated properties into <custom-properties>
+      val customProps = configRoot.element("custom-properties").elements("property")
+      assert(customProps.size == 1 && customProps.head.attributeValue("name") == "")
+
+      // Check MCP category placement
+      assert(curated.element("mcp").element("fb-mcp-enable").attributeValue("value") == "true")
+      assert(curated.element("mcp").element("fr-mcp-enable").attributeValue("value") == "true")
+      assert(curated.element("mcp").element("fr-mcp-token-validity").attributeValue("value") == "90")
+
+      // Check sample-interval quantity decomposition and wizard-steps multi-token selection normalization
+      val sampleIntervalEl = curated.element("admin").element("console-history-sample-interval")
+      assert(sampleIntervalEl.attributeValue("override") == "true")
+      assert(sampleIntervalEl.element("quantity").getText == "10")
+      assert(sampleIntervalEl.element("quantity").attributeValue("unit") == "s")
+
+      val wizardStepsEl = curated.element("form-builder").element("fb-new-form-wizard-steps")
+      assert(wizardStepsEl.attributeValue("selection") == "templates general-settings")
+
+      val sharedBytesEl = curated.element("caches").element("cache-shared-instances-max-size-bytes")
+      assert(sharedBytesEl.element("mode").getText == "size")
+      assert(sharedBytesEl.element("quantity").getText == "64")
+      assert(sharedBytesEl.element("quantity").attributeValue("unit") == "MB")
+
+      // Scoped analytics.roles override on acme / order
+      val acmeOrder =
+        configRoot.element("app-form-overrides").elements("override")
+          .find(e => e.attributeValue("app") == "acme" && e.attributeValue("form") == "order")
+          .get
+      assert(acmeOrder.element("curated").element("admin").element("analytics-roles").attributeValue("value") == "order-manager")
+
+      // Round-trip back to <properties>
+      val roundTripDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val defs         = PropertyStore.parseToPropertyDefinitions(roundTripDoc).asScala
+      assert(defs.size == 42)
+      val byName = defs.map(d => d.getName -> d.getValue.toString).toMap
+      assert(byName("oxf.fr.mcp.enable") == "true")
+      assert(byName("oxf.fb.mcp.token.validity") == "120")
+      assert(byName("oxf.fr.console.history.sample-interval") == "10s")
+      assert(byName("oxf.fb.new-form.wizard-steps") == "templates general-settings")
+      assert(byName("oxf.fr.analytics.roles.acme.order") == "order-manager")
+      assert(byName("oxf.fr.detail.captcha.location.*.*") == "inside-wizard-last-page")
+      assert(byName("oxf.fr.detail.available-from.dateTime.*.*") == "2026-01-01T00:00:00Z")
     }
   }
 }

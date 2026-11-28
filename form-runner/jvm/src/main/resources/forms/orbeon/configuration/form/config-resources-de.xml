@@ -61,6 +61,9 @@
         <positive-byte-size>Geben Sie eine positive Größe von mindestens 1 Byte ein</positive-byte-size>
         <heap-percentage>Geben Sie einen Prozentsatz größer als 0 % und bis zu 100 % ein</heap-percentage>
         <duration>Geben Sie eine Dauer ein, z. B. 30m, 2h, 1d, PT30M oder Millisekunden</duration>
+        <pdf-header-footer-json>Ungültige JSON-Konfiguration für PDF-Kopf-/Fußzeilen</pdf-header-footer-json>
+        <preview-devices-json>Ungültige JSON-Konfiguration für Vorschaugeräte</preview-devices-json>
+        <positive-duration>Geben Sie eine positive Dauer ein</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Unbegrenzt</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>% des max. Heaps</heap-percent>
         <fixed-size>Feste Größe</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Nicht festgelegt</unset>
+        <disabled>Deaktiviert</disabled>
+        <min-sections>Mindestanzahl Abschnitte</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Deaktiviert</disabled>
+        <delay>Nach Verzögerung</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Unbegrenzt</unlimited>
+        <max-files>Maximale Dateianzahl</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Kein Timeout</unlimited>
+        <timeout>Leerlauf-Timeout</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Formatieren</format>
+        <copy>Kopieren</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>Min.</min>
@@ -113,7 +137,7 @@
         <label>Übersichtsseite</label>
     </summary-section>
     <admin-section>
-        <label>Formularverwaltungsseite</label>
+        <label>Verwaltungsseiten</label>
     </admin-section>
     <import-section>
         <label>Import und Export</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Ein- und Ausgabeformate</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Optional</profiles-hint>
         <profiles-help>Optionale Eigenschaftsprofile. Wenn ein oder mehrere Profilnamen angegeben sind, gilt diese Eigenschaft nur für Anfragen, bei denen diese Profile aktiv sind; leer lassen, um sie uneingeschränkt anzuwenden.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Elemente der Navigationsleiste</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Sichtbare Tabellenspalten</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Schreibgeschützte und PDF-Anzeige</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Rahmenelemente der Detailseite</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Generierte Anhänge</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Sprachen</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Sitzung und Regionaleinstellungen</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Design und Layout</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Beschriftungen, Hinweise und Tastenkürzel</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Darstellung von Komponenten</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Branding und eigene Ressourcen</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Tabelle und Seitennummerierung</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Schaltflächen und Versionierung</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Speichern und Sitzung</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Formularverfügbarkeit</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Validierung und Daten</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Fehlerübersicht</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Fokus, Hinweise und Tab-Reihenfolge</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Abschnitte und Wiederholungen</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Singleton-Formular</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navigation und Validierung</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL-Parameter</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Seite Formularverwaltung</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Formularanalyse</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Systemkonsole</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Seiteneinrichtung und Kopf-/Fußzeile</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Standards und Darstellung</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Schriftarten und Vorlagen</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Transport und SMTP-Server</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Adressen</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Export</label>
+    </export-group>
+    <import-group>
+        <label>Import</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Formular-Metadaten und Veröffentlichung</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Optionen im Berechtigungsdialog</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder-MCP-Server</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner-MCP-Server</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner-Berechtigungen</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Benutzermenü der Navigationsleiste</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Tokens</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Eingabemasken</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Ausgabeausdrücke (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Standardsprache</label>
         <hint>Standardsprachcode &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Max. Leerlaufzeit</label>
         <hint>Optionales Leerlauf-Zeitlimit vor dem Entfernen zwischengespeicherter XPath-Ausdrücke (z. B. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; oder leer) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Max. Einträge</label>
+        <hint>Maximale Anzahl gemeinsam genutzter schreibgeschützter XML-Instanzen im JVM-Heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Speicherbudget</label>
+        <hint>Maximaler Prozentsatz des JVM-Heaps, feste Datengröße (in Byte gespeichert) oder unbegrenzt &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Max. Leerlaufzeit</label>
+        <hint>Optionales Leerlauf-Zeitlimit vor dem Entfernen zwischengespeicherter gemeinsamer Instanzen (z. B. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; oder leer) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Home-Link in der Navigationsleiste anzeigen</label>
+        <label>Startseiten-Link</label>
         <hint>Den Home-Link in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Verwaltungsmenü</label>
+        <hint>Das Verwaltungsmenü in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Sprachauswahl in der Navigationsleiste anzeigen</label>
+        <label>Sprachauswahl</label>
         <hint>Die Sprachauswahl in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Farbschema-Auswahl in der Navigationsleiste anzeigen</label>
+        <label>Farbschema-Auswahl</label>
         <hint>Die Auswahl für den hellen/dunklen Modus in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Teilen-Schaltfläche in der Navigationsleiste anzeigen</label>
+        <label>Teilen-Schaltfläche</label>
         <hint>Die Schaltfläche zum Teilen von Links in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Versionsverlauf in der Navigationsleiste anzeigen</label>
+        <label>Versionsverlauf</label>
         <hint>Das Symbol für den Versionsverlauf in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Workflow-Stufe in der Navigationsleiste anzeigen</label>
+        <label>Workflow-Stufe</label>
         <hint>Die aktuelle Workflow-Stufe in der Navigationsleiste anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Suchnavigation</label>
+        <hint>Navigationspfeile Vorheriger/Nächster Datensatz in der Navigationsleiste aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Anhangskontingent</label>
+        <hint>Auslastung des Speicherkontingents für Anhänge in der Navigationsleiste anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nein)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Design (pro Formular)</label>
         <hint>Visuelles Design für Formulare &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Hinweise in schreibgeschützten Modi anzeigen</label>
+        <label>Feldhinweise anzeigen</label>
         <hint>Steuerelement-Hinweise im Ansichts- und PDF-Modus anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Warnmeldungen in schreibgeschützten Modi anzeigen</label>
+        <label>Validierungsmeldungen anzeigen</label>
         <hint>Validierungswarnungen im Ansichts- und PDF-Modus anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Pflichtfeld-Markierungen in schreibgeschützten Modi anzeigen</label>
+        <label>Pflichtfeld-Markierungen anzeigen</label>
         <hint>Pflichtfeld-Markierungen im Ansichts- und PDF-Modus anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Erläuterungstexte im Ansichtsmodus anzeigen</label>
+        <label>Erklärungen anzeigen (Ansichtsmodus)</label>
         <hint>fr:explanation-Steuerelemente im Ansichtsmodus anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Darstellung von Abschnitten</label>
+        <hint>Visueller Stil für Abschnitte &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Vollständig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vollständig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Darstellung von Rastern</label>
+        <hint>Visueller Stil für wiederholte Raster &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Vollständig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vollständig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Darstellung berechneter Werte</label>
+        <hint>Visueller Stil für Steuerelemente vom Typ „Berechneter Wert“ &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Vollständig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vollständig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Miniaturansicht anzeigen</label>
+        <hint>Die Formular-Miniaturansicht auf Detailseiten anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nein)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Schaltflächen der Detailseite</label>
         <hint>Durch Leerzeichen getrennte Liste der auf der Detailseite angezeigten Schaltflächen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Durch Leerzeichen getrennte Liste der auf der Ansichtsseite angezeigten Schaltflächen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Verzögerung beim automatischen Speichern (ms)</label>
-        <hint>Verzögerung in Millisekunden vor dem automatischen Speichern; 0 deaktiviert das automatische Speichern &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Verzögerung für automatisches Speichern</label>
+        <hint>Verzögerung vor dem automatischen Speichern von Entwürfen (in Millisekunden gespeichert) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Einfache Datenmigration</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Seitengröße der Fehlerübersicht</label>
+        <hint>Maximale Anzahl anfänglich in der Fehlerübersicht angezeigter Validierungsmeldungen &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Steuerelemente bei Wertänderung als besucht markieren</label>
+        <hint>Steuerelemente als besucht markieren, sobald sich ihr Wert ändert &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Ungültige Steuerelemente als besucht markieren</label>
+        <hint>Ungültige Steuerelemente bei der Validierung als besucht markieren &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Captcha-Komponente</label>
         <hint>Captcha-Implementierung auf Detailseiten &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Captcha-Position</label>
+        <hint>Wo das Captcha auf Detail- und Assistentenseiten dargestellt wird &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Am Ende des Formulars)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Am Ende des Formulars</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Im Assistenten (alle Seiten)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Im Assistenten (erste Seite)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Im Assistenten (letzte Seite)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Captcha-Sichtbarkeit</label>
+        <hint>Boolescher Wert oder XPath-Ausdruck zur Steuerung der Captcha-Anzeige &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Singleton-Formular</label>
         <hint>Nur ein einziges Formulardatendokument für dieses Formular zulassen &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Inhaltsverzeichnis</label>
+    </toc-group>
     <toc-min-sections>
         <label>Mindestanzahl Abschnitte für Inhaltsverzeichnis</label>
-        <hint>Mindestanzahl an Abschnitten zum Anzeigen des Inhaltsverzeichnisses; -1 zum Deaktivieren, -2 für ungenutzt &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Inhaltsverzeichnis anzeigen, wenn das Formular mindestens diese Anzahl an Abschnitten hat &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Position des Inhaltsverzeichnisses</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Meldungen</label>
+    </messages-group>
     <messages-appearance>
         <label>Darstellung von Nachrichten</label>
         <hint>Wie Aktionsnachrichten angezeigt werden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Auslöser für Warnung vor Sitzungsablauf</label>
+        <hint>Prozentsatz der Sitzungsdauer, nach dem der Warndialog erscheint &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Sicherheitsmarge vor Sitzungsablauf</label>
+        <hint>Sicherheitsmarge in Sekunden vor dem Ablauf der Sitzung &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Verfügbar ab</label>
+        <hint>Frühestes Datum und früheste Uhrzeit für das Einreichen neuer Formulardaten &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Verfügbar bis</label>
+        <hint>Spätestes Datum und späteste Uhrzeit für das Einreichen neuer Formulardaten &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Beim Verlassen mit ungespeicherten Änderungen warnen</label>
         <hint>Boolescher Wert oder XPath-Ausdruck zur Steuerung der Warnung bei ungespeicherten Daten &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Durch Leerzeichen getrennte Liste der Schaltflächen auf der Übersichtsseite &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Spalte „Erstellt“ anzeigen</label>
+        <label>Erstellt</label>
         <hint>Spalte mit dem Erstellungszeitpunkt auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Spalte „Zuletzt geändert“ anzeigen</label>
+        <label>Zuletzt geändert</label>
         <hint>Spalte mit dem Zeitpunkt der letzten Änderung auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Spalte „Workflow-Stufe“ anzeigen</label>
+        <label>Workflow-Stufe</label>
         <hint>Spalte mit der Workflow-Stufe auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Spalte „Erstellt von“ anzeigen</label>
+        <label>Erstellt von</label>
         <hint>Spalte „Erstellt von“ auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Spalte „Geändert von“ anzeigen</label>
+        <label>Zuletzt geändert von</label>
         <hint>Spalte „Geändert von“ auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Miniaturansicht</label>
+        <hint>Die Formular-Miniaturansicht auf der Übersichtsseite anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nein)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Prozesse für Massenaktionen auf der Übersichtsseite</label>
+        <hint>Durch Leerzeichen getrennte Prozessnamen für Massenaktionen auf ausgewählten Zeilen &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Seitengröße der Formularverwaltung</label>
         <hint>Anzahl der Formulare pro Seite auf der Seite Formularverwaltung &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Konfiguration entfernter Server</label>
         <hint>JSON-Array entfernter Server für Formularveröffentlichung/-verwaltung &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Formularanalyse aktivieren</label>
+        <hint>Laufzeit-Sitzungsverfolgung und die Seite &lt;code&gt;/fr/analytics&lt;/code&gt; aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Autorisierte Rollen für Analysen</label>
+        <hint>Durch Kommas oder Leerzeichen getrennte Rollennamen mit Berechtigung zur Analyseansicht &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Benutzernamen in Analysen anzeigen</label>
+        <hint>Authentifizierte Benutzernamen in der Formularanalyse anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Max. erfasste aktive Sitzungen</label>
+        <hint>Maximale Anzahl im Speicher gehaltener aktiver Formularsitzungen &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Max. erfasste abgeschlossene Sitzungen</label>
+        <hint>Maximale Anzahl im Speicher gehaltener abgeschlossener Formularsitzungen &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Erfassung des Metrikverlaufs aktivieren</label>
+        <hint>Hintergrundverlauf von JVM- und Cache-Metriken für &lt;code&gt;/fr/console&lt;/code&gt; erfassen &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Abtastintervall für Metriken</label>
+        <hint>Abtastintervall (mindestens 1 Sekunde) für Metriken der Systemkonsole &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Exportseite aktivieren</label>
         <hint>Die Seite für den Formulardaten-Export aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Standard-BCC-Empfänger-E-Mail-Adresse &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>PDF an E-Mail anhängen</label>
+        <label>PDF</label>
         <hint>Erstelltes PDF an Benachrichtigungs-E-Mails anhängen &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>XML-Daten an E-Mail anhängen</label>
+        <label>XML-Daten</label>
         <hint>XML-Formulardaten an Benachrichtigungs-E-Mails anhängen &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>TIFF an E-Mail anhängen</label>
+        <label>TIFF</label>
         <hint>Erstelltes TIFF-Bild an Benachrichtigungs-E-Mails anhängen &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Excel (Benannte Bereiche) an E-Mail anhängen</label>
+        <label>Excel (benannte Bereiche)</label>
         <hint>Excel-Datei mit benannten Bereichen an Benachrichtigungs-E-Mails anhängen &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>XML-Formularstruktur und -Daten an E-Mail anhängen</label>
+        <label>XML-Formularstruktur und -Daten</label>
         <hint>XML-Export der Formularstruktur und -daten an Benachrichtigungs-E-Mails anhängen &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nein)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Aktionen &amp; Dienste</actions-services>
         <reset-all>Alle zurücksetzen</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Steuerelemente-Übersicht</label>
+        <hint>Schaltfläche für den Dialog „Steuerelemente-Übersicht“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Formular prüfen</label>
+        <hint>Schaltfläche für den Dialog „Formular prüfen“ in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-Schema</label>
         <hint>Schaltfläche für den XML-Schema-Dialog in Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Option für Token-Zugriff</label>
+        <hint>Option für den Token-Zugriff im Berechtigungsdialog von Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Inhaber- und Gruppenberechtigungen</label>
+        <hint>Zeilen „Inhaber“ und „Gruppenmitglieder“ im Berechtigungsdialog von Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Rollenauswahlliste</label>
+        <hint>Konfigurierte Rollenauswahlliste im Berechtigungsdialog von Form Builder anzeigen &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Schritte im Dialog „Neues Formular“</label>
+        <hint>Angezeigte Schritte beim Erstellen eines neuen Formulars in Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Vorlagen und allgemeine Einstellungen)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Vorlagen und allgemeine Einstellungen</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Nur Vorlagen</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Nur allgemeine Einstellungen</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Keine (Editor direkt öffnen)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Schwellenwert zum automatischen Einklappen von Abschnitten</label>
+        <hint>Anzahl an Steuerelementen, ab der Abschnitte in Form Builder eingeklappt starten &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Voreinstellungen für Vorschaugeräte (JSON)</label>
+        <hint>JSON-Array responsiver Gerätevoreinstellungen im Vorschaudialog von Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Form Builder-MCP-Server aktivieren</label>
         <hint>Den Model Context Protocol (MCP)-Server für Form Builder aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Gültigkeit des Form Builder-MCP-Tokens (Minuten)</label>
+        <hint>Gültigkeitsdauer in Minuten für Form Builder-MCP-Tokens &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Form Runner-MCP-Server aktivieren</label>
+        <hint>Den Model Context Protocol (MCP)-Server für Form Runner aktivieren &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nein)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Token für Form Runner-MCP-Server verlangen</label>
+        <hint>Token-Authentifizierung für den Form Runner-MCP-Server verlangen &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nein</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Gültigkeit des Form Runner-MCP-Tokens (Minuten)</label>
+        <hint>Gültigkeitsdauer in Minuten für Form Runner-MCP-Tokens &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Datumseingabeformat</label>
         <hint>Eingabemaske für Datumsangaben, z. B. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; oder &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

@@ -61,6 +61,9 @@
         <positive-byte-size>Introduïu una mida positiva d'almenys 1 byte</positive-byte-size>
         <heap-percentage>Introduïu un percentatge superior a 0 % i fins a 100 %</heap-percentage>
         <duration>Introduïu una durada, p. ex. 30m, 2h, 1d, PT30M o mil·lisegons</duration>
+        <pdf-header-footer-json>Configuració JSON de capçalera/peu de pàgina PDF no vàlida</pdf-header-footer-json>
+        <preview-devices-json>Configuració JSON de dispositius de previsualització no vàlida</preview-devices-json>
+        <positive-duration>Introduïu una durada positiva</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Il·limitat</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>% de memòria màx.</heap-percent>
         <fixed-size>Mida fixa</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Sense definir</unset>
+        <disabled>Desactivat</disabled>
+        <min-sections>Seccions mínimes</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Desactivat</disabled>
+        <delay>Després d'un retard</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Il·limitat</unlimited>
+        <max-files>Màxim de fitxers</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Sense límit</unlimited>
+        <timeout>Temps d'inactivitat</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Formata</format>
+        <copy>Copia</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>min</min>
@@ -113,7 +137,7 @@
         <label>Pàgina de resum</label>
     </summary-section>
     <admin-section>
-        <label>Administració de formularis</label>
+        <label>Pàgines d'administració</label>
     </admin-section>
     <import-section>
         <label>Importació i exportació</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Formats d'entrada i sortida</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Opcional</profiles-hint>
         <profiles-help>Perfils de propietats opcionals. Quan s'especifiquen un o més perfils, aquesta propietat només s'aplica a les sol·licituds on aquests perfils són actius; deixeu-ho en blanc perquè s'apliqui incondicionalment.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Elements de la barra de navegació</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Columnes visibles de la taula</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Visualització de només lectura i PDF</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Elements de marc de la pàgina de detall</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Adjunts generats</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Idiomes</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Sessió i configuració regional</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Tema i disposició</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Etiquetes, suggeriments i dreceres</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Aparença dels components</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Marca i recursos personalitzats</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Taula i paginació</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Botons i versions</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Desament i sessió</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Disponibilitat del formulari</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Validació i dades</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Resum d'errors</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Focus, suggeriments i tabulació</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Seccions i repeticions</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Formulari únic (singleton)</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navegació i validació</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>Paràmetres d'URL</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Pàgina d'administració de formularis</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Analítica de formularis</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Consola del sistema</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Configuració de pàgina i capçalera/peu</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Estàndards i renderització</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Tipografies i plantilles</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Transport i servidor SMTP</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Adreces</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Exportació</label>
+    </export-group>
+    <import-group>
+        <label>Importació</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Metadades i publicació</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Opcions del diàleg Permisos</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Servidor MCP de Form Builder</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Servidor MCP de Form Runner</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Permisos de Form Runner</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Menú d'usuari de la barra de navegació</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Testimonis (tokens)</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Màscares d'entrada</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Expressions de sortida (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Idioma per defecte</label>
         <hint>Codi d'idioma per defecte &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Inactivitat màx.</label>
         <hint>Temps d'inactivitat opcional abans d'expulsar les expressions XPath de la memòria cau (p. ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o en blanc) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Entrades màx.</label>
+        <hint>Nombre màxim d'instàncies XML compartides de només lectura conservades a la memòria JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Pressupost de memòria</label>
+        <hint>Percentatge màxim de memòria JVM, mida fixa de dades (desada en bytes) o il·limitat &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Inactivitat màx.</label>
+        <hint>Temps d'inactivitat opcional abans d'expulsar les instàncies compartides de la memòria cau (p. ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; o en blanc) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Mostrar l'enllaç Inici a la barra de navegació</label>
+        <label>Enllaç d'inici</label>
         <hint>Activar l'enllaç Inici a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Menú Administració</label>
+        <hint>Activar el menú Administració a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Mostrar el selector d'idioma a la barra de navegació</label>
+        <label>Selector d'idioma</label>
         <hint>Activar el selector d'idioma a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Mostrar el selector d'esquema de color a la barra de navegació</label>
+        <label>Selector d'esquema de colors</label>
         <hint>Activar el selector de mode clar/fosc a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Mostrar el botó Compartir a la barra de navegació</label>
+        <label>Botó de compartir</label>
         <hint>Activar el botó d'enllaç per compartir a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Mostrar l'historial de revisions a la barra de navegació</label>
+        <label>Historial de revisions</label>
         <hint>Activar la icona de l'historial de revisions a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Mostrar l'etapa del flux de treball a la barra de navegació</label>
+        <label>Fase del flux de treball</label>
         <hint>Mostrar l'etapa actual del flux de treball a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Navegació de cerca</label>
+        <hint>Activar les fletxes de navegació de registre Anterior/Següent a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Quota d'adjunts</label>
+        <hint>Mostrar l'ús de la quota d'emmagatzematge d'adjunts a la barra de navegació &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (No)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Tema (per formulari)</label>
         <hint>Tema visual per als formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Mostrar les ajudes en modes de només lectura</label>
+        <label>Mostra els suggeriments dels controls</label>
         <hint>Mostrar les ajudes dels controls en els modes de visualització i PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Mostrar les alertes en modes de només lectura</label>
+        <label>Mostra les alertes de validació</label>
         <hint>Mostrar les alertes de validació en els modes de visualització i PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Mostrar els indicadors d'obligatorietat en modes de només lectura</label>
+        <label>Mostra els indicadors d'obligatorietat</label>
         <hint>Mostrar els indicadors de camp obligatori en els modes de visualització i PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Mostrar els textos explicatius en mode de visualització</label>
+        <label>Mostra les explicacions (mode visualització)</label>
         <hint>Mostrar els controls fr:explanation en mode de visualització &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Aparença de les seccions</label>
+        <hint>Estil visual per a les seccions &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Completa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Completa</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Mínima</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Aparença de les quadrícules</label>
+        <hint>Estil visual per a les quadrícules repetides &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Completa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Completa</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Mínima</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Aparença de valor calculat</label>
+        <hint>Estil visual per als controls de Valor calculat &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Completa)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Completa</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Mínima</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Mostrar la miniatura</label>
+        <hint>Mostrar la miniatura del formulari a les pàgines de detall &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (No)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Botons de la pàgina de detall</label>
         <hint>Llista separada per espais dels botons mostrats a la pàgina de detall &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Llista separada per espais dels botons mostrats a la pàgina de visualització &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Retard de desament automàtic (ms)</label>
-        <hint>Retard en mil·lisegons abans del desament automàtic; 0 desactiva el desament automàtic &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Retard del desament automàtic</label>
+        <hint>Retard abans de desar automàticament els esborranys (emmagatzemat en mil·lisegons) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Migració simple de dades</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Mida de pàgina del resum d'errors</label>
+        <hint>Nombre màxim de missatges de validació mostrats inicialment al resum d'errors &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Marcar els controls com a visitats en canviar el valor</label>
+        <hint>Marcar els controls com a visitats quan en canvia el valor &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Marcar els controls no vàlids com a visitats</label>
+        <hint>Marcar els controls no vàlids com a visitats quan s'executa la validació &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Component Captcha</label>
         <hint>Implementació de Captcha a les pàgines de detall &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Ubicació del captcha</label>
+        <hint>On es mostra el captcha a les pàgines de detall i de l'assistent &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Al final del formulari)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Al final del formulari</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Dins de l'assistent (totes les pàgines)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Dins de l'assistent (primera pàgina)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Dins de l'assistent (última pàgina)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Visibilitat del captcha</label>
+        <hint>Valor booleà o expressió XPath que controla quan es mostra el captcha &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Formulari d'instància única</label>
         <hint>Permetre només un document de dades per a aquest formulari &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Taula de continguts</label>
+    </toc-group>
     <toc-min-sections>
         <label>Mínim de seccions per a la taula de continguts</label>
-        <hint>Nombre mínim de seccions requerit per mostrar la taula de continguts; -1 per desactivar, -2 per no utilitzar &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Mostra la taula de continguts quan el formulari tingui almenys aquest nombre de seccions &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Posició de la taula de continguts</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Missatges</label>
+    </messages-group>
     <messages-appearance>
         <label>Aparença dels missatges</label>
         <hint>Mode de presentació dels missatges d'acció &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Llindar d'avís d'expiració de sessió</label>
+        <hint>Percentatge de la durada de la sessió a partir del qual apareix el diàleg d'avís &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Marge d'expiració de sessió</label>
+        <hint>Marge de seguretat en segons abans de l'expiració de la sessió &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Disponible des de</label>
+        <hint>Data i hora inicials a partir de les quals s'accepten nous enviaments del formulari &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Disponible fins a</label>
+        <hint>Data i hora límit fins a les quals s'accepten nous enviaments del formulari &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Avisar en sortir amb canvis no desats</label>
         <hint>Valor booleà o expressió XPath que controla l'avís de dades no desades &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Llista separada per espais de botons a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Mostrar la columna Creat</label>
+        <label>Creat</label>
         <hint>Mostrar la columna de data de creació a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Mostrar la columna Última modificació</label>
+        <label>Última modificació</label>
         <hint>Mostrar la columna de data d'última modificació a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Mostrar la columna Etapa del flux de treball</label>
+        <label>Fase del flux de treball</label>
         <hint>Mostrar la columna d'etapa del flux de treball a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Mostrar la columna Creat per</label>
+        <label>Creat per</label>
         <hint>Mostrar la columna Creat per a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Mostrar la columna Modificat per</label>
+        <label>Modificat per</label>
         <hint>Mostrar la columna Modificat per a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Miniatura</label>
+        <hint>Mostrar la miniatura del formulari a la pàgina de resum &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (No)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Processos d'accions en bloc del resum</label>
+        <hint>Noms de processos separats per espais disponibles com a accions en bloc sobre les files seleccionades &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Mida de la pàgina d'administració de formularis</label>
         <hint>Nombre de formularis per pàgina a la pàgina d'administració de formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Configuració de servidors remots</label>
         <hint>Matriu JSON de servidors remots per a la publicació i l'administració de formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Activar l'analítica de formularis</label>
+        <hint>Activar el seguiment de sessions en execució i la pàgina &lt;code&gt;/fr/analytics&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Rols autoritzats per a l'analítica</label>
+        <hint>Noms de rols separats per comes o espais autoritzats a veure l'analítica &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Mostrar els noms d'usuari a l'analítica</label>
+        <hint>Mostrar els noms dels usuaris autenticats a l'analítica de formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Màxim de sessions actives registrades</label>
+        <hint>Nombre màxim de sessions de formulari actives conservades a la memòria &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Màxim de sessions recents registrades</label>
+        <hint>Nombre màxim de sessions de formulari completades conservades a la memòria &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Activar el mostreig de l'historial de mètriques</label>
+        <hint>Recopilar en segon pla l'historial de mètriques de JVM i memòria cau per a &lt;code&gt;/fr/console&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Interval de mostreig de mètriques</label>
+        <hint>Interval de mostreig (almenys 1 segon) per a les mètriques de la consola del sistema &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Activar la pàgina d'exportació</label>
         <hint>Activar la pàgina d'exportació de dades de formularis &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Adreça de correu en còpia oculta (CCO) per defecte &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>Adjuntar el PDF al correu electrònic</label>
+        <label>PDF</label>
         <hint>Adjuntar el PDF generat als correus de notificació &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>Adjuntar les dades XML al correu electrònic</label>
+        <label>Dades XML</label>
         <hint>Adjuntar les dades XML del formulari als correus de notificació &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (Sí)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>Adjuntar el TIFF al correu electrònic</label>
+        <label>TIFF</label>
         <hint>Adjuntar la imatge TIFF generada als correus de notificació &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Adjuntar l'Excel (intervals amb nom) al correu electrònic</label>
+        <label>Excel (intervals amb nom)</label>
         <hint>Adjuntar el fitxer Excel amb intervals amb nom als correus de notificació &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>Adjuntar l'estructura i les dades XML del formulari al correu electrònic</label>
+        <label>Estructura i dades XML</label>
         <hint>Adjuntar l'exportació XML de l'estructura i les dades del formulari als correus de notificació &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Per defecte (No)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Accions i serveis</actions-services>
         <reset-all>Restableix tot</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Vista general dels controls</label>
+        <hint>Mostrar el botó del diàleg Vista general dels controls a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Comprovar el formulari</label>
+        <hint>Mostrar el botó del diàleg Comprovar el formulari a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>Esquema XML</label>
         <hint>Mostrar el botó del diàleg Esquema XML a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Opció d'accés per token</label>
+        <hint>Mostrar l'opció d'accés per token al diàleg Permisos de Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Permisos de propietari i grup</label>
+        <hint>Mostrar les files de Propietari i Membres del grup al diàleg Permisos de Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Llista de selecció de rols</label>
+        <hint>Mostrar la llista configurada de selecció de rols al diàleg Permisos de Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Passos del diàleg Formulari nou</label>
+        <hint>Passos mostrats en crear un formulari nou a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Plantilles i Configuració general)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Plantilles i Configuració general</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Només plantilles</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Només Configuració general</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Cap (Obrir l'editor directament)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Llindar de plegament automàtic de seccions</label>
+        <hint>Llindar de nombre de controls a partir del qual les seccions s'inicien plegades a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Preconfiguracions de dispositius de previsualització (JSON)</label>
+        <hint>Matriu JSON de preconfiguracions de dispositius adaptables mostrades al diàleg de previsualització de Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Activar el servidor MCP de Form Builder</label>
         <hint>Activar el servidor Model Context Protocol (MCP) per a Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Validesa del token MCP de Form Builder (minuts)</label>
+        <hint>Durada de validesa en minuts per als tokens MCP de Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Activar el servidor MCP de Form Runner</label>
+        <hint>Activar el servidor Model Context Protocol (MCP) per a Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (No)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Exigir un token per al servidor MCP de Form Runner</label>
+        <hint>Exigir autenticació per token per al servidor MCP de Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Per defecte (Sí)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Sí</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>No</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Validesa del token MCP de Form Runner (minuts)</label>
+        <hint>Durada de validesa en minuts per als tokens MCP de Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Format d'entrada de data</label>
         <hint>Màscara de format d'entrada de data, p. ex. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; o &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

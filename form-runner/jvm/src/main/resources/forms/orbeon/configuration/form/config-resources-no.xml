@@ -61,6 +61,9 @@
         <positive-byte-size>Skriv inn en positiv størrelse på minst 1 byte</positive-byte-size>
         <heap-percentage>Skriv inn en prosentandel større enn 0 % og opptil 100 %</heap-percentage>
         <duration>Skriv inn en varighet, f.eks. 30m, 2h, 1d, PT30M eller millisekunder</duration>
+        <pdf-header-footer-json>Ugyldig JSON-konfigurasjon for PDF-topptekst/-bunntekst</pdf-header-footer-json>
+        <preview-devices-json>Ugyldig JSON-konfigurasjon for forhåndsvisningsenheter</preview-devices-json>
+        <positive-duration>Angi en positiv varighet</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Ubegrenset</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>Maks. heap-%</heap-percent>
         <fixed-size>Fast størrelse</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Ikke angitt</unset>
+        <disabled>Deaktivert</disabled>
+        <min-sections>Minimum antall seksjoner</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Deaktivert</disabled>
+        <delay>Etter forsinkelse</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Ubegrenset</unlimited>
+        <max-files>Maksimalt antall filer</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Ingen tidsavbrudd</unlimited>
+        <timeout>Tidsavbrudd ved inaktivitet</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Formater</format>
+        <copy>Kopier</copy>
+    </json-actions>
     <units>
         <ms>ms</ms>
         <min>min</min>
@@ -113,7 +137,7 @@
         <label>Oppsummeringsside</label>
     </summary-section>
     <admin-section>
-        <label>Skjemaadministrasjonsside</label>
+        <label>Administrasjonssider</label>
     </admin-section>
     <import-section>
         <label>Import og eksport</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Inndata- og utdataformater</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Valgfri</profiles-hint>
         <profiles-help>Valgfrie egenskapsprofiler. Når én eller flere profiler er angitt, gjelder denne egenskapen kun for forespørsler der disse profilene er aktive; la feltet stå tomt for å gjelde ubetinget.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Elementer i navigasjonslinjen</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Synlige tabellkolonner</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Skrivebeskyttet og PDF-visning</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Sideelementer på detaljsiden</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Genererte vedlegg</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Språk</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Økt og regionale innstillinger</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Tema og oppsett</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Etiketter, hjelpetekster og snarveier</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Utseende for komponenter</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Profilering og egendefinerte ressurser</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Tabell og sideinndeling</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Knapper og versjonering</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Lagring og økt</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Skjematilgjengelighet</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Validering og data</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Feiloversikt</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Captcha</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Fokus, hjelpetekster og tabulatorrekkefølge</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Seksjoner og gjentakelser</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Singleton-skjema</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Navigasjon og validering</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL-parametere</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Skjemaadministrasjonsside</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Skjemaanalyse</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Systemkonsoll</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Sideoppsett og topptekst/bunntekst</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Standarder og gjengivelse</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Skrifttyper og maler</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Transport og SMTP-server</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Adresser</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Eksport</label>
+    </export-group>
+    <import-group>
+        <label>Import</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Skjemametadata og publisering</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Alternativer i dialogboksen Tillatelser</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP-server</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP-server</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner-tillatelser</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Brukermeny i navigasjonslinjen</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Tokens</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Inndatamasker</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Utdatamaluttrykk (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Standardspråk</label>
         <hint>Standardspråkkode &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Maks. inaktivitet</label>
         <hint>Valgfri tidsgrense for inaktivitet før bufrede XPath-uttrykk fjernes (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Maks. oppføringer</label>
+        <hint>Maksimalt antall delte skrivebeskyttede XML-instanser i JVM-heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Bytebudsjett</label>
+        <hint>Maks. prosentandel av JVM-heap, fast datastørrelse (lagret i byte) eller ubegrenset &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Maks. inaktivitet</label>
+        <hint>Valgfri tidsgrense for inaktivitet før bufrede delte instanser fjernes (f.eks. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; eller tomt) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Vis Hjem-lenke på navigasjonslinjen</label>
+        <label>Hjem-lenke</label>
         <hint>Aktiver Hjem-lenken på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Administrasjonsmeny</label>
+        <hint>Aktiver menyen Administrasjon på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Vis språkvelger på navigasjonslinjen</label>
+        <label>Språkvelger</label>
         <hint>Aktiver språkvelgeren på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Vis fargemodusvelger på navigasjonslinjen</label>
+        <label>Fargetemavelger</label>
         <hint>Aktiver velgeren for lys/mørk modus på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Vis Del-knapp på navigasjonslinjen</label>
+        <label>Del-knapp</label>
         <hint>Aktiver knappen for deling av lenke på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Vis revisjonshistorikk på navigasjonslinjen</label>
+        <label>Revisjonshistorikk</label>
         <hint>Aktiver ikonet for revisjonshistorikk på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Vis arbeidsflytstadium på navigasjonslinjen</label>
+        <label>Arbeidsflyttrinn</label>
         <hint>Vis gjeldende arbeidsflytstadium på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Søkenavigasjon</label>
+        <hint>Aktiver navigasjonspilene Forrige/Neste oppføring på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Vedleggskvote</label>
+        <hint>Vis bruk av lagringskvote for vedlegg på navigasjonslinjen &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Tema (per skjema)</label>
         <hint>Visuelt tema for skjemaer &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Vis hint i skrivebeskyttede moduser</label>
+        <label>Vis hjelpetekster for felter</label>
         <hint>Vis kontrollhint i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Vis varsler i skrivebeskyttede moduser</label>
+        <label>Vis valideringsvarsler</label>
         <hint>Vis valideringsvarsler i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Vis indikatorer for påkrevde felt i skrivebeskyttede moduser</label>
+        <label>Vis indikatorer for obligatoriske felter</label>
         <hint>Vis indikatorer for påkrevde felt i visnings- og PDF-modus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Vis forklaringer i visningsmodus</label>
+        <label>Vis forklaringer (visningsmodus)</label>
         <hint>Vis kontroller av typen fr:explanation i visningsmodus &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Utseende for seksjoner</label>
+        <hint>Visuell stil for seksjoner &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fullstendig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fullstendig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Utseende for rutenett</label>
+        <hint>Visuell stil for gjentatte rutenett &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fullstendig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fullstendig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Utseende for beregnede verdier</label>
+        <hint>Visuell stil for kontroller av typen Beregnet verdi &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Fullstendig)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Fullstendig</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Minimal</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Vis miniatyrbilde</label>
+        <hint>Vis skjemaets miniatyrbilde på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Knapper på detaljside</label>
         <hint>Mellomromsatskilt liste over knapper som vises på detaljsiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Mellomromsatskilt liste over knapper som vises på visningssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Forsinkelse før automatisk lagring (ms)</label>
-        <hint>Forsinkelse i millisekunder før automatisk lagring; 0 deaktiverer automatisk lagring &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Forsinkelse for autolagring</label>
+        <hint>Forsinkelse før utkast lagres automatisk (lagres i millisekunder) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Enkel datamigrering</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Sidestørrelse for feiloversikt</label>
+        <hint>Maksimalt antall valideringsmeldinger som vises til å begynne med i feiloversikten &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Merk kontroller som besøkt ved verdiendring</label>
+        <hint>Merk kontroller som besøkt når verdien deres endres &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Merk ugyldige kontroller som besøkt</label>
+        <hint>Merk ugyldige kontroller som besøkt når validering kjøres &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Captcha-komponent</label>
         <hint>Captcha-implementering på detaljsider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Captcha-plassering</label>
+        <hint>Hvor captcha vises på detalj- og veivisersider &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nederst i skjemaet)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Nederst i skjemaet</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Inne i veiviseren (alle sider)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Inne i veiviseren (første side)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Inne i veiviseren (siste side)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Captcha-synlighet</label>
+        <hint>Boolsk verdi eller XPath-uttrykk som styrer når captcha vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Enkeltskjema</label>
         <hint>Tillat kun ett skjemadatadokument for dette skjemaet &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Innholdsfortegnelse</label>
+    </toc-group>
     <toc-min-sections>
         <label>Minimum antall seksjoner for innholdsfortegnelse</label>
-        <hint>Minimum antall seksjoner som kreves for å vise innholdsfortegnelsen; -1 for å deaktivere, -2 for ubrukt &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Vis innholdsfortegnelsen når skjemaet har minst dette antallet seksjoner &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Plassering av innholdsfortegnelse</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Meldinger</label>
+    </messages-group>
     <messages-appearance>
         <label>Utseende for meldinger</label>
         <hint>Hvordan handlingsmeldinger vises &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Utløser for varsel om øktutløp</label>
+        <hint>Prosentandel av øktens levetid før varseldialogen vises &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Sikkerhetsmargin ved øktutløp</label>
+        <hint>Sikkerhetsmargin i sekunder før øktutløp &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Tilgjengelig fra</label>
+        <hint>Tidligste dato og klokkeslett når nye skjemainnsendinger godtas &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Tilgjengelig til</label>
+        <hint>Seneste dato og klokkeslett når nye skjemainnsendinger godtas &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Varsle når siden forlates med ulagrede endringer</label>
         <hint>Boolsk verdi eller XPath-uttrykk som styrer varsel om ulagrede data &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Mellomromsatskilt liste over knapper på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Vis kolonnen Opprettet</label>
+        <label>Opprettet</label>
         <hint>Vis kolonne med opprettelsestidspunkt på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Vis kolonnen Sist endret</label>
+        <label>Sist endret</label>
         <hint>Vis kolonne med siste endringstidspunkt på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Vis kolonnen Arbeidsflytstadium</label>
+        <label>Arbeidsflyttrinn</label>
         <hint>Vis kolonne for arbeidsflytstadium på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Vis kolonnen Opprettet av</label>
+        <label>Opprettet av</label>
         <hint>Vis kolonnen Opprettet av på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Vis kolonnen Sist endret av</label>
+        <label>Sist endret av</label>
         <hint>Vis kolonnen Sist endret av på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Miniatyrbilde</label>
+        <hint>Vis skjemaets miniatyrbilde på oppsummeringssiden &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Massehandlingsprosesser på oppsummeringsside</label>
+        <hint>Mellomromsatskilte prosessnavn tilgjengelige som massehandlinger for valgte rader &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Sidestørrelse for skjemaadministrasjon</label>
         <hint>Antall skjema per side på siden Skjemaadministrasjon &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Konfigurasjon av eksterne servere</label>
         <hint>JSON-matrise med eksterne servere for publisering og administrasjon av skjema &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Aktiver skjemaanalyse</label>
+        <hint>Aktiver sporing av kjørende økter og siden &lt;code&gt;/fr/analytics&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Autoriserte roller for analyse</label>
+        <hint>Komma- eller mellomromsatskilte rollenavn med tilgang til å vise analyser &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Vis brukernavn i analyse</label>
+        <hint>Vis autentiserte brukernavn i Skjemaanalyse &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Maks. sporede aktive økter</label>
+        <hint>Maksimalt antall aktive skjemaøkter som beholdes i minnet &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Maks. sporede nylige økter</label>
+        <hint>Maksimalt antall fullførte skjemaøkter som beholdes i minnet &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Aktiver målehistorikk</label>
+        <hint>Samle inn bakgrunnshistorikk for JVM- og hurtigbuffermålinger for &lt;code&gt;/fr/console&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Måleintervall</label>
+        <hint>Måleintervall (minst 1 sekund) for målinger i Systemkonsoll &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Aktiver eksportside</label>
         <hint>Aktiver siden for eksport av skjemadata &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Standard e-postadresse for blindkopi (BCC) &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>Legg ved PDF i e-post</label>
+        <label>PDF</label>
         <hint>Legg ved generert PDF i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>Legg ved XML-data i e-post</label>
+        <label>XML-data</label>
         <hint>Legg ved skjemaets XML-data i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Ja)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>Legg ved TIFF i e-post</label>
+        <label>TIFF</label>
         <hint>Legg ved generert TIFF-bilde i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Legg ved Excel (Navngitte områder) i e-post</label>
+        <label>Excel (navngitte områder)</label>
         <hint>Legg ved Excel-fil med navngitte områder i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>Legg ved XML-skjemastruktur og -data i e-post</label>
+        <label>XML-skjemastruktur og -data</label>
         <hint>Legg ved XML-eksport av skjemastruktur og -data i varslings-e-poster &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>Standard (Nei)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Handlinger og tjenester</actions-services>
         <reset-all>Tilbakestill alle</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Oversikt over kontroller</label>
+        <hint>Vis knappen for dialogboksen Oversikt over kontroller i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Kontroller skjema</label>
+        <hint>Vis knappen for dialogboksen Kontroller skjema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-skjema</label>
         <hint>Vis knappen for dialogboksen XML-skjema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Alternativ for tilgangspollett</label>
+        <hint>Vis alternativet for tilgang med pollett i dialogboksen Tillatelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Tillatelser for eier og gruppe</label>
+        <hint>Vis radene Eier og Gruppemedlemmer i dialogboksen Tillatelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Rollevalgsliste</label>
+        <hint>Vis den konfigurerte rollevalgslisten i dialogboksen Tillatelser i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Trinn i dialogboksen Nytt skjema</label>
+        <hint>Trinn som vises ved opprettelse av et nytt skjema i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Maler og generelle innstillinger)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Maler og generelle innstillinger</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Kun maler</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Kun generelle innstillinger</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Ingen (Åpne redigeringsverktøy direkte)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Terskel for automatisk sammenslåing av seksjoner</label>
+        <hint>Antall kontroller der seksjoner starter sammenslått i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Enhetsforhåndsvalg for forhåndsvisning (JSON)</label>
+        <hint>JSON-matrise med responsive enhetsforhåndsvalg vist i dialogboksen Test i Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Aktiver MCP-server for Form Builder</label>
         <hint>Aktiver Model Context Protocol (MCP)-serveren for Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Gyldighet for tilgangspollett til Form Builder MCP (minutter)</label>
+        <hint>Gyldighetstid i minutter for tilgangspolletter til Form Builder MCP &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Aktiver MCP-server for Form Runner</label>
+        <hint>Aktiver Model Context Protocol (MCP)-serveren for Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Nei)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Krev tilgangspollett for Form Runner MCP-server</label>
+        <hint>Krev autentisering med tilgangspollett for Form Runner MCP-serveren &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>Standard (Ja)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Ja</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Nei</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Gyldighet for tilgangspollett til Form Runner MCP (minutter)</label>
+        <hint>Gyldighetstid i minutter for tilgangspolletter til Form Runner MCP &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Datoinndataformat</label>
         <hint>Maske for datoinndataformat, f.eks. &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; eller &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

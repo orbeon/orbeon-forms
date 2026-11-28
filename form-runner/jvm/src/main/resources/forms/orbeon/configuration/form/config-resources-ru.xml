@@ -61,6 +61,9 @@
         <positive-byte-size>Введите положительный размер не менее 1 байта</positive-byte-size>
         <heap-percentage>Введите процент строго больше 0% и не более 100%</heap-percentage>
         <duration>Введите длительность, например 30m, 2h, 1d, PT30M или значение в миллисекундах</duration>
+        <pdf-header-footer-json>Некорректная JSON-конфигурация верхнего/нижнего колонтитула PDF</pdf-header-footer-json>
+        <preview-devices-json>Недопустимая конфигурация JSON устройств предпросмотра</preview-devices-json>
+        <positive-duration>Введите положительную длительность</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>Без ограничений</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>% от макс. кучи</heap-percent>
         <fixed-size>Фиксированный размер</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>Не задано</unset>
+        <disabled>Отключено</disabled>
+        <min-sections>Минимум разделов</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>Отключено</disabled>
+        <delay>Через интервал</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>Без ограничений</unlimited>
+        <max-files>Максимум файлов</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>Без таймаута</unlimited>
+        <timeout>Таймаут простоя</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>Форматировать</format>
+        <copy>Копировать</copy>
+    </json-actions>
     <units>
         <ms>мс</ms>
         <min>мин</min>
@@ -113,7 +137,7 @@
         <label>Страница общей информации</label>
     </summary-section>
     <admin-section>
-        <label>Администрирование форм</label>
+        <label>Страницы администрирования</label>
     </admin-section>
     <import-section>
         <label>Импорт и экспорт</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>Форматы ввода и вывода</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>Необязательно</profiles-hint>
         <profiles-help>Необязательные профили свойств. Если указан один или несколько профилей, свойство применяется только к запросам, в которых эти профили активны; оставьте пустым для безусловного применения.</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>Элементы панели навигации</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>Видимые столбцы таблицы</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>Отображение только для чтения и PDF</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>Элементы оформления страницы формы</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>Генерируемые вложения</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>Языки</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>Сессия и региональные настройки</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>Тема и макет</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>Подписи, подсказки и горячие клавиши</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>Отображение компонентов</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>Символика и пользовательские ресурсы</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>Таблица и пагинация</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>Кнопки и версии</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>Сохранение и сессия</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>Доступность формы</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>Проверка и данные</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>Сводка ошибок</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>Защитный код (Captcha)</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>Фокус, подсказки и порядок табуляции</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>Разделы и повторения</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>Одиночная форма (singleton)</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>Навигация и проверка</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>Параметры URL</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>Страница администрирования форм</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>Аналитика форм</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>Системная консоль</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>Параметры страницы и колонтитулы</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>Стандарты и рендеринг</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>Шрифты и шаблоны</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>Транспорт и SMTP-сервер</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>Адреса</label>
+    </email-addresses-group>
+    <export-group>
+        <label>Экспорт</label>
+    </export-group>
+    <import-group>
+        <label>Импорт</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>Метаданные и публикация форм</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>Параметры диалога «Настройка прав»</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Сервер MCP Form Builder</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Сервер MCP Form Runner</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Права доступа Form Runner</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>Меню пользователя в панели навигации</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>Токены</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>Маски ввода</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>Выражения вывода (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>Язык по умолчанию</label>
         <hint>Код языка по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>Макс. время простоя</label>
         <hint>Необязательный тайм-аут простоя перед вытеснением кэшированных выражений XPath (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>Макс. число записей</label>
+        <hint>Максимальное число общих доступных только для чтения экземпляров XML в куче JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>Лимит памяти в байтах</label>
+        <hint>Макс. процент кучи JVM, фиксированный размер данных (в байтах) или без ограничений &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>Макс. время простоя</label>
+        <hint>Необязательный тайм-аут простоя перед вытеснением кэшированных общих экземпляров (например, &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; или пусто) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>Показывать ссылку «На главную» на панели навигации</label>
+        <label>Ссылка «Домой»</label>
         <hint>Включить ссылку «На главную» на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>Меню администрирования</label>
+        <hint>Включить меню администрирования на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>Показывать выбор языка на панели навигации</label>
+        <label>Выбор языка</label>
         <hint>Включить переключатель языка на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>Показывать выбор цветовой схемы на панели навигации</label>
+        <label>Переключатель цветовой схемы</label>
         <hint>Включить переключатель светлого/тёмного режима на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>Показывать кнопку «Поделиться» на панели навигации</label>
+        <label>Кнопка «Поделиться»</label>
         <hint>Включить кнопку обмена ссылкой на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>Показывать историю изменений на панели навигации</label>
+        <label>История изменений</label>
         <hint>Включить значок истории изменений на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>Показывать стадию рабочего процесса на панели навигации</label>
+        <label>Этап рабочего процесса</label>
         <hint>Отображать текущую стадию рабочего процесса на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>Навигация по записям</label>
+        <hint>Включить стрелки перехода к предыдущей и следующей записи на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>Квота вложений</label>
+        <hint>Отображать использование квоты хранилища вложений на панели навигации &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>Тема (для формы)</label>
         <hint>Визуальная тема для форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>Показывать подсказки в режимах только для чтения</label>
+        <label>Показывать подсказки полей</label>
         <hint>Отображать подсказки элементов управления в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>Показывать предупреждения в режимах только для чтения</label>
+        <label>Показывать сообщения проверки</label>
         <hint>Отображать предупреждения проверки в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>Показывать индикаторы обязательности в режимах только для чтения</label>
+        <label>Показывать индикаторы обязательности</label>
         <hint>Показывать индикаторы обязательных полей в режимах просмотра и PDF &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>Показывать пояснения в режиме просмотра</label>
+        <label>Показывать пояснения (режим просмотра)</label>
         <hint>Показывать элементы управления fr:explanation в режиме просмотра &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>Отображение разделов</label>
+        <hint>Визуальный стиль разделов &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полное)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полное</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Минимальное</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>Отображение сеток</label>
+        <hint>Визуальный стиль повторяющихся сеток &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полное)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полное</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Минимальное</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>Отображение вычисляемых значений</label>
+        <hint>Визуальный стиль элементов «Вычисляемое значение» &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Полное)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Полное</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>Минимальное</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>Показывать миниатюру</label>
+        <hint>Отображать миниатюру формы на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>Кнопки страницы формы</label>
         <hint>Разделённый пробелами список кнопок, отображаемых на странице формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>Разделённый пробелами список кнопок на странице просмотра &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>Задержка автосохранения (мс)</label>
-        <hint>Задержка в миллисекундах перед автосохранением; 0 отключает автосохранение &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>Задержка автосохранения</label>
+        <hint>Задержка перед автоматическим сохранением черновика (хранится в миллисекундах) &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>Простая миграция данных</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>Размер страницы сводки ошибок</label>
+        <hint>Максимальное число сообщений проверки, изначально отображаемых в сводке ошибок &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>Отмечать элементы как просмотренные при изменении значения</label>
+        <hint>Отмечать элементы управления как просмотренные при изменении их значения &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>Отмечать недопустимые элементы как просмотренные</label>
+        <hint>Отмечать недопустимые элементы управления как просмотренные при выполнении проверки &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>Компонент защитного кода (Captcha)</label>
         <hint>Реализация защитного кода на страницах форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>Расположение защитного кода (Captcha)</label>
+        <hint>Где отображается защитный код на страницах формы и мастера &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Внизу формы)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Внизу формы</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>Внутри мастера (все страницы)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>Внутри мастера (первая страница)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>Внутри мастера (последняя страница)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>Видимость защитного кода (Captcha)</label>
+        <hint>Логическое значение или выражение XPath, определяющее показ защитного кода &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>Форма-одиночка</label>
         <hint>Разрешить только один документ данных для этой формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>Оглавление</label>
+    </toc-group>
     <toc-min-sections>
         <label>Минимальное число разделов для оглавления</label>
-        <hint>Минимальное число разделов для показа оглавления; -1 — отключить, -2 — не используется &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>Показывать оглавление, если в форме не меньше указанного числа разделов &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>Положение оглавления</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>Сообщения</label>
+    </messages-group>
     <messages-appearance>
         <label>Отображение сообщений</label>
         <hint>Способ отображения сообщений о действиях &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>Порог предупреждения об истечении сеанса</label>
+        <hint>Процент времени жизни сеанса, после которого появляется окно предупреждения &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>Запас времени до истечения сеанса</label>
+        <hint>Резервный интервал в секундах до истечения сеанса &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>Доступна с</label>
+        <hint>Самые ранние дата и время начала приёма новых отправок формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>Доступна до</label>
+        <hint>Самые поздние дата и время окончания приёма новых отправок формы &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>Предупреждать при уходе с несохранёнными изменениями</label>
         <hint>Логическое значение или выражение XPath, управляющее предупреждением о несохранённых данных &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>Разделённый пробелами список кнопок на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>Показывать столбец «Дата создания»</label>
+        <label>Создано</label>
         <hint>Показывать столбец даты и времени создания на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>Показывать столбец «Дата изменения»</label>
+        <label>Изменено</label>
         <hint>Показывать столбец даты и времени последнего изменения на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>Показывать столбец «Стадия рабочего процесса»</label>
+        <label>Этап рабочего процесса</label>
         <hint>Показывать столбец стадии рабочего процесса на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>Показывать столбец «Создано»</label>
+        <label>Кем создано</label>
         <hint>Показывать столбец автора создания на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>Показывать столбец «Кем изменено»</label>
+        <label>Кем изменено</label>
         <hint>Показывать столбец автора последнего изменения на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>Миниатюра</label>
+        <hint>Отображать миниатюру формы на странице общей информации &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>Процессы массовых действий на странице общей информации</label>
+        <hint>Разделённые пробелами имена процессов, доступных как массовые действия для выбранных строк &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>Размер страницы администрирования форм</label>
         <hint>Количество форм на странице администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>Конфигурация удалённых серверов</label>
         <hint>Массив JSON удалённых серверов для публикации и администрирования форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>Включить аналитику форм</label>
+        <hint>Включить отслеживание активных сеансов и страницу &lt;code&gt;/fr/analytics&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>Авторизованные роли для аналитики</label>
+        <hint>Разделённые запятыми или пробелами имена ролей, которым разрешён просмотр аналитики &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>Показывать имена пользователей в аналитике</label>
+        <hint>Отображать имена аутентифицированных пользователей в аналитике форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>Макс. число отслеживаемых активных сеансов</label>
+        <hint>Максимальное число активных сеансов форм, сохраняемых в памяти &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>Макс. число отслеживаемых недавних сеансов</label>
+        <hint>Максимальное число завершённых сеансов форм, сохраняемых в памяти &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>Включить сбор истории метрик</label>
+        <hint>Собирать в фоновом режиме историю метрик JVM и кэшей для &lt;code&gt;/fr/console&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>Интервал сбора метрик</label>
+        <hint>Интервал выборки (не менее 1 секунды) для метрик системной консоли &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>Включить страницу экспорта</label>
         <hint>Включить страницу экспорта данных форм &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>Адрес электронной почты получателя скрытой копии по умолчанию &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>Прикреплять PDF к письму</label>
+        <label>PDF</label>
         <hint>Прикреплять созданный файл PDF к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>Прикреплять данные XML к письму</label>
+        <label>Данные XML</label>
         <hint>Прикреплять XML-данные формы к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Да)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>Прикреплять TIFF к письму</label>
+        <label>TIFF</label>
         <hint>Прикреплять созданное изображение TIFF к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>Прикреплять Excel (именованные диапазоны) к письму</label>
+        <label>Excel (именованные диапазоны)</label>
         <hint>Прикреплять файл Excel с именованными диапазонами к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>Прикреплять структуру и данные формы XML к письму</label>
+        <label>Структура и данные формы XML</label>
         <hint>Прикреплять XML-экспорт структуры и данных формы к письмам уведомлений &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>По умолчанию (Нет)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>Действия и сервисы</actions-services>
         <reset-all>Сбросить все</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>Обзор элементов управления</label>
+        <hint>Показывать кнопку диалога «Обзор элементов управления» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>Проверка формы</label>
+        <hint>Показывать кнопку диалога «Проверка формы» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML-схема</label>
         <hint>Показывать кнопку диалога «Схема XML» в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>Параметр доступа по токену</label>
+        <hint>Показывать параметр доступа по токену в диалоге «Настройка прав» Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>Права владельца и группы</label>
+        <hint>Показывать строки владельца и участников группы в диалоге «Настройка прав» Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>Список выбора ролей</label>
+        <hint>Показывать настроенный список выбора ролей в диалоге «Настройка прав» Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>Шаги диалога создания формы</label>
+        <hint>Шаги, отображаемые при создании новой формы в Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Шаблоны и общие параметры)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Шаблоны и общие параметры</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>Только шаблоны</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>Только общие параметры</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>Нет (сразу открыть редактор)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>Порог автосворачивания разделов</label>
+        <hint>Пороговое число элементов управления, при достижении которого разделы в Form Builder открываются свёрнутыми &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>Наборы устройств предпросмотра (JSON)</label>
+        <hint>Массив JSON предустановок экранов устройств в диалоге тестирования Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>Включить сервер MCP Form Builder</label>
         <hint>Включить сервер протокола контекста модели (MCP) для Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Срок действия токена MCP Form Builder (минуты)</label>
+        <hint>Срок действия в минутах для токенов MCP Form Builder &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>Включить сервер MCP Form Runner</label>
+        <hint>Включить сервер протокола контекста модели (MCP) для Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Нет)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>Требовать токен для сервера MCP Form Runner</label>
+        <hint>Требовать аутентификацию по токену для сервера MCP Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>По умолчанию (Да)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>Да</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>Нет</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Срок действия токена MCP Form Runner (минуты)</label>
+        <hint>Срок действия в минутах для токенов MCP Form Runner &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>Формат ввода даты</label>
         <hint>Маска формата ввода даты, например &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; или &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>

@@ -61,6 +61,9 @@
         <positive-byte-size>请输入至少为 1 字节的正数大小</positive-byte-size>
         <heap-percentage>请输入大于 0% 且不超过 100% 的百分比</heap-percentage>
         <duration>请输入持续时间，例如 30m、2h、1d、PT30M 或毫秒数</duration>
+        <pdf-header-footer-json>无效的 PDF 页眉/页脚 JSON 配置</pdf-header-footer-json>
+        <preview-devices-json>无效的预览设备 JSON 配置</preview-devices-json>
+        <positive-duration>请输入正数时长</positive-duration>
     </alerts>
     <size-modes>
         <unlimited>无限制</unlimited>
@@ -68,6 +71,27 @@
         <heap-percent>最大堆 %</heap-percent>
         <fixed-size>固定大小</fixed-size>
     </size-modes>
+    <toc-min-sections-modes>
+        <unset>未设置</unset>
+        <disabled>已禁用</disabled>
+        <min-sections>最少章节数</min-sections>
+    </toc-min-sections-modes>
+    <autosave-modes>
+        <disabled>禁用</disabled>
+        <delay>延迟后</delay>
+    </autosave-modes>
+    <max-files-modes>
+        <unlimited>无限制</unlimited>
+        <max-files>最大文件数</max-files>
+    </max-files-modes>
+    <idle-timeout-modes>
+        <unlimited>无超时</unlimited>
+        <timeout>空闲超时</timeout>
+    </idle-timeout-modes>
+    <json-actions>
+        <format>格式化</format>
+        <copy>复制</copy>
+    </json-actions>
     <units>
         <ms>毫秒</ms>
         <min>分钟</min>
@@ -113,7 +137,7 @@
         <label>摘要页面</label>
     </summary-section>
     <admin-section>
-        <label>表单管理页面</label>
+        <label>管理页面</label>
     </admin-section>
     <import-section>
         <label>导入与导出</label>
@@ -127,6 +151,9 @@
     <form-builder-section>
         <label>Form Builder</label>
     </form-builder-section>
+    <mcp-section>
+        <label>MCP</label>
+    </mcp-section>
     <formats-section>
         <label>输入与输出格式</label>
     </formats-section>
@@ -192,6 +219,132 @@
         <profiles-hint>可选</profiles-hint>
         <profiles-help>可选属性配置文件。指定一个或多个配置文件名称时，此属性仅适用于激活了这些配置文件的请求；留空则无条件适用。</profiles-help>
     </custom-properties-section>
+    <navbar-items-card>
+        <title>导航栏项目</title>
+    </navbar-items-card>
+    <summary-columns-card>
+        <title>可见表格列</title>
+    </summary-columns-card>
+    <readonly-display-card>
+        <title>只读与 PDF 显示</title>
+    </readonly-display-card>
+    <detail-chrome-card>
+        <title>详情页界面元素</title>
+    </detail-chrome-card>
+    <email-generated-attachments-card>
+        <title>生成的附件</title>
+    </email-generated-attachments-card>
+    <system-languages-group>
+        <label>语言</label>
+    </system-languages-group>
+    <system-session-group>
+        <label>会话与区域设置</label>
+    </system-session-group>
+    <appearance-theme-group>
+        <label>主题与布局</label>
+    </appearance-theme-group>
+    <appearance-labels-group>
+        <label>标签、提示与快捷键</label>
+    </appearance-labels-group>
+    <appearance-components-group>
+        <label>组件外观</label>
+    </appearance-components-group>
+    <appearance-branding-group>
+        <label>品牌与自定义资源</label>
+    </appearance-branding-group>
+    <summary-table-group>
+        <label>表格与分页</label>
+    </summary-table-group>
+    <summary-buttons-group>
+        <label>按钮与版本控制</label>
+    </summary-buttons-group>
+    <detail-saving-group>
+        <label>保存与会话</label>
+    </detail-saving-group>
+    <detail-availability-group>
+        <label>表单可用时间</label>
+    </detail-availability-group>
+    <detail-validation-group>
+        <label>验证与数据</label>
+    </detail-validation-group>
+    <detail-error-summary-group>
+        <label>错误摘要</label>
+    </detail-error-summary-group>
+    <detail-captcha-group>
+        <label>验证码</label>
+    </detail-captcha-group>
+    <detail-focus-group>
+        <label>焦点、提示与 Tab 顺序</label>
+    </detail-focus-group>
+    <detail-sections-group>
+        <label>节与重复项</label>
+    </detail-sections-group>
+    <detail-singleton-group>
+        <label>单例表单</label>
+    </detail-singleton-group>
+    <wizard-nav-group>
+        <label>导航与验证</label>
+    </wizard-nav-group>
+    <wizard-url-group>
+        <label>URL 参数</label>
+    </wizard-url-group>
+    <admin-forms-group>
+        <label>表单管理页面</label>
+    </admin-forms-group>
+    <admin-analytics-group>
+        <label>表单分析</label>
+    </admin-analytics-group>
+    <admin-console-group>
+        <label>系统控制台</label>
+    </admin-console-group>
+    <pdf-page-group>
+        <label>页面设置与页眉/页脚</label>
+    </pdf-page-group>
+    <pdf-standards-group>
+        <label>标准与渲染</label>
+    </pdf-standards-group>
+    <pdf-fonts-group>
+        <label>字体与模板</label>
+    </pdf-fonts-group>
+    <email-smtp-group>
+        <label>传输与 SMTP 服务器</label>
+    </email-smtp-group>
+    <email-addresses-group>
+        <label>邮件地址</label>
+    </email-addresses-group>
+    <export-group>
+        <label>导出</label>
+    </export-group>
+    <import-group>
+        <label>导入</label>
+    </import-group>
+    <fb-publishing-group>
+        <label>表单元数据与发布</label>
+    </fb-publishing-group>
+    <fb-permissions-card>
+        <title>权限对话框选项</title>
+    </fb-permissions-card>
+    <fb-mcp-group>
+        <label>Form Builder MCP 服务器</label>
+    </fb-mcp-group>
+    <fr-mcp-group>
+        <label>Form Runner MCP 服务器</label>
+    </fr-mcp-group>
+    <security-permissions-group>
+        <label>Form Runner 权限</label>
+    </security-permissions-group>
+    <security-user-menu-group>
+        <label>导航栏用户菜单</label>
+    </security-user-menu-group>
+    <security-tokens-group>
+        <label>令牌</label>
+    </security-tokens-group>
+    <formats-input-group>
+        <label>输入掩码</label>
+    </formats-input-group>
+    <formats-output-group>
+        <label>输出表达式 (XPath)</label>
+    </formats-output-group>
     <default-language>
         <label>默认语言</label>
         <hint>默认语言代码 &lt;code class="fr-config-prop-name"&gt;oxf.fr.default-language.*.*&lt;/code&gt;</hint>
@@ -272,8 +425,20 @@
         <label>最大空闲时间</label>
         <hint>驱逐缓存的 XPath 表达式前的可选空闲超时时间（例如 &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt; 或留空） &lt;code class="fr-config-prop-name"&gt;oxf.core.cache.xpath.max-idle&lt;/code&gt;</hint>
     </cache-xpath-max-idle>
+    <cache-shared-instances-size>
+        <label>最大条目数</label>
+        <hint>保留在 JVM 堆中的共享只读 XML 实例最大数量 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.size&lt;/code&gt;</hint>
+    </cache-shared-instances-size>
+    <cache-shared-instances-max-size-bytes>
+        <label>内存预算</label>
+        <hint>最大 JVM 堆百分比、固定数据大小（以字节为单位存储）或无限制 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-size-bytes&lt;/code&gt;</hint>
+    </cache-shared-instances-max-size-bytes>
+    <cache-shared-instances-max-idle>
+        <label>最大空闲时间</label>
+        <hint>驱逐已缓存的共享实例前的可选空闲超时时间（例如 &lt;code&gt;2h&lt;/code&gt;、&lt;code&gt;1d&lt;/code&gt; 或留空） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.shared-instances.max-idle&lt;/code&gt;</hint>
+    </cache-shared-instances-max-idle>
     <navbar-home-link>
-        <label>在导航栏中显示首页链接</label>
+        <label>主页链接</label>
         <hint>在导航栏中启用首页链接 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -288,8 +453,24 @@
             <value>false</value>
         </item>
     </navbar-home-link>
+    <navbar-admin-menu>
+        <label>管理菜单</label>
+        <hint>在导航栏中启用管理菜单 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.admin-menu.enable&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </navbar-admin-menu>
     <navbar-language-selector>
-        <label>在导航栏中显示语言选择器</label>
+        <label>语言选择器</label>
         <hint>在导航栏中启用语言选择器 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.language-selector.enable&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -305,7 +486,7 @@
         </item>
     </navbar-language-selector>
     <navbar-color-scheme-selector>
-        <label>在导航栏中显示配色方案选择器</label>
+        <label>配色方案选择器</label>
         <hint>在导航栏中启用浅色/深色模式选择器 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.color-scheme-selector.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -321,7 +502,7 @@
         </item>
     </navbar-color-scheme-selector>
     <navbar-share-button>
-        <label>在导航栏中显示共享按钮</label>
+        <label>分享按钮</label>
         <hint>在导航栏中启用共享链接按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.share-button.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -337,7 +518,7 @@
         </item>
     </navbar-share-button>
     <navbar-revision-history>
-        <label>在导航栏中显示修订历史</label>
+        <label>修订历史</label>
         <hint>在导航栏中启用修订历史图标 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.revision-history.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -353,7 +534,7 @@
         </item>
     </navbar-revision-history>
     <navbar-workflow-stage>
-        <label>在导航栏中显示工作流阶段</label>
+        <label>工作流阶段</label>
         <hint>在导航栏中显示当前工作流阶段 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.workflow-stage.enable.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -368,6 +549,38 @@
             <value>false</value>
         </item>
     </navbar-workflow-stage>
+    <navbar-search-navigation>
+        <label>搜索导航</label>
+        <hint>在导航栏中启用上一条/下一条记录导航箭头 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.search-navigation.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </navbar-search-navigation>
+    <navbar-attachment-quota>
+        <label>附件配额</label>
+        <hint>在导航栏中显示附件存储配额使用情况 &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.attachment-quota.enable.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (否)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </navbar-attachment-quota>
     <style-theme>
         <label>主题（按表单）</label>
         <hint>表单的视觉主题 &lt;code class="fr-config-prop-name"&gt;oxf.fr.style.theme.*.*&lt;/code&gt;</hint>
@@ -509,7 +722,7 @@
         </item>
     </hint-appearance>
     <static-readonly-hint>
-        <label>在只读模式下显示提示</label>
+        <label>显示控件提示</label>
         <hint>在查看和 PDF 模式下显示控件提示 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-hint.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -525,7 +738,7 @@
         </item>
     </static-readonly-hint>
     <static-readonly-alert>
-        <label>在只读模式下显示警告</label>
+        <label>显示验证警告</label>
         <hint>在查看和 PDF 模式下显示验证警告 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-alert.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -541,7 +754,7 @@
         </item>
     </static-readonly-alert>
     <static-readonly-required>
-        <label>在只读模式下显示必填标识</label>
+        <label>显示必填标识</label>
         <hint>在查看和 PDF 模式下显示必填字段标识 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.static-readonly-required.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -557,7 +770,7 @@
         </item>
     </static-readonly-required>
     <view-show-explanation>
-        <label>在查看模式下显示说明文本</label>
+        <label>显示说明文本（查看模式）</label>
         <hint>在查看模式下显示 fr:explanation 控件 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.view.show-explanation.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -668,6 +881,70 @@
             <value>false</value>
         </item>
     </keyboard-shortcuts-show-hints>
+    <section-appearance>
+        <label>章节外观</label>
+        <hint>章节的视觉样式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.section.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (完整)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>完整</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>精简</label>
+            <value>minimal</value>
+        </item>
+    </section-appearance>
+    <grid-appearance>
+        <label>网格外观</label>
+        <hint>重复网格的视觉样式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.grid.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (完整)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>完整</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>精简</label>
+            <value>minimal</value>
+        </item>
+    </grid-appearance>
+    <calculated-value-appearance>
+        <label>计算值外观</label>
+        <hint>计算值控件的视觉样式 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.calculated-value.appearance.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (完整)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>完整</label>
+            <value>full</value>
+        </item>
+        <item>
+            <label>精简</label>
+            <value>minimal</value>
+        </item>
+    </calculated-value-appearance>
+    <detail-show-thumbnail>
+        <label>显示缩略图</label>
+        <hint>在详情页面上显示表单缩略图 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (否)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </detail-show-thumbnail>
     <detail-buttons>
         <label>详情页面按钮</label>
         <hint>详情页面上显示的以空格分隔的按钮列表 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.*.*&lt;/code&gt;</hint>
@@ -677,8 +954,8 @@
         <hint>查看页面上显示的以空格分隔的按钮列表 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.buttons.view.*.*&lt;/code&gt;</hint>
     </detail-buttons-view>
     <autosave-delay>
-        <label>自动保存延迟 (毫秒)</label>
-        <hint>自动保存前的延迟时间（毫秒）；设为 0 禁用自动保存 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
+        <label>自动保存延迟</label>
+        <hint>自动保存草稿前的延迟时间（以毫秒为单位存储） &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.autosave-delay.*.*&lt;/code&gt;</hint>
     </autosave-delay>
     <data-migration>
         <label>简单数据迁移</label>
@@ -772,6 +1049,42 @@
             <value>both</value>
         </item>
     </error-summary>
+    <error-summary-page-size>
+        <label>错误摘要初始显示条数</label>
+        <hint>错误摘要中初始显示的最大验证消息数量 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.page-size&lt;/code&gt;</hint>
+    </error-summary-page-size>
+    <error-summary-visit-value-changed>
+        <label>值更改时将控件标记为已访问</label>
+        <hint>当控件的值更改时将其标记为已访问 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-value-changed&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-value-changed>
+    <error-summary-visit-invalid>
+        <label>将无效控件标记为已访问</label>
+        <hint>运行验证时将无效控件标记为已访问 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.xbl.fr.error-summary.visit-invalid&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </error-summary-visit-invalid>
     <captcha-component>
         <label>验证码组件</label>
         <hint>详情页面上的验证码实现方式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.component.*.*&lt;/code&gt;</hint>
@@ -792,6 +1105,34 @@
             <value>SimpleCaptcha</value>
         </item>
     </captcha-component>
+    <captcha-location>
+        <label>验证码位置</label>
+        <hint>验证码在详情页面和向导页面上的渲染位置 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.location.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (表单底部)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>表单底部</label>
+            <value>form-bottom</value>
+        </item>
+        <item>
+            <label>向导内部 (所有页面)</label>
+            <value>inside-wizard</value>
+        </item>
+        <item>
+            <label>向导内部 (第一页)</label>
+            <value>inside-wizard-first-page</value>
+        </item>
+        <item>
+            <label>向导内部 (最后一页)</label>
+            <value>inside-wizard-last-page</value>
+        </item>
+    </captcha-location>
+    <captcha-visible>
+        <label>验证码可见性</label>
+        <hint>控制何时显示验证码的布尔值或 XPath 表达式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.captcha.visible.*.*&lt;/code&gt;</hint>
+    </captcha-visible>
     <singleton-enabled>
         <label>单例表单</label>
         <hint>仅允许此表单存在一份表单数据文档 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.singleton.enabled.*.*&lt;/code&gt;</hint>
@@ -824,9 +1165,12 @@
             <value>error</value>
         </item>
     </singleton-if-one-exists>
+    <toc-group>
+        <label>目录</label>
+    </toc-group>
     <toc-min-sections>
         <label>目录最少章节数</label>
-        <hint>显示目录所需的最少章节数；-1 表示禁用，-2 表示未使用 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
+        <hint>当表单至少包含此数量的章节时显示目录 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.min-sections.*.*&lt;/code&gt;</hint>
     </toc-min-sections>
     <toc-position>
         <label>目录位置</label>
@@ -868,6 +1212,9 @@
             <value>pdf</value>
         </item>
     </toc-modes>
+    <messages-group>
+        <label>消息</label>
+    </messages-group>
     <messages-appearance>
         <label>消息外观</label>
         <hint>操作消息的显示方式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.messages.appearance.*.*&lt;/code&gt;</hint>
@@ -964,6 +1311,22 @@
             <value>false</value>
         </item>
     </session-expiration-dialog-enabled>
+    <session-expiration-trigger>
+        <label>会话过期警告触发比例</label>
+        <hint>显示警告对话框的会话生命周期百分比 &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.trigger&lt;/code&gt;</hint>
+    </session-expiration-trigger>
+    <session-expiration-margin>
+        <label>会话过期安全余量</label>
+        <hint>会话过期前的安全余量（秒） &lt;code class="fr-config-prop-name"&gt;oxf.xforms.session-expiration.margin&lt;/code&gt;</hint>
+    </session-expiration-margin>
+    <available-from-datetime>
+        <label>开放起始时间</label>
+        <hint>开始接受新表单提交的最早日期和时间 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-from.dateTime.*.*&lt;/code&gt;</hint>
+    </available-from-datetime>
+    <available-to-datetime>
+        <label>开放截止时间</label>
+        <hint>停止接受新表单提交的最晚日期和时间 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.available-to.dateTime.*.*&lt;/code&gt;</hint>
+    </available-to-datetime>
     <warn-when-data-unsafe>
         <label>存在未保存的更改时离开提醒</label>
         <hint>控制未保存数据警告的布尔值或 XPath 表达式 &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.warn-when-data-unsafe.*.*&lt;/code&gt;</hint>
@@ -1313,7 +1676,7 @@
         <hint>摘要页面上以空格分隔的按钮列表 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.buttons.*.*&lt;/code&gt;</hint>
     </summary-buttons>
     <summary-show-created>
-        <label>显示创建时间列</label>
+        <label>创建时间</label>
         <hint>在摘要页面上显示创建时间戳列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1329,7 +1692,7 @@
         </item>
     </summary-show-created>
     <summary-show-last-modified>
-        <label>显示修改时间列</label>
+        <label>最后修改时间</label>
         <hint>在摘要页面上显示最后修改时间戳列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1345,7 +1708,7 @@
         </item>
     </summary-show-last-modified>
     <summary-show-workflow-stage>
-        <label>显示工作流阶段列</label>
+        <label>工作流阶段</label>
         <hint>在摘要页面上显示工作流阶段列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-workflow-stage.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1361,7 +1724,7 @@
         </item>
     </summary-show-workflow-stage>
     <summary-show-created-by>
-        <label>显示创建者列</label>
+        <label>创建人</label>
         <hint>在摘要页面上显示创建者列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-created-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1377,7 +1740,7 @@
         </item>
     </summary-show-created-by>
     <summary-show-last-modified-by>
-        <label>显示最后修改者列</label>
+        <label>最后修改人</label>
         <hint>在摘要页面上显示最后修改者列 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-last-modified-by.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1440,6 +1803,26 @@
             <value>false</value>
         </item>
     </summary-search-options-opened-on-load>
+    <summary-show-thumbnail>
+        <label>缩略图</label>
+        <hint>在摘要页面上显示表单缩略图 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.show-thumbnail.*.*&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (否)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </summary-show-thumbnail>
+    <summary-bulk-processes>
+        <label>摘要页面批量操作流程</label>
+        <hint>可对所选行作为批量操作执行的以空格分隔的流程名称 &lt;code class="fr-config-prop-name"&gt;oxf.fr.summary.bulk-processes.*.*&lt;/code&gt;</hint>
+    </summary-bulk-processes>
     <home-page-size>
         <label>表单管理页面每页数量</label>
         <hint>表单管理页面上每页显示的表单数量 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.page-size&lt;/code&gt;</hint>
@@ -1492,6 +1875,70 @@
         <label>远程服务器配置</label>
         <hint>用于表单发布/管理的远程服务器 JSON 数组 &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.remote-servers&lt;/code&gt;</hint>
     </home-remote-servers>
+    <analytics-enable>
+        <label>启用表单分析</label>
+        <hint>启用运行时会话跟踪以及 &lt;code&gt;/fr/analytics&lt;/code&gt; 页面 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.enable&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </analytics-enable>
+    <analytics-roles>
+        <label>分析授权角色</label>
+        <hint>允许查看分析数据的以逗号或空格分隔的角色名称 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.roles.*.*&lt;/code&gt;</hint>
+    </analytics-roles>
+    <analytics-show-usernames>
+        <label>在分析中显示用户名</label>
+        <hint>在表单分析中显示已通过身份验证的用户名 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.show-usernames&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </analytics-show-usernames>
+    <analytics-max-active-sessions>
+        <label>最大跟踪活动会话数</label>
+        <hint>保留在内存中的最大活动表单会话数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-active-sessions&lt;/code&gt;</hint>
+    </analytics-max-active-sessions>
+    <analytics-max-recent-sessions>
+        <label>最大跟踪近期会话数</label>
+        <hint>保留在内存中的最大已完成表单会话数 &lt;code class="fr-config-prop-name"&gt;oxf.fr.analytics.max-recent-sessions&lt;/code&gt;</hint>
+    </analytics-max-recent-sessions>
+    <console-history-enable>
+        <label>启用指标历史采样</label>
+        <hint>在后台为 &lt;code&gt;/fr/console&lt;/code&gt; 收集 JVM 和缓存指标历史记录 &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.enable&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </console-history-enable>
+    <console-history-sample-interval>
+        <label>指标采样间隔</label>
+        <hint>系统控制台指标的采样间隔（至少 1 秒） &lt;code class="fr-config-prop-name"&gt;oxf.fr.console.history.sample-interval&lt;/code&gt;</hint>
+    </console-history-sample-interval>
     <export-page-enable>
         <label>启用导出页面</label>
         <hint>启用表单数据导出页面 &lt;code class="fr-config-prop-name"&gt;oxf.fr.export.page.enable.*.*&lt;/code&gt;</hint>
@@ -1849,7 +2296,7 @@
         <hint>默认密送收件人电子邮件地址 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.bcc.*.*&lt;/code&gt;</hint>
     </email-bcc>
     <email-attach-pdf>
-        <label>在电子邮件中附加 PDF</label>
+        <label>PDF</label>
         <hint>将生成的 PDF 附加到通知电子邮件中 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-pdf.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1865,7 +2312,7 @@
         </item>
     </email-attach-pdf>
     <email-attach-xml>
-        <label>在电子邮件中附加 XML 数据</label>
+        <label>XML 数据</label>
         <hint>将表单 XML 数据附加到通知电子邮件中 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (是)</label>
@@ -1881,7 +2328,7 @@
         </item>
     </email-attach-xml>
     <email-attach-tiff>
-        <label>在电子邮件中附加 TIFF</label>
+        <label>TIFF</label>
         <hint>将生成的 TIFF 图像附加到通知电子邮件中 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-tiff.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1897,7 +2344,7 @@
         </item>
     </email-attach-tiff>
     <email-attach-excel>
-        <label>在电子邮件中附加 Excel (命名范围)</label>
+        <label>Excel（命名区域）</label>
         <hint>将包含命名范围的 Excel 文件附加到通知电子邮件中 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-excel-with-named-ranges.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1913,7 +2360,7 @@
         </item>
     </email-attach-excel>
     <email-attach-xml-export>
-        <label>在电子邮件中附加 XML 表单结构和数据</label>
+        <label>XML 表单结构与数据</label>
         <hint>将表单结构和数据的 XML 导出文件附加到通知电子邮件中 &lt;code class="fr-config-prop-name"&gt;oxf.fr.email.attach-xml-form-structure-and-data.*.*&lt;/code&gt;</hint>
         <item>
             <label>默认 (否)</label>
@@ -1955,6 +2402,38 @@
         <actions-services>操作与服务</actions-services>
         <reset-all>全部重置</reset-all>
     </fb-visibility>
+    <fb-menu-controls>
+        <label>控件概览</label>
+        <hint>在 Form Builder 中显示控件概览对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.controls&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-controls>
+    <fb-menu-check-form>
+        <label>检查表单</label>
+        <hint>在 Form Builder 中显示检查表单对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.check-form&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-check-form>
     <fb-menu-schema>
         <label>XML Schema</label>
         <hint>在 Form Builder 中显示 XML 架构对话框按钮 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.schema&lt;/code&gt;</hint>
@@ -2215,6 +2694,86 @@
             <value>false</value>
         </item>
     </fb-metadata-logo>
+    <fb-menu-permissions-token>
+        <label>令牌访问选项</label>
+        <hint>在 Form Builder 的权限对话框中显示令牌访问选项 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.token&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-token>
+    <fb-menu-permissions-owner-group>
+        <label>所有者与组权限</label>
+        <hint>在 Form Builder 的权限对话框中显示所有者和组成员行 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.owner-group&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-owner-group>
+    <fb-menu-permissions-list>
+        <label>角色选择列表</label>
+        <hint>在 Form Builder 的权限对话框中显示已配置的角色选择列表 &lt;code class="fr-config-prop-name"&gt;oxf.fb.menu.permissions.list&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fb-menu-permissions-list>
+    <fb-new-form-wizard-steps>
+        <label>新建表单对话框步骤</label>
+        <hint>在 Form Builder 中创建新表单时显示的步骤 &lt;code class="fr-config-prop-name"&gt;oxf.fb.new-form.wizard-steps&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (模板与常规设置)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>模板与常规设置</label>
+            <value>templates general-settings</value>
+        </item>
+        <item>
+            <label>仅模板</label>
+            <value>templates</value>
+        </item>
+        <item>
+            <label>仅常规设置</label>
+            <value>general-settings</value>
+        </item>
+        <item>
+            <label>无 (直接打开编辑器)</label>
+            <value></value>
+        </item>
+    </fb-new-form-wizard-steps>
+    <fb-section-close>
+        <label>自动折叠章节阈值</label>
+        <hint>在 Form Builder 中章节初始折叠的控件数量阈值（达到或超过此数量时折叠） &lt;code class="fr-config-prop-name"&gt;oxf.fb.section.close&lt;/code&gt;</hint>
+    </fb-section-close>
+    <fb-test-devices>
+        <label>预览设备预设 (JSON)</label>
+        <hint>在 Form Builder 的测试对话框中显示的响应式设备预设 JSON 数组 &lt;code class="fr-config-prop-name"&gt;oxf.fb.test.devices&lt;/code&gt;</hint>
+    </fb-test-devices>
     <fb-mcp-enable>
         <label>启用 Form Builder MCP 服务器</label>
         <hint>启用 Form Builder 的模型上下文协议 (MCP) 服务器 &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.enable&lt;/code&gt;</hint>
@@ -2247,6 +2806,46 @@
             <value>false</value>
         </item>
     </fb-mcp-token-enable>
+    <fb-mcp-token-validity>
+        <label>Form Builder MCP 令牌有效期 (分钟)</label>
+        <hint>Form Builder MCP 令牌的有效时长（分钟） &lt;code class="fr-config-prop-name"&gt;oxf.fb.mcp.token.validity&lt;/code&gt;</hint>
+    </fb-mcp-token-validity>
+    <fr-mcp-enable>
+        <label>启用 Form Runner MCP 服务器</label>
+        <hint>启用 Form Runner 的模型上下文协议 (MCP) 服务器 &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.enable&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (否)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-enable>
+    <fr-mcp-token-enable>
+        <label>要求 Form Runner MCP 服务器使用令牌</label>
+        <hint>要求 Form Runner MCP 服务器进行令牌身份验证 &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.enable&lt;/code&gt;</hint>
+        <item>
+            <label>默认 (是)</label>
+            <value>__default__</value>
+        </item>
+        <item>
+            <label>是</label>
+            <value>true</value>
+        </item>
+        <item>
+            <label>否</label>
+            <value>false</value>
+        </item>
+    </fr-mcp-token-enable>
+    <fr-mcp-token-validity>
+        <label>Form Runner MCP 令牌有效期 (分钟)</label>
+        <hint>Form Runner MCP 令牌的有效时长（分钟） &lt;code class="fr-config-prop-name"&gt;oxf.fr.mcp.token.validity&lt;/code&gt;</hint>
+    </fr-mcp-token-validity>
     <format-input-date>
         <label>日期输入格式</label>
         <hint>日期输入格式掩码，例如 &lt;code&gt;[M]/[D]/[Y]&lt;/code&gt; 或 &lt;code&gt;[D]/[M]/[Y]&lt;/code&gt; &lt;code class="fr-config-prop-name"&gt;oxf.xforms.format.input.date&lt;/code&gt;</hint>
